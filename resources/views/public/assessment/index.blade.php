@@ -366,6 +366,40 @@
         </div>
     </div>
 
+    <!-- CUSTOM EVENT CODE ENTRY MODAL -->
+    <div x-show="showEventModal" x-cloak class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-md animate-fadeIn">
+        <div @click.away="showEventModal = false" class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative border border-slate-100 text-center space-y-4">
+            <button @click="showEventModal = false" type="button" class="absolute top-5 right-5 text-slate-400 hover:text-slate-700">✕</button>
+
+            <div class="w-14 h-14 bg-[#0B2A43]/10 text-[#0B2A43] rounded-2xl flex items-center justify-center mx-auto text-2xl font-bold border border-[#0B2A43]/20">
+                🔑
+            </div>
+
+            <div class="space-y-1">
+                <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest block">AKSES EVENT KHUSUS</span>
+                <h3 class="text-xl font-serif font-bold text-[#0B2A43]">Masukkan Kode Event</h3>
+                <p class="text-xs text-slate-500 leading-relaxed font-normal">
+                    Jika Anda peserta pelatihan / uji ruhiologi resmi instansi/sekolah, silakan masukkan Kode Event yang diberikan oleh narasumber.
+                </p>
+            </div>
+
+            <div class="space-y-3 pt-2">
+                <div>
+                    <input type="text" x-model="inputEventCode" placeholder="Contoh: RQ-JAMBI-26" class="w-full p-3.5 rounded-2xl border-2 border-slate-300 focus:border-[#0B2A43] focus:ring-2 focus:ring-[#0B2A43]/20 text-center font-mono font-bold uppercase text-base tracking-widest outline-none transition">
+                </div>
+
+                <div class="flex gap-2">
+                    <button type="button" @click="showEventModal = false" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition cursor-pointer">
+                        Batal
+                    </button>
+                    <button type="button" @click="applyCustomEventCode()" class="flex-1 py-3 bg-[#0B2A43] hover:bg-[#123B59] text-white font-bold rounded-xl text-xs transition shadow-md cursor-pointer">
+                        🔑 Terpakan Kode →
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 @push('scripts')
@@ -375,6 +409,8 @@ function rqAssessmentIndex() {
         showRegModal: false,
         showGeneratedCodeModal: false,
         showCheckScoreModal: false,
+        showEventModal: false,
+        inputEventCode: '',
         isSubmitting: false,
         copied: false,
         generatedCode: '',
@@ -470,10 +506,15 @@ function rqAssessmentIndex() {
         },
 
         promptEventCode() {
-            const code = prompt('Masukkan Kode Event / Acara (Contoh: RQ-JAMBI-26):');
-            if (code && code.trim()) {
-                this.eventCode = code.trim().toUpperCase();
+            this.inputEventCode = this.eventCode || '';
+            this.showEventModal = true;
+        },
+
+        applyCustomEventCode() {
+            if (this.inputEventCode && this.inputEventCode.trim()) {
+                this.eventCode = this.inputEventCode.trim().toUpperCase();
                 this.form.event_code = this.eventCode;
+                this.showEventModal = false;
             }
         },
 

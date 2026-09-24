@@ -75,18 +75,13 @@
                                 </div>
                             </div>
 
-                            <!-- Options Radio Cards (Likert 1-5 Compact Side-by-Side Pill Grid) -->
-                            <div class="pt-1 grid grid-cols-5 gap-1.5 sm:gap-2.5 text-xs">
+                            <!-- Options Radio Cards (Text Only Minimalist Pill Grid) -->
+                            <div class="pt-1 grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-2.5 text-xs">
                                 @foreach($q->options as $opt)
-                                    <label class="border-2 border-slate-200 rounded-xl p-2 sm:p-3 text-center cursor-pointer hover:bg-slate-50 hover:border-[#0B2A43]/50 has-[:checked]:bg-[#0B2A43] has-[:checked]:border-[#0B2A43] has-[:checked]:text-white transition-all duration-200 flex flex-col justify-center items-center gap-1 group shadow-sm min-h-[54px] sm:min-h-[64px]">
-                                        <input type="radio" name="answers[{{ $q->id }}]" value="opt_{{ $opt->id }}" required @change="onAnswerChange()" class="peer text-[#C9A24D] focus:ring-[#0B2A43] cursor-pointer sr-only">
+                                    <label class="border-2 border-slate-200/90 rounded-2xl p-3 sm:p-4 text-center cursor-pointer hover:bg-slate-50 hover:border-[#0B2A43]/40 has-[:checked]:bg-[#0B2A43] has-[:checked]:border-[#0B2A43] has-[:checked]:text-white transition-all duration-200 flex flex-col justify-center items-center group shadow-2xs min-h-[50px] sm:min-h-[58px]">
+                                        <input type="radio" name="answers[{{ $q->id }}]" value="opt_{{ $opt->id }}" required @change="onAnswerChange()" class="peer sr-only">
                                         
-                                        <!-- Score Indicator Pill Badge (1..5) -->
-                                        <span class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-slate-100 text-slate-700 font-mono font-bold text-[10px] sm:text-xs flex items-center justify-center group-has-[:checked]:bg-[#C9A24D] group-has-[:checked]:text-[#0B2A43] transition-colors">
-                                            {{ $opt->option_value }}
-                                        </span>
-
-                                        <span class="text-[9px] sm:text-[11px] font-semibold text-slate-700 group-has-[:checked]:text-[#C9A24D] group-has-[:checked]:font-bold transition-colors leading-tight text-center">
+                                        <span class="text-xs font-semibold text-slate-700 group-has-[:checked]:text-[#C9A24D] group-has-[:checked]:font-extrabold transition-colors leading-tight text-center">
                                             {{ $opt->option_text }}
                                         </span>
                                     </label>
@@ -121,17 +116,12 @@
                                     </div>
                                 </div>
 
-                                <div class="pt-1 grid grid-cols-5 gap-1.5 sm:gap-2.5 text-xs">
+                                <div class="pt-1 grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-2.5 text-xs">
                                     @foreach($wq->options as $wOpt)
-                                        <label class="border-2 border-slate-200 rounded-xl p-2 sm:p-3 text-center cursor-pointer hover:bg-emerald-50 hover:border-emerald-500 has-[:checked]:bg-emerald-800 has-[:checked]:border-emerald-800 has-[:checked]:text-white transition-all duration-200 flex flex-col justify-center items-center gap-1 group shadow-sm min-h-[54px] sm:min-h-[64px]">
-                                            <input type="radio" name="answers[{{ $wq->id }}]" value="opt_{{ $wOpt->id }}" required @change="onAnswerChange()" class="peer text-emerald-400 focus:ring-emerald-600 cursor-pointer sr-only">
+                                        <label class="border-2 border-slate-200/90 rounded-2xl p-3 sm:p-4 text-center cursor-pointer hover:bg-emerald-50 hover:border-emerald-500 has-[:checked]:bg-emerald-800 has-[:checked]:border-emerald-800 has-[:checked]:text-white transition-all duration-200 flex flex-col justify-center items-center group shadow-2xs min-h-[50px] sm:min-h-[58px]">
+                                            <input type="radio" name="answers[{{ $wq->id }}]" value="opt_{{ $wOpt->id }}" required @change="onAnswerChange()" class="peer sr-only">
                                             
-                                            <!-- Score Indicator Pill Badge (1..5) -->
-                                            <span class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-slate-100 text-slate-700 font-mono font-bold text-[10px] sm:text-xs flex items-center justify-center group-has-[:checked]:bg-white group-has-[:checked]:text-emerald-900 transition-colors">
-                                                {{ $wOpt->option_value }}
-                                            </span>
-
-                                            <span class="text-[9px] sm:text-[11px] font-semibold text-slate-700 group-has-[:checked]:text-white group-has-[:checked]:font-bold leading-tight text-center">
+                                            <span class="text-xs font-semibold text-slate-700 group-has-[:checked]:text-white group-has-[:checked]:font-extrabold transition-colors leading-tight text-center">
                                                 {{ $wOpt->option_text }}
                                             </span>
                                         </label>
