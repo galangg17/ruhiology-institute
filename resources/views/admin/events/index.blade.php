@@ -140,157 +140,165 @@
         {{ $events->links() }}
     </div>
 
-    <!-- CREATE EVENT MODAL (MAXIMIZED & SLEEK DESIGN) -->
+    <!-- CREATE EVENT MODAL (COMPACT 2-COLUMN DESIGN - NO EXCESSIVE SCROLLING) -->
     <div x-show="createModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/70 backdrop-blur-md animate-fadeIn">
-        <div @click.away="createModal = false" class="bg-white rounded-3xl max-w-2xl w-full shadow-2xl relative border border-slate-100 max-h-[92vh] flex flex-col overflow-hidden">
+        <div @click.away="createModal = false" class="bg-white rounded-3xl max-w-4xl w-full shadow-2xl relative border border-slate-100 flex flex-col max-h-[92vh] overflow-hidden">
             
             <!-- Modal Header -->
-            <div class="px-6 py-5 bg-[#0B2A43] text-white flex items-center justify-between shrink-0">
+            <div class="px-6 py-4 bg-[#0B2A43] text-white flex items-center justify-between shrink-0">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-[#C9A24D] text-[#0B2A43] font-bold flex items-center justify-center text-lg shadow">
+                    <div class="w-9 h-9 rounded-xl bg-[#C9A24D] text-[#0B2A43] font-bold flex items-center justify-center text-base shadow">
                         ✨
                     </div>
                     <div>
                         <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest block">INTEGRATED EVENT SETUP</span>
-                        <h3 class="text-lg font-serif font-bold text-white">Buat Event Asesmen Baru</h3>
+                        <h3 class="text-base font-serif font-bold text-white">Buat Event Asesmen Baru</h3>
                     </div>
                 </div>
                 <button @click="createModal = false" type="button" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white flex items-center justify-center transition">✕</button>
             </div>
 
-            <!-- Modal Body (Scrollable with padding) -->
-            <form action="{{ route('admin.events.store') }}" method="POST" class="p-6 sm:p-8 space-y-5 text-xs overflow-y-auto flex-1">
+            <!-- Modal Body (Compact 2 Columns Grid) -->
+            <form action="{{ route('admin.events.store') }}" method="POST" class="p-6 sm:p-7 text-xs overflow-y-auto flex-1 space-y-5">
                 @csrf
                 <input type="hidden" name="access_type" value="EVENT_PROGRAM">
                 
-                <div>
-                    <label class="block font-bold text-slate-800 text-xs mb-1.5">Nama Event / Kegiatan *</label>
-                    <input type="text" name="title" required placeholder="Contoh: Uji Ruhiologi Pemda Jambi 2026" class="w-full px-4 py-3 rounded-2xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-[#0B2A43] focus:border-[#0B2A43] outline-none font-medium transition text-xs">
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block font-bold text-slate-800 text-xs mb-1.5">Tempat / Instansi Kegiatan *</label>
-                        <input type="text" name="institution_name" required placeholder="Contoh: SMAN Titian Teras Jambi / Aula Pemda" class="w-full px-4 py-3 rounded-2xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-[#0B2A43] focus:border-[#0B2A43] outline-none font-medium transition text-xs">
-                    </div>
-
-                    <div>
-                        <label class="block font-bold text-slate-800 text-xs mb-1.5">Kode Event (Unique Code)</label>
-                        <input type="text" name="event_code" placeholder="Contoh: RQ-JAMBI-26" class="w-full px-4 py-3 rounded-2xl border border-slate-300 font-mono bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-[#0B2A43] focus:border-[#0B2A43] outline-none uppercase font-bold text-xs">
-                        <span class="text-[10px] text-slate-400 mt-1 block">Kosongkan jika ingin dibuatkan otomatis</span>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block font-bold text-slate-800 text-xs mb-1.5">Preset Target Kategori Peserta</label>
-                    <select name="target_category" class="w-full px-4 py-3 rounded-2xl border border-slate-300 bg-slate-50 font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-[#0B2A43] focus:bg-white transition text-xs">
-                        <option value="">🔘 Bebas / Fleksibel (Peserta memilih sendiri)</option>
-                        <option value="Pelajar">🏫 Pelajar (Siswa SD / SMP / SMA / SMK)</option>
-                        <option value="Mahasiswa/i">🎓 Mahasiswa / Mahasiswi</option>
-                        <option value="Umum">👤 Personal / Mandiri (Umum)</option>
-                    </select>
-                </div>
-
-                <!-- Mode Asesmen: Sekali Tes vs Pretest & Posttest -->
-                <div class="p-4 bg-amber-50/60 rounded-2xl border border-amber-200/80 space-y-3">
-                    <label class="block font-bold text-[#0B2A43] text-xs">Mode Asesmen Event *</label>
-                    <div class="grid grid-cols-2 gap-3">
-                        <button type="button" @click="assessmentType = 'single'" :class="assessmentType === 'single' ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'" class="p-3 rounded-xl border text-xs text-center transition">
-                            <span>📝 Sekali Tes (Single Test)</span>
-                        </button>
-                        <button type="button" @click="assessmentType = 'prepost'" :class="assessmentType === 'prepost' ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'" class="p-3 rounded-xl border text-xs text-center transition">
-                            <span>🔄 Pretest & Posttest (Longitudinal)</span>
-                        </button>
-                    </div>
-                    <input type="hidden" name="assessment_type" :value="assessmentType">
-
-                    <!-- Schedule inputs for Pretest & Posttest -->
-                    <template x-if="assessmentType === 'prepost'">
-                        <div class="pt-2 space-y-3">
-                            <div class="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label class="block font-bold text-slate-700 text-[11px] mb-1">Mulai Pretest</label>
-                                    <input type="datetime-local" name="pretest_start" class="w-full p-2.5 rounded-xl border border-slate-300 bg-white font-medium">
-                                </div>
-                                <div>
-                                    <label class="block font-bold text-slate-700 text-[11px] mb-1">Selesai Pretest</label>
-                                    <input type="datetime-local" name="pretest_end" class="w-full p-2.5 rounded-xl border border-slate-300 bg-white font-medium">
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label class="block font-bold text-slate-700 text-[11px] mb-1">Mulai Posttest</label>
-                                    <input type="datetime-local" name="posttest_start" class="w-full p-2.5 rounded-xl border border-slate-300 bg-white font-medium">
-                                </div>
-                                <div>
-                                    <label class="block font-bold text-slate-700 text-[11px] mb-1">Selesai Posttest</label>
-                                    <input type="datetime-local" name="posttest_end" class="w-full p-2.5 rounded-xl border border-slate-300 bg-white font-medium">
-                                </div>
-                            </div>
-                        </div>
-                    </template>
-                </div>
-
-                <!-- Custom Group / Class / Subcategory Options -->
-                <div class="p-4 bg-blue-50/60 rounded-2xl border border-blue-200/80 space-y-3">
-                    <div class="flex items-center justify-between">
-                        <label class="block font-bold text-[#0B2A43] text-xs">Dynamic Sub-Categories / Opsi Kelompok (Kelas/Divisi/Prodi)</label>
-                        <span class="text-[10px] font-bold text-blue-800 bg-blue-100 px-2 py-0.5 rounded">Semua Kategori</span>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div>
-                            <label class="block font-bold text-slate-700 text-[11px] mb-1">Judul Label Form Peserta</label>
-                            <input type="text" name="group_label" placeholder="Contoh: Pilih Kelas / Pilih Divisi / Pilih Angkatan" class="w-full p-2.5 rounded-xl border border-slate-300 bg-white font-medium text-xs">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- LEFT COLUMN: Informasi Utama & Akses -->
+                    <div class="space-y-4">
+                        <div class="pb-2 border-b border-slate-100 font-bold text-[#0B2A43] flex items-center gap-1.5 text-xs">
+                            <span>📌 1. Identitas & Target Event</span>
                         </div>
 
                         <div>
-                            <label class="block font-bold text-slate-700 text-[11px] mb-1">Opsi Pilihan (Pisahkan Komma)</label>
-                            <input type="text" name="custom_subcategories" placeholder="Contoh: Kelas X-A, Kelas X-B, Kelas XI IPA 1, Kelas XI IPA 2" class="w-full p-2.5 rounded-xl border border-slate-300 bg-white font-medium text-xs">
+                            <label class="block font-bold text-slate-800 text-xs mb-1">Nama Event / Kegiatan *</label>
+                            <input type="text" name="title" required placeholder="Contoh: Uji Ruhiologi Pemda Jambi 2026" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-[#0B2A43] outline-none font-medium text-xs">
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-slate-800 text-xs mb-1">Tempat / Instansi Kegiatan *</label>
+                            <input type="text" name="institution_name" required placeholder="Contoh: SMAN Titian Teras Jambi / Aula Pemda" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-[#0B2A43] outline-none font-medium text-xs">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block font-bold text-slate-800 text-xs mb-1">Kode Event (Unique)</label>
+                                <input type="text" name="event_code" placeholder="Contoh: RQ-JAMBI-26" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 font-mono bg-slate-50/50 focus:bg-white uppercase font-bold text-xs outline-none">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-800 text-xs mb-1">Status Event *</label>
+                                <select name="status" required class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 font-semibold text-slate-800 outline-none text-xs">
+                                    <option value="active">🟢 Active</option>
+                                    <option value="draft">⚪ Draft</option>
+                                    <option value="completed">🔵 Completed</option>
+                                    <option value="archived">🔴 Archived</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-slate-800 text-xs mb-1">Preset Target Kategori Peserta</label>
+                            <select name="target_category" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50 font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-[#0B2A43] text-xs">
+                                <option value="">🔘 Bebas / Fleksibel (Peserta memilih sendiri)</option>
+                                <option value="Pelajar">🏫 Pelajar (Siswa SD / SMP / SMA / SMK)</option>
+                                <option value="Mahasiswa/i">🎓 Mahasiswa / Mahasiswi</option>
+                                <option value="Umum">👤 Personal / Mandiri (Umum)</option>
+                            </select>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block font-bold text-slate-800 text-xs mb-1">Tanggal Mulai</label>
+                                <input type="date" name="start_date" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white text-xs outline-none">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-800 text-xs mb-1">Tanggal Selesai</label>
+                                <input type="date" name="end_date" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white text-xs outline-none">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-slate-800 text-xs mb-1">Target Kuota Peserta</label>
+                            <input type="number" name="quota" placeholder="Contoh: 250" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white outline-none font-medium text-xs">
                         </div>
                     </div>
-                    <span class="text-[10px] text-slate-500 block">Daftar opsi ini akan otomatis muncul sebagai dropdown pilihan kelas/kelompok saat peserta mendaftar event ini.</span>
-                </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block font-bold text-slate-800 text-xs mb-1.5">Tanggal Mulai Event</label>
-                        <input type="date" name="start_date" class="w-full px-4 py-3 rounded-2xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-[#0B2A43] outline-none transition text-xs font-medium">
-                    </div>
-                    <div>
-                        <label class="block font-bold text-slate-800 text-xs mb-1.5">Tanggal Selesai Event</label>
-                        <input type="date" name="end_date" class="w-full px-4 py-3 rounded-2xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-[#0B2A43] outline-none transition text-xs font-medium">
-                    </div>
-                </div>
+                    <!-- RIGHT COLUMN: Pengaturan Mode & Kelompok Custom -->
+                    <div class="space-y-4">
+                        <div class="pb-2 border-b border-slate-100 font-bold text-[#0B2A43] flex items-center gap-1.5 text-xs">
+                            <span>⚙️ 2. Mode Asesmen & Opsi Kelompok</span>
+                        </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block font-bold text-slate-800 text-xs mb-1.5">Target Kuota Peserta</label>
-                        <input type="number" name="quota" placeholder="Contoh: 250" class="w-full px-4 py-3 rounded-2xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-[#0B2A43] outline-none font-medium transition text-xs">
-                    </div>
-                    <div>
-                        <label class="block font-bold text-slate-800 text-xs mb-1.5">Status Event *</label>
-                        <select name="status" required class="w-full px-4 py-3 rounded-2xl border border-slate-300 bg-slate-50 font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-[#0B2A43] focus:bg-white transition text-xs">
-                            <option value="active">🟢 Active (Siap Diakses Peserta)</option>
-                            <option value="draft">⚪ Draft (Konsep Internal)</option>
-                            <option value="completed">🔵 Completed (Selesai)</option>
-                            <option value="archived">🔴 Archived (Diarsipkan)</option>
-                        </select>
-                    </div>
-                </div>
+                        <!-- Mode Asesmen -->
+                        <div class="p-3 bg-amber-50/60 rounded-2xl border border-amber-200/80 space-y-2">
+                            <label class="block font-bold text-[#0B2A43] text-xs">Mode Asesmen Event *</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button type="button" @click="assessmentType = 'single'" :class="assessmentType === 'single' ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'" class="p-2.5 rounded-xl border text-[11px] text-center transition">
+                                    <span>📝 Sekali Tes</span>
+                                </button>
+                                <button type="button" @click="assessmentType = 'prepost'" :class="assessmentType === 'prepost' ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'" class="p-2.5 rounded-xl border text-[11px] text-center transition">
+                                    <span>🔄 Pre & Posttest</span>
+                                </button>
+                            </div>
+                            <input type="hidden" name="assessment_type" :value="assessmentType">
 
-                <div>
-                    <label class="block font-bold text-slate-800 text-xs mb-1.5">Catatan / Deskripsi Event</label>
-                    <textarea name="description" rows="3" placeholder="Catatan singkat peruntukan kegiatan ini..." class="w-full px-4 py-3 rounded-2xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-[#0B2A43] outline-none font-medium transition text-xs"></textarea>
+                            <template x-if="assessmentType === 'prepost'">
+                                <div class="pt-2 space-y-2">
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label class="block font-bold text-slate-700 text-[10px] mb-0.5">Mulai Pretest</label>
+                                            <input type="datetime-local" name="pretest_start" class="w-full p-2 rounded-lg border border-slate-300 bg-white font-medium text-[11px]">
+                                        </div>
+                                        <div>
+                                            <label class="block font-bold text-slate-700 text-[10px] mb-0.5">Selesai Pretest</label>
+                                            <input type="datetime-local" name="pretest_end" class="w-full p-2 rounded-lg border border-slate-300 bg-white font-medium text-[11px]">
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label class="block font-bold text-slate-700 text-[10px] mb-0.5">Mulai Posttest</label>
+                                            <input type="datetime-local" name="posttest_start" class="w-full p-2 rounded-lg border border-slate-300 bg-white font-medium text-[11px]">
+                                        </div>
+                                        <div>
+                                            <label class="block font-bold text-slate-700 text-[10px] mb-0.5">Selesai Posttest</label>
+                                            <input type="datetime-local" name="posttest_end" class="w-full p-2 rounded-lg border border-slate-300 bg-white font-medium text-[11px]">
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+
+                        <!-- Custom Group / Subcategories -->
+                        <div class="p-3 bg-blue-50/60 rounded-2xl border border-blue-200/80 space-y-2">
+                            <label class="block font-bold text-[#0B2A43] text-xs">Opsi Kelompok / Kelas / Divisi (Custom)</label>
+
+                            <div>
+                                <label class="block font-bold text-slate-700 text-[10px] mb-0.5">Judul Label Form Peserta</label>
+                                <input type="text" name="group_label" placeholder="Contoh: Pilih Kelas / Pilih Divisi" class="w-full p-2 rounded-xl border border-slate-300 bg-white text-xs">
+                            </div>
+
+                            <div>
+                                <label class="block font-bold text-slate-700 text-[10px] mb-0.5">Opsi Pilihan (Pisahkan Koma)</label>
+                                <input type="text" name="custom_subcategories" placeholder="Contoh: Kelas X-A, Kelas X-B, Kelas XI IPA 1" class="w-full p-2 rounded-xl border border-slate-300 bg-white text-xs">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-slate-800 text-xs mb-1">Catatan / Deskripsi Event</label>
+                            <textarea name="description" rows="2" placeholder="Catatan peruntukan kegiatan..." class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white outline-none text-xs font-medium"></textarea>
+                        </div>
+                    </div>
+
                 </div>
 
                 <!-- Modal Footer Actions -->
-                <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
-                    <button @click="createModal = false" type="button" class="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl transition cursor-pointer text-xs">
+                <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-3 shrink-0">
+                    <button @click="createModal = false" type="button" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition cursor-pointer text-xs">
                         Batal
                     </button>
-                    <button type="submit" class="px-7 py-3 bg-gradient-to-r from-[#C9A24D] to-[#B48A16] hover:from-[#B48A16] hover:to-[#96710E] text-[#0B2A43] font-extrabold rounded-2xl shadow-lg transition transform hover:-translate-y-0.5 cursor-pointer text-xs flex items-center gap-2">
-                        <span>🚀 Simpan Event & Terbitkan Akses →</span>
+                    <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-[#C9A24D] to-[#B48A16] hover:from-[#B48A16] hover:to-[#96710E] text-[#0B2A43] font-extrabold rounded-xl shadow-lg transition transform hover:-translate-y-0.5 cursor-pointer text-xs flex items-center gap-2">
+                        <span>🚀 Simpan & Terbitkan Event →</span>
                     </button>
                 </div>
             </form>

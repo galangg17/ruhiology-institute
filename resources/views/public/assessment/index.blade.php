@@ -1,6 +1,251 @@
 @extends('layouts.app')
 
 @section('content')
+<script>
+window.rqAssessmentIndex = function rqAssessmentIndex() {
+    return {
+        showRegModal: false,
+        showGeneratedCodeModal: false,
+        showCheckScoreModal: false,
+        showEventSelectorModal: false,
+        
+        activeEventsList: @json($activeEvents ?? []),
+        selectedEventId: '',
+        inputEventCode: '',
+        verifyingEvent: false,
+        eventCheckError: '',
+        
+        isSubmitting: false,
+        copied: false,
+        generatedCode: '',
+        takeUrl: '#',
+        eventCode: new URLSearchParams(window.location.search).get('event') || '',
+        eventName: '',
+        eventInstitution: '',
+        isCategoryLocked: false,
+        eventGroupLabel: '',
+        eventSubcategories: [],
+
+        form: {
+            event_code: new URLSearchParams(window.location.search).get('event') || '',
+            name: '',
+            birth_date: '',
+            category: 'Pelajar',
+            sub_category: '',
+            country_id: 1,
+            province_id: null,
+            regency_id: null,
+            school_level: 'SMA',
+            university_id: null,
+            faculty_id: null,
+            study_program_id: null,
+            semester: 1,
+            entry_year: new Date().getFullYear().toString(),
+            occupation_id: null,
+            occupation_custom: ''
+        },
+
+        filteredProvinces: [
+            { id: 1, name: 'Aceh' }, { id: 2, name: 'Sumatera Utara' }, { id: 3, name: 'Sumatera Barat' },
+            { id: 4, name: 'Riau' }, { id: 5, name: 'Jambi' }, { id: 6, name: 'Sumatera Selatan' },
+            { id: 7, name: 'Bengkulu' }, { id: 8, name: 'Lampung' }, { id: 9, name: 'Kepulauan Bangka Belitung' },
+            { id: 10, name: 'Kepulauan Riau' }, { id: 11, name: 'DKI Jakarta' }, { id: 12, name: 'Jawa Barat' },
+            { id: 13, name: 'Jawa Tengah' }, { id: 14, name: 'DI Yogyakarta' }, { id: 15, name: 'Jawa Timur' },
+            { id: 16, name: 'Banten' }, { id: 17, name: 'Bali' }, { id: 18, name: 'Nusa Tenggara Barat' },
+            { id: 19, name: 'Nusa Tenggara Timur' }, { id: 20, name: 'Kalimantan Barat' }, { id: 21, name: 'Kalimantan Tengah' },
+            { id: 22, name: 'Kalimantan Selatan' }, { id: 23, name: 'Kalimantan Timur' }, { id: 24, name: 'Kalimantan Utara' },
+            { id: 25, name: 'Sulawesi Utara' }, { id: 26, name: 'Sulawesi Tengah' }, { id: 27, name: 'Sulawesi Selatan' },
+            { id: 28, name: 'Sulawesi Tenggara' }, { id: 29, name: 'Gorontalo' }, { id: 30, name: 'Sulawesi Barat' },
+            { id: 31, name: 'Maluku' }, { id: 32, name: 'Maluku Utara' }, { id: 33, name: 'Papua' },
+            { id: 34, name: 'Papua Barat' }, { id: 35, name: 'Papua Selatan' }, { id: 36, name: 'Papua Tengah' },
+            { id: 37, name: 'Papua Pegunungan' }, { id: 38, name: 'Papua Barat Daya' }
+        ],
+        filteredRegencies: [],
+        filteredUniversities: [],
+        occupations: [],
+
+        init() {
+            this.loadOccupations();
+            if (this.eventCode) {
+                this.inputEventCode = this.eventCode;
+                this.verifyEventCodeAsync(this.eventCode);
+            }
+        },
+
+        openRegistrationModal(track = 'PUBLIC_SELF') {
+            if (track === 'PUBLIC_SELF') {
+                this.eventCode = '';
+                this.eventName = '';
+                this.eventInstitution = '';
+                this.form.event_code = '';
+                this.form.sub_category = '';
+                this.eventGroupLabel = '';
+                this.eventSubcategories = [];
+                this.isCategoryLocked = false;
+            }
+            this.showRegModal = true;
+        },
+
+        openEventSelectorModal() {
+            this.eventCheckError = '';
+            this.showEventSelectorModal = true;
+        },
+
+        onEventSelectChange() {
+            this.eventCheckError = '';
+        },
+
+        proceedWithEventSelection() {
+            const code = (this.inputEventCode || '').trim().toUpperCase();
+            if (!code) {
+                this.eventCheckError = 'Mohon masukkan Kode Event / Kunci Sesi resmi dari panitia.';
+                return;
+            }
+
+            this.verifyEventCodeAsync(code);
+        },
+
+        verifyEventCodeAsync(code) {
+            this.verifyingEvent = true;
+            this.eventCheckError = '';
+
+            fetch('/api/events/verify', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ event_code: code })
+            })
+            .then(res => res.json())
+            .then(data => {
+                this.verifyingEvent = false;
+                if (data.status === 'success' && data.event) {
+                    const evt = data.event;
+                    this.eventCode = evt.event_code;
+                    this.eventName = evt.title;
+                    this.eventInstitution = evt.institution_name || '';
+                    this.form.event_code = evt.event_code;
+
+                    if (evt.custom_subcategories && evt.custom_subcategories.length > 0) {
+                        this.eventGroupLabel = evt.group_label || 'Pilih Sub-Kategori / Kelas / Bidang';
+                        this.eventSubcategories = evt.custom_subcategories;
+                    } else {
+                        this.eventGroupLabel = '';
+                        this.eventSubcategories = [];
+                    }
+
+                    if (evt.target_category) {
+                        this.form.category = evt.target_category;
+                        this.isCategoryLocked = true;
+                    } else {
+                        this.isCategoryLocked = false;
+                    }
+
+                    if (evt.province_id) {
+                        this.form.province_id = evt.province_id;
+                        this.onProvinceChange();
+                        if (evt.regency_id) {
+                            this.form.regency_id = evt.regency_id;
+                        }
+                    }
+
+                    this.showEventSelectorModal = false;
+                    this.showRegModal = true;
+                } else {
+                    this.eventCheckError = data.message || 'Kode Event tidak valid atau tidak aktif.';
+                }
+            })
+            .catch(() => {
+                this.verifyingEvent = false;
+                this.eventCheckError = 'Terjadi kesalahan saat memverifikasi Kode Event.';
+            });
+        },
+
+        setCategory(cat) {
+            if (this.isCategoryLocked) return;
+            this.form.category = cat;
+        },
+
+        onProvinceChange() {
+            this.form.regency_id = null;
+            this.filteredRegencies = [];
+            if (this.form.province_id) {
+                this.searchRegencies();
+            }
+        },
+
+        searchRegencies() {
+            if (!this.form.province_id) return;
+            fetch(`/api/master/regencies?province_id=${this.form.province_id}`)
+                .then(res => res.json())
+                .then(res => {
+                    this.filteredRegencies = res.data || [];
+                })
+                .catch(() => {});
+        },
+
+        searchUniversities() {
+            fetch(`/api/master/universities?province_id=${this.form.province_id || ''}&q=${encodeURIComponent(this.universityQuery)}`)
+                .then(res => res.json())
+                .then(res => { this.filteredUniversities = res.data || []; });
+        },
+
+        selectUniversity(u) {
+            this.form.university_id = u.id;
+            this.universityQuery = u.name;
+            this.showUniversityDropdown = false;
+        },
+
+        loadOccupations() {
+            fetch(`/api/master/occupations`)
+                .then(res => res.json())
+                .then(res => { this.occupations = res.data || []; });
+        },
+
+        submitRegistration() {
+            this.isSubmitting = true;
+
+            fetch('{{ route("assessment.register") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify(this.form)
+            })
+            .then(res => res.json())
+            .then(data => {
+                this.isSubmitting = false;
+                if (data.status === 'success') {
+                    this.generatedCode = data.assessment_code;
+                    this.takeUrl = data.take_url;
+                    this.showRegModal = false;
+                    this.showGeneratedCodeModal = true;
+                } else {
+                    alert(data.message || 'Gagal mendaftar. Silakan cek form Anda.');
+                }
+            })
+            .catch(err => {
+                this.isSubmitting = false;
+                alert('Terjadi kesalahan jaringan.');
+            });
+        },
+
+        copyCode() {
+            navigator.clipboard.writeText(this.generatedCode);
+            this.copied = true;
+            setTimeout(() => { this.copied = false; }, 3000);
+        }
+    };
+};
+document.addEventListener('alpine:init', () => {
+    Alpine.data('rqAssessmentIndex', window.rqAssessmentIndex);
+});
+</script>
+
 <div x-data="rqAssessmentIndex()" class="bg-[#F8F9FA] min-h-screen">
 
     <!-- HERO SECTION (MINIMALIST, HIGH-END CORPORATE) -->
@@ -419,251 +664,4 @@
     </div>
 
 </div>
-
-@push('scripts')
-<script>
-window.rqAssessmentIndex = function rqAssessmentIndex() {
-    return {
-        showRegModal: false,
-        showGeneratedCodeModal: false,
-        showCheckScoreModal: false,
-        showEventSelectorModal: false,
-        
-        activeEventsList: @json($activeEvents ?? []),
-        selectedEventId: '',
-        inputEventCode: '',
-        verifyingEvent: false,
-        eventCheckError: '',
-        
-        isSubmitting: false,
-        copied: false,
-        generatedCode: '',
-        takeUrl: '#',
-        eventCode: new URLSearchParams(window.location.search).get('event') || '',
-        eventName: '',
-        eventInstitution: '',
-        isCategoryLocked: false,
-        eventGroupLabel: '',
-        eventSubcategories: [],
-
-        form: {
-            event_code: new URLSearchParams(window.location.search).get('event') || '',
-            name: '',
-            birth_date: '',
-            category: 'Pelajar',
-            sub_category: '',
-            country_id: 1,
-            province_id: null,
-            regency_id: null,
-            school_level: 'SMA',
-            university_id: null,
-            faculty_id: null,
-            study_program_id: null,
-            semester: 1,
-            entry_year: new Date().getFullYear().toString(),
-            occupation_id: null,
-            occupation_custom: ''
-        },
-
-        filteredProvinces: [
-            { id: 1, name: 'Aceh' }, { id: 2, name: 'Sumatera Utara' }, { id: 3, name: 'Sumatera Barat' },
-            { id: 4, name: 'Riau' }, { id: 5, name: 'Jambi' }, { id: 6, name: 'Sumatera Selatan' },
-            { id: 7, name: 'Bengkulu' }, { id: 8, name: 'Lampung' }, { id: 9, name: 'Kepulauan Bangka Belitung' },
-            { id: 10, name: 'Kepulauan Riau' }, { id: 11, name: 'DKI Jakarta' }, { id: 12, name: 'Jawa Barat' },
-            { id: 13, name: 'Jawa Tengah' }, { id: 14, name: 'DI Yogyakarta' }, { id: 15, name: 'Jawa Timur' },
-            { id: 16, name: 'Banten' }, { id: 17, name: 'Bali' }, { id: 18, name: 'Nusa Tenggara Barat' },
-            { id: 19, name: 'Nusa Tenggara Timur' }, { id: 20, name: 'Kalimantan Barat' }, { id: 21, name: 'Kalimantan Tengah' },
-            { id: 22, name: 'Kalimantan Selatan' }, { id: 23, name: 'Kalimantan Timur' }, { id: 24, name: 'Kalimantan Utara' },
-            { id: 25, name: 'Sulawesi Utara' }, { id: 26, name: 'Sulawesi Tengah' }, { id: 27, name: 'Sulawesi Selatan' },
-            { id: 28, name: 'Sulawesi Tenggara' }, { id: 29, name: 'Gorontalo' }, { id: 30, name: 'Sulawesi Barat' },
-            { id: 31, name: 'Maluku' }, { id: 32, name: 'Maluku Utara' }, { id: 33, name: 'Papua' },
-            { id: 34, name: 'Papua Barat' }, { id: 35, name: 'Papua Selatan' }, { id: 36, name: 'Papua Tengah' },
-            { id: 37, name: 'Papua Pegunungan' }, { id: 38, name: 'Papua Barat Daya' }
-        ],
-        filteredRegencies: [],
-        filteredUniversities: [],
-        occupations: [],
-
-        init() {
-            this.loadOccupations();
-            if (this.eventCode) {
-                this.inputEventCode = this.eventCode;
-                this.verifyEventCodeAsync(this.eventCode);
-            }
-        },
-
-        openRegistrationModal(track = 'PUBLIC_SELF') {
-            if (track === 'PUBLIC_SELF') {
-                this.eventCode = '';
-                this.eventName = '';
-                this.eventInstitution = '';
-                this.form.event_code = '';
-                this.form.sub_category = '';
-                this.eventGroupLabel = '';
-                this.eventSubcategories = [];
-                this.isCategoryLocked = false;
-            }
-            this.showRegModal = true;
-        },
-
-        openEventSelectorModal() {
-            this.eventCheckError = '';
-            this.showEventSelectorModal = true;
-        },
-
-        onEventSelectChange() {
-            this.eventCheckError = '';
-        },
-
-        proceedWithEventSelection() {
-            const code = (this.inputEventCode || '').trim().toUpperCase();
-            if (!code) {
-                this.eventCheckError = 'Mohon masukkan Kode Event / Kunci Sesi resmi dari panitia.';
-                return;
-            }
-
-            this.verifyEventCodeAsync(code);
-        },
-
-        verifyEventCodeAsync(code) {
-            this.verifyingEvent = true;
-            this.eventCheckError = '';
-
-            fetch('/api/events/verify', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ event_code: code })
-            })
-            .then(res => res.json())
-            .then(data => {
-                this.verifyingEvent = false;
-                if (data.status === 'success' && data.event) {
-                    const evt = data.event;
-                    this.eventCode = evt.event_code;
-                    this.eventName = evt.title;
-                    this.eventInstitution = evt.institution_name || '';
-                    this.form.event_code = evt.event_code;
-
-                    // Group / Subcategory Options
-                    if (evt.custom_subcategories && evt.custom_subcategories.length > 0) {
-                        this.eventGroupLabel = evt.group_label || 'Pilih Sub-Kategori / Kelas / Bidang';
-                        this.eventSubcategories = evt.custom_subcategories;
-                    } else {
-                        this.eventGroupLabel = '';
-                        this.eventSubcategories = [];
-                    }
-
-                    // Preset Category Lock
-                    if (evt.target_category) {
-                        this.form.category = evt.target_category;
-                        this.isCategoryLocked = true;
-                    } else {
-                        this.isCategoryLocked = false;
-                    }
-
-                    // Preset Province / Regency if configured
-                    if (evt.province_id) {
-                        this.form.province_id = evt.province_id;
-                        this.onProvinceChange();
-                        if (evt.regency_id) {
-                            this.form.regency_id = evt.regency_id;
-                        }
-                    }
-
-                    this.showEventSelectorModal = false;
-                    this.showRegModal = true;
-                } else {
-                    this.eventCheckError = data.message || 'Kode Event tidak valid atau tidak aktif.';
-                }
-            })
-            .catch(() => {
-                this.verifyingEvent = false;
-                this.eventCheckError = 'Terjadi kesalahan saat memverifikasi Kode Event.';
-            });
-        },
-
-        setCategory(cat) {
-            if (this.isCategoryLocked) return;
-            this.form.category = cat;
-        },
-
-        onProvinceChange() {
-            this.form.regency_id = null;
-            this.filteredRegencies = [];
-            if (this.form.province_id) {
-                this.searchRegencies();
-            }
-        },
-
-        searchRegencies() {
-            if (!this.form.province_id) return;
-            fetch(`/api/master/regencies?province_id=${this.form.province_id}`)
-                .then(res => res.json())
-                .then(res => {
-                    this.filteredRegencies = res.data || [];
-                })
-                .catch(() => {});
-        },
-
-        searchUniversities() {
-            fetch(`/api/master/universities?province_id=${this.form.province_id || ''}&q=${encodeURIComponent(this.universityQuery)}`)
-                .then(res => res.json())
-                .then(res => { this.filteredUniversities = res.data || []; });
-        },
-
-        selectUniversity(u) {
-            this.form.university_id = u.id;
-            this.universityQuery = u.name;
-            this.showUniversityDropdown = false;
-        },
-
-        loadOccupations() {
-            fetch(`/api/master/occupations`)
-                .then(res => res.json())
-                .then(res => { this.occupations = res.data || []; });
-        },
-
-        submitRegistration() {
-            this.isSubmitting = true;
-
-            fetch('{{ route("assessment.register") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify(this.form)
-            })
-            .then(res => res.json())
-            .then(data => {
-                this.isSubmitting = false;
-                if (data.status === 'success') {
-                    this.generatedCode = data.assessment_code;
-                    this.takeUrl = data.take_url;
-                    this.showRegModal = false;
-                    this.showGeneratedCodeModal = true;
-                } else {
-                    alert(data.message || 'Gagal mendaftar. Silakan cek form Anda.');
-                }
-            })
-            .catch(err => {
-                this.isSubmitting = false;
-                alert('Terjadi kesalahan jaringan.');
-            });
-        },
-
-        copyCode() {
-            navigator.clipboard.writeText(this.generatedCode);
-            this.copied = true;
-            setTimeout(() => { this.copied = false; }, 3000);
-        }
-    }
-}
-</script>
-@endpush
 @endsection
