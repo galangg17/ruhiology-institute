@@ -223,9 +223,22 @@
                     </template>
                 </div>
 
-                <div>
-                    <label class="block font-bold text-slate-800 text-xs mb-1.5">Nama Instansi / Lembaga Partner</label>
-                    <input type="text" name="institution_name" placeholder="Contoh: SMAN Titian Teras Jambi / Kanwil Kemenag Jambi" class="w-full px-4 py-3 rounded-2xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-[#0B2A43] focus:border-[#0B2A43] outline-none font-medium transition text-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-bold text-slate-800 text-xs mb-1.5">Preset Target Kategori Peserta *</label>
+                        <select name="target_category" class="w-full px-4 py-3 rounded-2xl border border-slate-300 bg-slate-50 font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-[#0B2A43] focus:bg-white transition text-xs">
+                            <option value="">-- Bebas / Fleksibel (Peserta Memilih) --</option>
+                            <option value="Pelajar">🏫 Pelajar (Siswa SD / SMP / SMA / SMK)</option>
+                            <option value="Mahasiswa/i">🎓 Mahasiswa / Mahasiswi</option>
+                            <option value="Umum">👤 Personal / Mandiri (Umum)</option>
+                        </select>
+                        <span class="text-[10px] text-slate-400 mt-1 block">Form registrasi peserta akan otomatis mengunci kategori ini</span>
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-slate-800 text-xs mb-1.5">Nama Instansi / Lembaga Partner</label>
+                        <input type="text" name="institution_name" placeholder="Contoh: SMAN Titian Teras Jambi / Kanwil Kemenag Jambi" class="w-full px-4 py-3 rounded-2xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-[#0B2A43] focus:border-[#0B2A43] outline-none font-medium transition text-xs">
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">

@@ -103,7 +103,7 @@
         </div>
     </section>
 
-    <!-- EVENT SELECTION MODAL (DROPDOWN EVENT + KODE PASSPHRASE) -->
+    <!-- EVENT SELECTION MODAL (DROPDOWN EVENT + KODE PASSPHRASE VERIFICATION) -->
     <div x-show="showEventSelectorModal" x-cloak class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-md animate-fadeIn">
         <div @click.away="showEventSelectorModal = false" class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border border-slate-100 space-y-5">
             <button @click="showEventSelectorModal = false" type="button" class="absolute top-5 right-5 text-slate-400 hover:text-slate-700">✕</button>
@@ -114,39 +114,45 @@
                 </div>
                 <div>
                     <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest block">EVENT & ACARA ASESMEN</span>
-                    <h3 class="text-xl font-serif font-bold text-[#0B2A43]">Pilih Event / Acara Asesmen</h3>
+                    <h3 class="text-xl font-serif font-bold text-[#0B2A43]">Verifikasi Akses Event</h3>
                 </div>
             </div>
 
             <p class="text-xs text-slate-500 leading-relaxed">
-                Silakan pilih nama event yang Anda ikuti dari daftar di bawah ini, atau masukkan kode event yang diberikan oleh panitia.
+                Silakan pilih nama event dari daftar atau ketik Kode Event / Kunci Sesi yang diberikan oleh panitia untuk memverifikasi akses Anda.
             </p>
 
             <div class="space-y-4 text-xs font-sans">
                 <!-- Dropdown Select Active Events -->
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1.5">Pilih Event Aktif *</label>
+                    <label class="block font-bold text-slate-700 mb-1.5">Pilih Event Aktif (Opsional)</label>
                     <select x-model="selectedEventId" @change="onEventSelectChange()" class="w-full p-3.5 rounded-2xl border border-slate-300 bg-slate-50 font-medium focus:bg-white focus:ring-2 focus:ring-[#0B2A43] outline-none text-xs">
-                        <option value="">-- Pilih Event dari Daftar --</option>
+                        <option value="">-- Pilih Nama Event dari Daftar --</option>
                         <template x-for="evt in activeEventsList" :key="evt.id">
-                            <option :value="evt.id" x-text="evt.title + (evt.institution_name ? ' (' + evt.institution_name + ')' : '')"></option>
+                            <option :value="evt.id" x-text="evt.title + (evt.institution_name ? ' — ' + evt.institution_name : '')"></option>
                         </template>
-                        <option value="CUSTOM_CODE">🔑 Masukkan Kode Event Manual...</option>
                     </select>
                 </div>
 
-                <!-- Input Event Code (If Custom or selected event has code) -->
+                <!-- Input Event Code / Kunci Passcode -->
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1.5">Kode Event / Kunci Sesi *</label>
-                    <input type="text" x-model="inputEventCode" placeholder="Contoh: RQ-JAMBI-26" class="w-full p-3.5 rounded-2xl border-2 border-slate-300 focus:border-[#0B2A43] focus:ring-2 focus:ring-[#0B2A43]/20 font-mono font-bold uppercase text-sm tracking-wider text-center outline-none">
+                    <label class="block font-bold text-slate-800 mb-1.5">Masukkan Kode Event / Kunci Sesi *</label>
+                    <input type="text" x-model="inputEventCode" placeholder="Masukkan Kode Event (Contoh: RQ-JAMBI-26)" class="w-full p-3.5 rounded-2xl border-2 border-slate-300 focus:border-[#0B2A43] focus:ring-2 focus:ring-[#0B2A43]/20 font-mono font-bold uppercase text-sm tracking-wider text-center outline-none">
+                    <span class="text-[10px] text-slate-400 mt-1 block text-center">Kode resmi diberikan oleh panitia / narasumber event Anda.</span>
                 </div>
+
+                <template x-if="eventCheckError">
+                    <div class="p-3 bg-rose-50 border border-rose-200 text-rose-700 font-semibold rounded-xl text-xs flex items-center gap-2">
+                        <span>⚠️</span> <span x-text="eventCheckError"></span>
+                    </div>
+                </template>
 
                 <div class="pt-2 flex gap-3">
                     <button type="button" @click="showEventSelectorModal = false" class="flex-1 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl text-xs transition cursor-pointer">
                         Batal
                     </button>
-                    <button type="button" @click="proceedWithEventSelection()" class="flex-1 py-3.5 bg-gradient-to-r from-[#C9A24D] to-[#B48A16] hover:from-[#B48A16] hover:to-[#96710E] text-[#0B2A43] font-extrabold rounded-2xl text-xs shadow-lg transition transform hover:-translate-y-0.5 cursor-pointer">
-                        Lanjut ke Registrasi →
+                    <button type="button" @click="proceedWithEventSelection()" :disabled="verifyingEvent" class="flex-1 py-3.5 bg-gradient-to-r from-[#C9A24D] to-[#B48A16] hover:from-[#B48A16] hover:to-[#96710E] text-[#0B2A43] font-extrabold rounded-2xl text-xs shadow-lg transition transform hover:-translate-y-0.5 cursor-pointer disabled:opacity-50">
+                        <span x-text="verifyingEvent ? 'Memverifikasi...' : 'Verifikasi & Lanjut →'"></span>
                     </button>
                 </div>
             </div>
@@ -175,8 +181,13 @@
                     <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-wider block">Jalur Asesmen Dipilih</span>
                     <template x-if="eventCode">
                         <div class="flex items-center justify-between">
-                            <span class="font-bold text-[#0B2A43] text-xs">📌 Event: <span x-text="eventName || eventCode"></span></span>
-                            <span class="text-[10px] font-mono font-bold bg-[#0B2A43] text-white px-2.5 py-0.5 rounded-full" x-text="eventCode"></span>
+                            <div class="space-y-0.5">
+                                <span class="font-bold text-[#0B2A43] text-xs block">📌 Event: <span x-text="eventName || eventCode"></span></span>
+                                <template x-if="eventInstitution">
+                                    <span class="text-[11px] text-slate-500 block font-medium">Instansi: <strong class="text-slate-800" x-text="eventInstitution"></strong></span>
+                                </template>
+                            </div>
+                            <span class="text-[10px] font-mono font-bold bg-[#0B2A43] text-white px-2.5 py-1 rounded-full shrink-0" x-text="eventCode"></span>
                         </div>
                     </template>
                     <template x-if="!eventCode">
@@ -201,22 +212,37 @@
                     </div>
                 </div>
 
-                <!-- 2. Kategori Selection -->
+                <!-- 2. Kategori Selection (Preset Locked if Event restricts it) -->
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1.5">Kategori Peserta *</label>
-                    <div class="grid grid-cols-3 gap-3">
-                        <template x-for="cat in [
-                            { key: 'Pelajar', label: 'Pelajar' },
-                            { key: 'Mahasiswa/i', label: 'Mahasiswa/i' },
-                            { key: 'Umum', label: 'Personal / Mandiri' }
-                        ]" :key="cat.key">
-                            <button type="button" @click="setCategory(cat.key)"
-                                :class="form.category === cat.key ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'"
-                                class="py-2.5 px-3 rounded-xl border text-xs transition-colors text-center">
-                                <span x-text="cat.label"></span>
-                            </button>
+                    <label class="block font-bold text-slate-700 mb-1.5">
+                        Kategori Peserta *
+                        <template x-if="isCategoryLocked">
+                            <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded ml-2 border border-emerald-200">🔒 Terkunci dari Event</span>
                         </template>
-                    </div>
+                    </label>
+
+                    <template x-if="isCategoryLocked">
+                        <div class="p-3 bg-emerald-50/80 rounded-xl border border-emerald-200 text-xs font-bold text-emerald-900 flex items-center justify-between">
+                            <span x-text="'Kategori Event: ' + (form.category === 'Umum' ? 'Personal / Mandiri' : form.category)"></span>
+                            <span>✅ Terverifikasi</span>
+                        </div>
+                    </template>
+
+                    <template x-if="!isCategoryLocked">
+                        <div class="grid grid-cols-3 gap-3">
+                            <template x-for="cat in [
+                                { key: 'Pelajar', label: 'Pelajar' },
+                                { key: 'Mahasiswa/i', label: 'Mahasiswa/i' },
+                                { key: 'Umum', label: 'Personal / Mandiri' }
+                            ]" :key="cat.key">
+                                <button type="button" @click="setCategory(cat.key)"
+                                    :class="form.category === cat.key ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'"
+                                    class="py-2.5 px-3 rounded-xl border text-xs transition-colors text-center">
+                                    <span x-text="cat.label"></span>
+                                </button>
+                            </template>
+                        </div>
+                    </template>
                 </div>
 
                 <!-- 3. Regional Cascading: Province -> Regency -->
@@ -393,6 +419,8 @@ function rqAssessmentIndex() {
         activeEventsList: @json($activeEvents ?? []),
         selectedEventId: '',
         inputEventCode: '',
+        verifyingEvent: false,
+        eventCheckError: '',
         
         isSubmitting: false,
         copied: false,
@@ -400,6 +428,8 @@ function rqAssessmentIndex() {
         takeUrl: '#',
         eventCode: new URLSearchParams(window.location.search).get('event') || '',
         eventName: '',
+        eventInstitution: '',
+        isCategoryLocked: false,
 
         form: {
             event_code: new URLSearchParams(window.location.search).get('event') || '',
@@ -441,8 +471,8 @@ function rqAssessmentIndex() {
         init() {
             this.loadOccupations();
             if (this.eventCode) {
-                const found = this.activeEventsList.find(e => e.event_code === this.eventCode);
-                if (found) this.eventName = found.title;
+                this.inputEventCode = this.eventCode;
+                this.verifyEventCodeAsync(this.eventCode);
             }
         },
 
@@ -450,43 +480,88 @@ function rqAssessmentIndex() {
             if (track === 'PUBLIC_SELF') {
                 this.eventCode = '';
                 this.eventName = '';
+                this.eventInstitution = '';
                 this.form.event_code = '';
+                this.isCategoryLocked = false;
             }
             this.showRegModal = true;
         },
 
         openEventSelectorModal() {
+            this.eventCheckError = '';
             this.showEventSelectorModal = true;
         },
 
         onEventSelectChange() {
-            if (this.selectedEventId === 'CUSTOM_CODE') {
-                this.inputEventCode = '';
-                return;
-            }
-            const evt = this.activeEventsList.find(e => e.id == this.selectedEventId);
-            if (evt) {
-                this.inputEventCode = evt.event_code;
-                this.eventName = evt.title;
-            }
+            this.eventCheckError = '';
+            // Secrecy requirement: selecting an event in dropdown does NOT leak/prefill the event code!
+            // The participant must enter the code/key.
         },
 
         proceedWithEventSelection() {
-            if (!this.inputEventCode || !this.inputEventCode.trim()) {
-                alert('Mohon pilih event atau masukkan kode event.');
+            const code = (this.inputEventCode || '').trim().toUpperCase();
+            if (!code) {
+                this.eventCheckError = 'Mohon masukkan Kode Event / Kunci Sesi resmi dari panitia.';
                 return;
             }
-            this.eventCode = this.inputEventCode.trim().toUpperCase();
-            this.form.event_code = this.eventCode;
 
-            const evt = this.activeEventsList.find(e => e.event_code === this.eventCode);
-            if (evt) this.eventName = evt.title;
+            this.verifyEventCodeAsync(code);
+        },
 
-            this.showEventSelectorModal = false;
-            this.showRegModal = true;
+        verifyEventCodeAsync(code) {
+            this.verifyingEvent = true;
+            this.eventCheckError = '';
+
+            fetch('/api/events/verify', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ event_code: code })
+            })
+            .then(res => res.json())
+            .then(data => {
+                this.verifyingEvent = false;
+                if (data.status === 'success' && data.event) {
+                    const evt = data.event;
+                    this.eventCode = evt.event_code;
+                    this.eventName = evt.title;
+                    this.eventInstitution = evt.institution_name || '';
+                    this.form.event_code = evt.event_code;
+
+                    // Preset Category Lock
+                    if (evt.target_category) {
+                        this.form.category = evt.target_category;
+                        this.isCategoryLocked = true;
+                    } else {
+                        this.isCategoryLocked = false;
+                    }
+
+                    // Preset Province / Regency if configured
+                    if (evt.province_id) {
+                        this.form.province_id = evt.province_id;
+                        this.onProvinceChange();
+                        if (evt.regency_id) {
+                            this.form.regency_id = evt.regency_id;
+                        }
+                    }
+
+                    this.showEventSelectorModal = false;
+                    this.showRegModal = true;
+                } else {
+                    this.eventCheckError = data.message || 'Kode Event tidak valid atau tidak aktif.';
+                }
+            })
+            .catch(() => {
+                this.verifyingEvent = false;
+                this.eventCheckError = 'Terjadi kesalahan saat memverifikasi Kode Event.';
+            });
         },
 
         setCategory(cat) {
+            if (this.isCategoryLocked) return;
             this.form.category = cat;
         },
 

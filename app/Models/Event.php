@@ -14,7 +14,10 @@ class Event extends Model
         'title',
         'access_type',
         'assessment_type',
+        'target_category',
         'institution_name',
+        'province_id',
+        'regency_id',
         'program_id',
         'instrument_id',
         'start_date',
@@ -45,6 +48,16 @@ class Event extends Model
     public function instrument()
     {
         return $this->belongsTo(Instrument::class);
+    }
+
+    public function province()
+    {
+        return $this->belongsTo(Province::class);
+    }
+
+    public function regency()
+    {
+        return $this->belongsTo(Regency::class);
     }
 
     public function participants()

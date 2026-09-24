@@ -375,4 +375,43 @@ class PublicAssessmentController extends Controller
 
         return back()->with('success', 'Tekad perubahan batin & refleksi Anda berhasil disimpan.');
     }
+
+    /**
+     * Verify event code and return event details (target category, title, institution).
+     */
+    public function verifyEventCode(Request $request)
+    {
+        $code = strtoupper(trim($request->input('event_code', '')));
+
+        if (empty($code)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Kode event wajib diisi.'
+            ], 422);
+        }
+
+        $event = \App\Models\Event::where('event_code', $code)
+            ->where('status', 'active')
+            ->first();
+
+        if (!$event) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Kode Event "' . $code . '" tidak valid atau tidak ditemukan. Silakan periksa kembali kode yang Anda masukkan.'
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'event' => [
+                'id' => $event->id,
+                'event_code' => $event->event_code,
+                'title' => $event->title,
+                'institution_name' => $event->institution_name,
+                'target_category' => $event->target_category,
+                'province_id' => $event->province_id,
+                'regency_id' => $event->regency_id,
+            ]
+        ]);
+    }
 }

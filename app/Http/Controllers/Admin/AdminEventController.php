@@ -19,7 +19,7 @@ class AdminEventController extends Controller
         $search = trim($request->query('q', ''));
         $status = $request->query('status', '');
 
-        $query = Event::with(['program', 'instrument'])
+        $query = Event::with(['program', 'instrument', 'province', 'regency'])
             ->withCount(['participants', 'submissions'])
             ->latest();
 
@@ -39,8 +39,9 @@ class AdminEventController extends Controller
 
         $programs = Program::where('status', 'active')->get();
         $instruments = Instrument::where('status', 'active')->get();
+        $provinces = Province::orderBy('name', 'asc')->get();
 
-        return view('admin.events.index', compact('events', 'programs', 'instruments'));
+        return view('admin.events.index', compact('events', 'programs', 'instruments', 'provinces'));
     }
 
     public function store(Request $request)
@@ -50,7 +51,10 @@ class AdminEventController extends Controller
             'event_code' => ['nullable', 'string', 'max:50', 'unique:events,event_code'],
             'access_type' => ['required', 'in:EVENT_PROGRAM,PUBLIC_SELF'],
             'assessment_type' => ['required', 'in:single,prepost'],
+            'target_category' => ['nullable', 'in:Pelajar,Mahasiswa/i,Umum'],
             'institution_name' => ['nullable', 'string', 'max:255'],
+            'province_id' => ['nullable', 'exists:provinces,id'],
+            'regency_id' => ['nullable', 'exists:regencies,id'],
             'program_id' => ['nullable', 'exists:programs,id'],
             'instrument_id' => ['nullable', 'exists:instruments,id'],
             'start_date' => ['nullable', 'date'],
@@ -86,7 +90,7 @@ class AdminEventController extends Controller
 
     public function show(Event $event)
     {
-        $event->load(['program', 'instrument']);
+        $event->load(['program', 'instrument', 'province', 'regency']);
 
         $submissions = AssessmentSubmission::where('event_id', $event->id)
             ->with(['participant.province', 'participant.regency', 'result'])
@@ -124,6 +128,9 @@ class AdminEventController extends Controller
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'institution_name' => ['nullable', 'string', 'max:255'],
+            'target_category' => ['nullable', 'in:Pelajar,Mahasiswa/i,Umum'],
+            'province_id' => ['nullable', 'exists:provinces,id'],
+            'regency_id' => ['nullable', 'exists:regencies,id'],
             'access_type' => ['nullable', 'in:EVENT_PROGRAM,PUBLIC_SELF'],
             'assessment_type' => ['required', 'in:single,prepost'],
             'start_date' => ['nullable', 'date'],
