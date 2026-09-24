@@ -392,34 +392,37 @@
     </div>
 
     <!-- INSTAGRAM / WHATSAPP STORY 9:16 SHARE MODAL -->
-    <div x-show="showStoryModal" x-cloak class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fadeIn no-print">
-        <div @click.away="showStoryModal = false" class="bg-slate-900 rounded-3xl max-w-lg w-full p-5 sm:p-6 shadow-2xl border border-slate-700 text-center space-y-4">
+    <div x-show="showStoryModal" x-cloak class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[9999] flex items-center justify-center p-4 animate-fadeIn no-print">
+        <div @click.away="showStoryModal = false" class="bg-slate-900 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-800 flex flex-col space-y-5 text-center">
             
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <div class="flex items-center gap-2">
             <!-- Header -->
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <div class="flex items-center gap-2">
-                    <span class="text-xl">📱</span>
-                    <h3 class="text-base font-serif font-bold text-white">Kartu Hasil 9:16 (Story Instagram / WhatsApp)</h3>
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">📱</span>
+                    <div class="text-left">
+                        <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest block">INSTAGRAM & WHATSAPP STORY</span>
+                        <h3 class="text-lg font-serif font-bold text-white">Kartu Hasil 9:16</h3>
+                    </div>
                 </div>
-                <button @click="showStoryModal = false" class="text-slate-400 hover:text-white font-mono text-lg font-bold cursor-pointer">✕</button>
+                <button @click="showStoryModal = false" type="button" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-slate-400 hover:text-white flex items-center justify-center transition cursor-pointer">✕</button>
             </div>
 
-            <p class="text-xs text-slate-300">Format visual minimalis dan elegan untuk dibagikan ke Story Instagram atau Status WhatsApp Anda:</p>
+            <p class="text-xs text-slate-300 leading-relaxed text-left">
+                Format visual 9:16 minimalis dan elegan untuk dibagikan ke Story Instagram atau Status WhatsApp Anda:
+            </p>
 
             <!-- Preview Canvas Container -->
-            <div class="bg-black/60 p-4 rounded-3xl border border-slate-800 flex justify-center items-center">
-                <canvas id="storyCanvas" class="w-full max-w-[260px] sm:max-w-[300px] aspect-[9/16] rounded-2xl shadow-2xl border border-slate-700/80"></canvas>
+            <div class="bg-black/60 p-4 rounded-3xl border border-slate-800/80 flex justify-center items-center">
+                <canvas id="storyCanvas" class="w-full max-w-[280px] sm:max-w-[320px] aspect-[9/16] rounded-2xl shadow-2xl border border-slate-700/80"></canvas>
             </div>
 
             <!-- Actions -->
             <div class="pt-2 flex flex-col sm:flex-row gap-3">
-                <button type="button" @click="showStoryModal = false" class="w-full sm:w-1/2 py-3 rounded-xl border border-slate-700 text-slate-300 font-bold text-xs hover:bg-slate-800 transition cursor-pointer">
+                <button type="button" @click="showStoryModal = false" class="w-full sm:w-1/2 py-3.5 rounded-2xl border border-slate-700 text-slate-300 font-bold text-xs hover:bg-slate-800 transition cursor-pointer">
                     Tutup
                 </button>
-                <button type="button" @click="downloadStoryImage()" class="w-full sm:w-1/2 py-3 rounded-xl bg-gradient-to-r from-[#C9A24D] to-[#B48A16] hover:from-[#B48A16] hover:to-[#96710E] text-[#0B2A43] font-extrabold text-xs uppercase tracking-wider shadow-lg transition transform hover:scale-[1.02] cursor-pointer flex items-center justify-center gap-2">
-                    <span>📥 Unduh Kartu Story (9:16)</span>
+                <button type="button" @click="downloadStoryImage()" class="w-full sm:w-1/2 py-3.5 rounded-2xl bg-gradient-to-r from-[#C9A24D] to-[#B48A16] hover:from-[#B48A16] hover:to-[#96710E] text-[#0B2A43] font-extrabold text-xs uppercase tracking-wider shadow-lg transition transform hover:scale-[1.02] cursor-pointer flex items-center justify-center gap-2">
+                    <span>📥 Unduh Kartu Story</span>
                 </button>
             </div>
 
@@ -449,115 +452,153 @@ function rqResultPage() {
             canvas.width = 1080;
             canvas.height = 1920;
 
-            // Background - Deep Luxury Navy
-            const bgGrad = ctx.createLinearGradient(0, 0, 1080, 1920);
-            bgGrad.addColorStop(0, '#0B2A43');
-            bgGrad.addColorStop(0.5, '#123B59');
-            bgGrad.addColorStop(1, '#061726');
-            ctx.fillStyle = bgGrad;
-            ctx.fillRect(0, 0, 1080, 1920);
+            const logoImg = new Image();
 
-            // Gold Ambient Radial Glow
-            const glowGrad = ctx.createRadialGradient(540, 500, 60, 540, 500, 550);
-            glowGrad.addColorStop(0, 'rgba(201, 162, 77, 0.25)');
-            glowGrad.addColorStop(1, 'rgba(11, 42, 67, 0)');
-            ctx.fillStyle = glowGrad;
-            ctx.fillRect(0, 0, 1080, 1920);
+            const render = () => {
+                // Background - Deep Luxury Navy
+                const bgGrad = ctx.createLinearGradient(0, 0, 1080, 1920);
+                bgGrad.addColorStop(0, '#0B2A43');
+                bgGrad.addColorStop(0.5, '#123B59');
+                bgGrad.addColorStop(1, '#061726');
+                ctx.fillStyle = bgGrad;
+                ctx.fillRect(0, 0, 1080, 1920);
 
-            // Header Logo & Branding
-            ctx.fillStyle = '#C9A24D';
-            ctx.font = 'bold 34px "Outfit", sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText('RUHIOLOGY INSTITUTE', 540, 180);
+                // Gold Ambient Radial Glow
+                const glowGrad = ctx.createRadialGradient(540, 500, 60, 540, 500, 550);
+                glowGrad.addColorStop(0, 'rgba(201, 162, 77, 0.25)');
+                glowGrad.addColorStop(1, 'rgba(11, 42, 67, 0)');
+                ctx.fillStyle = glowGrad;
+                ctx.fillRect(0, 0, 1080, 1920);
 
-            ctx.fillStyle = '#e2e8f0';
-            ctx.font = 'bold 22px monospace';
-            ctx.fillText('INDEKS KECERDASAN RUHIOLOGI (RQI-15)', 540, 225);
+                // Top Header Logo Image
+                if (logoImg.complete && logoImg.naturalWidth > 0) {
+                    const logoWidth = 130;
+                    const logoHeight = (logoImg.naturalHeight / logoImg.naturalWidth) * logoWidth;
+                    ctx.drawImage(logoImg, 540 - (logoWidth / 2), 55, logoWidth, logoHeight);
+                } else {
+                    // Fallback Gold Icon Badge
+                    ctx.fillStyle = '#C9A24D';
+                    ctx.font = '48px "Outfit", sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('🕌', 540, 110);
+                }
 
-            // Gold Line Accent
-            ctx.strokeStyle = 'rgba(201, 162, 77, 0.4)';
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.moveTo(220, 265);
-            ctx.lineTo(860, 265);
-            ctx.stroke();
+                // Header Logo & Branding Text
+                ctx.fillStyle = '#C9A24D';
+                ctx.font = 'bold 34px "Outfit", sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('RUHIOLOGY INSTITUTE', 540, 220);
 
-            // Participant Name Glass Box
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
-            ctx.beginPath();
-            ctx.roundRect(140, 315, 800, 115, 24);
-            ctx.fill();
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-            ctx.lineWidth = 2;
-            ctx.stroke();
+                ctx.fillStyle = '#e2e8f0';
+                ctx.font = 'bold 20px monospace';
+                ctx.fillText('INDEKS KECERDASAN RUHIOLOGI (RQI-15)', 540, 260);
 
-            ctx.fillStyle = '#94a3b8';
-            ctx.font = 'bold 20px monospace';
-            ctx.fillText('PESERTA ASESMEN:', 540, 355);
+                // Gold Line Accent
+                ctx.strokeStyle = 'rgba(201, 162, 77, 0.4)';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(220, 290);
+                ctx.lineTo(860, 290);
+                ctx.stroke();
 
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 40px "Outfit", sans-serif';
-            ctx.fillText('{{ addslashes($submission->participant->name) }}', 540, 405);
+                // Participant Name Glass Box
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+                ctx.beginPath();
+                ctx.roundRect(140, 330, 800, 115, 24);
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
 
-            // Minimalist Central Score Circle
-            ctx.fillStyle = 'rgba(201, 162, 77, 0.1)';
-            ctx.beginPath();
-            ctx.arc(540, 680, 180, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.strokeStyle = '#C9A24D';
-            ctx.lineWidth = 6;
-            ctx.stroke();
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = 'bold 20px monospace';
+                ctx.fillText('PESERTA ASESMEN:', 540, 370);
 
-            ctx.fillStyle = '#C9A24D';
-            ctx.font = 'bold 24px monospace';
-            ctx.fillText('SKOR RQI-15', 540, 590);
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 40px "Outfit", sans-serif';
+                ctx.fillText('{{ addslashes($submission->participant->name) }}', 540, 420);
 
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 115px "Outfit", sans-serif';
-            ctx.fillText('{{ $rqiScore }}', 540, 705);
+                // Minimalist Central Score Circle
+                ctx.fillStyle = 'rgba(201, 162, 77, 0.1)';
+                ctx.beginPath();
+                ctx.arc(540, 675, 170, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#C9A24D';
+                ctx.lineWidth = 6;
+                ctx.stroke();
 
-            ctx.fillStyle = '#94a3b8';
-            ctx.font = '600 28px "Plus Jakarta Sans", sans-serif';
-            ctx.fillText('/ {{ $maxRqiScore }} POIN ({{ $scorePct }}%)', 540, 765);
+                ctx.fillStyle = '#C9A24D';
+                ctx.font = 'bold 24px monospace';
+                ctx.fillText('SKOR RQI-15', 540, 585);
 
-            // Category Level Badge (Auto-scaling font size to fit width)
-            const categoryText = '✦ {{ addslashes($catName) }}';
-            ctx.fillStyle = '#C9A24D';
-            ctx.beginPath();
-            ctx.roundRect(120, 910, 840, 95, 48);
-            ctx.fill();
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 110px "Outfit", sans-serif';
+                ctx.fillText('{{ $rqiScore }}', 540, 700);
 
-            ctx.fillStyle = '#0B2A43';
-            let fontSize = 34;
-            if (categoryText.length > 35) {
-                fontSize = 24;
-            } else if (categoryText.length > 25) {
-                fontSize = 28;
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = '600 26px "Plus Jakarta Sans", sans-serif';
+                ctx.fillText('/ {{ $maxRqiScore }} POIN ({{ $scorePct }}%)', 540, 760);
+
+                // Category Level Badge
+                const categoryText = '✦ {{ addslashes($catName) }}';
+                ctx.fillStyle = '#C9A24D';
+                ctx.beginPath();
+                ctx.roundRect(120, 890, 840, 90, 45);
+                ctx.fill();
+
+                ctx.fillStyle = '#0B2A43';
+                let fontSize = 32;
+                if (categoryText.length > 35) {
+                    fontSize = 24;
+                } else if (categoryText.length > 25) {
+                    fontSize = 28;
+                }
+                ctx.font = `bold ${fontSize}px "Outfit", sans-serif`;
+                ctx.fillText(categoryText, 540, 945);
+
+                // Minimalist Narrative Quote Box
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+                ctx.beginPath();
+                ctx.roundRect(140, 1020, 800, 360, 24);
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(201, 162, 77, 0.25)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.fillStyle = '#f1f5f9';
+                ctx.font = 'italic 25px "Plus Jakarta Sans", sans-serif';
+                this.wrapText(ctx, '"{{ addslashes($submission->result->overall_interpretation) }}"', 540, 1100, 720, 42);
+
+                // Footer URL & Verification Code
+                ctx.fillStyle = '#C9A24D';
+                ctx.font = 'bold 26px monospace';
+                ctx.fillText('ruhiology.gmadhyaksa-litbang.my.id', 540, 1640);
+
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = '20px monospace';
+                ctx.fillText('Kode Evaluasi: {{ $submission->participant->assessment_code ?? $submission->participant->participant_code }}', 540, 1685);
+
+                // Gold Line Separator Footer
+                ctx.strokeStyle = 'rgba(201, 162, 77, 0.3)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(300, 1725);
+                ctx.lineTo(780, 1725);
+                ctx.stroke();
+
+                // Founder Signature / Branding (Bottom)
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 26px "Outfit", sans-serif';
+                ctx.fillText('Prof. Iskandar Nazari - Founder Ruhiology Institute', 540, 1775);
+            };
+
+            logoImg.onload = render;
+            logoImg.src = "{{ asset('images/ruhiology-logo.png') }}";
+            if (logoImg.complete) {
+                render();
+            } else {
+                render();
             }
-            ctx.font = `bold ${fontSize}px "Outfit", sans-serif`;
-            ctx.fillText(categoryText, 540, 968);
-
-            // Minimalist Narrative Quote Box
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
-            ctx.beginPath();
-            ctx.roundRect(140, 1060, 800, 360, 24);
-            ctx.fill();
-            ctx.strokeStyle = 'rgba(201, 162, 77, 0.25)';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-
-            ctx.fillStyle = '#f1f5f9';
-            ctx.font = 'italic 26px "Plus Jakarta Sans", sans-serif';
-            this.wrapText(ctx, '"{{ addslashes($submission->result->overall_interpretation) }}"', 540, 1140, 720, 42);
-
-            // Footer URL & Verification Code
-            ctx.fillStyle = '#C9A24D';
-            ctx.font = 'bold 28px monospace';
-            ctx.fillText('ruhiology.gmadhyaksa-litbang.my.id', 540, 1720);
-
-            ctx.fillStyle = '#94a3b8';
-            ctx.font = '22px monospace';
-            ctx.fillText('Kode Evaluasi: {{ $submission->participant->assessment_code ?? $submission->participant->participant_code }}', 540, 1770);
         },
 
         wrapText(ctx, text, x, y, maxWidth, lineHeight) {

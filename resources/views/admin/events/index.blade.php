@@ -70,7 +70,7 @@
                     </h3>
 
                     <p class="text-xs text-slate-500 flex items-center gap-1.5 font-medium">
-                        <span>🏛️</span> <span>{{ $event->institution_name ?? 'Personal / Mandiri' }}</span>
+                        <span>🏛️</span> <span>{{ $event->institution_name ?? 'Instansi Internal' }}</span>
                     </p>
                 </div>
 
@@ -89,8 +89,8 @@
 
                     <div class="text-[11px] text-slate-500 space-y-1">
                         <div class="flex justify-between">
-                            <span>Tipe Akses:</span>
-                            <strong class="text-slate-800">{{ $event->access_type === 'PUBLIC_SELF' ? 'Mandiri Publik' : 'Event Khusus' }}</strong>
+                            <span>Preset Kategori:</span>
+                            <strong class="text-slate-800">{{ $event->target_category ?? 'Bebas / Fleksibel' }}</strong>
                         </div>
                         <div class="flex justify-between">
                             <span>Jadwal:</span>
@@ -161,6 +161,7 @@
             <!-- Modal Body (Scrollable with padding) -->
             <form action="{{ route('admin.events.store') }}" method="POST" class="p-6 sm:p-8 space-y-5 text-xs overflow-y-auto flex-1">
                 @csrf
+                <input type="hidden" name="access_type" value="EVENT_PROGRAM">
                 
                 <div>
                     <label class="block font-bold text-slate-800 text-xs mb-1.5">Nama Event / Kegiatan *</label>
@@ -169,18 +170,25 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
+                        <label class="block font-bold text-slate-800 text-xs mb-1.5">Tempat / Instansi Kegiatan *</label>
+                        <input type="text" name="institution_name" required placeholder="Contoh: SMAN Titian Teras Jambi / Aula Pemda" class="w-full px-4 py-3 rounded-2xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-[#0B2A43] focus:border-[#0B2A43] outline-none font-medium transition text-xs">
+                    </div>
+
+                    <div>
                         <label class="block font-bold text-slate-800 text-xs mb-1.5">Kode Event (Unique Code)</label>
                         <input type="text" name="event_code" placeholder="Contoh: RQ-JAMBI-26" class="w-full px-4 py-3 rounded-2xl border border-slate-300 font-mono bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-[#0B2A43] focus:border-[#0B2A43] outline-none uppercase font-bold text-xs">
                         <span class="text-[10px] text-slate-400 mt-1 block">Kosongkan jika ingin dibuatkan otomatis</span>
                     </div>
+                </div>
 
-                    <div>
-                        <label class="block font-bold text-slate-800 text-xs mb-1.5">Tipe Akses *</label>
-                        <select name="access_type" required class="w-full px-4 py-3 rounded-2xl border border-slate-300 bg-slate-50 font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-[#0B2A43] focus:bg-white transition text-xs">
-                            <option value="EVENT_PROGRAM">🔵 Event / Kegiatan Khusus (Instansi/Acara)</option>
-                            <option value="PUBLIC_SELF">🟢 Mandiri / Personal (Terbuka Publik)</option>
-                        </select>
-                    </div>
+                <div>
+                    <label class="block font-bold text-slate-800 text-xs mb-1.5">Preset Target Kategori Peserta</label>
+                    <select name="target_category" class="w-full px-4 py-3 rounded-2xl border border-slate-300 bg-slate-50 font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-[#0B2A43] focus:bg-white transition text-xs">
+                        <option value="">🔘 Bebas / Fleksibel (Peserta memilih sendiri)</option>
+                        <option value="Pelajar">🏫 Pelajar (Siswa SD / SMP / SMA / SMK)</option>
+                        <option value="Mahasiswa/i">🎓 Mahasiswa / Mahasiswi</option>
+                        <option value="Umum">👤 Personal / Mandiri (Umum)</option>
+                    </select>
                 </div>
 
                 <!-- Mode Asesmen: Sekali Tes vs Pretest & Posttest -->

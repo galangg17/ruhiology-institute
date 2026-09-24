@@ -422,7 +422,7 @@
 
 @push('scripts')
 <script>
-function rqAssessmentIndex() {
+window.rqAssessmentIndex = function rqAssessmentIndex() {
     return {
         showRegModal: false,
         showGeneratedCodeModal: false,
