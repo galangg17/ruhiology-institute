@@ -28,6 +28,15 @@ class AdminResultController extends Controller
             ? Regency::where('province_id', $request->province_id)->orderBy('name')->get()
             : collect([]);
 
+        // Subcategory list for active event filter
+        $subCategories = collect();
+        if ($request->filled('event_id') && $request->event_id !== 'PUBLIC_SELF') {
+            $selectedEvt = Event::find($request->event_id);
+            if ($selectedEvt && !empty($selectedEvt->custom_subcategories)) {
+                $subCategories = collect($selectedEvt->custom_subcategories);
+            }
+        }
+
         // Calculated stats for current filter
         $allFilteredSubmissions = $this->buildFilterQuery($request)->get();
         $results = $allFilteredSubmissions->pluck('result')->filter();
@@ -45,6 +54,7 @@ class AdminResultController extends Controller
             'events',
             'provinces',
             'regencies',
+            'subCategories',
             'stats'
         ));
     }
@@ -91,6 +101,7 @@ class AdminResultController extends Controller
                 'Tanggal Submit',
                 'Nama Peserta',
                 'Kategori Peserta',
+                'Sub-Kategori / Kelas / Kelompok',
                 'Event / Kegiatan',
                 'Provinsi',
                 'Kabupaten/Kota',
@@ -113,7 +124,7 @@ class AdminResultController extends Controller
                     } elseif ($p->category === 'Mahasiswa/i') {
                         $institutionDetail = $p->university->name ?? '-';
                     } else {
-                        $institutionDetail = $p->occupation ?? $p->occupation_custom ?? 'Umum';
+                        $institutionDetail = $p->occupation ?? $p->occupation_custom ?? 'Personal / Mandiri';
                     }
                 }
 
@@ -126,11 +137,12 @@ class AdminResultController extends Controller
                     $index + 1,
                     $sub->submission_code,
                     $sub->submitted_at ? $sub->submitted_at->format('Y-m-d H:i') : '-',
-                    $p->name ?? 'Anonim',
-                    $p->category ?? 'Umum',
+                    $p?->name ?? 'Anonim',
+                    $p?->category ?? 'Mandiri',
+                    $p?->sub_category ?? '-',
                     $sub->event->title ?? ($sub->access_type === 'PUBLIC_SELF' ? 'Mandiri Publik' : 'Umum'),
-                    $p->province->name ?? '-',
-                    $p->regency->name ?? '-',
+                    $p?->province->name ?? '-',
+                    $p?->regency->name ?? '-',
                     $institutionDetail,
                     $res->rqi_score ?? '-',
                     $res->category_name ?? '-',
@@ -216,6 +228,12 @@ class AdminResultController extends Controller
             });
         }
 
+        if ($request->filled('sub_category')) {
+            $query->whereHas('participant', function ($q) use ($request) {
+                $q->where('sub_category', $request->sub_category);
+            });
+        }
+
         if ($request->filled('who5_status')) {
             if ($request->who5_status === 'sehat') {
                 $query->whereHas('result', fn($q) => $q->where('who5_percentage', '>=', 50));
@@ -230,6 +248,7 @@ class AdminResultController extends Controller
                 $q->where('submission_code', 'like', "%{$search}%")
                   ->orWhereHas('participant', function ($pq) use ($search) {
                       $pq->where('name', 'like', "%{$search}%")
+                         ->orWhere('sub_category', 'like', "%{$search}%")
                          ->orWhere('assessment_code', 'like', "%{$search}%");
                   });
             });

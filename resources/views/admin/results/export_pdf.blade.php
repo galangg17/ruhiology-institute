@@ -137,7 +137,12 @@
                             <td class="p-2.5 text-center font-bold text-slate-400">{{ $index + 1 }}</td>
                             <td class="p-2.5 font-mono font-bold text-[#0B2A43] whitespace-nowrap">{{ $sub->submission_code }}</td>
                             <td class="p-2.5 font-bold text-slate-900">{{ $p?->name ?? 'Anonim' }}</td>
-                            <td class="p-2.5 whitespace-nowrap text-slate-600">{{ $p?->category ?? 'Mandiri' }}</td>
+                            <td class="p-2.5 whitespace-nowrap text-slate-600">
+                                {{ $p?->category === 'Umum' ? 'Mandiri' : ($p?->category ?? 'Mandiri') }}
+                                @if($p?->sub_category)
+                                    <span class="block text-[9px] font-bold text-[#0B2A43] font-mono">({{ $p->sub_category }})</span>
+                                @endif
+                            </td>
                             <td class="p-2.5 text-slate-600">{{ $p?->province?->name ?? '-' }} {{ $p?->regency ? '('.$p?->regency?->name.')' : '' }}</td>
                             <td class="p-2.5 text-center font-extrabold text-[#0B2A43] whitespace-nowrap">{{ $res->rqi_score ?? '-' }}</td>
                             <td class="p-2.5 text-center font-bold whitespace-nowrap {{ ($res->who5_percentage ?? 0) >= 50 ? 'text-emerald-700' : 'text-rose-700' }}">

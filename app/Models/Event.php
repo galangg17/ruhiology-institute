@@ -15,6 +15,8 @@ class Event extends Model
         'access_type',
         'assessment_type',
         'target_category',
+        'group_label',
+        'custom_subcategories',
         'institution_name',
         'province_id',
         'regency_id',
@@ -32,6 +34,7 @@ class Event extends Model
     ];
 
     protected $casts = [
+        'custom_subcategories' => 'array',
         'start_date' => 'datetime',
         'end_date' => 'datetime',
         'pretest_start' => 'datetime',

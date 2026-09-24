@@ -12,6 +12,7 @@ class AssessmentSubmission extends Model
     protected $fillable = [
         'event_id',
         'access_type',
+        'sub_category',
         'period_id',
         'participant_id',
         'submission_type',

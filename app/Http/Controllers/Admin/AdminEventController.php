@@ -52,6 +52,8 @@ class AdminEventController extends Controller
             'access_type' => ['required', 'in:EVENT_PROGRAM,PUBLIC_SELF'],
             'assessment_type' => ['required', 'in:single,prepost'],
             'target_category' => ['nullable', 'in:Pelajar,Mahasiswa/i,Umum'],
+            'group_label' => ['nullable', 'string', 'max:100'],
+            'custom_subcategories' => ['nullable'],
             'institution_name' => ['nullable', 'string', 'max:255'],
             'province_id' => ['nullable', 'exists:provinces,id'],
             'regency_id' => ['nullable', 'exists:regencies,id'],
@@ -73,6 +75,12 @@ class AdminEventController extends Controller
             $validated['event_code'] = 'RQ-' . $prefix . '-' . strtoupper(Str::random(6));
         } else {
             $validated['event_code'] = strtoupper(Str::slug($validated['event_code'], '-'));
+        }
+
+        // Process custom_subcategories input if string
+        if (isset($validated['custom_subcategories']) && is_string($validated['custom_subcategories'])) {
+            $items = array_map('trim', explode(',', $validated['custom_subcategories']));
+            $validated['custom_subcategories'] = array_values(array_filter($items));
         }
 
         $event = Event::create($validated);
@@ -129,6 +137,8 @@ class AdminEventController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'institution_name' => ['nullable', 'string', 'max:255'],
             'target_category' => ['nullable', 'in:Pelajar,Mahasiswa/i,Umum'],
+            'group_label' => ['nullable', 'string', 'max:100'],
+            'custom_subcategories' => ['nullable'],
             'province_id' => ['nullable', 'exists:provinces,id'],
             'regency_id' => ['nullable', 'exists:regencies,id'],
             'access_type' => ['nullable', 'in:EVENT_PROGRAM,PUBLIC_SELF'],
@@ -143,6 +153,11 @@ class AdminEventController extends Controller
             'status' => ['required', 'in:draft,active,completed,archived'],
             'description' => ['nullable', 'string'],
         ]);
+
+        if (isset($validated['custom_subcategories']) && is_string($validated['custom_subcategories'])) {
+            $items = array_map('trim', explode(',', $validated['custom_subcategories']));
+            $validated['custom_subcategories'] = array_values(array_filter($items));
+        }
 
         $event->update($validated);
 

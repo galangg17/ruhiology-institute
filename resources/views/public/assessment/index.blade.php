@@ -240,10 +240,23 @@
                                     class="py-2.5 px-3 rounded-xl border text-xs transition-colors text-center">
                                     <span x-text="cat.label"></span>
                                 </button>
-                            </template>
-                        </div>
                     </template>
                 </div>
+
+                <!-- Dynamic Sub-Category / Group Dropdown (If configured on event) -->
+                <template x-if="eventSubcategories && eventSubcategories.length > 0">
+                    <div class="p-4 bg-blue-50/70 border border-blue-200/90 rounded-2xl space-y-1.5">
+                        <label class="block font-bold text-[#0B2A43] text-xs">
+                            <span x-text="eventGroupLabel || 'Pilih Sub-Kategori / Kelas / Bidang'"></span> *
+                        </label>
+                        <select x-model="form.sub_category" required class="w-full p-3 text-xs font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
+                            <option value="">-- Pilih Opsi --</option>
+                            <template x-for="item in eventSubcategories" :key="item">
+                                <option :value="item" x-text="item"></option>
+                            </template>
+                        </select>
+                    </div>
+                </template>
 
                 <!-- 3. Regional Cascading: Province -> Regency -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -430,12 +443,15 @@ function rqAssessmentIndex() {
         eventName: '',
         eventInstitution: '',
         isCategoryLocked: false,
+        eventGroupLabel: '',
+        eventSubcategories: [],
 
         form: {
             event_code: new URLSearchParams(window.location.search).get('event') || '',
             name: '',
             birth_date: '',
             category: 'Pelajar',
+            sub_category: '',
             country_id: 1,
             province_id: null,
             regency_id: null,
@@ -482,6 +498,9 @@ function rqAssessmentIndex() {
                 this.eventName = '';
                 this.eventInstitution = '';
                 this.form.event_code = '';
+                this.form.sub_category = '';
+                this.eventGroupLabel = '';
+                this.eventSubcategories = [];
                 this.isCategoryLocked = false;
             }
             this.showRegModal = true;
@@ -494,8 +513,6 @@ function rqAssessmentIndex() {
 
         onEventSelectChange() {
             this.eventCheckError = '';
-            // Secrecy requirement: selecting an event in dropdown does NOT leak/prefill the event code!
-            // The participant must enter the code/key.
         },
 
         proceedWithEventSelection() {
@@ -530,6 +547,15 @@ function rqAssessmentIndex() {
                     this.eventName = evt.title;
                     this.eventInstitution = evt.institution_name || '';
                     this.form.event_code = evt.event_code;
+
+                    // Group / Subcategory Options
+                    if (evt.custom_subcategories && evt.custom_subcategories.length > 0) {
+                        this.eventGroupLabel = evt.group_label || 'Pilih Sub-Kategori / Kelas / Bidang';
+                        this.eventSubcategories = evt.custom_subcategories;
+                    } else {
+                        this.eventGroupLabel = '';
+                        this.eventSubcategories = [];
+                    }
 
                     // Preset Category Lock
                     if (evt.target_category) {

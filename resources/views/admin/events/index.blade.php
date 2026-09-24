@@ -223,22 +223,25 @@
                     </template>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block font-bold text-slate-800 text-xs mb-1.5">Preset Target Kategori Peserta *</label>
-                        <select name="target_category" class="w-full px-4 py-3 rounded-2xl border border-slate-300 bg-slate-50 font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-[#0B2A43] focus:bg-white transition text-xs">
-                            <option value="">-- Bebas / Fleksibel (Peserta Memilih) --</option>
-                            <option value="Pelajar">🏫 Pelajar (Siswa SD / SMP / SMA / SMK)</option>
-                            <option value="Mahasiswa/i">🎓 Mahasiswa / Mahasiswi</option>
-                            <option value="Umum">👤 Personal / Mandiri (Umum)</option>
-                        </select>
-                        <span class="text-[10px] text-slate-400 mt-1 block">Form registrasi peserta akan otomatis mengunci kategori ini</span>
+                <!-- Custom Group / Class / Subcategory Options -->
+                <div class="p-4 bg-blue-50/60 rounded-2xl border border-blue-200/80 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <label class="block font-bold text-[#0B2A43] text-xs">Dynamic Sub-Categories / Opsi Kelompok (Kelas/Divisi/Prodi)</label>
+                        <span class="text-[10px] font-bold text-blue-800 bg-blue-100 px-2 py-0.5 rounded">Semua Kategori</span>
                     </div>
 
-                    <div>
-                        <label class="block font-bold text-slate-800 text-xs mb-1.5">Nama Instansi / Lembaga Partner</label>
-                        <input type="text" name="institution_name" placeholder="Contoh: SMAN Titian Teras Jambi / Kanwil Kemenag Jambi" class="w-full px-4 py-3 rounded-2xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-[#0B2A43] focus:border-[#0B2A43] outline-none font-medium transition text-xs">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-bold text-slate-700 text-[11px] mb-1">Judul Label Form Peserta</label>
+                            <input type="text" name="group_label" placeholder="Contoh: Pilih Kelas / Pilih Divisi / Pilih Angkatan" class="w-full p-2.5 rounded-xl border border-slate-300 bg-white font-medium text-xs">
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-slate-700 text-[11px] mb-1">Opsi Pilihan (Pisahkan Komma)</label>
+                            <input type="text" name="custom_subcategories" placeholder="Contoh: Kelas X-A, Kelas X-B, Kelas XI IPA 1, Kelas XI IPA 2" class="w-full p-2.5 rounded-xl border border-slate-300 bg-white font-medium text-xs">
+                        </div>
                     </div>
+                    <span class="text-[10px] text-slate-500 block">Daftar opsi ini akan otomatis muncul sebagai dropdown pilihan kelas/kelompok saat peserta mendaftar event ini.</span>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">

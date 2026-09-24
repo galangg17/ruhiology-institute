@@ -21,6 +21,7 @@ class Participant extends Model
         'name',
         'birth_date',
         'category',
+        'sub_category',
         'email',
         'phone',
         'batch',

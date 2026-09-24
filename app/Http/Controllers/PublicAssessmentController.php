@@ -70,6 +70,7 @@ class PublicAssessmentController extends Controller
             'occupation_id' => ['nullable', 'exists:occupations,id'],
             'occupation_custom' => ['nullable', 'string', 'max:255'],
             
+            'sub_category' => ['nullable', 'string', 'max:255'],
             'event_code' => ['nullable', 'string'],
             'period_code' => ['nullable', 'string'],
         ]);
@@ -118,6 +119,7 @@ class PublicAssessmentController extends Controller
             'name' => trim($validated['name']),
             'birth_date' => $validated['birth_date'],
             'category' => $validated['category'],
+            'sub_category' => $validated['sub_category'] ?? null,
             'email' => $email,
             'country_id' => $countryId,
             'province_id' => $validated['province_id'],
@@ -409,6 +411,8 @@ class PublicAssessmentController extends Controller
                 'title' => $event->title,
                 'institution_name' => $event->institution_name,
                 'target_category' => $event->target_category,
+                'group_label' => $event->group_label,
+                'custom_subcategories' => $event->custom_subcategories,
                 'province_id' => $event->province_id,
                 'regency_id' => $event->regency_id,
             ]

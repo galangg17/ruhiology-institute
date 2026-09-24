@@ -160,7 +160,11 @@
                             <td class="p-4">
                                 <strong class="text-slate-900 block font-bold text-sm">{{ $p?->name ?? 'Anonim' }}</strong>
                                 <span class="text-[11px] text-slate-500 font-normal">
-                                    {{ $p?->category ?? 'Umum' }} {{ $p?->birth_date ? '• ' . \Carbon\Carbon::parse($p?->birth_date)->age . ' Thn' : '' }}
+                                    {{ $p?->category === 'Umum' ? 'Personal / Mandiri' : ($p?->category ?? 'Mandiri') }}
+                                    @if($p?->sub_category)
+                                        <span class="inline-block bg-blue-100 text-blue-900 border border-blue-200 text-[10px] font-bold px-2 py-0.5 rounded-full ml-1">{{ $p->sub_category }}</span>
+                                    @endif
+                                    {{ $p?->birth_date ? ' • ' . \Carbon\Carbon::parse($p?->birth_date)->age . ' Thn' : '' }}
                                 </span>
                             </td>
 
