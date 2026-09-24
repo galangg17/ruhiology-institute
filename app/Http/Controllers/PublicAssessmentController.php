@@ -25,9 +25,13 @@ class PublicAssessmentController extends Controller
 
     public function index()
     {
-        $activePeriods = AssessmentPeriod::where('status', 'active')
-            ->with(['program.institution', 'instrument'])
-            ->get();
+        try {
+            $activePeriods = AssessmentPeriod::where('status', 'active')
+                ->with(['program.institution', 'instrument'])
+                ->get();
+        } catch (\Throwable $e) {
+            $activePeriods = collect([]);
+        }
 
         $defaultPeriod = $activePeriods->first();
 
