@@ -391,39 +391,71 @@
 
     </div>
 
-    <!-- INSTAGRAM / WHATSAPP STORY 9:16 SHARE MODAL -->
-    <div x-show="showStoryModal" x-cloak class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[9999] flex items-center justify-center p-4 animate-fadeIn no-print">
-        <div @click.away="showStoryModal = false" class="bg-slate-900 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-800 flex flex-col space-y-5 text-center">
+    <!-- INSTAGRAM / WHATSAPP STORY 9:16 SHARE MODAL (2-COLUMN SPLIT GRID) -->
+    <div x-show="showStoryModal" x-cloak class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[9999] flex items-center justify-center p-4 sm:p-6 animate-fadeIn no-print">
+        <div @click.away="showStoryModal = false" class="bg-slate-900 rounded-3xl max-w-3xl w-full p-6 sm:p-8 shadow-2xl border border-slate-800 space-y-6">
             
-            <!-- Header -->
+            <!-- Modal Header -->
             <div class="flex items-center justify-between border-b border-slate-800 pb-4">
                 <div class="flex items-center gap-3">
-                    <span class="text-2xl">📱</span>
-                    <div class="text-left">
-                        <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest block">INSTAGRAM & WHATSAPP STORY</span>
-                        <h3 class="text-lg font-serif font-bold text-white">Kartu Hasil 9:16</h3>
+                    <div class="w-10 h-10 rounded-2xl bg-[#C9A24D]/10 border border-[#C9A24D]/30 flex items-center justify-center text-xl text-[#C9A24D]">
+                        📱
+                    </div>
+                    <div>
+                        <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest block">INSTAGRAM & WHATSAPP STORY ENGINE</span>
+                        <h3 class="text-lg font-serif font-bold text-white">Kartu Visual Hasil Asesmen (Rasio 9:16)</h3>
                     </div>
                 </div>
                 <button @click="showStoryModal = false" type="button" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-slate-400 hover:text-white flex items-center justify-center transition cursor-pointer">✕</button>
             </div>
 
-            <p class="text-xs text-slate-300 leading-relaxed text-left">
-                Format visual 9:16 minimalis dan elegan untuk dibagikan ke Story Instagram atau Status WhatsApp Anda:
-            </p>
+            <!-- 2-Column Split Body Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                
+                <!-- Left Column (5 Cols): Card Canvas Preview -->
+                <div class="md:col-span-5 bg-black/60 p-4 rounded-3xl border border-slate-800 flex justify-center items-center">
+                    <canvas id="storyCanvas" class="w-full max-w-[210px] sm:max-w-[230px] aspect-[9/16] rounded-2xl shadow-2xl border border-slate-700/80"></canvas>
+                </div>
 
-            <!-- Preview Canvas Container -->
-            <div class="bg-black/60 p-4 rounded-3xl border border-slate-800/80 flex justify-center items-center">
-                <canvas id="storyCanvas" class="w-full max-w-[280px] sm:max-w-[320px] aspect-[9/16] rounded-2xl shadow-2xl border border-slate-700/80"></canvas>
-            </div>
+                <!-- Right Column (7 Cols): Information & Actions -->
+                <div class="md:col-span-7 space-y-5 text-left text-xs">
+                    
+                    <div class="space-y-2">
+                        <h4 class="text-sm font-bold text-white">Siap Dibagikan ke Media Sosial</h4>
+                        <p class="text-slate-300 leading-relaxed font-normal">
+                            Format visual 9:16 dirancang dengan estetika minimalis & elegan, memuat ringkasan profil kecerdasan batiniah Anda secara resmi dari Ruhiology Institute.
+                        </p>
+                    </div>
 
-            <!-- Actions -->
-            <div class="pt-2 flex flex-col sm:flex-row gap-3">
-                <button type="button" @click="showStoryModal = false" class="w-full sm:w-1/2 py-3.5 rounded-2xl border border-slate-700 text-slate-300 font-bold text-xs hover:bg-slate-800 transition cursor-pointer">
-                    Tutup
-                </button>
-                <button type="button" @click="downloadStoryImage()" class="w-full sm:w-1/2 py-3.5 rounded-2xl bg-gradient-to-r from-[#C9A24D] to-[#B48A16] hover:from-[#B48A16] hover:to-[#96710E] text-[#0B2A43] font-extrabold text-xs uppercase tracking-wider shadow-lg transition transform hover:scale-[1.02] cursor-pointer flex items-center justify-center gap-2">
-                    <span>📥 Unduh Kartu Story</span>
-                </button>
+                    <!-- Feature List -->
+                    <div class="p-4 bg-slate-800/60 rounded-2xl border border-slate-700/60 space-y-2.5">
+                        <div class="flex items-center gap-2 text-slate-200">
+                            <span class="text-[#C9A24D]">✨</span>
+                            <span>Resolusi HD Terstandar (1080 x 1920 px)</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-slate-200">
+                            <span class="text-[#C9A24D]">📊</span>
+                            <span>Menampilkan Skor RQI-15 & Interpretasi Resmi</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-slate-200">
+                            <span class="text-[#C9A24D]">🏛️</span>
+                            <span>Dilengkapi Autentikasi Logo & Founder Ruhiologi</span>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="pt-2 space-y-3">
+                        <button type="button" @click="downloadStoryImage()" class="w-full py-4 bg-gradient-to-r from-[#C9A24D] to-[#B48A16] hover:from-[#B48A16] hover:to-[#96710E] text-[#0B2A43] font-extrabold text-xs uppercase tracking-wider rounded-2xl shadow-xl transition transform hover:-translate-y-0.5 cursor-pointer flex items-center justify-center gap-2">
+                            <span>📥 Unduh Gambar Story (PNG)</span>
+                        </button>
+
+                        <button type="button" @click="showStoryModal = false" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-2xl transition cursor-pointer">
+                            Tutup
+                        </button>
+                    </div>
+
+                </div>
+
             </div>
 
         </div>
