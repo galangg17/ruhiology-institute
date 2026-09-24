@@ -30,13 +30,13 @@ return new class extends Migration
             
             $table->string('assessment_code', 30)->nullable()->unique()->after('participant_code');
 
-            $table->index(['category', 'province_id', 'regency_id']);
-            $table->index(['university_id', 'faculty_id', 'study_program_id']);
+            $table->index(['category', 'province_id', 'regency_id'], 'idx_part_cat_prov_reg');
+            $table->index(['university_id', 'faculty_id', 'study_program_id'], 'idx_part_univ_fac_prog');
         });
 
         Schema::table('assessment_submissions', function (Blueprint $table) {
             $table->string('cycle_status')->default('PRE_COMPLETED')->after('status'); // CREATED, PRE_AVAILABLE, PRE_COMPLETED, POST_LOCKED, POST_AVAILABLE, POST_COMPLETED
-            $table->index(['participant_id', 'submission_type', 'cycle_status']);
+            $table->index(['participant_id', 'submission_type', 'cycle_status'], 'idx_sub_part_type_cycle');
         });
 
         Schema::table('assessment_results', function (Blueprint $table) {
@@ -67,7 +67,7 @@ return new class extends Migration
         });
 
         Schema::table('assessment_submissions', function (Blueprint $table) {
-            $table->dropIndex(['participant_id', 'submission_type', 'cycle_status']);
+            $table->dropIndex('idx_sub_part_type_cycle');
             $table->dropColumn('cycle_status');
         });
 
