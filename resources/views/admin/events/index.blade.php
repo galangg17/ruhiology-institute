@@ -130,81 +130,92 @@
     </div>
 
     <!-- CREATE EVENT MODAL -->
-    <div x-show="createModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
-        <div @click.away="createModal = false" class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border border-slate-100 max-h-[90vh] overflow-y-auto">
+    <div x-show="createModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/70 backdrop-blur-md animate-fadeIn">
+        <div @click.away="createModal = false" class="bg-white rounded-3xl max-w-2xl w-full shadow-2xl relative border border-slate-100 max-h-[92vh] flex flex-col overflow-hidden">
             
-            <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
-                <div>
-                    <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-wider">EVENT / BATCH SETUP</span>
-                    <h3 class="text-xl font-serif font-bold text-[#0B2A43]">Buat Event Asesmen Baru</h3>
+            <!-- Modal Header -->
+            <div class="px-6 py-5 bg-[#0B2A43] text-white flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-[#C9A24D] text-[#0B2A43] font-bold flex items-center justify-center text-lg shadow">
+                        ✨
+                    </div>
+                    <div>
+                        <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest block">EVENT SETUP FORM</span>
+                        <h3 class="text-lg font-serif font-bold text-white">Buat Event Asesmen Baru</h3>
+                    </div>
                 </div>
-                <button @click="createModal = false" type="button" class="text-slate-400 hover:text-slate-700">✕</button>
+                <button @click="createModal = false" type="button" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white flex items-center justify-center transition">✕</button>
             </div>
 
-            <form action="{{ route('admin.events.store') }}" method="POST" class="space-y-4 text-xs">
+            <!-- Modal Body (Scrollable with padding) -->
+            <form action="{{ route('admin.events.store') }}" method="POST" class="p-6 sm:p-8 space-y-5 text-xs overflow-y-auto flex-1">
                 @csrf
                 
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1">Nama Event / Kegiatan *</label>
-                    <input type="text" name="title" required placeholder="Contoh: Uji Ruhiologi Pemda Jambi 2026" class="w-full p-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none">
+                    <label class="block font-bold text-slate-800 text-xs mb-1.5">Nama Event / Kegiatan *</label>
+                    <input type="text" name="title" required placeholder="Contoh: Uji Ruhiologi Pemda Jambi 2026" class="w-full px-4 py-3 rounded-2xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-[#0B2A43] focus:border-[#0B2A43] outline-none font-medium transition text-xs">
                 </div>
 
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block font-bold text-slate-700 mb-1">Kode Event (Opsional)</label>
-                        <input type="text" name="event_code" placeholder="Contoh: RQ-JAMBI-26" class="w-full p-3 rounded-xl border border-slate-300 font-mono focus:ring-2 focus:ring-[#0B2A43] outline-none uppercase">
-                        <span class="text-[10px] text-slate-400">Kosongkan untuk auto-generate</span>
+                        <label class="block font-bold text-slate-800 text-xs mb-1.5">Kode Event (Unique Code)</label>
+                        <input type="text" name="event_code" placeholder="Contoh: RQ-JAMBI-26" class="w-full px-4 py-3 rounded-2xl border border-slate-300 font-mono bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-[#0B2A43] focus:border-[#0B2A43] outline-none uppercase font-bold text-xs">
+                        <span class="text-[10px] text-slate-400 mt-1 block">Kosongkan jika ingin dibuatkan otomatis oleh sistem</span>
                     </div>
 
                     <div>
-                        <label class="block font-bold text-slate-700 mb-1">Tipe Akses *</label>
-                        <select name="access_type" required class="w-full p-3 rounded-xl border border-slate-300 font-bold bg-slate-50 outline-none">
-                            <option value="EVENT_PROGRAM">🔵 Event / Kegiatan Khusus</option>
-                            <option value="PUBLIC_SELF">🟢 Mandiri Umum</option>
+                        <label class="block font-bold text-slate-800 text-xs mb-1.5">Tipe Akses *</label>
+                        <select name="access_type" required class="w-full px-4 py-3 rounded-2xl border border-slate-300 bg-slate-50 font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-[#0B2A43] focus:bg-white transition text-xs">
+                            <option value="EVENT_PROGRAM">🔵 Event / Kegiatan Khusus (Instansi/Acara)</option>
+                            <option value="PUBLIC_SELF">🟢 Mandiri Umum (Terbuka Publik)</option>
                         </select>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1">Nama Instansi / Lembaga Partner</label>
-                    <input type="text" name="institution_name" placeholder="Contoh: Kanwil Kemenag Jambi / Universitas X" class="w-full p-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none">
+                    <label class="block font-bold text-slate-800 text-xs mb-1.5">Nama Instansi / Lembaga Partner</label>
+                    <input type="text" name="institution_name" placeholder="Contoh: SMAN Titian Teras Jambi / Kanwil Kemenag Jambi" class="w-full px-4 py-3 rounded-2xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-[#0B2A43] focus:border-[#0B2A43] outline-none font-medium transition text-xs">
                 </div>
 
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block font-bold text-slate-700 mb-1">Tanggal Mulai</label>
-                        <input type="date" name="start_date" class="w-full p-3 rounded-xl border border-slate-300 outline-none">
+                        <label class="block font-bold text-slate-800 text-xs mb-1.5">Tanggal Mulai</label>
+                        <input type="date" name="start_date" class="w-full px-4 py-3 rounded-2xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-[#0B2A43] outline-none transition text-xs font-medium">
                     </div>
                     <div>
-                        <label class="block font-bold text-slate-700 mb-1">Tanggal Selesai</label>
-                        <input type="date" name="end_date" class="w-full p-3 rounded-xl border border-slate-300 outline-none">
+                        <label class="block font-bold text-slate-800 text-xs mb-1.5">Tanggal Selesai</label>
+                        <input type="date" name="end_date" class="w-full px-4 py-3 rounded-2xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-[#0B2A43] outline-none transition text-xs font-medium">
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block font-bold text-slate-700 mb-1">Target Kuota Peserta</label>
-                        <input type="number" name="quota" placeholder="Contoh: 250" class="w-full p-3 rounded-xl border border-slate-300 outline-none">
+                        <label class="block font-bold text-slate-800 text-xs mb-1.5">Target Kuota Peserta</label>
+                        <input type="number" name="quota" placeholder="Contoh: 250" class="w-full px-4 py-3 rounded-2xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-[#0B2A43] outline-none font-medium transition text-xs">
                     </div>
                     <div>
-                        <label class="block font-bold text-slate-700 mb-1">Status Event *</label>
-                        <select name="status" required class="w-full p-3 rounded-xl border border-slate-300 font-bold bg-slate-50 outline-none">
-                            <option value="active">🟢 Active (Bisa diakses)</option>
-                            <option value="draft">⚪ Draft</option>
-                            <option value="completed">🔵 Completed</option>
-                            <option value="archived">🔴 Archived</option>
+                        <label class="block font-bold text-slate-800 text-xs mb-1.5">Status Event *</label>
+                        <select name="status" required class="w-full px-4 py-3 rounded-2xl border border-slate-300 bg-slate-50 font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-[#0B2A43] focus:bg-white transition text-xs">
+                            <option value="active">🟢 Active (Siap Diakses Peserta)</option>
+                            <option value="draft">⚪ Draft (Konsep Internal)</option>
+                            <option value="completed">🔵 Completed (Selesai)</option>
+                            <option value="archived">🔴 Archived (Diarsipkan)</option>
                         </select>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1">Catatan / Deskripsi Event</label>
-                    <textarea name="description" rows="2" placeholder="Catatan singkat peruntukan kegiatan ini..." class="w-full p-3 rounded-xl border border-slate-300 outline-none"></textarea>
+                    <label class="block font-bold text-slate-800 text-xs mb-1.5">Catatan / Deskripsi Event</label>
+                    <textarea name="description" rows="3" placeholder="Catatan singkat peruntukan kegiatan ini..." class="w-full px-4 py-3 rounded-2xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-[#0B2A43] outline-none font-medium transition text-xs"></textarea>
                 </div>
 
-                <div class="pt-2">
-                    <button type="submit" class="w-full py-3.5 bg-[#0B2A43] hover:bg-[#123B59] text-white font-bold rounded-xl shadow-lg transition cursor-pointer">
-                        🚀 Simpan Event & Buat Akses →
+                <!-- Modal Footer Actions -->
+                <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
+                    <button @click="createModal = false" type="button" class="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl transition cursor-pointer text-xs">
+                        Batal
+                    </button>
+                    <button type="submit" class="px-7 py-3 bg-gradient-to-r from-[#C9A24D] to-[#B48A16] hover:from-[#B48A16] hover:to-[#96710E] text-[#0B2A43] font-extrabold rounded-2xl shadow-lg transition transform hover:-translate-y-0.5 cursor-pointer text-xs flex items-center gap-2">
+                        <span>🚀 Simpan Event & Terbitkan Akses →</span>
                     </button>
                 </div>
             </form>
