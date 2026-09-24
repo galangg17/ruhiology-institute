@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminAuditLogController;
 use App\Http\Controllers\Admin\AdminCmsController;
 use App\Http\Controllers\Admin\AdminConsultationController;
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminEventController;
 use App\Http\Controllers\Admin\AdminInstitutionController;
 use App\Http\Controllers\Admin\AdminInstrumentController;
 use App\Http\Controllers\Admin\AdminOrderController;
@@ -128,15 +129,23 @@ Route::middleware(['auth', \App\Http\Middleware\EnsureAdminAccess::class])
         Route::post('/instruments/{instrument}/questions', [AdminInstrumentController::class, 'storeQuestion'])->name('instruments.questions.store');
         Route::post('/instruments/{instrument}/scoring', [AdminInstrumentController::class, 'updateScoringRule'])->name('instruments.scoring.update');
 
+        // Assessment Events Management (Event / Batch Program)
+        Route::get('/events', [AdminEventController::class, 'index'])->name('events.index');
+        Route::post('/events', [AdminEventController::class, 'store'])->name('events.store');
+        Route::get('/events/{event}', [AdminEventController::class, 'show'])->name('events.show');
+        Route::put('/events/{event}', [AdminEventController::class, 'update'])->name('events.update');
+        Route::delete('/events/{event}', [AdminEventController::class, 'destroy'])->name('events.destroy');
+
         // Assessment Periods (Pretest / Posttest)
         Route::get('/periods', [AdminPeriodController::class, 'index'])->name('periods.index');
         Route::post('/periods', [AdminPeriodController::class, 'store'])->name('periods.store');
         Route::put('/periods/{period}', [AdminPeriodController::class, 'update'])->name('periods.update');
 
-        // Assessment Results & Reporting Export
+        // Assessment Results & Multi-dimensional Reporting Export
         Route::get('/results', [AdminResultController::class, 'index'])->name('results.index');
         Route::get('/results/{submission}', [AdminResultController::class, 'show'])->name('results.show');
         Route::get('/reports/export-csv', [AdminResultController::class, 'exportCsv'])->name('reports.export_csv');
+        Route::get('/reports/export-pdf', [AdminResultController::class, 'exportPdf'])->name('reports.export_pdf');
 
         // Training Center Management
         Route::get('/training', [AdminTrainingController::class, 'index'])->name('training.index');

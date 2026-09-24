@@ -6,8 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\AssessmentPeriod;
 use App\Models\AssessmentResult;
 use App\Models\AssessmentSubmission;
+use App\Models\Event;
 use App\Models\Institution;
 use App\Models\Program;
+use App\Models\Province;
+use App\Models\Regency;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -15,54 +18,45 @@ class AdminResultController extends Controller
 {
     public function index(Request $request)
     {
-        $query = AssessmentSubmission::where('status', 'submitted')
-            ->with([
-                'participant.institution',
-                'participant.program',
-                'period.instrument',
-                'result.dimensionResults.dimension'
-            ]);
+        $query = $this->buildFilterQuery($request);
 
-        if ($request->filled('institution_id')) {
-            $query->whereHas('participant', function ($q) use ($request) {
-                $q->where('institution_id', $request->institution_id);
-            });
-        }
+        $submissions = $query->latest('submitted_at')->paginate(15)->withQueryString();
 
-        if ($request->filled('program_id')) {
-            $query->whereHas('participant', function ($q) use ($request) {
-                $q->where('program_id', $request->program_id);
-            });
-        }
+        $events = Event::where('status', 'active')->orWhere('id', $request->event_id)->get();
+        $provinces = Province::where('status', 'active')->orderBy('name')->get();
+        $regencies = $request->filled('province_id')
+            ? Regency::where('province_id', $request->province_id)->orderBy('name')->get()
+            : collect([]);
 
-        if ($request->filled('period_id')) {
-            $query->where('period_id', $request->period_id);
-        }
+        // Calculated stats for current filter
+        $allFilteredSubmissions = $this->buildFilterQuery($request)->get();
+        $results = $allFilteredSubmissions->pluck('result')->filter();
 
-        if ($request->filled('submission_type')) {
-            $query->where('submission_type', $request->submission_type);
-        }
+        $stats = [
+            'total' => $allFilteredSubmissions->count(),
+            'avg_rqi' => $results->count() > 0 ? round($results->avg('rqi_score'), 1) : 0,
+            'avg_who5' => $results->count() > 0 ? round($results->avg('who5_percentage'), 1) : 0,
+            'who5_sehat' => $results->filter(fn($r) => $r->who5_percentage >= 50)->count(),
+            'who5_skrining' => $results->filter(fn($r) => $r->who5_percentage < 50)->count(),
+        ];
 
-        if ($request->filled('q')) {
-            $query->whereHas('participant', function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->q . '%')
-                  ->orWhere('participant_code', 'like', '%' . $request->q . '%');
-            });
-        }
-
-        $submissions = $query->latest('submitted_at')->paginate(15);
-
-        $institutions = Institution::all();
-        $programs = Program::all();
-        $periods = AssessmentPeriod::all();
-
-        return view('admin.results.index', compact('submissions', 'institutions', 'programs', 'periods'));
+        return view('admin.results.index', compact(
+            'submissions',
+            'events',
+            'provinces',
+            'regencies',
+            'stats'
+        ));
     }
 
     public function show(AssessmentSubmission $submission)
     {
         $submission->load([
-            'participant.institution',
+            'participant.province',
+            'participant.regency',
+            'participant.school',
+            'participant.university',
+            'event',
             'period.program',
             'period.instrument',
             'result.dimensionResults.dimension',
@@ -70,106 +64,177 @@ class AdminResultController extends Controller
             'answers.option'
         ]);
 
-        // Pre/Post Comparison object if exists
-        $pretestSubmission = null;
-        $posttestSubmission = null;
-
-        if ($submission->submission_type === 'posttest') {
-            $posttestSubmission = $submission;
-            $pretestSubmission = AssessmentSubmission::where('period_id', $submission->period_id)
-                ->where('participant_id', $submission->participant_id)
-                ->where('submission_type', 'pretest')
-                ->where('status', 'submitted')
-                ->with('result.dimensionResults.dimension')
-                ->first();
-        } elseif ($submission->submission_type === 'pretest') {
-            $pretestSubmission = $submission;
-            $posttestSubmission = AssessmentSubmission::where('period_id', $submission->period_id)
-                ->where('participant_id', $submission->participant_id)
-                ->where('submission_type', 'posttest')
-                ->where('status', 'submitted')
-                ->with('result.dimensionResults.dimension')
-                ->first();
-        }
-
-        return view('admin.results.show', compact('submission', 'pretestSubmission', 'posttestSubmission'));
+        return view('admin.results.show', compact('submission'));
     }
 
-    public function exportCsv(Request $request): StreamedResponse
+    public function exportCsv(Request $request)
     {
-        $query = AssessmentSubmission::where('status', 'submitted')
-            ->with([
-                'participant.institution',
-                'participant.program',
-                'period.instrument',
-                'result'
-            ]);
+        $submissions = $this->buildFilterQuery($request)->latest('submitted_at')->get();
 
-        if ($request->filled('institution_id')) {
-            $query->whereHas('participant', function ($q) use ($request) {
-                $q->where('institution_id', $request->institution_id);
-            });
-        }
-
-        if ($request->filled('program_id')) {
-            $query->whereHas('participant', function ($q) use ($request) {
-                $q->where('program_id', $request->program_id);
-            });
-        }
-
-        if ($request->filled('period_id')) {
-            $query->where('period_id', $request->period_id);
-        }
-
-        $submissions = $query->get();
+        $filename = 'Rekap_Hasil_Asesmen_Ruhiology_' . date('Y-m-d_His') . '.csv';
 
         $headers = [
-            "Content-type" => "text/csv",
-            "Content-Disposition" => "attachment; filename=Laporan_Asesmen_RQ_" . date('Y-m-d_H-i-s') . ".csv",
-            "Pragma" => "no-cache",
-            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
-            "Expires" => "0"
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
         ];
 
         $callback = function () use ($submissions) {
             $file = fopen('php://output', 'w');
+            
+            // UTF-8 BOM for Excel compatibility
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+
+            // CSV Header Row
             fputcsv($file, [
-                'Submission Code',
-                'Participant Code',
-                'Participant Name',
-                'Email',
-                'Institution',
-                'Program',
-                'Assessment Type',
-                'Total Score',
-                'Max Score',
-                'Percentage (%)',
-                'Pre-Post Delta',
-                'Interpretation',
-                'Submitted At'
+                'No',
+                'Kode Assessment',
+                'Tanggal Submit',
+                'Nama Peserta',
+                'Kategori Peserta',
+                'Event / Kegiatan',
+                'Provinsi',
+                'Kabupaten/Kota',
+                'Sekolah / Kampus / Pekerjaan',
+                'Skor RQI (0-100)',
+                'Kategori RQI',
+                'Skor WHO-5 (%)',
+                'Status WHO-5',
+                'Tipe Sesi'
             ]);
 
-            foreach ($submissions as $sub) {
+            foreach ($submissions as $index => $sub) {
+                $p = $sub->participant;
+                $res = $sub->result;
+
+                $institutionDetail = '-';
+                if ($p) {
+                    if ($p->category === 'Pelajar') {
+                        $institutionDetail = ($p->school_level ? $p->school_level . ' ' : '') . ($p->school->name ?? '');
+                    } elseif ($p->category === 'Mahasiswa/i') {
+                        $institutionDetail = $p->university->name ?? '-';
+                    } else {
+                        $institutionDetail = $p->occupation ?? $p->occupation_custom ?? 'Umum';
+                    }
+                }
+
+                $who5Status = '-';
+                if ($res && $res->who5_percentage !== null) {
+                    $who5Status = $res->who5_percentage >= 50 ? 'Kesejahteraan Baik' : 'Indikasi Perlu Skrining';
+                }
+
                 fputcsv($file, [
+                    $index + 1,
                     $sub->submission_code,
-                    $sub->participant->participant_code,
-                    $sub->participant->name,
-                    $sub->participant->email,
-                    $sub->participant->institution->name ?? 'N/A',
-                    $sub->participant->program->name ?? 'N/A',
-                    strtoupper($sub->submission_type),
-                    $sub->result->total_score ?? 0,
-                    $sub->result->max_score ?? 0,
-                    $sub->result->percentage ?? 0,
-                    $sub->result->pre_post_diff ?? '-',
-                    $sub->result->overall_interpretation ?? '-',
-                    $sub->submitted_at ? $sub->submitted_at->format('Y-m-d H:i:s') : '-',
+                    $sub->submitted_at ? $sub->submitted_at->format('Y-m-d H:i') : '-',
+                    $p->name ?? 'Anonim',
+                    $p->category ?? 'Umum',
+                    $sub->event->title ?? ($sub->access_type === 'PUBLIC_SELF' ? 'Mandiri Publik' : 'Umum'),
+                    $p->province->name ?? '-',
+                    $p->regency->name ?? '-',
+                    $institutionDetail,
+                    $res->rqi_score ?? '-',
+                    $res->category_name ?? '-',
+                    $res->who5_percentage !== null ? $res->who5_percentage . '%' : '-',
+                    $who5Status,
+                    strtoupper($sub->submission_type)
                 ]);
             }
 
             fclose($file);
         };
 
-        return response()->stream($callback, 200, $headers);
+        return new StreamedResponse($callback, 200, $headers);
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $submissions = $this->buildFilterQuery($request)->latest('submitted_at')->get();
+        $results = $submissions->pluck('result')->filter();
+
+        $event = $request->filled('event_id') ? Event::find($request->event_id) : null;
+        $province = $request->filled('province_id') ? Province::find($request->province_id) : null;
+        $regency = $request->filled('regency_id') ? Regency::find($request->regency_id) : null;
+
+        $avgRqi = $results->count() > 0 ? round($results->avg('rqi_score'), 1) : 0;
+        $avgWho5 = $results->count() > 0 ? round($results->avg('who5_percentage'), 1) : 0;
+
+        $who5SehatCount = $results->filter(fn($r) => $r->who5_percentage >= 50)->count();
+        $who5SkriningCount = $results->filter(fn($r) => $r->who5_percentage < 50)->count();
+
+        return view('admin.results.export_pdf', compact(
+            'submissions',
+            'results',
+            'event',
+            'province',
+            'regency',
+            'avgRqi',
+            'avgWho5',
+            'who5SehatCount',
+            'who5SkriningCount',
+            'request'
+        ));
+    }
+
+    private function buildFilterQuery(Request $request)
+    {
+        $query = AssessmentSubmission::where('status', 'submitted')
+            ->with([
+                'participant.province',
+                'participant.regency',
+                'participant.school',
+                'participant.university',
+                'event',
+                'period.instrument',
+                'result'
+            ]);
+
+        if ($request->filled('event_id')) {
+            if ($request->event_id === 'PUBLIC_SELF') {
+                $query->where(function ($q) {
+                    $q->whereNull('event_id')->orWhere('access_type', 'PUBLIC_SELF');
+                });
+            } else {
+                $query->where('event_id', $request->event_id);
+            }
+        }
+
+        if ($request->filled('province_id')) {
+            $query->whereHas('participant', function ($q) use ($request) {
+                $q->where('province_id', $request->province_id);
+            });
+        }
+
+        if ($request->filled('regency_id')) {
+            $query->whereHas('participant', function ($q) use ($request) {
+                $q->where('regency_id', $request->regency_id);
+            });
+        }
+
+        if ($request->filled('category')) {
+            $query->whereHas('participant', function ($q) use ($request) {
+                $q->where('category', $request->category);
+            });
+        }
+
+        if ($request->filled('who5_status')) {
+            if ($request->who5_status === 'sehat') {
+                $query->whereHas('result', fn($q) => $q->where('who5_percentage', '>=', 50));
+            } elseif ($request->who5_status === 'skrining') {
+                $query->whereHas('result', fn($q) => $q->where('who5_percentage', '<', 50));
+            }
+        }
+
+        if ($request->filled('q')) {
+            $search = trim($request->q);
+            $query->where(function ($q) use ($search) {
+                $q->where('submission_code', 'like', "%{$search}%")
+                  ->orWhereHas('participant', function ($pq) use ($search) {
+                      $pq->where('name', 'like', "%{$search}%")
+                         ->orWhere('assessment_code', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        return $query;
     }
 }

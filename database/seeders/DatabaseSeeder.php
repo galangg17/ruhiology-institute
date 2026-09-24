@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
             MasterDataSeeder::class,
             InstitutionAndProgramSeeder::class,
             InstrumentSeeder::class,
+            EventSeeder::class,
             ParticipantAndAssessmentSeeder::class,
             TrainingSeeder::class,
             CatalogSeeder::class,

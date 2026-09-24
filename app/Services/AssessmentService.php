@@ -108,6 +108,8 @@ class AssessmentService
             $submissionCode = 'SUB-' . strtoupper(Str::random(10));
 
             $submission = AssessmentSubmission::create([
+                'event_id' => $participant->event_id,
+                'access_type' => $participant->access_type ?? 'PUBLIC_SELF',
                 'period_id' => $period->id,
                 'participant_id' => $participant->id,
                 'submission_type' => $type,

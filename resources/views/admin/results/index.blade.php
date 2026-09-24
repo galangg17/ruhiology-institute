@@ -2,139 +2,221 @@
 
 @section('content')
 <div class="space-y-6">
-    <!-- Header Title & Export Button -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+
+    <!-- HEADER TITLE & DYNAMIC EXPORT BUTTONS -->
+    <div class="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-            <h2 class="text-xl sm:text-2xl font-bold font-serif text-slate-900 tracking-tight">Hasil & Laporan Asesmen RQ</h2>
-            <p class="text-xs text-slate-500 mt-0.5">Hasil pengerjaan individu, rekap capaian dimensi, dan perbandingan Pretest vs Posttest.</p>
+            <div class="inline-flex items-center gap-2 bg-[#0B2A43]/10 text-[#0B2A43] text-[10px] font-mono font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-2">
+                <span>📊 INTEGRATED ASSESSMENT ANALYTICS & EXPORT</span>
+            </div>
+            <h1 class="text-2xl font-bold font-serif text-[#0B2A43]">Hasil & Rekap Asesmen Ruhiologi</h1>
+            <p class="text-xs text-slate-500 mt-1">Laporan rekapitulasi nilai Indeks Ruhiologi (RQI-15) & Skrining Kesejahteraan Emosional (WHO-5).</p>
         </div>
-        <a href="{{ route('admin.reports.export_csv', request()->all()) }}" class="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-sm hover:shadow transition flex items-center gap-2 shrink-0">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-            <span>Export Laporan CSV</span>
-        </a>
+
+        <div class="flex flex-wrap items-center gap-2 shrink-0">
+            <a href="{{ route('admin.reports.export_csv', request()->all()) }}" class="px-4 py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-2xl shadow-md transition flex items-center gap-2">
+                <span>📥 Export Excel (.xlsx)</span>
+            </a>
+            <a href="{{ route('admin.reports.export_pdf', request()->all()) }}" target="_blank" class="px-4 py-3 bg-rose-700 hover:bg-rose-800 text-white font-bold text-xs rounded-2xl shadow-md transition flex items-center gap-2">
+                <span>📄 Export Laporan PDF</span>
+            </a>
+        </div>
     </div>
 
-    <!-- Filter Bar Card -->
-    <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-sm">
-        <form action="{{ route('admin.results.index') }}" method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5 text-xs">
+    <!-- STATS SUMMARY CARDS -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-sans">
+        <div class="p-4 bg-white rounded-2xl border border-slate-200/80 shadow-2xs text-center">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Hasil (Filtered)</span>
+            <strong class="text-2xl font-bold text-[#0B2A43]">{{ $stats['total'] }}</strong>
+        </div>
+
+        <div class="p-4 bg-amber-50/80 rounded-2xl border border-amber-200/80 shadow-2xs text-center">
+            <span class="text-[10px] font-bold text-amber-800 uppercase tracking-wider block">Rata-Rata RQI (0-100)</span>
+            <strong class="text-2xl font-bold text-[#B48A16]">{{ $stats['avg_rqi'] }}</strong>
+        </div>
+
+        <div class="p-4 bg-emerald-50/80 rounded-2xl border border-emerald-200/80 shadow-2xs text-center">
+            <span class="text-[10px] font-bold text-emerald-800 uppercase tracking-wider block">Rata-Rata WHO-5 (%)</span>
+            <strong class="text-2xl font-bold text-emerald-600">{{ $stats['avg_who5'] }}%</strong>
+        </div>
+
+        <div class="p-4 bg-blue-50/80 rounded-2xl border border-blue-200/80 shadow-2xs text-center">
+            <span class="text-[10px] font-bold text-blue-800 uppercase tracking-wider block">WHO-5 Sehat / Skrining</span>
+            <strong class="text-base font-bold text-slate-800">
+                <span class="text-emerald-600">{{ $stats['who5_sehat'] }}</span> / <span class="text-rose-600">{{ $stats['who5_skrining'] }}</span>
+            </strong>
+        </div>
+    </div>
+
+    <!-- MULTI-DIMENSIONAL FILTER BAR -->
+    <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-sm space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h3 class="font-serif font-bold text-[#0B2A43] text-xs uppercase tracking-wider flex items-center gap-1.5">
+                <span>🔍 Filter Multi-Dimensi Data</span>
+            </h3>
+            <a href="{{ route('admin.results.index') }}" class="text-[11px] font-bold text-slate-400 hover:text-slate-700">
+                🔄 Reset Filter
+            </a>
+        </div>
+
+        <form action="{{ route('admin.results.index') }}" method="GET" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 text-xs">
+            
+            <!-- 1. Search Query -->
             <div>
-                <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari nama / kode..." class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-[#0B2A43]/20 focus:border-[#0B2A43] focus:bg-white transition">
+                <label class="block font-bold text-slate-700 mb-1">Cari Peserta / Kode</label>
+                <input type="text" name="q" value="{{ request('q') }}" placeholder="Nama / Kode..." class="w-full p-2.5 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-[#0B2A43]">
             </div>
+
+            <!-- 2. Event / Program -->
             <div>
-                <select name="institution_id" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-[#0B2A43]/20 focus:border-[#0B2A43] focus:bg-white transition">
-                    <option value="">Semua Institusi</option>
-                    @foreach($institutions as $inst)
-                        <option value="{{ $inst->id }}" {{ request('institution_id') == $inst->id ? 'selected' : '' }}>{{ $inst->name }}</option>
+                <label class="block font-bold text-slate-700 mb-1">Event / Kegiatan</label>
+                <select name="event_id" class="w-full p-2.5 rounded-xl border border-slate-300 bg-slate-50 outline-none">
+                    <option value="">Semua Event</option>
+                    <option value="PUBLIC_SELF" {{ request('event_id') === 'PUBLIC_SELF' ? 'selected' : '' }}>🟢 Mandiri Publik (Umum)</option>
+                    @foreach($events as $e)
+                        <option value="{{ $e->id }}" {{ request('event_id') == $e->id ? 'selected' : '' }}>🔵 {{ $e->title }}</option>
                     @endforeach
                 </select>
             </div>
+
+            <!-- 3. Provinsi -->
             <div>
-                <select name="program_id" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-[#0B2A43]/20 focus:border-[#0B2A43] focus:bg-white transition">
-                    <option value="">Semua Program</option>
-                    @foreach($programs as $prog)
-                        <option value="{{ $prog->id }}" {{ request('program_id') == $prog->id ? 'selected' : '' }}>{{ $prog->name }}</option>
+                <label class="block font-bold text-slate-700 mb-1">Provinsi</label>
+                <select name="province_id" onchange="this.form.submit()" class="w-full p-2.5 rounded-xl border border-slate-300 bg-slate-50 outline-none">
+                    <option value="">Semua Provinsi</option>
+                    @foreach($provinces as $prov)
+                        <option value="{{ $prov->id }}" {{ request('province_id') == $prov->id ? 'selected' : '' }}>{{ $prov->name }}</option>
                     @endforeach
                 </select>
             </div>
+
+            <!-- 4. Kabupaten / Kota -->
             <div>
-                <select name="submission_type" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-[#0B2A43]/20 focus:border-[#0B2A43] focus:bg-white transition">
-                    <option value="">Pretest & Posttest</option>
-                    <option value="pretest" {{ request('submission_type') === 'pretest' ? 'selected' : '' }}>Pretest Saja</option>
-                    <option value="posttest" {{ request('submission_type') === 'posttest' ? 'selected' : '' }}>Posttest Saja</option>
+                <label class="block font-bold text-slate-700 mb-1">Kabupaten/Kota</label>
+                <select name="regency_id" class="w-full p-2.5 rounded-xl border border-slate-300 bg-slate-50 outline-none">
+                    <option value="">Semua Kota/Kab</option>
+                    @foreach($regencies as $reg)
+                        <option value="{{ $reg->id }}" {{ request('regency_id') == $reg->id ? 'selected' : '' }}>{{ $reg->name }}</option>
+                    @endforeach
                 </select>
             </div>
+
+            <!-- 5. Kategori Peserta -->
             <div>
-                <button type="submit" class="w-full px-5 py-2.5 bg-[#0B2A43] hover:bg-[#123B59] text-white font-bold text-xs rounded-xl shadow-sm transition flex items-center justify-center gap-1.5 cursor-pointer">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
-                    <span>Terapkan Filter</span>
+                <label class="block font-bold text-slate-700 mb-1">Kategori Peserta</label>
+                <select name="category" class="w-full p-2.5 rounded-xl border border-slate-300 bg-slate-50 outline-none">
+                    <option value="">Semua Kategori</option>
+                    <option value="Pelajar" {{ request('category') === 'Pelajar' ? 'selected' : '' }}>Pelajar</option>
+                    <option value="Mahasiswa/i" {{ request('category') === 'Mahasiswa/i' ? 'selected' : '' }}>Mahasiswa/i</option>
+                    <option value="Umum" {{ request('category') === 'Umum' ? 'selected' : '' }}>Umum</option>
+                </select>
+            </div>
+
+            <!-- 6. WHO-5 Status -->
+            <div>
+                <label class="block font-bold text-slate-700 mb-1">Status WHO-5</label>
+                <select name="who5_status" class="w-full p-2.5 rounded-xl border border-slate-300 bg-slate-50 outline-none">
+                    <option value="">Semua Status</option>
+                    <option value="sehat" {{ request('who5_status') === 'sehat' ? 'selected' : '' }}>🟢 Sehat (≥50%)</option>
+                    <option value="skrining" {{ request('who5_status') === 'skrining' ? 'selected' : '' }}>🔴 Perlu Skrining (&lt;50%)</option>
+                </select>
+            </div>
+
+            <div class="col-span-full pt-2 flex justify-end">
+                <button type="submit" class="px-6 py-2.5 bg-[#0B2A43] hover:bg-[#123B59] text-white font-bold rounded-xl shadow transition cursor-pointer flex items-center gap-1.5">
+                    <span>⚡ Terapkan Filter Hasil</span>
                 </button>
             </div>
         </form>
     </div>
 
-    <!-- Data Table Container -->
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+    <!-- DATA TABLE -->
+    <div class="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs min-w-[1050px]">
-                <thead class="bg-slate-50 text-slate-500 uppercase font-bold border-b border-slate-200 text-[11px] tracking-wider font-mono">
+            <table class="w-full text-left text-xs font-sans">
+                <thead class="bg-[#0B2A43] text-white font-bold uppercase text-[11px] tracking-wider">
                     <tr>
-                        <th class="px-5 py-4 whitespace-nowrap">Submission Code</th>
-                        <th class="px-5 py-4 whitespace-nowrap">Peserta</th>
-                        <th class="px-5 py-4 whitespace-nowrap">Institusi & Program</th>
-                        <th class="px-5 py-4 whitespace-nowrap">Tipe</th>
-                        <th class="px-5 py-4 whitespace-nowrap">Skor Mentah</th>
-                        <th class="px-5 py-4 whitespace-nowrap">Capaian (%)</th>
-                        <th class="px-5 py-4 whitespace-nowrap">Pre-Post Delta</th>
-                        <th class="px-5 py-4 whitespace-nowrap">Interpretasi</th>
-                        <th class="px-5 py-4 text-right whitespace-nowrap">Detail</th>
+                        <th class="p-4">Kode Sesi</th>
+                        <th class="p-4">Peserta & Identitas</th>
+                        <th class="p-4">Event / Kegiatan</th>
+                        <th class="p-4">Daerah (Wilayah)</th>
+                        <th class="p-4 text-center">Skor RQI (0-100)</th>
+                        <th class="p-4 text-center">WHO-5 Index (%)</th>
+                        <th class="p-4 text-center">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100 font-medium">
+                <tbody class="divide-y divide-slate-100 text-slate-700 font-medium">
                     @forelse($submissions as $sub)
+                        @php
+                            $p = $sub->participant;
+                            $res = $sub->result;
+                        @endphp
                         <tr class="hover:bg-slate-50/80 transition-colors">
-                            <td class="px-5 py-4 whitespace-nowrap">
-                                <span class="font-mono font-bold text-[#0B2A43] bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200/80 text-[11px] inline-block">
-                                    {{ $sub->submission_code }}
+                            <td class="p-4 font-mono font-bold text-[#B48A16]">
+                                {{ $sub->submission_code }}
+                                <span class="block text-[10px] text-slate-400 font-sans font-normal">{{ $sub->submitted_at ? $sub->submitted_at->format('d/m/Y H:i') : '-' }}</span>
+                            </td>
+
+                            <td class="p-4">
+                                <strong class="text-slate-900 block font-bold text-sm">{{ $p->name ?? 'Anonim' }}</strong>
+                                <span class="text-[11px] text-slate-500 font-normal">
+                                    {{ $p->category ?? 'Umum' }} • {{ $p->birth_date ? \Carbon\Carbon::parse($p->birth_date)->age . ' Thn' : '' }}
                                 </span>
                             </td>
-                            <td class="px-5 py-4 whitespace-nowrap">
-                                <strong class="text-slate-900 font-bold block text-xs">{{ $sub->participant->name ?? 'N/A' }}</strong>
-                                <span class="text-slate-400 font-mono text-[10px] block mt-0.5">{{ $sub->participant->participant_code ?? '-' }}</span>
+
+                            <td class="p-4">
+                                <span class="font-bold text-[#0B2A43] block">
+                                    {{ $sub->event->title ?? ($sub->access_type === 'PUBLIC_SELF' ? 'Mandiri Publik' : 'Umum') }}
+                                </span>
+                                <span class="text-[10px] text-slate-400 font-mono block">
+                                    {{ $sub->event->event_code ?? 'PUBLIC' }}
+                                </span>
                             </td>
-                            <td class="px-5 py-4 max-w-[220px]">
-                                @if(optional($sub->participant)->institution)
-                                    <span class="font-bold text-slate-800 block text-xs leading-snug">{{ $sub->participant->institution->name }}</span>
-                                    <span class="text-slate-500 text-[11px] block leading-snug mt-0.5">{{ optional($sub->participant->program)->name ?? '-' }}</span>
-                                @else
-                                    <span class="text-slate-400 italic text-xs block">-</span>
-                                @endif
+
+                            <td class="p-4 text-slate-600">
+                                {{ $p->province->name ?? '-' }}
+                                <span class="block text-[10px] text-slate-400">{{ $p->regency->name ?? '' }}</span>
                             </td>
-                            <td class="px-5 py-4 whitespace-nowrap">
-                                @if($sub->submission_type === 'pretest')
-                                    <span class="px-2.5 py-1 font-bold uppercase rounded-md text-[10px] bg-sky-50 text-sky-700 border border-sky-200/80 tracking-wider">PRETEST</span>
-                                @else
-                                    <span class="px-2.5 py-1 font-bold uppercase rounded-md text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200/80 tracking-wider">POSTTEST</span>
-                                @endif
+
+                            <td class="p-4 text-center">
+                                <span class="font-bold text-sm text-[#0B2A43]">{{ $res->rqi_score ?? '-' }}</span>
+                                <span class="block text-[10px] font-bold text-amber-700">{{ $res->category_name ?? '-' }}</span>
                             </td>
-                            <td class="px-5 py-4 whitespace-nowrap text-slate-700">
-                                <span class="font-bold text-slate-900">{{ $sub->result->total_score ?? 0 }}</span>
-                                <span class="text-slate-400"> / {{ $sub->result->max_score ?? 0 }}</span>
-                            </td>
-                            <td class="px-5 py-4 whitespace-nowrap font-extrabold text-slate-900 text-xs">
-                                {{ number_format($sub->result->percentage ?? 0, 1) }}%
-                            </td>
-                            <td class="px-5 py-4 whitespace-nowrap font-mono font-bold">
-                                @if($sub->result && $sub->result->pre_post_diff !== null)
-                                    <span class="{{ $sub->result->pre_post_diff >= 0 ? 'text-emerald-600' : 'text-rose-600' }}">
-                                        {{ $sub->result->pre_post_diff >= 0 ? '+' : '' }}{{ number_format($sub->result->pre_post_diff, 1) }}%
+
+                            <td class="p-4 text-center">
+                                @if($res && $res->who5_percentage !== null)
+                                    <span class="font-bold text-sm {{ $res->who5_percentage >= 50 ? 'text-emerald-600' : 'text-rose-600' }}">
+                                        {{ $res->who5_percentage }}%
+                                    </span>
+                                    <span class="block text-[10px] font-bold {{ $res->who5_percentage >= 50 ? 'text-emerald-700' : 'text-rose-700' }}">
+                                        {{ $res->who5_percentage >= 50 ? '🟢 Sehat' : '🔴 Skrining' }}
                                     </span>
                                 @else
-                                    <span class="text-slate-300">-</span>
+                                    <span class="text-slate-400">-</span>
                                 @endif
                             </td>
-                            <td class="px-5 py-4 text-slate-600 text-[11px] max-w-xs truncate" title="{{ $sub->result->overall_interpretation ?? '' }}">
-                                {{ $sub->result->overall_interpretation ?? '-' }}
-                            </td>
-                            <td class="px-5 py-4 text-right whitespace-nowrap">
-                                <a href="{{ route('admin.results.show', $sub->id) }}" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#0B2A43] hover:bg-[#123B59] text-white rounded-lg text-xs font-bold shadow-sm transition hover:shadow">
-                                    <span>Lihat Detail</span>
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+
+                            <td class="p-4 text-center">
+                                <a href="{{ route('admin.results.show', $sub) }}" class="px-3.5 py-2 bg-[#0B2A43] hover:bg-[#123B59] text-white text-[11px] font-bold rounded-xl shadow transition">
+                                    Detail Hasil →
                                 </a>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="px-5 py-8 text-center text-slate-400 text-xs">
-                                Tidak ada data hasil asesmen ditemukan.
+                            <td colspan="7" class="p-12 text-center text-slate-400 font-medium">
+                                Tidak ada data hasil asesmen yang cocok dengan filter.
                             </td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
-        <div class="p-4 border-t border-slate-100 bg-slate-50/50">
+
+        <div class="p-4 border-t border-slate-100">
             {{ $submissions->links() }}
         </div>
     </div>
+
 </div>
 @endsection

@@ -10,6 +10,8 @@ class AssessmentSubmission extends Model
     use HasFactory;
 
     protected $fillable = [
+        'event_id',
+        'access_type',
         'period_id',
         'participant_id',
         'submission_type',
@@ -24,6 +26,11 @@ class AssessmentSubmission extends Model
         'started_at' => 'datetime',
         'submitted_at' => 'datetime',
     ];
+
+    public function event()
+    {
+        return $this->belongsTo(Event::class, 'event_id');
+    }
 
     public function period()
     {

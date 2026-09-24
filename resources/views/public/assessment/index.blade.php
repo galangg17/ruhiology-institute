@@ -120,6 +120,25 @@
 
             <form @submit.prevent="submitRegistration()" class="space-y-4 text-xs font-sans">
                 
+                <!-- 0. Event / Track Indicator -->
+                <div class="p-3 bg-[#0B2A43]/5 border border-[#0B2A43]/15 rounded-2xl space-y-1">
+                    <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-wider block">Jalur Asesmen</span>
+                    <template x-if="eventCode">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-[#0B2A43] text-xs">📌 Mengikuti Event: <span x-text="eventName || eventCode"></span></span>
+                            <span class="text-[10px] font-mono font-bold bg-[#0B2A43] text-white px-2 py-0.5 rounded" x-text="eventCode"></span>
+                        </div>
+                    </template>
+                    <template x-if="!eventCode">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="font-medium text-slate-700">🟢 Refleksi Mandiri Publik (Umum)</span>
+                            <button type="button" @click="promptEventCode()" class="text-[11px] font-bold text-[#C9A24D] hover:underline cursor-pointer">
+                                🔑 Punya Kode Event Acara?
+                            </button>
+                        </div>
+                    </template>
+                </div>
+                
                 <!-- 1. Nama & Tanggal Lahir -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
@@ -360,8 +379,11 @@ function rqAssessmentIndex() {
         copied: false,
         generatedCode: '',
         takeUrl: '#',
+        eventCode: new URLSearchParams(window.location.search).get('event') || '',
+        eventName: '',
 
         form: {
+            event_code: new URLSearchParams(window.location.search).get('event') || '',
             name: '',
             birth_date: '',
             category: 'Pelajar',
@@ -445,6 +467,14 @@ function rqAssessmentIndex() {
                 this.loadOccupations();
             }
             this.showRegModal = true;
+        },
+
+        promptEventCode() {
+            const code = prompt('Masukkan Kode Event / Acara (Contoh: RQ-JAMBI-26):');
+            if (code && code.trim()) {
+                this.eventCode = code.trim().toUpperCase();
+                this.form.event_code = this.eventCode;
+            }
         },
 
         setCategory(cat) {

@@ -11,6 +11,8 @@ class Participant extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'event_id',
+        'access_type',
         'institution_id',
         'program_id',
         'user_id',
@@ -39,6 +41,11 @@ class Participant extends Model
         'occupation',
         'status',
     ];
+
+    public function event()
+    {
+        return $this->belongsTo(Event::class, 'event_id');
+    }
 
     public function institution()
     {

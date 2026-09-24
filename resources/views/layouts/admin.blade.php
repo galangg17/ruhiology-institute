@@ -76,6 +76,9 @@
             <!-- Group 1: Modul RQ Assessment -->
             <div class="pt-4 pb-1 px-3.5 text-[10px] font-extrabold text-[#C9A24D] uppercase tracking-widest font-mono">Modul RQ Assessment</div>
             
+            <a href="{{ route('admin.events.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl transition-all {{ request()->routeIs('admin.events.*') ? 'bg-slate-800 text-[#C9A24D] font-bold border-l-4 border-[#C9A24D]' : 'hover:bg-slate-900 text-slate-300 hover:text-white' }}">
+                <span>🎯</span> <span>Manajemen Event / Acara</span>
+            </a>
             <a href="{{ route('admin.participants.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl transition-all {{ request()->routeIs('admin.participants.*') ? 'bg-slate-800 text-[#C9A24D] font-bold border-l-4 border-[#C9A24D]' : 'hover:bg-slate-900 text-slate-300 hover:text-white' }}">
                 <span>👥</span> <span>Data Peserta</span>
             </a>

@@ -20,12 +20,14 @@ class AssessmentResult extends Model
         'who5_raw_score',
         'who5_percentage',
         'who5_screening_note',
+        'dimension_scores',
         'pre_post_diff',
         'scoring_version',
         'snapshot_data',
     ];
 
     protected $casts = [
+        'dimension_scores' => 'array',
         'snapshot_data' => 'array',
     ];
 

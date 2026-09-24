@@ -65,12 +65,34 @@ class PublicAssessmentController extends Controller
             'occupation_id' => ['nullable', 'exists:occupations,id'],
             'occupation_custom' => ['nullable', 'string', 'max:255'],
             
+            'event_code' => ['nullable', 'string'],
             'period_code' => ['nullable', 'string'],
         ]);
 
+        $eventId = null;
+        $accessType = 'PUBLIC_SELF';
+
+        if (!empty($validated['event_code'])) {
+            $event = \App\Models\Event::where('event_code', strtoupper(trim($validated['event_code'])))->first();
+            if ($event) {
+                $eventId = $event->id;
+                $accessType = $event->access_type ?? 'EVENT_PROGRAM';
+            }
+        }
+
         $periodCode = $validated['period_code'] ?? 'RQI-PERIOD-2026';
         $period = AssessmentPeriod::where('period_code', $periodCode)->first() 
-            ?? AssessmentPeriod::where('status', 'active')->firstOrFail();
+            ?? AssessmentPeriod::where('status', 'active')->first();
+
+        if (!$period) {
+            $period = AssessmentPeriod::create([
+                'program_id' => 1,
+                'instrument_id' => 1,
+                'title' => 'Default Periode Asesmen 2026',
+                'period_code' => 'RQI-PERIOD-2026',
+                'status' => 'active',
+            ]);
+        }
 
         $assessmentCode = Participant::generateUniqueAssessmentCode();
         $participantCode = 'PAR-' . strtoupper(Str::random(8));
@@ -83,6 +105,8 @@ class PublicAssessmentController extends Controller
         $countryId = $validated['country_id'] ?? 1;
 
         $participant = Participant::create([
+            'event_id' => $eventId,
+            'access_type' => $accessType,
             'participant_code' => $participantCode,
             'assessment_code' => $assessmentCode,
             'user_id' => Auth::id(),
