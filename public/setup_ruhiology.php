@@ -4,6 +4,9 @@
  * Visit this script in browser: https://ruhiology.gmadhyaksa-litbang.my.id/setup_ruhiology.php
  */
 
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 define('LARAVEL_START', microtime(true));
 
 // Auto-fix composer platform check for PHP 8.2 / 8.3 hosting compatibility
@@ -45,16 +48,43 @@ ENV;
     @file_put_contents($envFile, $envDefault);
 }
 
+// Ensure storage directories exist and are writable
+$storageDirs = [
+    __DIR__ . '/../storage',
+    __DIR__ . '/../storage/app',
+    __DIR__ . '/../storage/app/public',
+    __DIR__ . '/../storage/framework',
+    __DIR__ . '/../storage/framework/cache',
+    __DIR__ . '/../storage/framework/sessions',
+    __DIR__ . '/../storage/framework/views',
+    __DIR__ . '/../storage/logs',
+    __DIR__ . '/../bootstrap/cache',
+];
+foreach ($storageDirs as $dir) {
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0755, true);
+    }
+}
+
 // Check if Laravel bootstrap exists
 if (!file_exists(__DIR__ . '/../vendor/autoload.php')) {
     die('<h1>Error: vendor directory missing.</h1><p>Please make sure composer install or vendor files are uploaded to the root directory.</p>');
 }
 
-require __DIR__ . '/../vendor/autoload.php';
-$app = require_once __DIR__ . '/../bootstrap/app.php';
-
-$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
-$kernel->bootstrap();
+try {
+    require __DIR__ . '/../vendor/autoload.php';
+    $app = require_once __DIR__ . '/../bootstrap/app.php';
+    $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+    $kernel->bootstrap();
+} catch (\Throwable $e) {
+    echo '<div style="font-family:sans-serif; padding:20px; background:#fff0f0; border:2px solid red; border-radius:10px;">';
+    echo '<h1 style="color:red; margin-top:0;">Bootstrap Error</h1>';
+    echo '<p><b>Error Message:</b> ' . htmlspecialchars($e->getMessage()) . '</p>';
+    echo '<p><b>File:</b> ' . htmlspecialchars($e->getFile()) . ' (Line ' . $e->getLine() . ')</p>';
+    echo '<pre style="background:#222; color:#0f0; padding:10px; border-radius:5px; overflow:auto;">' . htmlspecialchars($e->getTraceAsString()) . '</pre>';
+    echo '</div>';
+    exit;
+}
 
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;

@@ -2,6 +2,27 @@
 /**
  * Emergency Auto-Fixer Script for Ruhiology Institute Deployment
  */
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+// Ensure storage directories exist and are writable
+$storageDirs = [
+    __DIR__ . '/../storage',
+    __DIR__ . '/../storage/app',
+    __DIR__ . '/../storage/app/public',
+    __DIR__ . '/../storage/framework',
+    __DIR__ . '/../storage/framework/cache',
+    __DIR__ . '/../storage/framework/sessions',
+    __DIR__ . '/../storage/framework/views',
+    __DIR__ . '/../storage/logs',
+    __DIR__ . '/../bootstrap/cache',
+];
+foreach ($storageDirs as $dir) {
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0755, true);
+    }
+}
+
 $platformCheck = __DIR__ . '/../vendor/composer/platform_check.php';
 if (file_exists($platformCheck)) {
     file_put_contents($platformCheck, "<?php\n\$issues = array();\n");
