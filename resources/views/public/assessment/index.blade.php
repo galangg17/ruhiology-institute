@@ -30,19 +30,24 @@ window.rqAssessmentIndex = function rqAssessmentIndex() {
             event_code: new URLSearchParams(window.location.search).get('event') || '',
             name: '',
             birth_date: '',
+            gender: 'Laki-laki',
+            phone: '',
+            email: '',
             category: 'Pelajar',
             sub_category: '',
             country_id: 1,
             province_id: null,
             regency_id: null,
             school_level: 'SMA',
+            school_class: '',
             university_id: null,
             faculty_id: null,
             study_program_id: null,
             semester: 1,
             entry_year: new Date().getFullYear().toString(),
             occupation_id: null,
-            occupation_custom: ''
+            occupation_custom: '',
+            last_education: 'S1/D4'
         },
 
         filteredProvinces: [
@@ -457,6 +462,25 @@ document.addEventListener('alpine:init', () => {
                     </div>
                 </div>
 
+                <!-- 1B. Jenis Kelamin & No. WhatsApp / HP -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Jenis Kelamin *</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="button" @click="form.gender = 'Laki-laki'" :class="form.gender === 'Laki-laki' ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'" class="py-2.5 px-3 rounded-xl border text-xs transition-colors text-center cursor-pointer">
+                                👨 Laki-laki
+                            </button>
+                            <button type="button" @click="form.gender = 'Perempuan'" :class="form.gender === 'Perempuan' ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'" class="py-2.5 px-3 rounded-xl border text-xs transition-colors text-center cursor-pointer">
+                                👩 Perempuan
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">No. WhatsApp / HP (Opsional)</label>
+                        <input type="tel" x-model="form.phone" placeholder="Contoh: 081234567890" class="w-full p-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none">
+                    </div>
+                </div>
+
                 <!-- 2. Kategori Selection (Preset Locked if Event restricts it) -->
                 <div>
                     <label class="block font-bold text-slate-700 mb-1.5">
@@ -485,6 +509,8 @@ document.addEventListener('alpine:init', () => {
                                     class="py-2.5 px-3 rounded-xl border text-xs transition-colors text-center">
                                     <span x-text="cat.label"></span>
                                 </button>
+                            </template>
+                        </div>
                     </template>
                 </div>
 
@@ -528,16 +554,25 @@ document.addEventListener('alpine:init', () => {
 
                 <!-- 4A. Dynamic Fields for PELAJAR -->
                 <template x-if="form.category === 'Pelajar'">
-                    <div class="p-4 bg-amber-50/70 rounded-2xl border border-amber-200/90 space-y-2">
-                        <label class="block font-bold text-slate-800 text-xs mb-1">Jenjang Pendidikan *</label>
-                        <select x-model="form.school_level" class="w-full p-3 text-xs font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] focus:border-[#0B2A43] outline-none bg-white">
-                            <option value="SMA">SMA (Sekolah Menengah Atas)</option>
-                            <option value="SMK">SMK (Sekolah Menengah Kejuruan)</option>
-                            <option value="MA">MA (Madrasah Aliyah)</option>
-                            <option value="SMP">SMP / MTs (Sekolah Menengah Pertama)</option>
-                            <option value="SD">SD / MI (Sekolah Dasar)</option>
-                            <option value="Sederajat">Sederajat / Lainnya</option>
-                        </select>
+                    <div class="p-4 bg-amber-50/70 rounded-2xl border border-amber-200/90 space-y-3">
+                        <span class="text-[10px] font-mono font-bold text-amber-800 uppercase tracking-wider block">✦ PROFIL SEKOLAH / MADRASAH</span>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block font-bold text-slate-800 text-xs mb-1">Jenjang Pendidikan *</label>
+                                <select x-model="form.school_level" class="w-full p-2.5 text-xs font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
+                                    <option value="SMA">SMA (Sekolah Menengah Atas)</option>
+                                    <option value="SMK">SMK (Sekolah Menengah Kejuruan)</option>
+                                    <option value="MA">MA (Madrasah Aliyah)</option>
+                                    <option value="SMP">SMP / MTs (Sekolah Menengah Pertama)</option>
+                                    <option value="SD">SD / MI (Sekolah Dasar)</option>
+                                    <option value="Sederajat">Sederajat / Lainnya</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-800 text-xs mb-1">Kelas / Rombel (Opsional)</label>
+                                <input type="text" x-model="form.school_class" placeholder="Contoh: Kelas X IPA 1 / XI IPS 2" class="w-full p-2.5 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
+                            </div>
+                        </div>
                     </div>
                 </template>
 
@@ -582,15 +617,37 @@ document.addEventListener('alpine:init', () => {
 
                 <!-- 4C. Dynamic Fields for PERSONAL / MANDIRI (UMUM) -->
                 <template x-if="form.category === 'Umum'">
-                    <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
-                        <label class="block font-bold text-slate-700 text-xs mb-1">Pekerjaan / Sektor Kegiatan</label>
-                        <select x-model="form.occupation_id" class="w-full p-3 text-xs font-semibold rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] focus:border-[#0B2A43] outline-none bg-white">
-                            <option value="">-- Pilih Pekerjaan --</option>
-                            <template x-for="occ in occupations" :key="occ.id">
-                                <option :value="occ.id" x-text="occ.name"></option>
-                            </template>
-                        </select>
-                        <input type="text" x-model="form.occupation_custom" placeholder="Atau tuliskan pekerjaan Anda secara spesifik..." class="w-full p-3 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
+                    <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200/90 space-y-3">
+                        <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-wider block">✦ PROFIL PROFESI & PENDIDIKAN</span>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block font-bold text-slate-700 text-xs mb-1">Profesi / Sektor Pekerjaan *</label>
+                                <select x-model="form.occupation_id" class="w-full p-2.5 text-xs font-semibold rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
+                                    <option value="">-- Pilih Pekerjaan --</option>
+                                    <template x-for="occ in occupations" :key="occ.id">
+                                        <option :value="occ.id" x-text="occ.name"></option>
+                                    </template>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-700 text-xs mb-1">Pendidikan Terakhir</label>
+                                <select x-model="form.last_education" class="w-full p-2.5 text-xs font-semibold rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
+                                    <option value="S1/D4">S1 / D4 (Sarjana)</option>
+                                    <option value="SMA/SMK">SMA / SMK / MA</option>
+                                    <option value="D3">D3 / D1 / D2 (Diploma)</option>
+                                    <option value="S2">S2 (Magister)</option>
+                                    <option value="S3">S3 (Doktor)</option>
+                                    <option value="SMP/SD">SMP / SD / Sederajat</option>
+                                    <option value="Lainnya">Lainnya</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-slate-700 text-xs mb-1">Nama Instansi / Perusahaan / Komunitas (Opsional)</label>
+                            <input type="text" x-model="form.occupation_custom" placeholder="Contoh: PT Ruhiology Utama / Pemda Jambi / Mandiri" class="w-full p-2.5 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
+                        </div>
                     </div>
                 </template>
 

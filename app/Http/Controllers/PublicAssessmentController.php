@@ -51,6 +51,9 @@ class PublicAssessmentController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'birth_date' => ['required', 'date'],
+            'gender' => ['nullable', 'in:Laki-laki,Perempuan'],
+            'phone' => ['nullable', 'string', 'max:50'],
+            'email' => ['nullable', 'email', 'max:255'],
             'category' => ['required', 'in:Pelajar,Mahasiswa/i,Umum'],
             'country_id' => ['nullable', 'exists:countries,id'],
             'province_id' => ['required', 'exists:provinces,id'],
@@ -58,6 +61,7 @@ class PublicAssessmentController extends Controller
             
             // Pelajar fields
             'school_level' => ['required_if:category,Pelajar', 'nullable', 'string'],
+            'school_class' => ['nullable', 'string', 'max:100'],
             
             // Mahasiswa/i fields
             'university_id' => ['required_if:category,Mahasiswa/i', 'nullable', 'exists:universities,id'],
@@ -103,8 +107,8 @@ class PublicAssessmentController extends Controller
         $assessmentCode = Participant::generateUniqueAssessmentCode();
         $participantCode = 'PAR-' . strtoupper(Str::random(8));
 
-        $email = 'participant.' . strtolower(Str::random(6)) . '@ruhiologyinstitute.com';
-        if (Auth::check() && Auth::user()->email) {
+        $email = !empty($validated['email']) ? $validated['email'] : ('participant.' . strtolower(Str::random(6)) . '@ruhiologyinstitute.com');
+        if (Auth::check() && Auth::user()->email && empty($validated['email'])) {
             $email = Auth::user()->email;
         }
 
@@ -118,6 +122,8 @@ class PublicAssessmentController extends Controller
             'user_id' => Auth::id(),
             'name' => trim($validated['name']),
             'birth_date' => $validated['birth_date'],
+            'gender' => $validated['gender'] ?? 'Laki-laki',
+            'phone' => $validated['phone'] ?? null,
             'category' => $validated['category'],
             'sub_category' => $validated['sub_category'] ?? null,
             'email' => $email,
@@ -129,7 +135,7 @@ class PublicAssessmentController extends Controller
             'faculty_id' => $validated['faculty_id'] ?? null,
             'study_program_id' => $validated['study_program_id'] ?? null,
             'school_level' => $validated['school_level'] ?? null,
-            'school_class' => null,
+            'school_class' => $validated['school_class'] ?? null,
             'semester' => $validated['semester'] ?? null,
             'entry_year' => $validated['entry_year'] ?? null,
             'occupation_id' => $validated['occupation_id'] ?? null,
