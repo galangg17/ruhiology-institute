@@ -1,19 +1,19 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="space-y-6" x-data="{ createModal: false, qrModal: false, activeQrUrl: '', activeQrTitle: '' }">
+<div class="space-y-6" x-data="{ createModal: false, qrModal: false, activeQrUrl: '', activeQrTitle: '', assessmentType: 'single' }">
     
     <!-- HEADER -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm">
         <div>
             <div class="inline-flex items-center gap-2 bg-[#0B2A43]/10 text-[#0B2A43] text-[10px] font-mono font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-2">
-                <span>🎯 EVENT & BATCH PROGRAM MANAGEMENT</span>
+                <span>🎯 EVENT & PROGRAM MANAGEMENT</span>
             </div>
             <h1 class="text-2xl font-bold font-serif text-[#0B2A43]">Manajemen Event & Kegiatan Uji Ruhiologi</h1>
-            <p class="text-xs text-slate-500 mt-1">Buat dan kelola event khusus (workshop/uji instansi/batch) atau sesuaikan sesi mandiri publik.</p>
+            <p class="text-xs text-slate-500 mt-1">Buat dan kelola event khusus (workshop/uji instansi/batch) beserta jadwal Pretest & Posttest terintegrasi.</p>
         </div>
         <div>
-            <button @click="createModal = true" type="button" class="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-[#C9A24D] to-[#B48A16] hover:from-[#B48A16] hover:to-[#96710E] text-[#0B2A43] font-bold text-xs rounded-2xl shadow-lg transition transform hover:-translate-y-0.5 flex items-center justify-center gap-2 cursor-pointer">
+            <button @click="createModal = true" type="button" class="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-[#C9A24D] to-[#B48A16] hover:from-[#B48A16] hover:to-[#96710E] text-[#0B2A43] font-extrabold text-xs rounded-2xl shadow-lg transition transform hover:-translate-y-0.5 flex items-center justify-center gap-2 cursor-pointer">
                 <span>✨ + Buat Event / Kegiatan Baru</span>
             </button>
         </div>
@@ -51,13 +51,18 @@
                         <span class="font-mono text-[11px] font-extrabold text-[#C9A24D] bg-[#0B2A43] px-3 py-1 rounded-full uppercase tracking-wider">
                             {{ $event->event_code }}
                         </span>
-                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide
-                            {{ $event->status === 'active' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : '' }}
-                            {{ $event->status === 'draft' ? 'bg-slate-100 text-slate-700 border border-slate-300' : '' }}
-                            {{ $event->status === 'completed' ? 'bg-blue-100 text-blue-800 border border-blue-300' : '' }}
-                            {{ $event->status === 'archived' ? 'bg-rose-100 text-rose-800 border border-rose-300' : '' }}">
-                            {{ $event->status }}
-                        </span>
+                        <div class="flex items-center gap-1.5">
+                            @if($event->assessment_type === 'prepost')
+                                <span class="px-2 py-0.5 bg-amber-50 text-amber-800 border border-amber-300 rounded-full text-[10px] font-bold">Pre & Post</span>
+                            @endif
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide
+                                {{ $event->status === 'active' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : '' }}
+                                {{ $event->status === 'draft' ? 'bg-slate-100 text-slate-700 border border-slate-300' : '' }}
+                                {{ $event->status === 'completed' ? 'bg-blue-100 text-blue-800 border border-blue-300' : '' }}
+                                {{ $event->status === 'archived' ? 'bg-rose-100 text-rose-800 border border-rose-300' : '' }}">
+                                {{ $event->status }}
+                            </span>
+                        </div>
                     </div>
 
                     <h3 class="font-serif font-bold text-lg text-[#0B2A43] group-hover:text-[#C9A24D] transition-colors leading-snug">
@@ -65,7 +70,7 @@
                     </h3>
 
                     <p class="text-xs text-slate-500 flex items-center gap-1.5 font-medium">
-                        <span>🏛️</span> <span>{{ $event->institution_name ?? 'Umum / Terbuka' }}</span>
+                        <span>🏛️</span> <span>{{ $event->institution_name ?? 'Personal / Mandiri' }}</span>
                     </p>
                 </div>
 
@@ -93,6 +98,12 @@
                                 {{ $event->start_date ? $event->start_date->format('d M Y') : 'Kapan Saja' }}
                             </strong>
                         </div>
+                        @if($event->assessment_type === 'prepost')
+                            <div class="pt-1 text-[10px] border-t border-slate-200/60 space-y-0.5 text-slate-600">
+                                <div>📅 Pretest: <strong>{{ $event->pretest_start ? $event->pretest_start->format('d/m/Y') : '-' }} s/d {{ $event->pretest_end ? $event->pretest_end->format('d/m/Y') : '-' }}</strong></div>
+                                <div>📅 Posttest: <strong>{{ $event->posttest_start ? $event->posttest_start->format('d/m/Y') : '-' }} s/d {{ $event->posttest_end ? $event->posttest_end->format('d/m/Y') : '-' }}</strong></div>
+                            </div>
+                        @endif
                     </div>
                 </div>
 
@@ -129,7 +140,7 @@
         {{ $events->links() }}
     </div>
 
-    <!-- CREATE EVENT MODAL -->
+    <!-- CREATE EVENT MODAL (MAXIMIZED & SLEEK DESIGN) -->
     <div x-show="createModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/70 backdrop-blur-md animate-fadeIn">
         <div @click.away="createModal = false" class="bg-white rounded-3xl max-w-2xl w-full shadow-2xl relative border border-slate-100 max-h-[92vh] flex flex-col overflow-hidden">
             
@@ -140,7 +151,7 @@
                         ✨
                     </div>
                     <div>
-                        <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest block">EVENT SETUP FORM</span>
+                        <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest block">INTEGRATED EVENT SETUP</span>
                         <h3 class="text-lg font-serif font-bold text-white">Buat Event Asesmen Baru</h3>
                     </div>
                 </div>
@@ -160,16 +171,56 @@
                     <div>
                         <label class="block font-bold text-slate-800 text-xs mb-1.5">Kode Event (Unique Code)</label>
                         <input type="text" name="event_code" placeholder="Contoh: RQ-JAMBI-26" class="w-full px-4 py-3 rounded-2xl border border-slate-300 font-mono bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-[#0B2A43] focus:border-[#0B2A43] outline-none uppercase font-bold text-xs">
-                        <span class="text-[10px] text-slate-400 mt-1 block">Kosongkan jika ingin dibuatkan otomatis oleh sistem</span>
+                        <span class="text-[10px] text-slate-400 mt-1 block">Kosongkan jika ingin dibuatkan otomatis</span>
                     </div>
 
                     <div>
                         <label class="block font-bold text-slate-800 text-xs mb-1.5">Tipe Akses *</label>
                         <select name="access_type" required class="w-full px-4 py-3 rounded-2xl border border-slate-300 bg-slate-50 font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-[#0B2A43] focus:bg-white transition text-xs">
                             <option value="EVENT_PROGRAM">🔵 Event / Kegiatan Khusus (Instansi/Acara)</option>
-                            <option value="PUBLIC_SELF">🟢 Mandiri Umum (Terbuka Publik)</option>
+                            <option value="PUBLIC_SELF">🟢 Mandiri / Personal (Terbuka Publik)</option>
                         </select>
                     </div>
+                </div>
+
+                <!-- Mode Asesmen: Sekali Tes vs Pretest & Posttest -->
+                <div class="p-4 bg-amber-50/60 rounded-2xl border border-amber-200/80 space-y-3">
+                    <label class="block font-bold text-[#0B2A43] text-xs">Mode Asesmen Event *</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button type="button" @click="assessmentType = 'single'" :class="assessmentType === 'single' ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'" class="p-3 rounded-xl border text-xs text-center transition">
+                            <span>📝 Sekali Tes (Single Test)</span>
+                        </button>
+                        <button type="button" @click="assessmentType = 'prepost'" :class="assessmentType === 'prepost' ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'" class="p-3 rounded-xl border text-xs text-center transition">
+                            <span>🔄 Pretest & Posttest (Longitudinal)</span>
+                        </button>
+                    </div>
+                    <input type="hidden" name="assessment_type" :value="assessmentType">
+
+                    <!-- Schedule inputs for Pretest & Posttest -->
+                    <template x-if="assessmentType === 'prepost'">
+                        <div class="pt-2 space-y-3">
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block font-bold text-slate-700 text-[11px] mb-1">Mulai Pretest</label>
+                                    <input type="datetime-local" name="pretest_start" class="w-full p-2.5 rounded-xl border border-slate-300 bg-white font-medium">
+                                </div>
+                                <div>
+                                    <label class="block font-bold text-slate-700 text-[11px] mb-1">Selesai Pretest</label>
+                                    <input type="datetime-local" name="pretest_end" class="w-full p-2.5 rounded-xl border border-slate-300 bg-white font-medium">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block font-bold text-slate-700 text-[11px] mb-1">Mulai Posttest</label>
+                                    <input type="datetime-local" name="posttest_start" class="w-full p-2.5 rounded-xl border border-slate-300 bg-white font-medium">
+                                </div>
+                                <div>
+                                    <label class="block font-bold text-slate-700 text-[11px] mb-1">Selesai Posttest</label>
+                                    <input type="datetime-local" name="posttest_end" class="w-full p-2.5 rounded-xl border border-slate-300 bg-white font-medium">
+                                </div>
+                            </div>
+                        </div>
+                    </template>
                 </div>
 
                 <div>
@@ -179,11 +230,11 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block font-bold text-slate-800 text-xs mb-1.5">Tanggal Mulai</label>
+                        <label class="block font-bold text-slate-800 text-xs mb-1.5">Tanggal Mulai Event</label>
                         <input type="date" name="start_date" class="w-full px-4 py-3 rounded-2xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-[#0B2A43] outline-none transition text-xs font-medium">
                     </div>
                     <div>
-                        <label class="block font-bold text-slate-800 text-xs mb-1.5">Tanggal Selesai</label>
+                        <label class="block font-bold text-slate-800 text-xs mb-1.5">Tanggal Selesai Event</label>
                         <input type="date" name="end_date" class="w-full px-4 py-3 rounded-2xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-[#0B2A43] outline-none transition text-xs font-medium">
                     </div>
                 </div>

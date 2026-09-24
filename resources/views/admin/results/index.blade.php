@@ -158,9 +158,9 @@
                             </td>
 
                             <td class="p-4">
-                                <strong class="text-slate-900 block font-bold text-sm">{{ $p->name ?? 'Anonim' }}</strong>
+                                <strong class="text-slate-900 block font-bold text-sm">{{ $p?->name ?? 'Anonim' }}</strong>
                                 <span class="text-[11px] text-slate-500 font-normal">
-                                    {{ $p->category ?? 'Umum' }} • {{ $p->birth_date ? \Carbon\Carbon::parse($p->birth_date)->age . ' Thn' : '' }}
+                                    {{ $p?->category ?? 'Umum' }} {{ $p?->birth_date ? '• ' . \Carbon\Carbon::parse($p?->birth_date)->age . ' Thn' : '' }}
                                 </span>
                             </td>
 
@@ -174,8 +174,8 @@
                             </td>
 
                             <td class="p-4 text-slate-600">
-                                {{ $p->province->name ?? '-' }}
-                                <span class="block text-[10px] text-slate-400">{{ $p->regency->name ?? '' }}</span>
+                                {{ $p?->province?->name ?? '-' }}
+                                <span class="block text-[10px] text-slate-400">{{ $p?->regency?->name ?? '' }}</span>
                             </td>
 
                             <td class="p-4 text-center">

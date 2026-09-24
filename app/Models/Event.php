@@ -13,11 +13,16 @@ class Event extends Model
         'event_code',
         'title',
         'access_type',
+        'assessment_type',
         'institution_name',
         'program_id',
         'instrument_id',
         'start_date',
         'end_date',
+        'pretest_start',
+        'pretest_end',
+        'posttest_start',
+        'posttest_end',
         'quota',
         'status',
         'description',
@@ -26,6 +31,10 @@ class Event extends Model
     protected $casts = [
         'start_date' => 'datetime',
         'end_date' => 'datetime',
+        'pretest_start' => 'datetime',
+        'pretest_end' => 'datetime',
+        'posttest_start' => 'datetime',
+        'posttest_end' => 'datetime',
     ];
 
     public function program()
@@ -51,5 +60,31 @@ class Event extends Model
     public function getDirectAccessUrlAttribute(): string
     {
         return url('/assessment?event=' . $this->event_code);
+    }
+
+    /**
+     * Determine active test phase based on current time
+     */
+    public function activeTestPhase(): string
+    {
+        if ($this->assessment_type !== 'prepost') {
+            return 'single';
+        }
+
+        $now = now();
+
+        if ($this->posttest_start && $this->posttest_end && $now->between($this->posttest_start, $this->posttest_end)) {
+            return 'posttest';
+        }
+
+        if ($this->pretest_start && $this->pretest_end && $now->between($this->pretest_start, $this->pretest_end)) {
+            return 'pretest';
+        }
+
+        if ($this->posttest_start && $now->greaterThanOrEqualTo($this->posttest_start)) {
+            return 'posttest';
+        }
+
+        return 'pretest';
     }
 }

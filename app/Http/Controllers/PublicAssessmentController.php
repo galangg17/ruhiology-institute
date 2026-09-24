@@ -29,13 +29,18 @@ class PublicAssessmentController extends Controller
             $activePeriods = AssessmentPeriod::where('status', 'active')
                 ->with(['program.institution', 'instrument'])
                 ->get();
+            $activeEvents = \App\Models\Event::where('status', 'active')
+                ->where('access_type', 'EVENT_PROGRAM')
+                ->orderBy('title', 'asc')
+                ->get();
         } catch (\Throwable $e) {
             $activePeriods = collect([]);
+            $activeEvents = collect([]);
         }
 
         $defaultPeriod = $activePeriods->first();
 
-        return view('public.assessment.index', compact('activePeriods', 'defaultPeriod'));
+        return view('public.assessment.index', compact('activePeriods', 'defaultPeriod', 'activeEvents'));
     }
 
     /**

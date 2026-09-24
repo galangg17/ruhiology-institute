@@ -93,9 +93,6 @@
                     <span class="bg-amber-500 text-slate-950 font-bold px-2 py-0.5 rounded-full text-[10px] shadow" title="{{ $pendingInstCount }} Usulan Kampus Baru">{{ $pendingInstCount }}</span>
                 @endif
             </a>
-            <a href="{{ route('admin.periods.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl transition-all {{ request()->routeIs('admin.periods.*') ? 'bg-slate-800 text-[#C9A24D] font-bold border-l-4 border-[#C9A24D]' : 'hover:bg-slate-900 text-slate-300 hover:text-white' }}">
-                <span>📅</span> <span>Periode Pretest / Posttest</span>
-            </a>
             <a href="{{ route('admin.instruments.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl transition-all {{ request()->routeIs('admin.instruments.*') ? 'bg-slate-800 text-[#C9A24D] font-bold border-l-4 border-[#C9A24D]' : 'hover:bg-slate-900 text-slate-300 hover:text-white' }}">
                 <span>⚙️</span> <span>Instrumen & Scoring</span>
             </a>
