@@ -69,7 +69,8 @@
     </div>
 
     <!-- Official Printable Certificate Container (A4 Landscape aspect ~ 297mm x 210mm) -->
-    <div class="cert-container w-full max-w-[1050px] aspect-[1.414/1] bg-[#F8F6F0] relative p-8 md:p-12 border-[12px] border-[#0B2A43] rounded-3xl shadow-2xl overflow-hidden flex flex-col justify-between">
+    <div class="cert-container w-full max-w-[1050px] aspect-[1.414/1] bg-[#F8F6F0] relative p-8 md:p-12 border-[12px] border-[#0B2A43] rounded-3xl shadow-2xl overflow-hidden flex flex-col justify-between"
+         @if(!empty($settings['certificate_bg'])) style="background-image: url('{{ $settings['certificate_bg'] }}'); background-size: cover; background-position: center;" @endif>
         
         <!-- Outer Gold Frame Overlay -->
         <div class="absolute inset-3 border-2 border-[#C9A24D] rounded-2xl pointer-events-none"></div>

@@ -119,45 +119,212 @@
             </div>
         </div>
 
-        <!-- Section 3: Sertifikat Digital, Tanda Tangan & Kartu Hasil -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-            <h3 class="font-bold font-serif text-slate-900 text-sm border-b border-slate-100 pb-2 flex items-center gap-2">
-                <span>📜</span>
-                <span>Sertifikat Digital, Tanda Tangan Founder & Kartu Hasil</span>
-            </h3>
+        <!-- Section 3: Sertifikat Digital, Tanda Tangan Founder & Kartu Hasil dengan Live Preview -->
+        <div x-data="{
+            activeTab: 'certificate',
+            certTitle: '{{ addslashes($settings['certificate_title'] ?? 'SERTIFIKAT HASIL ASESMEN RQI') }}',
+            certSubtitle: '{{ addslashes($settings['certificate_subtitle'] ?? 'Ruhiology Quotient Assessment Certificate') }}',
+            certBody: '{{ addslashes($settings['certificate_body_text'] ?? 'Diberikan kepada peserta di bawah ini atas partisipasi dan pencapaian evaluasi potensi diri dalam Asesmen Ruhiology Quotient (RQI).') }}',
+            founderName: '{{ addslashes($settings['founder_name'] ?? 'Prof. Dr. Iskandar Nazari, S.Ag., M.Pd., M.S.I., M.H., Ph.D.') }}',
+            founderTitle: '{{ addslashes($settings['founder_title'] ?? 'Founder Ruhiology Institute & Guru Besar UIN STS Jambi') }}',
+            signatureUrl: '{{ $settings['founder_signature'] ?? '' }}',
+            certBgUrl: '{{ $settings['certificate_bg'] ?? '' }}',
+            storyBgUrl: '{{ $settings['story_bg'] ?? '' }}',
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            previewFile(event, type) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        if (type === 'signature') this.signatureUrl = e.target.result;
+                        if (type === 'certBg') this.certBgUrl = e.target.result;
+                        if (type === 'storyBg') this.storyBgUrl = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        }" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+            <div class="flex flex-wrap justify-between items-center border-b border-slate-100 pb-3 gap-3">
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1">Upload Tanda Tangan Digital Founder (PNG Transparan Disarankan)</label>
-                    <input type="file" name="founder_signature_file" accept="image/*" class="w-full p-2 rounded border border-slate-300 bg-slate-50">
-                    <p class="text-[11px] text-slate-400 mt-1">Disarankan format PNG transparan untuk tampilan sertifikat & kartu hasil yang optimal.</p>
+                    <h3 class="font-bold font-serif text-slate-900 text-sm flex items-center gap-2">
+                        <span>📜</span>
+                        <span>Pengaturan & Pratinjau Live Sertifikat Digital & Kartu Hasil</span>
+                    </h3>
+                    <p class="text-[11px] text-slate-500 mt-0.5">Kelola gambar latar, tanda tangan founder, serta lihat hasil pratinjau langsung di sebelah kanan.</p>
                 </div>
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1">URL Gambar Tanda Tangan (Opsional Manual)</label>
-                    <input type="text" name="founder_signature" value="{{ $settings['founder_signature'] ?? '' }}" placeholder="Direct URL atau biarkan kosong" class="w-full p-2.5 rounded border border-slate-300">
-                    @if(!empty($settings['founder_signature']))
-                        <div class="mt-2 p-2 border border-slate-200 rounded bg-slate-50 flex items-center gap-3">
-                            <span class="text-[11px] text-slate-500 font-semibold">Preview Signature:</span>
-                            <img src="{{ $settings['founder_signature'] }}" alt="Signature Preview" class="h-10 object-contain max-w-[150px] bg-white p-1 rounded border border-slate-200">
+                
+                <!-- Tab Switcher for Live Preview -->
+                <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-xl">
+                    <button type="button" @click="activeTab = 'certificate'" :class="activeTab === 'certificate' ? 'bg-[#0B2A43] text-white shadow' : 'text-slate-600 hover:text-slate-900'" class="px-3 py-1.5 rounded-lg font-bold text-xs transition cursor-pointer">
+                        📜 Live Preview Sertifikat (A4)
+                    </button>
+                    <button type="button" @click="activeTab = 'story'" :class="activeTab === 'story' ? 'bg-[#0B2A43] text-white shadow' : 'text-slate-600 hover:text-slate-900'" class="px-3 py-1.5 rounded-lg font-bold text-xs transition cursor-pointer">
+                        📱 Live Preview Kartu Hasil (9:16)
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                
+                <!-- Left Side (Form Inputs: 7 cols) -->
+                <div class="lg:col-span-7 space-y-4">
+                    <!-- Founder Signature Upload -->
+                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+                        <span class="font-bold text-slate-800 text-xs block">✍️ Tanda Tangan Digital Founder</span>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block font-semibold text-slate-600 mb-1">Upload File Tanda Tangan (PNG Transparan)</label>
+                                <input type="file" name="founder_signature_file" accept="image/*" @change="previewFile($event, 'signature')" class="w-full p-2 text-xs rounded border border-slate-300 bg-white">
+                            </div>
+                            <div>
+                                <label class="block font-semibold text-slate-600 mb-1">atau URL Tanda Tangan</label>
+                                <input type="text" name="founder_signature" x-model="signatureUrl" placeholder="Direct URL..." class="w-full p-2.5 text-xs rounded border border-slate-300">
+                            </div>
                         </div>
-                    @endif
-                </div>
-            </div>
+                    </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1">Judul Utama Sertifikat</label>
-                    <input type="text" name="certificate_title" value="{{ $settings['certificate_title'] ?? 'SERTIFIKAT HASIL ASESMEN RQI' }}" required class="w-full p-2.5 rounded border border-slate-300 font-serif font-bold">
-                </div>
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1">Subjudul Sertifikat</label>
-                    <input type="text" name="certificate_subtitle" value="{{ $settings['certificate_subtitle'] ?? 'Ruhiology Quotient Assessment Certificate' }}" required class="w-full p-2.5 rounded border border-slate-300">
-                </div>
-            </div>
+                    <!-- Custom Backgrounds Upload -->
+                    <div class="p-4 bg-amber-50/60 rounded-xl border border-amber-200/80 space-y-3">
+                        <span class="font-bold text-amber-900 text-xs block">🎨 Gambar Latar / Custom Background</span>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Certificate Background -->
+                            <div class="space-y-1">
+                                <label class="block font-semibold text-slate-700 text-xs">Latar Sertifikat Digital (A4)</label>
+                                <input type="file" name="certificate_bg_file" accept="image/*" @change="previewFile($event, 'certBg')" class="w-full p-2 text-xs rounded border border-slate-300 bg-white">
+                                <input type="text" name="certificate_bg" x-model="certBgUrl" placeholder="URL Background Sertifikat..." class="w-full p-2 text-[11px] rounded border border-slate-300 mt-1">
+                                <template x-if="certBgUrl">
+                                    <button type="button" @click="certBgUrl = ''" class="text-[10px] text-rose-600 font-bold hover:underline mt-1 block">✕ Hapus Latar Sertifikat (Gunakan Default)</button>
+                                </template>
+                            </div>
 
-            <div>
-                <label class="block font-bold text-slate-700 mb-1">Teks Pengantar Sertifikat (Body Text)</label>
-                <textarea name="certificate_body_text" rows="2" required class="w-full p-2.5 rounded border border-slate-300">{{ $settings['certificate_body_text'] ?? 'Diberikan kepada peserta di bawah ini atas partisipasi dan pencapaian evaluasi potensi diri dalam Asesmen Ruhiology Quotient (RQI).' }}</textarea>
+                            <!-- 9:16 Story Background -->
+                            <div class="space-y-1">
+                                <label class="block font-semibold text-slate-700 text-xs">Latar Kartu Hasil (Story 9:16)</label>
+                                <input type="file" name="story_bg_file" accept="image/*" @change="previewFile($event, 'storyBg')" class="w-full p-2 text-xs rounded border border-slate-300 bg-white">
+                                <input type="text" name="story_bg" x-model="storyBgUrl" placeholder="URL Background Story 9:16..." class="w-full p-2 text-[11px] rounded border border-slate-300 mt-1">
+                                <template x-if="storyBgUrl">
+                                    <button type="button" @click="storyBgUrl = ''" class="text-[10px] text-rose-600 font-bold hover:underline mt-1 block">✕ Hapus Latar Story (Gunakan Default)</button>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Certificate Text Settings -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Judul Utama Sertifikat</label>
+                            <input type="text" name="certificate_title" x-model="certTitle" required class="w-full p-2.5 rounded border border-slate-300 font-serif font-bold">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Subjudul Sertifikat</label>
+                            <input type="text" name="certificate_subtitle" x-model="certSubtitle" required class="w-full p-2.5 rounded border border-slate-300">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Teks Pengantar Sertifikat (Body Text)</label>
+                        <textarea name="certificate_body_text" x-model="certBody" rows="2" required class="w-full p-2.5 rounded border border-slate-300"></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-slate-100">
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Nama Founder / Penandatangan</label>
+                            <input type="text" name="founder_name" x-model="founderName" required class="w-full p-2.5 rounded border border-slate-300">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Gelar / Jabatan Founder</label>
+                            <input type="text" name="founder_title" x-model="founderTitle" required class="w-full p-2.5 rounded border border-slate-300">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Side (Live Interactive Preview Box: 5 cols) -->
+                <div class="lg:col-span-5 bg-slate-900 p-4 rounded-2xl border border-slate-800 text-white space-y-3 sticky top-24">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                        <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest flex items-center gap-1">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span>Pratinjau Tampilan Live</span>
+                        </span>
+                        <span class="text-[10px] text-slate-400 font-mono" x-text="activeTab === 'certificate' ? 'A4 Landscape' : 'Story 9:16'"></span>
+                    </div>
+
+                    <!-- PREVIEW TAB 1: SERTIFIKAT A4 LANDSCAPE -->
+                    <div x-show="activeTab === 'certificate'" class="relative aspect-[1.414/1] w-full bg-[#F8F6F0] text-[#0B2A43] p-4 rounded-xl border-4 border-[#0B2A43] shadow-xl overflow-hidden flex flex-col justify-between text-center select-none"
+                         :style="certBgUrl ? `background-image: url('${certBgUrl}'); background-size: cover; background-position: center;` : ''">
+                        
+                        <!-- Inner Gold Frame -->
+                        <div class="absolute inset-1.5 border border-[#C9A24D] rounded-lg pointer-events-none"></div>
+
+                        <!-- Header -->
+                        <div class="space-y-1 pt-1">
+                            <span class="block text-[8px] font-bold tracking-widest uppercase text-[#0B2A43]" x-text="'RUHIOLOGY INSTITUTE'"></span>
+                            <h4 class="font-serif font-black text-xs uppercase text-[#0B2A43] leading-tight" x-text="certTitle"></h4>
+                            <p class="text-[7px] italic text-amber-800 font-serif" x-text="certSubtitle"></p>
+                        </div>
+
+                        <!-- Body -->
+                        <div class="space-y-1 my-1">
+                            <p class="text-[7px] text-slate-600 line-clamp-2 leading-tight px-2" x-text="certBody"></p>
+                            <h5 class="font-serif font-bold text-xs text-[#0B2A43] border-b border-amber-400 inline-block px-3" x-text="'NAMA PESERTA CONTOH'"></h5>
+                            <div class="text-[7px] font-bold text-amber-900 bg-amber-100/80 px-2 py-0.5 rounded-full inline-block">
+                                Skor RQI: 85.0 (Tinggi / Paripurna)
+                            </div>
+                        </div>
+
+                        <!-- Footer & Signature -->
+                        <div class="flex justify-between items-end pt-1 border-t border-amber-200 text-[6px]">
+                            <div class="text-left">
+                                <span class="font-mono text-slate-400 block">NO: CERT/RQI/2026/SAMPLE</span>
+                                <span class="text-emerald-700 font-bold">✓ Terverifikasi Resmi</span>
+                            </div>
+                            <div class="text-center space-y-0.5 min-w-[90px]">
+                                <div class="h-6 flex items-center justify-center">
+                                    <template x-if="signatureUrl">
+                                        <img :src="signatureUrl" class="max-h-6 max-w-[80px] object-contain">
+                                    </template>
+                                    <template x-if="!signatureUrl">
+                                        <span class="italic text-slate-400 text-[7px] border-b border-dashed border-slate-300">Prof. Iskandar Nazari</span>
+                                    </template>
+                                </div>
+                                <span class="font-bold block text-[7px] text-[#0B2A43] leading-tight" x-text="founderName"></span>
+                                <span class="text-amber-800 text-[6px] block" x-text="founderTitle"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PREVIEW TAB 2: KARTU HASIL STORY 9:16 -->
+                    <div x-show="activeTab === 'story'" class="relative aspect-[9/16] max-w-[220px] mx-auto w-full bg-[#0B2A43] text-white p-4 rounded-2xl border-2 border-slate-700 shadow-2xl overflow-hidden flex flex-col justify-between text-center select-none"
+                         :style="storyBgUrl ? `background-image: url('${storyBgUrl}'); background-size: cover; background-position: center;` : ''">
+                        
+                        <!-- Top Header -->
+                        <div class="space-y-1 pt-2">
+                            <span class="text-[7px] font-bold font-mono text-[#C9A24D] uppercase tracking-widest block">RUHIOLOGY INSTITUTE</span>
+                            <span class="text-[6px] font-mono text-slate-300 block">INDEKS KECERDASAN RUHIOLOGI (RQI)</span>
+                        </div>
+
+                        <!-- Central Score -->
+                        <div class="my-2 py-2 bg-white/10 rounded-xl border border-white/15 backdrop-blur space-y-1">
+                            <span class="text-[7px] text-[#C9A24D] font-mono uppercase block">PESERTA: CONTOH PESERTA</span>
+                            <div class="text-2xl font-black font-serif text-white">85.0</div>
+                            <span class="text-[7px] bg-[#C9A24D] text-slate-950 font-bold px-2 py-0.5 rounded-full inline-block">✦ Tinggi / Paripurna</span>
+                        </div>
+
+                        <!-- Footer Signature -->
+                        <div class="space-y-1 pb-1 border-t border-white/20 pt-2">
+                            <div class="h-6 flex items-center justify-center">
+                                <template x-if="signatureUrl">
+                                    <img :src="signatureUrl" class="max-h-6 max-w-[80px] object-contain">
+                                </template>
+                                <template x-if="!signatureUrl">
+                                    <span class="italic text-slate-400 text-[7px]">Prof. Iskandar Nazari</span>
+                                </template>
+                            </div>
+                            <span class="font-bold block text-[7px] text-white" x-text="founderName"></span>
+                            <span class="text-slate-300 text-[6px] block" x-text="founderTitle"></span>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
