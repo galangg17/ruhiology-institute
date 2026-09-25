@@ -100,17 +100,36 @@ class AdminEventController extends Controller
     {
         $event->load(['program', 'instrument', 'province', 'regency']);
 
-        $submissions = AssessmentSubmission::where('event_id', $event->id)
-            ->with(['participant.province', 'participant.regency', 'result'])
-            ->latest()
-            ->paginate(15);
+        $eventId = $event->id;
+        $eventCode = $event->event_code;
 
-        $totalSubmissions = AssessmentSubmission::where('event_id', $event->id)->count();
-        $completedSubmissions = AssessmentSubmission::where('event_id', $event->id)->where('status', 'submitted')->count();
+        $submissions = AssessmentSubmission::where(function ($q) use ($eventId, $eventCode) {
+            $q->where('event_id', $eventId)
+              ->orWhereHas('participant', function ($pq) use ($eventId, $eventCode) {
+                  $pq->where('event_id', $eventId)
+                     ->orWhere('sub_category', 'like', "%{$eventCode}%");
+              });
+        })
+        ->with(['participant.province', 'participant.regency', 'result'])
+        ->latest()
+        ->paginate(15);
+
+        $totalSubmissions = AssessmentSubmission::where(function ($q) use ($eventId, $eventCode) {
+            $q->where('event_id', $eventId)
+              ->orWhereHas('participant', function ($pq) use ($eventId, $eventCode) {
+                  $pq->where('event_id', $eventId);
+              });
+        })->count();
+
+        $completedSubmissions = AssessmentSubmission::where(function ($q) use ($eventId) {
+            $q->where('event_id', $eventId)
+              ->orWhereHas('participant', fn($pq) => $pq->where('event_id', $eventId));
+        })->where('status', 'submitted')->count();
 
         // Analytics aggregation
-        $results = \App\Models\AssessmentResult::whereHas('submission', function ($q) use ($event) {
-            $q->where('event_id', $event->id);
+        $results = \App\Models\AssessmentResult::whereHas('submission', function ($q) use ($eventId) {
+            $q->where('event_id', $eventId)
+              ->orWhereHas('participant', fn($pq) => $pq->where('event_id', $eventId));
         })->get();
 
         $avgRqi = $results->count() > 0 ? round($results->avg('rqi_score'), 1) : 0;
