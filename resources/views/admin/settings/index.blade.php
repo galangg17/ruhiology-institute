@@ -119,6 +119,48 @@
             </div>
         </div>
 
+        <!-- Section 3: Sertifikat Digital, Tanda Tangan & Kartu Hasil -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+            <h3 class="font-bold font-serif text-slate-900 text-sm border-b border-slate-100 pb-2 flex items-center gap-2">
+                <span>📜</span>
+                <span>Sertifikat Digital, Tanda Tangan Founder & Kartu Hasil</span>
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Upload Tanda Tangan Digital Founder (PNG Transparan Disarankan)</label>
+                    <input type="file" name="founder_signature_file" accept="image/*" class="w-full p-2 rounded border border-slate-300 bg-slate-50">
+                    <p class="text-[11px] text-slate-400 mt-1">Disarankan format PNG transparan untuk tampilan sertifikat & kartu hasil yang optimal.</p>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">URL Gambar Tanda Tangan (Opsional Manual)</label>
+                    <input type="text" name="founder_signature" value="{{ $settings['founder_signature'] ?? '' }}" placeholder="Direct URL atau biarkan kosong" class="w-full p-2.5 rounded border border-slate-300">
+                    @if(!empty($settings['founder_signature']))
+                        <div class="mt-2 p-2 border border-slate-200 rounded bg-slate-50 flex items-center gap-3">
+                            <span class="text-[11px] text-slate-500 font-semibold">Preview Signature:</span>
+                            <img src="{{ $settings['founder_signature'] }}" alt="Signature Preview" class="h-10 object-contain max-w-[150px] bg-white p-1 rounded border border-slate-200">
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Judul Utama Sertifikat</label>
+                    <input type="text" name="certificate_title" value="{{ $settings['certificate_title'] ?? 'SERTIFIKAT HASIL ASESMEN RQI' }}" required class="w-full p-2.5 rounded border border-slate-300 font-serif font-bold">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Subjudul Sertifikat</label>
+                    <input type="text" name="certificate_subtitle" value="{{ $settings['certificate_subtitle'] ?? 'Ruhiology Quotient Assessment Certificate' }}" required class="w-full p-2.5 rounded border border-slate-300">
+                </div>
+            </div>
+
+            <div>
+                <label class="block font-bold text-slate-700 mb-1">Teks Pengantar Sertifikat (Body Text)</label>
+                <textarea name="certificate_body_text" rows="2" required class="w-full p-2.5 rounded border border-slate-300">{{ $settings['certificate_body_text'] ?? 'Diberikan kepada peserta di bawah ini atas partisipasi dan pencapaian evaluasi potensi diri dalam Asesmen Ruhiology Quotient (RQI).' }}</textarea>
+            </div>
+        </div>
+
         <!-- General Info -->
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
             <h3 class="font-bold font-serif text-slate-900 text-sm border-b border-slate-100 pb-2">Identitas Lembaga & Penggagas</h3>
@@ -139,7 +181,7 @@
                 </div>
                 <div>
                     <label class="block font-bold text-slate-700 mb-1">Gelar / Jabatan Penggagas</label>
-                    <input type="text" name="founder_title" value="{{ $settings['founder_title'] ?? 'Guru Besar Psikologi Pendidikan UIN Sulthan Thaha Saifuddin Jambi' }}" required class="w-full p-2.5 rounded border border-slate-300">
+                    <input type="text" name="founder_title" value="{{ $settings['founder_title'] ?? 'Founder Ruhiology Institute & Guru Besar UIN STS Jambi' }}" required class="w-full p-2.5 rounded border border-slate-300">
                 </div>
             </div>
         </div>

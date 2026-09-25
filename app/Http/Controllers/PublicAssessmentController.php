@@ -332,6 +332,29 @@ class PublicAssessmentController extends Controller
     }
 
     /**
+     * Official Digital Certificate View (A4 Landscape Print/PDF).
+     */
+    public function certificate(string $submissionCode)
+    {
+        $submission = AssessmentSubmission::where('submission_code', $submissionCode)
+            ->with([
+                'participant.country',
+                'participant.province',
+                'participant.regency',
+                'participant.school',
+                'participant.university',
+                'period.program',
+                'period.instrument',
+                'result.dimensionResults.dimension'
+            ])
+            ->firstOrFail();
+
+        $settings = \App\Models\Setting::all()->pluck('value', 'key')->toArray();
+
+        return view('public.assessment.certificate', compact('submission', 'settings'));
+    }
+
+    /**
      * Verification & Score Lookup via Assessment Code + Birth Date.
      */
     public function checkScore(Request $request)

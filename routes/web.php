@@ -60,6 +60,7 @@ Route::post('/assessment/verify', [PublicAssessmentController::class, 'verify'])
 Route::get('/assessment/take/{period_code}/{type}', [PublicAssessmentController::class, 'take'])->name('assessment.take');
 Route::post('/assessment/submit/{period_code}/{type}', [PublicAssessmentController::class, 'submit'])->name('assessment.submit');
 Route::get('/assessment/result/{submission_code}', [PublicAssessmentController::class, 'result'])->name('assessment.result');
+Route::get('/assessment/result/{submission_code}/certificate', [PublicAssessmentController::class, 'certificate'])->name('assessment.certificate');
 Route::post('/assessment/reflection/{submission_code}', [PublicAssessmentController::class, 'submitReflection'])->name('assessment.reflection');
 
 // Training Center

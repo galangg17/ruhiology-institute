@@ -17,7 +17,7 @@ class AdminSettingController extends Controller
 
     public function update(Request $request)
     {
-        $data = $request->except(['_token', 'hero_card_image_file', 'about_image_file']);
+        $data = $request->except(['_token', 'hero_card_image_file', 'about_image_file', 'founder_signature_file', 'certificate_logo_file']);
 
         // Handle Hero Card Image Upload
         if ($request->hasFile('hero_card_image_file')) {
@@ -41,6 +41,30 @@ class AdminSettingController extends Controller
             }
             $file->move($path, $filename);
             $data['about_image'] = asset('images/settings/' . $filename);
+        }
+
+        // Handle Founder Signature Upload
+        if ($request->hasFile('founder_signature_file')) {
+            $file = $request->file('founder_signature_file');
+            $filename = 'founder_signature_' . time() . '.' . $file->getClientOriginalExtension();
+            $path = public_path('images/settings');
+            if (!file_exists($path)) {
+                mkdir($path, 0755, true);
+            }
+            $file->move($path, $filename);
+            $data['founder_signature'] = asset('images/settings/' . $filename);
+        }
+
+        // Handle Certificate Logo Upload
+        if ($request->hasFile('certificate_logo_file')) {
+            $file = $request->file('certificate_logo_file');
+            $filename = 'cert_logo_' . time() . '.' . $file->getClientOriginalExtension();
+            $path = public_path('images/settings');
+            if (!file_exists($path)) {
+                mkdir($path, 0755, true);
+            }
+            $file->move($path, $filename);
+            $data['certificate_logo'] = asset('images/settings/' . $filename);
         }
 
         foreach ($data as $key => $val) {

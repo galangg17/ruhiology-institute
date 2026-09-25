@@ -29,11 +29,14 @@
                     Kode Assessment: <strong class="font-mono text-[#C9A24D] text-sm">{{ $submission->participant->assessment_code ?? $submission->participant->participant_code }}</strong> &bull; Sesi: <strong class="uppercase text-emerald-400 font-bold">{{ $submission->submission_type }}</strong>
                 </p>
             </div>
-            <div class="flex gap-2.5 w-full md:w-auto">
-                <button onclick="window.print()" class="flex-1 md:flex-none justify-center px-5 py-3 bg-[#C9A24D] hover:bg-[#B48A16] text-[#0B2A43] text-xs font-bold rounded-xl shadow-lg transition cursor-pointer flex items-center gap-2 font-mono uppercase tracking-wider min-h-[44px]">
+            <div class="flex flex-wrap gap-2.5 w-full md:w-auto">
+                <a href="{{ route('assessment.certificate', $submission->submission_code) }}" target="_blank" class="flex-1 md:flex-none justify-center px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-lg transition cursor-pointer flex items-center gap-2 font-mono uppercase tracking-wider min-h-[44px]">
+                    <span>📜</span> <span>Sertifikat Resmi</span>
+                </a>
+                <button onclick="window.print()" class="flex-1 md:flex-none justify-center px-4 py-3 bg-[#C9A24D] hover:bg-[#B48A16] text-[#0B2A43] text-xs font-bold rounded-xl shadow-lg transition cursor-pointer flex items-center gap-2 font-mono uppercase tracking-wider min-h-[44px]">
                     <span>🖨️</span> <span>Cetak / PDF</span>
                 </button>
-                <button @click="openStoryModal()" class="flex-1 md:flex-none justify-center px-5 py-3 bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 hover:from-purple-700 hover:to-rose-700 text-white text-xs font-bold rounded-xl shadow-lg transition cursor-pointer flex items-center gap-2 font-mono uppercase tracking-wider min-h-[44px]">
+                <button @click="openStoryModal()" class="flex-1 md:flex-none justify-center px-4 py-3 bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 hover:from-purple-700 hover:to-rose-700 text-white text-xs font-bold rounded-xl shadow-lg transition cursor-pointer flex items-center gap-2 font-mono uppercase tracking-wider min-h-[44px]">
                     <span>📱</span> <span>Story IG / WA</span>
                 </button>
             </div>
@@ -618,10 +621,29 @@ function rqResultPage() {
                 ctx.lineTo(780, 1725);
                 ctx.stroke();
 
-                // Founder Signature / Branding (Bottom)
-                ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 26px "Outfit", sans-serif';
-                ctx.fillText('Prof. Iskandar Nazari - Founder Ruhiology Institute', 540, 1775);
+                // Founder Signature & Title Branding (Bottom)
+                const founderName = '{{ addslashes(\App\Models\Setting::get("founder_name", "Prof. Iskandar Nazari")) }}';
+                const founderTitle = '{{ addslashes(\App\Models\Setting::get("founder_title", "Founder Ruhiology Institute")) }}';
+                const founderText = `${founderName} - ${founderTitle}`;
+                const sigUrl = '{{ \App\Models\Setting::get("founder_signature") }}';
+
+                if (sigUrl) {
+                    const sigImg = new Image();
+                    sigImg.crossOrigin = 'anonymous';
+                    sigImg.onload = function() {
+                        const sigWidth = 160;
+                        const sigHeight = (sigImg.naturalHeight / sigImg.naturalWidth) * sigWidth;
+                        ctx.drawImage(sigImg, 540 - (sigWidth / 2), 1735 - sigHeight, sigWidth, sigHeight);
+                        ctx.fillStyle = '#ffffff';
+                        ctx.font = 'bold 24px "Outfit", sans-serif';
+                        ctx.fillText(founderText, 540, 1785);
+                    };
+                    sigImg.src = sigUrl;
+                } else {
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = 'bold 25px "Outfit", sans-serif';
+                    ctx.fillText(founderText, 540, 1775);
+                }
             };
 
             logoImg.onload = render;
