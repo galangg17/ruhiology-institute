@@ -255,7 +255,7 @@
                         <!-- Inner Gold Frame -->
                         <div class="absolute inset-1 border border-[#C9A24D] rounded-lg pointer-events-none"></div>
 
-                        <!-- Header with Logo -->
+                        <!-- 1. Header with Logo -->
                         <div class="space-y-0.5 pt-0.5 flex flex-col items-center">
                             <img src="{{ asset('images/settings/ruhiology-logo.png') }}" class="h-6 w-6 object-contain mx-auto" alt="Logo">
                             <span class="block text-[7px] font-bold tracking-widest uppercase text-[#0B2A43]" x-text="'RUHIOLOGY INSTITUTE'"></span>
@@ -263,9 +263,9 @@
                             <p class="text-[6px] italic text-amber-800 font-serif" x-text="certSubtitle"></p>
                         </div>
 
-                        <!-- Body Centered -->
+                        <!-- 2. Body Centered -->
                         <div class="space-y-0.5 my-0.5">
-                            <span class="text-[6px] uppercase font-serif tracking-widest text-slate-500 font-bold block">Diberikan Kepada :</span>
+                            <span class="text-[5px] uppercase font-serif tracking-widest text-slate-500 font-bold block">Diberikan Kepada :</span>
                             <h5 class="font-serif font-bold text-[11px] text-[#0B2A43] border-b border-amber-400 inline-block px-3" x-text="'NAMA PESERTA CONTOH'"></h5>
                             <p class="text-[6px] text-slate-600 line-clamp-2 leading-tight px-2" x-text="certBody"></p>
                             
@@ -274,23 +274,27 @@
                             </div>
                         </div>
 
-                        <!-- Footer & Signature -->
-                        <div class="flex justify-between items-end pt-0.5 border-t border-amber-200 text-[5px]">
-                            <div class="text-left">
-                                <span class="font-mono text-slate-400 block">NO: CERT/RQI/2026/SAMPLE</span>
-                                <span class="text-emerald-700 font-bold">✓ Terverifikasi Resmi</span>
-                            </div>
-                            <div class="text-center space-y-0.5 min-w-[80px]">
-                                <div class="h-5 flex items-center justify-center">
-                                    <template x-if="signatureUrl">
-                                        <img :src="signatureUrl" class="max-h-5 max-w-[70px] object-contain">
-                                    </template>
-                                    <template x-if="!signatureUrl">
-                                        <span class="italic text-slate-400 text-[6px] border-b border-dashed border-slate-300">Prof. Iskandar Nazari</span>
-                                    </template>
+                        <!-- 3. Footer & Signature -->
+                        <div class="space-y-1">
+                            <p class="text-[5px] font-serif italic text-slate-500 line-clamp-1">"Ruh adalah pusat inteligensi tertinggi yang mengendalikan orientasi nilai."</p>
+                            
+                            <div class="flex justify-between items-end pt-0.5 border-t border-amber-200 text-[5px]">
+                                <div class="text-left">
+                                    <span class="font-mono text-slate-400 block">NO: CERT/RQI/2026/SAMPLE</span>
+                                    <span class="text-emerald-700 font-bold">✓ Terverifikasi Resmi</span>
                                 </div>
-                                <span class="font-bold block text-[6px] text-[#0B2A43] leading-tight" x-text="founderName"></span>
-                                <span class="text-amber-800 text-[5px] block" x-text="founderTitle"></span>
+                                <div class="text-center space-y-0.5 min-w-[80px]">
+                                    <div class="h-5 flex items-center justify-center">
+                                        <template x-if="signatureUrl">
+                                            <img :src="signatureUrl" class="max-h-5 max-w-[70px] object-contain">
+                                        </template>
+                                        <template x-if="!signatureUrl">
+                                            <span class="italic text-slate-400 text-[6px] border-b border-dashed border-slate-300">Prof. Iskandar Nazari</span>
+                                        </template>
+                                    </div>
+                                    <span class="font-bold block text-[6px] text-[#0B2A43] leading-tight" x-text="founderName"></span>
+                                    <span class="text-amber-800 text-[5px] block" x-text="founderTitle"></span>
+                                </div>
                             </div>
                         </div>
                     </div>
