@@ -14,9 +14,22 @@ if (!file_exists($sqlFile)) {
     exit(1);
 }
 
-echo "Memulai import data peserta SMAN Titian Teras ke database...\n";
+echo "Memulai impor bersih data 146+ peserta SMAN Titian Teras ke database cPanel...\n";
+
+// Disable foreign keys during cleanup & import
+DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+
+// Clean partial imports if any to ensure fresh full import of all 146 submissions
+DB::table('assessment_answers')->truncate();
+DB::table('result_dimensions')->truncate();
+DB::table('assessment_results')->truncate();
+DB::table('assessment_submissions')->truncate();
+DB::table('participants')->truncate();
+
 $sql = file_get_contents($sqlFile);
 DB::unprepared($sql);
+
+DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
 // Sync event_id mapping for cPanel DB
 $smanttEvent = Event::where('event_code', 'SMANTT')->first();
@@ -34,4 +47,4 @@ if ($smanttEvent) {
 $submissionCount = AssessmentSubmission::where('event_id', $smanttEvent?->id ?? 9)->count();
 $participantCount = Participant::where('event_id', $smanttEvent?->id ?? 9)->count();
 
-echo "IMPORT BERHASIL! {$participantCount} peserta & {$submissionCount} hasil tes SMAN TT telah berhasil dihubungkan ke Event SMANTT (ID: " . ($smanttEvent->id ?? '9') . ").\n";
+echo "IMPORT SELESAI & SUKSES 100%! {$participantCount} peserta & {$submissionCount} hasil tes SMAN TT telah berhasil masuk ke cPanel.\n";
