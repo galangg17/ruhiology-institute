@@ -249,45 +249,48 @@
                     </div>
 
                     <!-- PREVIEW TAB 1: SERTIFIKAT A4 LANDSCAPE -->
-                    <div x-show="activeTab === 'certificate'" class="relative aspect-[1.414/1] w-full bg-[#F8F6F0] text-[#0B2A43] p-4 rounded-xl border-4 border-[#0B2A43] shadow-xl overflow-hidden flex flex-col justify-between text-center select-none"
+                    <div x-show="activeTab === 'certificate'" class="relative aspect-[1.414/1] w-full bg-[#F8F6F0] text-[#0B2A43] p-3 rounded-xl border-4 border-[#0B2A43] shadow-xl overflow-hidden flex flex-col justify-between text-center select-none"
                          :style="certBgUrl ? `background-image: url('${certBgUrl}'); background-size: cover; background-position: center;` : ''">
                         
                         <!-- Inner Gold Frame -->
-                        <div class="absolute inset-1.5 border border-[#C9A24D] rounded-lg pointer-events-none"></div>
+                        <div class="absolute inset-1 border border-[#C9A24D] rounded-lg pointer-events-none"></div>
 
-                        <!-- Header -->
-                        <div class="space-y-1 pt-1">
-                            <span class="block text-[8px] font-bold tracking-widest uppercase text-[#0B2A43]" x-text="'RUHIOLOGY INSTITUTE'"></span>
-                            <h4 class="font-serif font-black text-xs uppercase text-[#0B2A43] leading-tight" x-text="certTitle"></h4>
-                            <p class="text-[7px] italic text-amber-800 font-serif" x-text="certSubtitle"></p>
+                        <!-- Header with Logo -->
+                        <div class="space-y-0.5 pt-0.5 flex flex-col items-center">
+                            <img src="{{ asset('images/settings/ruhiology-logo.png') }}" class="h-6 w-6 object-contain mx-auto" alt="Logo">
+                            <span class="block text-[7px] font-bold tracking-widest uppercase text-[#0B2A43]" x-text="'RUHIOLOGY INSTITUTE'"></span>
+                            <h4 class="font-serif font-black text-[10px] uppercase text-[#0B2A43] leading-tight" x-text="certTitle"></h4>
+                            <p class="text-[6px] italic text-amber-800 font-serif" x-text="certSubtitle"></p>
                         </div>
 
-                        <!-- Body -->
-                        <div class="space-y-1 my-1">
-                            <p class="text-[7px] text-slate-600 line-clamp-2 leading-tight px-2" x-text="certBody"></p>
-                            <h5 class="font-serif font-bold text-xs text-[#0B2A43] border-b border-amber-400 inline-block px-3" x-text="'NAMA PESERTA CONTOH'"></h5>
-                            <div class="text-[7px] font-bold text-amber-900 bg-amber-100/80 px-2 py-0.5 rounded-full inline-block">
+                        <!-- Body Centered -->
+                        <div class="space-y-0.5 my-0.5">
+                            <span class="text-[6px] uppercase font-serif tracking-widest text-slate-500 font-bold block">Diberikan Kepada :</span>
+                            <h5 class="font-serif font-bold text-[11px] text-[#0B2A43] border-b border-amber-400 inline-block px-3" x-text="'NAMA PESERTA CONTOH'"></h5>
+                            <p class="text-[6px] text-slate-600 line-clamp-2 leading-tight px-2" x-text="certBody"></p>
+                            
+                            <div class="text-[6px] font-bold text-amber-900 bg-amber-100/90 px-2 py-0.5 rounded-full inline-block border border-amber-300">
                                 Skor RQI: 85.0 (Tinggi / Paripurna)
                             </div>
                         </div>
 
                         <!-- Footer & Signature -->
-                        <div class="flex justify-between items-end pt-1 border-t border-amber-200 text-[6px]">
+                        <div class="flex justify-between items-end pt-0.5 border-t border-amber-200 text-[5px]">
                             <div class="text-left">
                                 <span class="font-mono text-slate-400 block">NO: CERT/RQI/2026/SAMPLE</span>
                                 <span class="text-emerald-700 font-bold">✓ Terverifikasi Resmi</span>
                             </div>
-                            <div class="text-center space-y-0.5 min-w-[90px]">
-                                <div class="h-6 flex items-center justify-center">
+                            <div class="text-center space-y-0.5 min-w-[80px]">
+                                <div class="h-5 flex items-center justify-center">
                                     <template x-if="signatureUrl">
-                                        <img :src="signatureUrl" class="max-h-6 max-w-[80px] object-contain">
+                                        <img :src="signatureUrl" class="max-h-5 max-w-[70px] object-contain">
                                     </template>
                                     <template x-if="!signatureUrl">
-                                        <span class="italic text-slate-400 text-[7px] border-b border-dashed border-slate-300">Prof. Iskandar Nazari</span>
+                                        <span class="italic text-slate-400 text-[6px] border-b border-dashed border-slate-300">Prof. Iskandar Nazari</span>
                                     </template>
                                 </div>
-                                <span class="font-bold block text-[7px] text-[#0B2A43] leading-tight" x-text="founderName"></span>
-                                <span class="text-amber-800 text-[6px] block" x-text="founderTitle"></span>
+                                <span class="font-bold block text-[6px] text-[#0B2A43] leading-tight" x-text="founderName"></span>
+                                <span class="text-amber-800 text-[5px] block" x-text="founderTitle"></span>
                             </div>
                         </div>
                     </div>

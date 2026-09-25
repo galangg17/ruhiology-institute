@@ -89,39 +89,36 @@
 
         <!-- Certificate Header -->
         <div class="relative z-10 text-center space-y-2">
-            <div class="flex items-center justify-center gap-3 mb-1">
-                <img src="{{ asset('images/settings/ruhiology-logo.png') }}" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=RQ&background=0B2A43&color=C9A24D';" class="h-12 w-12 object-contain" alt="Logo">
-                <div class="text-left">
-                    <span class="block font-serif-gold text-lg font-bold tracking-widest text-[#0B2A43] leading-none">
-                        {{ $settings['institute_name'] ?? 'RUHIOLOGY INSTITUTE' }}
-                    </span>
-                    <span class="block text-[10px] tracking-widest uppercase text-amber-700 font-bold mt-0.5">
-                        {{ $settings['tagline'] ?? 'Mengenal Diri. Mengembangkan Potensi. Menumbuhkan Ruh.' }}
-                    </span>
-                </div>
+            <!-- Centered Prominent Logo & Institute Header -->
+            <div class="flex flex-col items-center justify-center space-y-1 mb-2">
+                <img src="{{ $settings['certificate_logo'] ?? asset('images/settings/ruhiology-logo.png') }}" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=RQ&background=0B2A43&color=C9A24D';" class="h-16 w-16 object-contain mx-auto" alt="Logo Ruhiology Institute">
+                <span class="block font-serif-gold text-xl font-bold tracking-widest text-[#0B2A43] leading-none">
+                    {{ $settings['institute_name'] ?? 'RUHIOLOGY INSTITUTE' }}
+                </span>
+                <span class="block text-[10px] tracking-widest uppercase text-amber-800 font-bold">
+                    {{ $settings['tagline'] ?? 'Mengenal Diri. Mengembangkan Potensi. Menumbuhkan Ruh.' }}
+                </span>
             </div>
 
-            <div class="pt-2">
+            <div class="pt-1">
                 <h1 class="font-serif-gold text-2xl md:text-3xl font-extrabold text-[#0B2A43] tracking-wide uppercase">
                     {{ $settings['certificate_title'] ?? 'SERTIFIKAT HASIL ASESMEN RQI' }}
                 </h1>
                 <p class="text-xs font-serif italic text-amber-800 tracking-wider mt-0.5">
                     {{ $settings['certificate_subtitle'] ?? 'Ruhiology Quotient Assessment Certificate' }}
                 </p>
-                <div class="inline-block mt-2 px-4 py-1 bg-amber-100/80 border border-amber-300 text-amber-900 rounded-full text-[10px] font-mono font-bold tracking-wider">
+                <div class="inline-block mt-1.5 px-4 py-0.5 bg-amber-100/80 border border-amber-300 text-amber-900 rounded-full text-[10px] font-mono font-bold tracking-wider">
                     NO: CERT/RQI/{{ date('Y') }}/{{ strtoupper($submission->submission_code) }}
                 </div>
             </div>
         </div>
 
-        <!-- Certificate Body -->
-        <div class="relative z-10 text-center my-4 space-y-3">
-            <p class="text-xs text-slate-600 max-w-2xl mx-auto leading-relaxed">
-                {{ $settings['certificate_body_text'] ?? 'Diberikan kepada peserta di bawah ini atas partisipasi dan pencapaian evaluasi potensi diri dalam Asesmen Ruhiology Quotient (RQI).' }}
-            </p>
+        <!-- Certificate Centered Body Content -->
+        <div class="relative z-10 text-center my-3 space-y-3">
+            <span class="text-xs uppercase font-serif tracking-widest text-slate-500 font-bold block">Diberikan Kepada :</span>
 
-            <div class="py-2">
-                <h2 class="font-serif-classic text-2xl md:text-3xl font-extrabold text-[#0B2A43] tracking-wide border-b-2 border-amber-400/60 inline-block px-8 pb-1">
+            <div>
+                <h2 class="font-serif-classic text-3xl md:text-4xl font-extrabold text-[#0B2A43] tracking-wide border-b-2 border-amber-400/80 inline-block px-10 pb-1">
                     {{ $submission->participant->name }}
                 </h2>
                 <p class="text-xs text-slate-500 font-medium mt-1">
@@ -132,31 +129,19 @@
                 </p>
             </div>
 
-            <!-- Score Summary Box -->
-            <div class="max-w-xl mx-auto bg-white/90 p-4 rounded-2xl border border-amber-200 shadow-sm flex items-center justify-around">
-                <div class="text-center px-4">
-                    <span class="block text-[10px] uppercase font-bold tracking-wider text-slate-400">Skor Total RQI</span>
-                    <span class="font-serif-gold text-3xl font-black text-[#0B2A43]">
-                        {{ number_format($submission->result->total_score ?? 0, 1) }}
-                    </span>
-                    <span class="block text-[10px] font-semibold text-slate-500">Skala 100</span>
-                </div>
-                <div class="h-10 w-px bg-amber-200"></div>
-                <div class="text-center px-4">
-                    <span class="block text-[10px] uppercase font-bold tracking-wider text-slate-400">Tingkat Potensi</span>
-                    <span class="font-serif-classic text-lg font-bold text-amber-800">
-                        {{ $submission->result->level_category ?? 'Tinggi / Paripurna' }}
-                    </span>
-                    <span class="block text-[10px] font-semibold text-slate-500">Kualifikasi Standar</span>
-                </div>
-                <div class="h-10 w-px bg-amber-200"></div>
-                <div class="text-center px-4">
-                    <span class="block text-[10px] uppercase font-bold tracking-wider text-slate-400">Tanggal Asesmen</span>
-                    <span class="font-bold text-xs text-slate-800">
-                        {{ $submission->created_at ? $submission->created_at->translatedFormat('d F Y') : date('d F Y') }}
-                    </span>
-                    <span class="block text-[10px] font-semibold text-slate-500">Verifikasi Resmi</span>
-                </div>
+            <p class="text-xs sm:text-sm text-slate-700 max-w-2xl mx-auto leading-relaxed font-normal">
+                {{ $settings['certificate_body_text'] ?? 'Atas partisipasi dan pencapaian evaluasi potensi diri dalam Asesmen Ruhiology Quotient (RQI).' }}
+            </p>
+
+            <!-- Centered RQI Score Badge -->
+            <div class="inline-flex items-center justify-center gap-3 bg-gradient-to-r from-amber-50 via-white to-amber-50 px-6 py-2.5 rounded-2xl border border-amber-300 shadow-sm mx-auto">
+                <span class="text-xs uppercase font-mono font-bold text-slate-500 tracking-wider">Skor RQI:</span>
+                <span class="font-serif-gold text-2xl font-black text-[#0B2A43]">
+                    {{ number_format($submission->result->total_score ?? 0, 1) }}
+                </span>
+                <span class="text-xs font-serif italic font-bold text-amber-900 bg-amber-100 px-3 py-1 rounded-full border border-amber-300">
+                    {{ $submission->result->level_category ?? 'Tinggi / Paripurna' }}
+                </span>
             </div>
         </div>
 
