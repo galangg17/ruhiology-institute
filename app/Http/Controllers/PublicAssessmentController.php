@@ -48,6 +48,21 @@ class PublicAssessmentController extends Controller
      */
     public function register(Request $request)
     {
+        if (!empty($request->input('event_code'))) {
+            $eventModel = \App\Models\Event::where('event_code', strtoupper(trim($request->input('event_code'))))->first();
+            if ($eventModel) {
+                if (!$request->has('province_id') || empty($request->input('province_id'))) {
+                    $request->merge(['province_id' => $eventModel->province_id ?? 5]);
+                }
+                if (!$request->has('regency_id') || empty($request->input('regency_id'))) {
+                    $request->merge(['regency_id' => $eventModel->regency_id ?? 51]);
+                }
+                if (!$request->has('category') || empty($request->input('category'))) {
+                    $request->merge(['category' => $eventModel->target_category ?? 'Pelajar']);
+                }
+            }
+        }
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'birth_date' => ['required', 'date'],

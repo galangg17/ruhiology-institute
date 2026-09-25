@@ -409,250 +409,297 @@ document.addEventListener('alpine:init', () => {
         </div>
     </div>
 
-    <!-- REGISTRATION INTAKE MODAL -->
-    <div x-show="showRegModal" x-cloak class="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/65 backdrop-blur-sm animate-fadeIn">
-        <div @click.away="showRegModal = false" class="bg-white rounded-t-3xl sm:rounded-3xl max-w-2xl w-full p-5 sm:p-8 shadow-2xl relative border border-slate-100 max-h-[85vh] sm:max-h-[90vh] overflow-y-auto" @click.stop>
+    <!-- REGISTRATION INTAKE MODAL (2-COLUMN NO-SCROLL LAYOUT) -->
+    <div x-show="showRegModal" x-cloak class="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-6 bg-slate-900/65 backdrop-blur-sm animate-fadeIn">
+        <div @click.away="showRegModal = false" class="bg-white rounded-3xl max-w-4xl w-full p-5 sm:p-7 shadow-2xl relative border border-slate-100 max-h-[92vh] overflow-y-auto" @click.stop>
             
             <!-- Close Button -->
-            <button @click="showRegModal = false" type="button" class="absolute top-5 right-5 p-2 text-slate-400 hover:text-slate-700 rounded-full hover:bg-slate-100 transition-colors">
+            <button @click="showRegModal = false" type="button" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-700 rounded-full hover:bg-slate-100 transition-colors">
                 ✕
             </button>
 
-            <div class="mb-6 pb-3 border-b border-slate-100">
-                <span class="text-[10px] font-extrabold text-[#C9A24D] uppercase tracking-widest block font-mono">REGISTRASI PESERTA</span>
-                <h3 class="text-xl sm:text-2xl font-bold font-serif text-[#0B2A43]">Form Intake Asesmen Ruhiologi</h3>
-                <p class="text-xs text-slate-500 font-normal mt-1">Lengkapi data pribadi Anda di bawah ini untuk mendapatkan Kode Assessment unik.</p>
+            <div class="mb-4 pb-2 border-b border-slate-100 flex items-center justify-between">
+                <div>
+                    <span class="text-[10px] font-extrabold text-[#C9A24D] uppercase tracking-widest block font-mono">REGISTRASI PESERTA</span>
+                    <h3 class="text-lg sm:text-xl font-bold font-serif text-[#0B2A43]">Form Intake Asesmen Ruhiologi</h3>
+                </div>
+                <template x-if="eventCode">
+                    <span class="text-xs font-mono font-bold bg-[#0B2A43] text-[#C9A24D] px-3 py-1 rounded-full border border-[#C9A24D]/30">
+                        📌 Mode Event: <span x-text="eventCode"></span>
+                    </span>
+                </template>
             </div>
 
             <form @submit.prevent="submitRegistration()" class="space-y-4 text-xs font-sans">
                 
-                <!-- Track Indicator Banner -->
-                <div class="p-3.5 bg-[#0B2A43]/5 border border-[#0B2A43]/15 rounded-2xl space-y-1">
-                    <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-wider block">Jalur Asesmen Dipilih</span>
-                    <template x-if="eventCode">
-                        <div class="flex items-center justify-between">
-                            <div class="space-y-0.5">
-                                <span class="font-bold text-[#0B2A43] text-xs block">📌 Event: <span x-text="eventName || eventCode"></span></span>
-                                <template x-if="eventInstitution">
-                                    <span class="text-[11px] text-slate-500 block font-medium">Instansi: <strong class="text-slate-800" x-text="eventInstitution"></strong></span>
+                <!-- EVENT MODE: 2-COLUMN LAYOUT -->
+                <template x-if="eventCode">
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-start">
+                        <!-- LEFT COLUMN (5 cols): Locked Event Metadata Card -->
+                        <div class="md:col-span-5 bg-[#0B2A43] text-white p-5 rounded-2xl shadow-md border border-slate-800 space-y-4">
+                            <div class="border-b border-slate-700/80 pb-3">
+                                <span class="text-[9px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest block mb-1">🎯 TERVERIFIKASI EVENT</span>
+                                <h4 class="font-serif font-bold text-base text-white leading-tight" x-text="eventName || eventCode"></h4>
+                                <p class="text-xs text-slate-300 mt-1 font-medium" x-text="eventInstitution || 'Instansi Terdaftar'"></p>
+                            </div>
+
+                            <div class="space-y-2 text-xs">
+                                <div class="flex justify-between items-center bg-white/10 p-2.5 rounded-xl border border-white/10">
+                                    <span class="text-slate-300">Kode Event:</span>
+                                    <span class="font-mono font-bold text-[#C9A24D]" x-text="eventCode"></span>
+                                </div>
+                                <div class="flex justify-between items-center bg-white/10 p-2.5 rounded-xl border border-white/10">
+                                    <span class="text-slate-300">Kategori Peserta:</span>
+                                    <span class="font-bold text-emerald-400" x-text="form.category"></span>
+                                </div>
+                            </div>
+
+                            <div class="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-[11px] text-amber-200/90 leading-relaxed space-y-1">
+                                <div class="font-bold text-amber-400 flex items-center gap-1">
+                                    <span>🔒 Data Instansi Dikunci</span>
+                                </div>
+                                <p class="text-[10px] text-slate-300">
+                                    Profil sekolah, instansi, & wilayah sudah diset otomatis oleh panitia event. Anda cukup mengisi identitas diri di samping.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- RIGHT COLUMN (7 cols): Quick Personal Intake Inputs -->
+                        <div class="md:col-span-7 space-y-3.5 bg-slate-50/80 p-5 rounded-2xl border border-slate-200">
+                            <h4 class="font-serif font-bold text-sm text-[#0B2A43] border-b border-slate-200 pb-2">Identitas Peserta Event</h4>
+
+                            <div>
+                                <label class="block font-bold text-slate-700 mb-1">Nama Lengkap *</label>
+                                <input type="text" x-model="form.name" required placeholder="Masukkan nama lengkap Anda..." class="w-full p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block font-bold text-slate-700 mb-1">Tanggal Lahir *</label>
+                                    <input type="date" x-model="form.birth_date" required class="w-full p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white text-xs">
+                                </div>
+                                <div>
+                                    <label class="block font-bold text-slate-700 mb-1">No. WA / HP (Opsional)</label>
+                                    <input type="tel" x-model="form.phone" placeholder="081234567890" class="w-full p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white text-xs">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block font-bold text-slate-700 mb-1">Jenis Kelamin *</label>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button type="button" @click="form.gender = 'Laki-laki'" :class="form.gender === 'Laki-laki' ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'" class="py-2 px-3 rounded-xl border text-xs transition-colors text-center cursor-pointer">
+                                        👨 Laki-laki
+                                    </button>
+                                    <button type="button" @click="form.gender = 'Perempuan'" :class="form.gender === 'Perempuan' ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'" class="py-2 px-3 rounded-xl border text-xs transition-colors text-center cursor-pointer">
+                                        👩 Perempuan
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Sub-category / Kelas Dropdown or Input -->
+                            <template x-if="eventSubcategories && eventSubcategories.length > 0">
+                                <div>
+                                    <label class="block font-bold text-[#0B2A43] mb-1">
+                                        <span x-text="eventGroupLabel || 'Pilih Sub-Kategori / Kelas / Bidang'"></span> *
+                                    </label>
+                                    <select x-model="form.sub_category" required class="w-full p-2.5 text-xs font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
+                                        <option value="">-- Pilih Opsi Kelas --</option>
+                                        <template x-for="item in eventSubcategories" :key="item">
+                                            <option :value="item" x-text="item"></option>
+                                        </template>
+                                    </select>
+                                </div>
+                            </template>
+                            <template x-if="!eventSubcategories || eventSubcategories.length === 0">
+                                <div>
+                                    <label class="block font-bold text-slate-700 mb-1">Kelas / Rombel / Jurusan (Opsional)</label>
+                                    <input type="text" x-model="form.school_class" placeholder="Contoh: Kelas X IPA 1 / XII IPS 2" class="w-full p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white text-xs">
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+
+
+                <!-- ASESMEN MANDIRI MODE: 2-COLUMN LAYOUT -->
+                <template x-if="!eventCode">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-3 bg-[#0B2A43]/5 border border-[#0B2A43]/15 rounded-2xl">
+                            <span class="font-bold text-[#0B2A43] text-xs">🟢 Track Asesmen Mandiri / Personal</span>
+                            <button type="button" @click="showRegModal = false; openEventSelectorModal()" class="text-[11px] font-bold text-[#C9A24D] hover:underline cursor-pointer flex items-center gap-1">
+                                <span>🎯 Punya Kode Event Panitia?</span>
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
+                            <!-- LEFT COLUMN: Identitas Diri, WA, Kategori & Wilayah -->
+                            <div class="space-y-3.5 bg-slate-50/80 p-4 sm:p-5 rounded-2xl border border-slate-200">
+                                <h4 class="font-serif font-bold text-xs text-[#0B2A43] border-b border-slate-200 pb-1.5 uppercase font-mono tracking-wider">Langkah 1: Identitas & Wilayah</h4>
+
+                                <div>
+                                    <label class="block font-bold text-slate-700 mb-1">Nama Lengkap *</label>
+                                    <input type="text" x-model="form.name" required placeholder="Masukkan nama lengkap..." class="w-full p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-2.5">
+                                    <div>
+                                        <label class="block font-bold text-slate-700 mb-1">Tanggal Lahir *</label>
+                                        <input type="date" x-model="form.birth_date" required class="w-full p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white text-xs">
+                                    </div>
+                                    <div>
+                                        <label class="block font-bold text-slate-700 mb-1">No. WA (Opsional)</label>
+                                        <input type="tel" x-model="form.phone" placeholder="081234567890" class="w-full p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white text-xs">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block font-bold text-slate-700 mb-1">Jenis Kelamin *</label>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <button type="button" @click="form.gender = 'Laki-laki'" :class="form.gender === 'Laki-laki' ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'" class="py-2 px-3 rounded-xl border text-xs transition-colors text-center cursor-pointer">
+                                            👨 Laki-laki
+                                        </button>
+                                        <button type="button" @click="form.gender = 'Perempuan'" :class="form.gender === 'Perempuan' ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'" class="py-2 px-3 rounded-xl border text-xs transition-colors text-center cursor-pointer">
+                                            👩 Perempuan
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block font-bold text-slate-700 mb-1">Kategori Peserta *</label>
+                                    <div class="grid grid-cols-3 gap-1.5">
+                                        <template x-for="cat in [
+                                            { key: 'Pelajar', label: 'Pelajar' },
+                                            { key: 'Mahasiswa/i', label: 'Mahasiswa' },
+                                            { key: 'Umum', label: 'Mandiri' }
+                                        ]" :key="cat.key">
+                                            <button type="button" @click="setCategory(cat.key)"
+                                                :class="form.category === cat.key ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'"
+                                                class="py-2 px-2 rounded-xl border text-[11px] transition-colors text-center">
+                                                <span x-text="cat.label"></span>
+                                            </button>
+                                        </template>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-2.5">
+                                    <div>
+                                        <label class="block font-bold text-slate-700 text-xs mb-1">Provinsi *</label>
+                                        <select x-model="form.province_id" @change="onProvinceChange()" required class="w-full p-2.5 text-xs font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
+                                            <option value="">-- Pilih --</option>
+                                            <template x-for="p in filteredProvinces" :key="p.id">
+                                                <option :value="p.id" x-text="p.name"></option>
+                                            </template>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block font-bold text-slate-700 text-xs mb-1">Kab/Kota *</label>
+                                        <select x-model="form.regency_id" :disabled="!form.province_id" required class="w-full p-2.5 text-xs font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white disabled:bg-slate-100">
+                                            <option value="" x-text="form.province_id ? '-- Pilih --' : 'Provinsi dahulu'"></option>
+                                            <template x-for="r in filteredRegencies" :key="r.id">
+                                                <option :value="r.id" x-text="(r.type ? r.type + ' ' : '') + r.name"></option>
+                                            </template>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- RIGHT COLUMN: Detail Profil Pendidikan / Pekerjaan -->
+                            <div class="space-y-3.5 bg-slate-50/80 p-4 sm:p-5 rounded-2xl border border-slate-200">
+                                <h4 class="font-serif font-bold text-xs text-[#0B2A43] border-b border-slate-200 pb-1.5 uppercase font-mono tracking-wider">Langkah 2: Profil Spesifik</h4>
+
+                                <!-- Pelajar Fields -->
+                                <template x-if="form.category === 'Pelajar'">
+                                    <div class="p-3.5 bg-amber-50/80 rounded-2xl border border-amber-200/90 space-y-3">
+                                        <div>
+                                            <label class="block font-bold text-slate-800 text-xs mb-1">Jenjang Pendidikan *</label>
+                                            <select x-model="form.school_level" class="w-full p-2.5 text-xs font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
+                                                <option value="SMA">SMA (Sekolah Menengah Atas)</option>
+                                                <option value="SMK">SMK (Sekolah Menengah Kejuruan)</option>
+                                                <option value="MA">MA (Madrasah Aliyah)</option>
+                                                <option value="SMP">SMP / MTs (Sekolah Menengah Pertama)</option>
+                                                <option value="SD">SD / MI (Sekolah Dasar)</option>
+                                                <option value="Sederajat">Sederajat / Lainnya</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block font-bold text-slate-800 text-xs mb-1">Kelas / Rombel (Opsional)</label>
+                                            <input type="text" x-model="form.school_class" placeholder="Contoh: Kelas X IPA 1 / XI IPS 2" class="w-full p-2.5 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
+                                        </div>
+                                    </div>
                                 </template>
-                            </div>
-                            <span class="text-[10px] font-mono font-bold bg-[#0B2A43] text-white px-2.5 py-1 rounded-full shrink-0" x-text="eventCode"></span>
-                        </div>
-                    </template>
-                    <template x-if="!eventCode">
-                        <div class="flex items-center justify-between text-xs">
-                            <span class="font-bold text-slate-800">🟢 Asesmen Mandiri / Personal (Umum)</span>
-                            <button type="button" @click="showRegModal = false; openEventSelectorModal()" class="text-[11px] font-bold text-[#C9A24D] hover:underline cursor-pointer">
-                                🎯 Pilih Event Acara?
-                            </button>
-                        </div>
-                    </template>
-                </div>
-                
-                <!-- 1. Nama & Tanggal Lahir -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block font-bold text-slate-700 mb-1">Nama Lengkap *</label>
-                        <input type="text" x-model="form.name" required placeholder="Masukkan nama lengkap Anda..." class="w-full p-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none">
-                    </div>
-                    <div>
-                        <label class="block font-bold text-slate-700 mb-1">Tanggal Lahir *</label>
-                        <input type="date" x-model="form.birth_date" required class="w-full p-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none">
-                    </div>
-                </div>
 
-                <!-- 1B. Jenis Kelamin & No. WhatsApp / HP -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block font-bold text-slate-700 mb-1">Jenis Kelamin *</label>
-                        <div class="grid grid-cols-2 gap-2">
-                            <button type="button" @click="form.gender = 'Laki-laki'" :class="form.gender === 'Laki-laki' ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'" class="py-2.5 px-3 rounded-xl border text-xs transition-colors text-center cursor-pointer">
-                                👨 Laki-laki
-                            </button>
-                            <button type="button" @click="form.gender = 'Perempuan'" :class="form.gender === 'Perempuan' ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'" class="py-2.5 px-3 rounded-xl border text-xs transition-colors text-center cursor-pointer">
-                                👩 Perempuan
-                            </button>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block font-bold text-slate-700 mb-1">No. WhatsApp / HP (Opsional)</label>
-                        <input type="tel" x-model="form.phone" placeholder="Contoh: 081234567890" class="w-full p-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none">
-                    </div>
-                </div>
+                                <!-- Mahasiswa Fields -->
+                                <template x-if="form.category === 'Mahasiswa/i'">
+                                    <div class="p-3.5 bg-blue-50/70 rounded-2xl border border-blue-200/80 space-y-3">
+                                        <div class="relative">
+                                            <label class="block font-bold text-slate-800 text-xs mb-1">Perguruan Tinggi / Kampus *</label>
+                                            <input type="text" x-model="universityQuery" @focus="showUniversityDropdown = true" @input="searchUniversities()" placeholder="Ketik nama perguruan tinggi..." class="w-full p-2.5 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
+                                            <div x-show="showUniversityDropdown" @click.away="showUniversityDropdown = false" class="absolute z-50 left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-48 overflow-y-auto">
+                                                <template x-for="u in filteredUniversities" :key="u.id">
+                                                    <div @click="selectUniversity(u)" class="p-2 hover:bg-slate-100 cursor-pointer text-xs flex justify-between items-center border-b border-slate-100">
+                                                        <span x-text="u.name" class="font-bold text-[#0B2A43]"></span>
+                                                        <span class="text-[10px] text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded font-mono">Pilih</span>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-2.5">
+                                            <div>
+                                                <label class="block font-bold text-slate-700 text-xs mb-1">Semester</label>
+                                                <select x-model="form.semester" class="w-full p-2.5 text-xs font-semibold rounded-xl border border-slate-300 outline-none bg-white">
+                                                    <template x-for="s in 12" :key="s">
+                                                        <option :value="s" x-text="'Semester ' + s"></option>
+                                                    </template>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label class="block font-bold text-slate-700 text-xs mb-1">Angkatan</label>
+                                                <input type="text" x-model="form.entry_year" placeholder="2024" class="w-full p-2.5 text-xs rounded-xl border border-slate-300 outline-none bg-white">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
 
-                <!-- 2. Kategori Selection (Preset Locked if Event restricts it) -->
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1.5">
-                        Kategori Peserta *
-                        <template x-if="isCategoryLocked">
-                            <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded ml-2 border border-emerald-200">🔒 Terkunci dari Event</span>
-                        </template>
-                    </label>
-
-                    <template x-if="isCategoryLocked">
-                        <div class="p-3 bg-emerald-50/80 rounded-xl border border-emerald-200 text-xs font-bold text-emerald-900 flex items-center justify-between">
-                            <span x-text="'Kategori Event: ' + (form.category === 'Umum' ? 'Personal / Mandiri' : form.category)"></span>
-                            <span>✅ Terverifikasi</span>
-                        </div>
-                    </template>
-
-                    <template x-if="!isCategoryLocked">
-                        <div class="grid grid-cols-3 gap-3">
-                            <template x-for="cat in [
-                                { key: 'Pelajar', label: 'Pelajar' },
-                                { key: 'Mahasiswa/i', label: 'Mahasiswa/i' },
-                                { key: 'Umum', label: 'Personal / Mandiri' }
-                            ]" :key="cat.key">
-                                <button type="button" @click="setCategory(cat.key)"
-                                    :class="form.category === cat.key ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'"
-                                    class="py-2.5 px-3 rounded-xl border text-xs transition-colors text-center">
-                                    <span x-text="cat.label"></span>
-                                </button>
-                            </template>
-                        </div>
-                    </template>
-                </div>
-
-                <!-- Dynamic Sub-Category / Group Dropdown (If configured on event) -->
-                <template x-if="eventSubcategories && eventSubcategories.length > 0">
-                    <div class="p-4 bg-blue-50/70 border border-blue-200/90 rounded-2xl space-y-1.5">
-                        <label class="block font-bold text-[#0B2A43] text-xs">
-                            <span x-text="eventGroupLabel || 'Pilih Sub-Kategori / Kelas / Bidang'"></span> *
-                        </label>
-                        <select x-model="form.sub_category" required class="w-full p-3 text-xs font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
-                            <option value="">-- Pilih Opsi --</option>
-                            <template x-for="item in eventSubcategories" :key="item">
-                                <option :value="item" x-text="item"></option>
-                            </template>
-                        </select>
-                    </div>
-                </template>
-
-                <!-- 3. Regional Cascading: Province -> Regency -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block font-bold text-slate-700 text-xs mb-1">Provinsi *</label>
-                        <select x-model="form.province_id" @change="onProvinceChange()" required class="w-full p-3 text-xs font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] focus:border-[#0B2A43] outline-none bg-white transition">
-                            <option value="">-- Pilih Provinsi --</option>
-                            <template x-for="p in filteredProvinces" :key="p.id">
-                                <option :value="p.id" x-text="p.name"></option>
-                            </template>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block font-bold text-slate-700 text-xs mb-1">Kabupaten/Kota *</label>
-                        <select x-model="form.regency_id" @change="onRegencyChange()" :disabled="!form.province_id" required class="w-full p-3 text-xs font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] focus:border-[#0B2A43] outline-none bg-white disabled:bg-slate-100 disabled:cursor-not-allowed transition">
-                            <option value="" x-text="form.province_id ? '-- Pilih Kabupaten/Kota --' : 'Pilih provinsi dahulu'"></option>
-                            <template x-for="r in filteredRegencies" :key="r.id">
-                                <option :value="r.id" x-text="(r.type ? r.type + ' ' : '') + r.name"></option>
-                            </template>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- 4A. Dynamic Fields for PELAJAR -->
-                <template x-if="form.category === 'Pelajar'">
-                    <div class="p-4 bg-amber-50/70 rounded-2xl border border-amber-200/90 space-y-3">
-                        <span class="text-[10px] font-mono font-bold text-amber-800 uppercase tracking-wider block">✦ PROFIL SEKOLAH / MADRASAH</span>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
-                                <label class="block font-bold text-slate-800 text-xs mb-1">Jenjang Pendidikan *</label>
-                                <select x-model="form.school_level" class="w-full p-2.5 text-xs font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
-                                    <option value="SMA">SMA (Sekolah Menengah Atas)</option>
-                                    <option value="SMK">SMK (Sekolah Menengah Kejuruan)</option>
-                                    <option value="MA">MA (Madrasah Aliyah)</option>
-                                    <option value="SMP">SMP / MTs (Sekolah Menengah Pertama)</option>
-                                    <option value="SD">SD / MI (Sekolah Dasar)</option>
-                                    <option value="Sederajat">Sederajat / Lainnya</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block font-bold text-slate-800 text-xs mb-1">Kelas / Rombel (Opsional)</label>
-                                <input type="text" x-model="form.school_class" placeholder="Contoh: Kelas X IPA 1 / XI IPS 2" class="w-full p-2.5 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
-                            </div>
-                        </div>
-                    </div>
-                </template>
-
-                <!-- 4B. Dynamic Fields for MAHASISWA/I -->
-                <template x-if="form.category === 'Mahasiswa/i'">
-                    <div class="p-4 bg-blue-50/60 rounded-2xl border border-blue-200/80 space-y-4">
-                        <div class="relative">
-                            <div class="flex justify-between items-center mb-1">
-                                <label class="block font-bold text-slate-800 text-xs">Perguruan Tinggi / Kampus *</label>
-                                <button type="button" @click="addInstantUniversity()" class="text-[11px] font-bold text-[#C9A24D] hover:underline flex items-center gap-1 cursor-pointer">
-                                    <span>✨ + Tambah Kampus Baru</span>
-                                </button>
-                            </div>
-                            <input type="text" x-model="universityQuery" @focus="showUniversityDropdown = true" @input="searchUniversities()" placeholder="Ketik nama perguruan tinggi..." class="w-full p-3 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] focus:border-[#0B2A43] outline-none bg-white transition">
-                            
-                            <div x-show="showUniversityDropdown" @click.away="showUniversityDropdown = false" class="absolute z-50 left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-52 overflow-y-auto">
-                                <template x-for="u in filteredUniversities" :key="u.id">
-                                    <div @click="selectUniversity(u)" class="p-2.5 hover:bg-slate-100 cursor-pointer text-xs border-b border-slate-100 flex justify-between items-center">
-                                        <span x-text="u.name" class="font-bold text-[#0B2A43]"></span>
-                                        <span class="text-[10px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded font-mono">Pilih</span>
+                                <!-- Umum Fields -->
+                                <template x-if="form.category === 'Umum'">
+                                    <div class="p-3.5 bg-slate-100/70 rounded-2xl border border-slate-200/90 space-y-3">
+                                        <div class="grid grid-cols-2 gap-2.5">
+                                            <div>
+                                                <label class="block font-bold text-slate-700 text-xs mb-1">Pekerjaan *</label>
+                                                <select x-model="form.occupation_id" class="w-full p-2.5 text-xs font-semibold rounded-xl border border-slate-300 outline-none bg-white">
+                                                    <option value="">-- Pilih Pekerjaan --</option>
+                                                    <template x-for="occ in occupations" :key="occ.id">
+                                                        <option :value="occ.id" x-text="occ.name"></option>
+                                                    </template>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label class="block font-bold text-slate-700 text-xs mb-1">Pendidikan Terakhir</label>
+                                                <select x-model="form.last_education" class="w-full p-2.5 text-xs font-semibold rounded-xl border border-slate-300 outline-none bg-white">
+                                                    <option value="S1/D4">S1 / D4 (Sarjana)</option>
+                                                    <option value="SMA/SMK">SMA / SMK / MA</option>
+                                                    <option value="D3">D3 / D1 / D2 (Diploma)</option>
+                                                    <option value="S2">S2 (Magister)</option>
+                                                    <option value="S3">S3 (Doktor)</option>
+                                                    <option value="SMP/SD">SMP / SD / Sederajat</option>
+                                                    <option value="Lainnya">Lainnya</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="block font-bold text-slate-700 text-xs mb-1">Instansi / Perusahaan (Opsional)</label>
+                                            <input type="text" x-model="form.occupation_custom" placeholder="Nama instansi/perusahaan..." class="w-full p-2.5 text-xs rounded-xl border border-slate-300 outline-none bg-white">
+                                        </div>
                                     </div>
                                 </template>
                             </div>
                         </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block font-bold text-slate-700 text-xs mb-1">Semester</label>
-                                <select x-model="form.semester" class="w-full p-3 text-xs font-semibold rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
-                                    <template x-for="s in 12" :key="s">
-                                        <option :value="s" x-text="'Semester ' + s"></option>
-                                    </template>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block font-bold text-slate-700 text-xs mb-1">Angkatan</label>
-                                <input type="text" x-model="form.entry_year" placeholder="Contoh: 2024" class="w-full p-3 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
-                            </div>
-                        </div>
                     </div>
                 </template>
 
-                <!-- 4C. Dynamic Fields for PERSONAL / MANDIRI (UMUM) -->
-                <template x-if="form.category === 'Umum'">
-                    <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200/90 space-y-3">
-                        <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-wider block">✦ PROFIL PROFESI & PENDIDIKAN</span>
-                        
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
-                                <label class="block font-bold text-slate-700 text-xs mb-1">Profesi / Sektor Pekerjaan *</label>
-                                <select x-model="form.occupation_id" class="w-full p-2.5 text-xs font-semibold rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
-                                    <option value="">-- Pilih Pekerjaan --</option>
-                                    <template x-for="occ in occupations" :key="occ.id">
-                                        <option :value="occ.id" x-text="occ.name"></option>
-                                    </template>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block font-bold text-slate-700 text-xs mb-1">Pendidikan Terakhir</label>
-                                <select x-model="form.last_education" class="w-full p-2.5 text-xs font-semibold rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
-                                    <option value="S1/D4">S1 / D4 (Sarjana)</option>
-                                    <option value="SMA/SMK">SMA / SMK / MA</option>
-                                    <option value="D3">D3 / D1 / D2 (Diploma)</option>
-                                    <option value="S2">S2 (Magister)</option>
-                                    <option value="S3">S3 (Doktor)</option>
-                                    <option value="SMP/SD">SMP / SD / Sederajat</option>
-                                    <option value="Lainnya">Lainnya</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block font-bold text-slate-700 text-xs mb-1">Nama Instansi / Perusahaan / Komunitas (Opsional)</label>
-                            <input type="text" x-model="form.occupation_custom" placeholder="Contoh: PT Ruhiology Utama / Pemda Jambi / Mandiri" class="w-full p-2.5 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
-                        </div>
-                    </div>
-                </template>
-
-                <div class="pt-4">
-                    <button type="submit" :disabled="isSubmitting" class="w-full py-4 bg-[#0B2A43] hover:bg-[#123B59] text-white font-bold rounded-2xl text-xs uppercase tracking-wider shadow-lg transition-transform hover:scale-[1.01] cursor-pointer disabled:opacity-50">
+                <!-- Full-Width Bottom Action Bar -->
+                <div class="pt-2">
+                    <button type="submit" :disabled="isSubmitting" class="w-full py-3.5 bg-[#0B2A43] hover:bg-[#123B59] text-[#C9A24D] font-extrabold rounded-2xl text-xs uppercase tracking-wider shadow-lg transition-transform hover:scale-[1.005] cursor-pointer disabled:opacity-50 border border-[#C9A24D]/30">
                         <span x-text="isSubmitting ? 'Memproses Registrasi...' : 'Generate Kode Assessment & Mulai Test →'"></span>
                     </button>
                 </div>
