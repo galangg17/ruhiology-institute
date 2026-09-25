@@ -11,83 +11,99 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         // 1. Super Admin
-        User::create([
-            'name' => 'Super Admin Ruhiology',
-            'email' => 'admin@ruhiologyinstitute.com',
-            'password' => Hash::make('password123'),
-            'role' => 'super_admin',
-            'phone' => '081274110001',
-            'status' => 'active',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'admin@ruhiologyinstitute.com'],
+            [
+                'name' => 'Super Admin Ruhiology',
+                'password' => Hash::make('password123'),
+                'role' => 'super_admin',
+                'phone' => '081274110001',
+                'status' => 'active',
+            ]
+        );
 
         // 2. Operational Admin
-        User::create([
-            'name' => 'Admin Operasional',
-            'email' => 'operasional@ruhiologyinstitute.com',
-            'password' => Hash::make('password123'),
-            'role' => 'admin',
-            'phone' => '081274110002',
-            'status' => 'active',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'operasional@ruhiologyinstitute.com'],
+            [
+                'name' => 'Admin Operasional',
+                'password' => Hash::make('password123'),
+                'role' => 'admin',
+                'phone' => '081274110002',
+                'status' => 'active',
+            ]
+        );
 
         // 3. Assessment Manager
-        User::create([
-            'name' => 'Assessment Specialist',
-            'email' => 'assessment@ruhiologyinstitute.com',
-            'password' => Hash::make('password123'),
-            'role' => 'assessment_manager',
-            'phone' => '081274110003',
-            'status' => 'active',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'assessment@ruhiologyinstitute.com'],
+            [
+                'name' => 'Assessment Specialist',
+                'password' => Hash::make('password123'),
+                'role' => 'assessment_manager',
+                'phone' => '081274110003',
+                'status' => 'active',
+            ]
+        );
 
         // 4. Content Manager
-        User::create([
-            'name' => 'Content Manager',
-            'email' => 'content@ruhiologyinstitute.com',
-            'password' => Hash::make('password123'),
-            'role' => 'content_manager',
-            'phone' => '081274110004',
-            'status' => 'active',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'content@ruhiologyinstitute.com'],
+            [
+                'name' => 'Content Manager',
+                'password' => Hash::make('password123'),
+                'role' => 'content_manager',
+                'phone' => '081274110004',
+                'status' => 'active',
+            ]
+        );
 
         // 5. Training Manager
-        User::create([
-            'name' => 'Training Coordinator',
-            'email' => 'training@ruhiologyinstitute.com',
-            'password' => Hash::make('password123'),
-            'role' => 'training_manager',
-            'phone' => '081274110005',
-            'status' => 'active',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'training@ruhiologyinstitute.com'],
+            [
+                'name' => 'Training Coordinator',
+                'password' => Hash::make('password123'),
+                'role' => 'training_manager',
+                'phone' => '081274110005',
+                'status' => 'active',
+            ]
+        );
 
         // 6. Store Manager
-        User::create([
-            'name' => 'Store Manager',
-            'email' => 'store@ruhiologyinstitute.com',
-            'password' => Hash::make('password123'),
-            'role' => 'store_manager',
-            'phone' => '081274110006',
-            'status' => 'active',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'store@ruhiologyinstitute.com'],
+            [
+                'name' => 'Store Manager',
+                'password' => Hash::make('password123'),
+                'role' => 'store_manager',
+                'phone' => '081274110006',
+                'status' => 'active',
+            ]
+        );
 
         // 7. Consultation Manager
-        User::create([
-            'name' => 'Consultation Advisor',
-            'email' => 'consultation@ruhiologyinstitute.com',
-            'password' => Hash::make('password123'),
-            'role' => 'consultation_manager',
-            'phone' => '081274110007',
-            'status' => 'active',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'consultation@ruhiologyinstitute.com'],
+            [
+                'name' => 'Consultation Advisor',
+                'password' => Hash::make('password123'),
+                'role' => 'consultation_manager',
+                'phone' => '081274110007',
+                'status' => 'active',
+            ]
+        );
 
         // 8. Sample Participant User
-        User::create([
-            'name' => 'Ahmad Fauzi',
-            'email' => 'fauzi@uinjambi.ac.id',
-            'password' => Hash::make('password123'),
-            'role' => 'participant',
-            'phone' => '085266123456',
-            'status' => 'active',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'fauzi@uinjambi.ac.id'],
+            [
+                'name' => 'Ahmad Fauzi',
+                'password' => Hash::make('password123'),
+                'role' => 'participant',
+                'phone' => '085266123456',
+                'status' => 'active',
+            ]
+        );
     }
 }
