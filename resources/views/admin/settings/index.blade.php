@@ -128,6 +128,7 @@
             founderName: '{{ addslashes($settings['founder_name'] ?? 'Prof. Dr. Iskandar Nazari, S.Ag., M.Pd., M.S.I., M.H., Ph.D.') }}',
             founderTitle: '{{ addslashes($settings['founder_title'] ?? 'Founder Ruhiology Institute & Guru Besar UIN STS Jambi') }}',
             signatureUrl: '{{ $settings['founder_signature'] ?? '' }}',
+            certLogoUrl: '{{ $settings['certificate_logo'] ?? asset('images/ruhiology-logo.png') }}',
             certBgUrl: '{{ $settings['certificate_bg'] ?? '' }}',
             storyBgUrl: '{{ $settings['story_bg'] ?? '' }}',
 
@@ -137,6 +138,7 @@
                     const reader = new FileReader();
                     reader.onload = (e) => {
                         if (type === 'signature') this.signatureUrl = e.target.result;
+                        if (type === 'certLogo') this.certLogoUrl = e.target.result;
                         if (type === 'certBg') this.certBgUrl = e.target.result;
                         if (type === 'storyBg') this.storyBgUrl = e.target.result;
                     };
@@ -150,7 +152,7 @@
                         <span>📜</span>
                         <span>Pengaturan & Pratinjau Live Sertifikat Digital & Kartu Hasil</span>
                     </h3>
-                    <p class="text-[11px] text-slate-500 mt-0.5">Kelola gambar latar, tanda tangan founder, serta lihat hasil pratinjau langsung di sebelah kanan.</p>
+                    <p class="text-[11px] text-slate-500 mt-0.5">Kelola logo, gambar latar, tanda tangan founder, serta lihat hasil pratinjau langsung di sebelah kanan.</p>
                 </div>
                 
                 <!-- Tab Switcher for Live Preview -->
@@ -168,17 +170,17 @@
                 
                 <!-- Left Side (Form Inputs: 7 cols) -->
                 <div class="lg:col-span-7 space-y-4">
-                    <!-- Founder Signature Upload -->
+                    <!-- Logo & Founder Signature Upload -->
                     <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
-                        <span class="font-bold text-slate-800 text-xs block">✍️ Tanda Tangan Digital Founder</span>
+                        <span class="font-bold text-slate-800 text-xs block">🏛️ Logo Institusi & ✍️ Tanda Tangan Founder</span>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block font-semibold text-slate-600 mb-1">Upload Logo Sertifikat (PNG Transparan)</label>
+                                <input type="file" name="certificate_logo_file" accept="image/*" @change="previewFile($event, 'certLogo')" class="w-full p-2 text-xs rounded border border-slate-300 bg-white">
+                            </div>
                             <div>
                                 <label class="block font-semibold text-slate-600 mb-1">Upload File Tanda Tangan (PNG Transparan)</label>
                                 <input type="file" name="founder_signature_file" accept="image/*" @change="previewFile($event, 'signature')" class="w-full p-2 text-xs rounded border border-slate-300 bg-white">
-                            </div>
-                            <div>
-                                <label class="block font-semibold text-slate-600 mb-1">atau URL Tanda Tangan</label>
-                                <input type="text" name="founder_signature" x-model="signatureUrl" placeholder="Direct URL..." class="w-full p-2.5 text-xs rounded border border-slate-300">
                             </div>
                         </div>
                     </div>
@@ -257,7 +259,7 @@
 
                         <!-- 1. Header with Logo -->
                         <div class="space-y-0.5 pt-0.5 flex flex-col items-center">
-                            <img src="{{ asset('images/settings/ruhiology-logo.png') }}" class="h-6 w-6 object-contain mx-auto" alt="Logo">
+                            <img :src="certLogoUrl" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=RQ&background=0B2A43&color=C9A24D';" class="h-6 w-6 object-contain mx-auto" alt="Logo">
                             <span class="block text-[7px] font-bold tracking-widest uppercase text-[#0B2A43]" x-text="'RUHIOLOGY INSTITUTE'"></span>
                             <h4 class="font-serif font-black text-[10px] uppercase text-[#0B2A43] leading-tight" x-text="certTitle"></h4>
                             <p class="text-[6px] italic text-amber-800 font-serif" x-text="certSubtitle"></p>
