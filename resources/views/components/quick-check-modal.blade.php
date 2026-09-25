@@ -30,7 +30,7 @@
             this.resultData = null;
 
             try {
-                let response = await fetch('{{ route('api.assessment.quick_check') }}', {
+                let response = await fetch('/api/assessment/quick-check', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

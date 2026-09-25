@@ -212,7 +212,7 @@ window.rqAssessmentIndex = function rqAssessmentIndex() {
         submitRegistration() {
             this.isSubmitting = true;
 
-            fetch('{{ route("assessment.register") }}', {
+            fetch('/assessment/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
