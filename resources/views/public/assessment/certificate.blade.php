@@ -69,7 +69,7 @@
     </div>
 
     <!-- Official Printable Certificate Container (A4 Landscape aspect ~ 297mm x 210mm) -->
-    <div class="cert-container w-full max-w-[1050px] aspect-[1.414/1] bg-[#F8F6F0] relative p-8 md:p-12 border-[12px] border-[#0B2A43] rounded-3xl shadow-2xl overflow-hidden flex flex-col justify-between"
+    <div class="cert-container w-full max-w-[1050px] aspect-[1.414/1] bg-[#F8F6F0] relative p-8 md:p-10 border-[12px] border-[#0B2A43] rounded-3xl shadow-2xl overflow-hidden flex flex-col justify-between"
          @if(!empty($settings['certificate_bg'])) style="background-image: url('{{ $settings['certificate_bg'] }}'); background-size: cover; background-position: center;" @endif>
         
         <!-- Outer Gold Frame Overlay -->
@@ -77,10 +77,10 @@
         <div class="absolute inset-4 border border-[#C9A24D]/40 rounded-xl pointer-events-none"></div>
         
         <!-- Corner Ornaments -->
-        <div class="absolute top-6 left-6 text-[#C9A24D] text-2xl font-serif leading-none select-none">❖</div>
-        <div class="absolute top-6 right-6 text-[#C9A24D] text-2xl font-serif leading-none select-none">❖</div>
-        <div class="absolute bottom-6 left-6 text-[#C9A24D] text-2xl font-serif leading-none select-none">❖</div>
-        <div class="absolute bottom-6 right-6 text-[#C9A24D] text-2xl font-serif leading-none select-none">❖</div>
+        <div class="absolute top-5 left-5 text-[#C9A24D] text-2xl font-serif leading-none select-none">❖</div>
+        <div class="absolute top-5 right-5 text-[#C9A24D] text-2xl font-serif leading-none select-none">❖</div>
+        <div class="absolute bottom-5 left-5 text-[#C9A24D] text-2xl font-serif leading-none select-none">❖</div>
+        <div class="absolute bottom-5 right-5 text-[#C9A24D] text-2xl font-serif leading-none select-none">❖</div>
 
         <!-- Watermark Background Logo -->
         <div class="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
@@ -88,43 +88,50 @@
         </div>
 
         <!-- 1. HEADER SECTION -->
-        <div class="relative z-10 text-center space-y-1.5">
-            <!-- Centered Logo & Institute Header -->
+        <div class="relative z-10 text-center space-y-1">
             <div class="flex flex-col items-center justify-center space-y-1 mb-1">
-                <img src="{{ $settings['certificate_logo'] ?? asset('images/settings/ruhiology-logo.png') }}" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=RQ&background=0B2A43&color=C9A24D';" class="h-16 w-16 object-contain mx-auto" alt="Logo Ruhiology Institute">
-                <span class="block font-serif-gold text-xl font-bold tracking-widest text-[#0B2A43] leading-none">
+                <img src="{{ $settings['certificate_logo'] ?? asset('images/settings/ruhiology-logo.png') }}" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=RQ&background=0B2A43&color=C9A24D';" class="h-14 w-14 object-contain mx-auto" alt="Logo Ruhiology Institute">
+                <span class="block font-serif-gold text-lg font-bold tracking-widest text-[#0B2A43] leading-none">
                     {{ $settings['institute_name'] ?? 'RUHIOLOGY INSTITUTE' }}
                 </span>
-                <span class="block text-[9px] tracking-widest uppercase text-amber-800 font-bold">
+                <span class="block text-[8px] tracking-widest uppercase text-amber-800 font-bold">
                     {{ $settings['tagline'] ?? 'Mengenal Diri. Mengembangkan Potensi. Menumbuhkan Ruh.' }}
                 </span>
             </div>
 
-            <!-- Certificate Title -->
-            <div class="pt-0.5">
+            <div>
                 <h1 class="font-serif-gold text-2xl md:text-3xl font-extrabold text-[#0B2A43] tracking-wide uppercase">
                     {{ $settings['certificate_title'] ?? 'SERTIFIKAT HASIL ASESMEN RQI' }}
                 </h1>
-                <p class="text-xs font-serif italic text-amber-800 tracking-wider mt-0.5">
+                <p class="text-[11px] font-serif italic text-amber-800 tracking-wider mt-0.5">
                     {{ $settings['certificate_subtitle'] ?? 'Ruhiology Quotient Assessment Certificate' }}
                 </p>
-                <div class="inline-block mt-1 px-4 py-0.5 bg-amber-100/80 border border-amber-300 text-amber-900 rounded-full text-[10px] font-mono font-bold tracking-wider">
+                <div class="inline-block mt-1 px-3 py-0.5 bg-amber-100/80 border border-amber-300 text-amber-900 rounded-full text-[9px] font-mono font-bold tracking-wider">
                     NO: CERT/RQI/{{ date('Y') }}/{{ strtoupper($submission->submission_code) }}
                 </div>
             </div>
         </div>
 
-        <!-- 2. BODY SECTION (CENTERED) -->
+        <!-- 2. BODY SECTION (CENTERED & BALANCED) -->
         <div class="relative z-10 text-center my-2 space-y-2.5">
-            <span class="text-xs uppercase font-serif tracking-widest text-slate-500 font-bold block">Diberikan Kepada :</span>
+            <span class="text-[11px] uppercase font-serif tracking-widest text-slate-500 font-bold block">Diberikan Kepada :</span>
 
-            <!-- Participant Name (Most Prominent Symbol) -->
+            <!-- Participant Name -->
             <div>
                 <h2 class="font-serif-classic text-3xl md:text-4xl font-extrabold text-[#0B2A43] tracking-wide border-b-2 border-amber-400/80 inline-block px-10 pb-1">
                     {{ $submission->participant->name }}
                 </h2>
-                <p class="text-xs text-slate-500 font-medium mt-1">
+                <p class="text-[11px] text-slate-500 font-medium mt-1">
                     Kategori: <strong class="text-slate-700">{{ $submission->participant->category }}</strong>
+                    @php
+                        $instName = $submission->participant->school->name 
+                            ?? $submission->participant->university->name 
+                            ?? $submission->participant->occupation_custom 
+                            ?? null;
+                    @endphp
+                    @if($instName)
+                        • {{ $instName }}
+                    @endif
                     @if($submission->participant->regency)
                         • {{ $submission->participant->regency->name }}
                     @endif
@@ -135,55 +142,65 @@
                 {{ $settings['certificate_body_text'] ?? 'Atas partisipasi dan pencapaian evaluasi potensi diri dalam Asesmen Ruhiology Quotient (RQI).' }}
             </p>
 
-            <!-- Main RQI Score & Level Box -->
-            <div class="inline-flex items-center justify-center gap-4 bg-gradient-to-r from-amber-50 via-white to-amber-50 px-6 py-2 rounded-2xl border border-amber-300 shadow-sm mx-auto">
+            <!-- Main RQI Score & Level Summary Card -->
+            <div class="inline-flex items-center justify-center gap-5 bg-gradient-to-r from-amber-50 via-white to-amber-50 px-7 py-2 rounded-2xl border border-amber-300 shadow-xs mx-auto">
                 <div class="text-center">
                     <span class="text-[9px] uppercase font-mono font-bold text-slate-400 block">Skor Total RQI</span>
                     <span class="font-serif-gold text-2xl font-black text-[#0B2A43]">
                         {{ number_format($submission->result->total_score ?? 0, 1) }}
                     </span>
                 </div>
-                <div class="h-8 w-px bg-amber-200"></div>
+                <div class="h-7 w-px bg-amber-200"></div>
                 <div class="text-center">
-                    <span class="text-[9px] uppercase font-mono font-bold text-slate-400 block">Tingkat Potensi</span>
-                    <span class="text-xs font-serif italic font-bold text-amber-900 bg-amber-100 px-3 py-1 rounded-full border border-amber-300 inline-block">
-                        {{ $submission->result->level_category ?? 'Tinggi / Paripurna' }}
+                    <span class="text-[9px] uppercase font-mono font-bold text-slate-400 block">Kualifikasi Tingkat Potensi</span>
+                    <span class="text-xs font-serif italic font-bold text-amber-900 bg-amber-100/90 px-3.5 py-1 rounded-full border border-amber-300 inline-block">
+                        ✦ {{ $submission->result->level_category ?? 'Tinggi / Paripurna' }}
                     </span>
                 </div>
             </div>
 
-            <!-- 5 Dimensions Sub-Scores Breakdown Bar -->
+            <!-- 5-Dimension Competency Matrix Grid -->
             @if(isset($submission->result->dimensionResults) && count($submission->result->dimensionResults) > 0)
-                <div class="max-w-xl mx-auto grid grid-cols-5 gap-1.5 pt-1">
-                    @foreach($submission->result->dimensionResults as $dr)
-                        <div class="bg-white/80 p-1.5 rounded-xl border border-amber-200/80 text-center shadow-2xs">
-                            <span class="block text-[8px] font-bold text-slate-600 truncate" title="{{ $dr->dimension->name }}">
-                                {{ Str::limit($dr->dimension->name, 12) }}
-                            </span>
-                            <span class="font-mono font-bold text-[10px] text-[#0B2A43]">
-                                {{ round($dr->percentage) }}%
-                            </span>
-                        </div>
-                    @endforeach
+                <div class="max-w-2xl mx-auto bg-white/70 p-2.5 rounded-2xl border border-amber-200/90 shadow-2xs space-y-1">
+                    <span class="text-[9px] font-mono font-bold uppercase tracking-wider text-slate-400 block text-center">Rincian Capaian 5 Dimensi Utama RQI</span>
+                    <div class="grid grid-cols-5 gap-2">
+                        @foreach($submission->result->dimensionResults as $dr)
+                            <div class="bg-amber-50/70 p-1.5 rounded-xl border border-amber-200/80 text-center">
+                                <span class="block text-[8px] font-bold text-slate-700 truncate" title="{{ $dr->dimension->name }}">
+                                    {{ Str::limit($dr->dimension->name, 14) }}
+                                </span>
+                                <span class="font-mono font-bold text-xs text-[#0B2A43]">
+                                    {{ round($dr->percentage) }}%
+                                </span>
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
             @endif
+
+            <!-- Interpretation Summary Pill -->
+            <div class="max-w-2xl mx-auto bg-[#0B2A43]/5 p-2.5 rounded-xl border border-[#0B2A43]/10 text-center">
+                <p class="text-[11px] text-slate-700 italic font-medium leading-tight">
+                    "{{ $submission->result->overall_interpretation ?? 'Peserta memiliki inteligensi ruhiologi yang stabil dalam menyeimbangkan kesadaran batin, intuisi kebenaran, dan komitmen etis.' }}"
+                </p>
+            </div>
         </div>
 
         <!-- 3. FOOTER SECTION -->
-        <div class="relative z-10 space-y-2 pt-2 border-t border-amber-200/80">
+        <div class="relative z-10 space-y-1.5 pt-2 border-t border-amber-200/80">
             
             <!-- Ruhiology Philosophical Quote Box -->
             <div class="text-center">
-                <p class="text-[10px] font-serif italic text-slate-600 max-w-xl mx-auto">
+                <p class="text-[9px] font-serif italic text-slate-500 max-w-xl mx-auto">
                     "Ruh bukan sekadar dorongan mistis, melainkan pusat inteligensi tertinggi (Ruhiology Quotient) yang mengendalikan orientasi nilai, kebersihan batin, serta komitmen etis."
                 </p>
             </div>
 
             <div class="flex justify-between items-end">
                 <!-- QR / Security Code Verification -->
-                <div class="text-left space-y-1">
+                <div class="text-left space-y-0.5">
                     <div class="p-1 bg-white border border-slate-200 rounded-lg inline-block shadow-sm">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=60x60&data={{ urlencode(route('assessment.result', $submission->submission_code)) }}" alt="QR Code" class="w-12 h-12 object-contain">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=60x60&data={{ urlencode(route('assessment.result', $submission->submission_code)) }}" alt="QR Code" class="w-11 h-11 object-contain">
                     </div>
                     <span class="block text-[8px] font-mono text-slate-500 font-bold">✓ Terverifikasi Resmi RQI</span>
                     <span class="block text-[8px] font-mono text-slate-400">Tgl Terbit: {{ $submission->created_at ? $submission->created_at->translatedFormat('d F Y') : date('d F Y') }}</span>
@@ -191,25 +208,25 @@
 
                 <!-- Official Institute Seal -->
                 <div class="text-center">
-                    <div class="w-16 h-16 rounded-full border-2 border-dashed border-amber-500/60 p-0.5 flex items-center justify-center mx-auto opacity-80">
-                        <div class="w-full h-full rounded-full bg-amber-50 flex flex-col items-center justify-center text-[8px] font-serif font-bold text-amber-900 border border-amber-300">
+                    <div class="w-14 h-14 rounded-full border-2 border-dashed border-amber-500/60 p-0.5 flex items-center justify-center mx-auto opacity-80">
+                        <div class="w-full h-full rounded-full bg-amber-50 flex flex-col items-center justify-center text-[7px] font-serif font-bold text-amber-900 border border-amber-300">
                             <span>RUHIOLOGY</span>
-                            <span class="text-[6px] text-amber-700">VERIFIED</span>
+                            <span class="text-[5px] text-amber-700">VERIFIED</span>
                             <span>INSTITUTE</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Founder Signature & Title Section -->
-                <div class="text-center space-y-1 min-w-[200px]">
+                <div class="text-center space-y-0.5 min-w-[200px]">
                     <p class="text-[9px] text-slate-500 font-medium">Kota Jambi, {{ date('d F Y') }}</p>
                     
-                    <div class="h-12 flex items-center justify-center">
+                    <div class="h-11 flex items-center justify-center">
                         @if(!empty($settings['founder_signature']))
-                            <img src="{{ $settings['founder_signature'] }}" alt="Tanda Tangan Founder" class="max-h-12 max-w-[170px] object-contain">
+                            <img src="{{ $settings['founder_signature'] }}" alt="Tanda Tangan Founder" class="max-h-11 max-w-[160px] object-contain">
                         @else
                             <!-- Default Signature Stylized Placeholder -->
-                            <div class="font-serif italic text-base text-slate-400 tracking-widest border-b border-dashed border-slate-300 px-4">
+                            <div class="font-serif italic text-sm text-slate-400 tracking-widest border-b border-dashed border-slate-300 px-4">
                                 Prof. Iskandar Nazari
                             </div>
                         @endif
@@ -219,7 +236,7 @@
                         <h3 class="font-serif-classic text-xs font-bold text-[#0B2A43]">
                             {{ $settings['founder_name'] ?? 'Prof. Dr. Iskandar Nazari, S.Ag., M.Pd., M.S.I., M.H., Ph.D.' }}
                         </h3>
-                        <p class="text-[9px] text-amber-800 font-medium">
+                        <p class="text-[8px] text-amber-800 font-medium">
                             {{ $settings['founder_title'] ?? 'Founder Ruhiology Institute' }}
                         </p>
                     </div>

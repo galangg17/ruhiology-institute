@@ -271,14 +271,24 @@
                             <h5 class="font-serif font-bold text-[11px] text-[#0B2A43] border-b border-amber-400 inline-block px-3" x-text="'NAMA PESERTA CONTOH'"></h5>
                             <p class="text-[6px] text-slate-600 line-clamp-2 leading-tight px-2" x-text="certBody"></p>
                             
+                            <!-- Main Score Badge -->
                             <div class="text-[6px] font-bold text-amber-900 bg-amber-100/90 px-2 py-0.5 rounded-full inline-block border border-amber-300">
                                 Skor RQI: 85.0 (Tinggi / Paripurna)
+                            </div>
+
+                            <!-- 5-Dimension Mini Grid Preview -->
+                            <div class="grid grid-cols-5 gap-1 max-w-[90%] mx-auto pt-0.5">
+                                <div class="bg-white/80 p-0.5 rounded text-[5px] border border-amber-200 text-center font-mono">Nafl: 88%</div>
+                                <div class="bg-white/80 p-0.5 rounded text-[5px] border border-amber-200 text-center font-mono">Nurani: 84%</div>
+                                <div class="bg-white/80 p-0.5 rounded text-[5px] border border-amber-200 text-center font-mono">Resil: 80%</div>
+                                <div class="bg-white/80 p-0.5 rounded text-[5px] border border-amber-200 text-center font-mono">Wahyu: 85%</div>
+                                <div class="bg-white/80 p-0.5 rounded text-[5px] border border-amber-200 text-center font-mono">Etis: 88%</div>
                             </div>
                         </div>
 
                         <!-- 3. Footer & Signature -->
-                        <div class="space-y-1">
-                            <p class="text-[5px] font-serif italic text-slate-500 line-clamp-1">"Ruh adalah pusat inteligensi tertinggi yang mengendalikan orientasi nilai."</p>
+                        <div class="space-y-0.5">
+                            <p class="text-[5px] font-serif italic text-slate-500 line-clamp-1">"Ruh adalah pusat inteligensi tertinggi yang mengendalikan orientasi nilai." — Prof. Iskandar Nazari</p>
                             
                             <div class="flex justify-between items-end pt-0.5 border-t border-amber-200 text-[5px]">
                                 <div class="text-left">
