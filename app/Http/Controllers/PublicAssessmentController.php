@@ -51,16 +51,26 @@ class PublicAssessmentController extends Controller
         if (!empty($request->input('event_code'))) {
             $eventModel = \App\Models\Event::where('event_code', strtoupper(trim($request->input('event_code'))))->first();
             if ($eventModel) {
-                if (!$request->has('province_id') || empty($request->input('province_id'))) {
+                if (empty($request->input('province_id'))) {
                     $request->merge(['province_id' => $eventModel->province_id ?? 5]);
                 }
-                if (!$request->has('regency_id') || empty($request->input('regency_id'))) {
-                    $request->merge(['regency_id' => $eventModel->regency_id ?? 51]);
+                if (empty($request->input('regency_id'))) {
+                    $request->merge(['regency_id' => $eventModel->regency_id ?? 10]);
                 }
-                if (!$request->has('category') || empty($request->input('category'))) {
+                if (empty($request->input('category'))) {
                     $request->merge(['category' => $eventModel->target_category ?? 'Pelajar']);
                 }
             }
+        }
+
+        if (empty($request->input('province_id'))) {
+            $request->merge(['province_id' => 5]);
+        }
+        if (empty($request->input('regency_id'))) {
+            $request->merge(['regency_id' => 10]);
+        }
+        if (($request->input('category') === 'Pelajar' || empty($request->input('category'))) && empty($request->input('school_level'))) {
+            $request->merge(['school_level' => 'SMA']);
         }
 
         $validated = $request->validate([

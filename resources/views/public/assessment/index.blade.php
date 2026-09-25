@@ -221,21 +221,29 @@ window.rqAssessmentIndex = function rqAssessmentIndex() {
                 },
                 body: JSON.stringify(this.form)
             })
-            .then(res => res.json())
-            .then(data => {
+            .then(async res => {
+                const data = await res.json().catch(() => ({}));
                 this.isSubmitting = false;
-                if (data.status === 'success') {
+
+                if (res.ok && data.status === 'success') {
                     this.generatedCode = data.assessment_code;
                     this.takeUrl = data.take_url;
                     this.showRegModal = false;
                     this.showGeneratedCodeModal = true;
                 } else {
-                    alert(data.message || 'Gagal mendaftar. Silakan cek form Anda.');
+                    let errMsg = data.message || 'Gagal mendaftar. Silakan periksa kembali formulir Anda.';
+                    if (data.errors) {
+                        const firstKey = Object.keys(data.errors)[0];
+                        if (firstKey && data.errors[firstKey][0]) {
+                            errMsg = data.errors[firstKey][0];
+                        }
+                    }
+                    alert(errMsg);
                 }
             })
             .catch(err => {
                 this.isSubmitting = false;
-                alert('Terjadi kesalahan jaringan.');
+                alert('Terjadi kesalahan koneksi. Silakan periksa jaringan internet Anda.');
             });
         },
 
