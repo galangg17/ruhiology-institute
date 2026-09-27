@@ -120,11 +120,12 @@ class AdminResultController extends Controller
                 $institutionDetail = '-';
                 if ($p) {
                     if ($p->category === 'Pelajar') {
-                        $institutionDetail = ($p->school_level ? $p->school_level . ' ' : '') . ($p->school->name ?? '');
+                        $schoolName = $p->school_custom ?: ($p->school->name ?? '');
+                        $institutionDetail = trim(($p->school_level ? $p->school_level . ' ' : '') . $schoolName) ?: '-';
                     } elseif ($p->category === 'Mahasiswa/i') {
-                        $institutionDetail = $p->university->name ?? '-';
+                        $institutionDetail = $p->university_custom ?: ($p->university->name ?? '-');
                     } else {
-                        $institutionDetail = $p->occupation ?? $p->occupation_custom ?? 'Personal / Mandiri';
+                        $institutionDetail = $p->occupation_custom ?: ($p->occupation ?: 'Personal / Mandiri');
                     }
                 }
 

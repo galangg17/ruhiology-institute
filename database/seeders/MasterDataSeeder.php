@@ -252,19 +252,19 @@ class MasterDataSeeder extends Seeder
             Occupation::firstOrCreate(['name' => $occ], ['status' => 'active']);
         }
 
-        // 9. Primary Instrument: RQI-15 (Inventori Kecerdasan Ruhiologi 15 Butir)
+        // 9. Primary Instrument: RQI-20 (Inventori Kecerdasan Ruhiologi 20 Butir & WHO-5)
         $rqi = Instrument::firstOrCreate(
-            ['code' => 'RQI-15'],
+            ['code' => 'RQI-20'],
             [
-                'name' => 'Inventori Kecerdasan Ruhiologi (RQI-15)',
-                'description' => 'Instrumen 15 butir terstruktur untuk mengukur 5 tahap utama Kecerdasan Ruhiologi manusia.',
+                'name' => 'Inventori Kecerdasan Ruhiologi (RQI-20 & WHO-5)',
+                'description' => 'Instrumen 20 butir terstruktur yang mencakup 5 Tahap Utama Kecerdasan Ruhiologi dan Dimensi ke-6 Kesejahteraan Mental (WHO-5).',
                 'version' => '1.0',
                 'instructions' => 'Pilih frekuensi yang paling menggambarkan kondisi dan perasaan Anda yang sebenarnya.',
                 'status' => 'active'
             ]
         );
 
-        // 5 RQI-15 Dimensions (Tahap 1 s/d Tahap 5)
+        // 6 RQI-20 Dimensions (Tahap 1 s/d Tahap 5 + WHO-5)
         $dim1 = Dimension::firstOrCreate(
             ['instrument_id' => $rqi->id, 'code' => 'DIM-1'],
             ['name' => 'Pengenalan & Kesadaran Diri Hakiki', 'description' => 'Kesadaran mendalam akan kedudukan ruh sebagai intisari kemanusiaan.', 'order' => 1]
@@ -288,6 +288,11 @@ class MasterDataSeeder extends Seeder
         $dim5 = Dimension::firstOrCreate(
             ['instrument_id' => $rqi->id, 'code' => 'DIM-5'],
             ['name' => 'Kesadaran Puncak Ketuhanan (God Light & Muraqabah)', 'description' => 'Kesadaran bahwa Tuhan selalu mengawasi dan integritas kejujuran puncak.', 'order' => 5]
+        );
+
+        $dimWho = Dimension::firstOrCreate(
+            ['instrument_id' => $rqi->id, 'code' => 'DIM-WHO5'],
+            ['name' => 'Dimensi ke-6: Indeks Kesejahteraan Mental (WHO-5)', 'description' => 'Indikator kesejahteraan umum berdasarkan WHO-5 (Well-being Index).', 'order' => 6]
         );
 
         // 15 RQI Questions (3 questions per dimension)
@@ -346,7 +351,36 @@ class MasterDataSeeder extends Seeder
             }
         }
 
-        // Scoring rule for RQI-15
+        // Add 5 WHO-5 questions under Dimensi ke-6 to the same instrument
+        $whoQuestions = [
+            'Saya merasa bersemangat, ceria, dan termotivasi dalam menjalani hari-hari.',
+            'Saya merasa tenang, damai, dan tidak terbebani oleh kecemasan berlebih.',
+            'Tubuh dan pikiran saya merasa aktif, segar, dan bertenaga.',
+            'Saya bisa bangun tidur pagi dengan perasaan segar dan istirahat yang cukup.',
+            'Kehidupan sehari-hari saya terasa bermakna dan memicu antusiasme saya.',
+        ];
+
+        foreach ($whoQuestions as $idx => $qText) {
+            $question = Question::firstOrCreate(
+                ['instrument_id' => $rqi->id, 'order' => 15 + $idx + 1],
+                [
+                    'dimension_id' => $dimWho->id,
+                    'question_text' => $qText,
+                    'type' => 'likert',
+                    'scoring_direction' => 'normal',
+                    'status' => 'active'
+                ]
+            );
+
+            foreach ($likertOptions as $optIdx => $opt) {
+                QuestionOption::firstOrCreate(
+                    ['question_id' => $question->id, 'option_value' => $opt['val']],
+                    ['option_text' => $opt['text'], 'order' => $optIdx + 1]
+                );
+            }
+        }
+
+        // Scoring rule for RQI-20
         ScoringRule::firstOrCreate(
             ['instrument_id' => $rqi->id],
             [
@@ -362,59 +396,6 @@ class MasterDataSeeder extends Seeder
                 ]
             ]
         );
-
-        // 10. Secondary Instrument: WHO-5 Well-Being Index
-        $who5 = Instrument::firstOrCreate(
-            ['code' => 'WHO-5'],
-            [
-                'name' => 'Indeks Kesejahteraan Mental (WHO-5)',
-                'description' => 'Instrumen 5 butir untuk menilai kondisi kesejahteraan psikologis & keseimbangan batiniah dalam 2 minggu terakhir.',
-                'version' => '1.0',
-                'instructions' => 'Pilih frekuensi yang menggambarkan kondisi Anda dalam 2 minggu terakhir.',
-                'status' => 'active'
-            ]
-        );
-
-        $dimWho = Dimension::firstOrCreate(
-            ['instrument_id' => $who5->id, 'code' => 'DIM-WHO5'],
-            ['name' => 'Skrining Kesejahteraan Emosional', 'description' => 'Indikator kesejahteraan umum berdasarkan WHO-5.', 'order' => 1]
-        );
-
-        $whoQuestions = [
-            'Saya merasa bersemangat, ceria, dan termotivasi dalam menjalani hari-hari.',
-            'Saya merasa tenang, damai, dan tidak terbebani oleh kecemasan berlebih.',
-            'Tubuh dan pikiran saya merasa aktif, segar, dan bertenaga.',
-            'Saya bisa bangun tidur pagi dengan perasaan segar dan istirahat yang cukup.',
-            'Kehidupan sehari-hari saya terasa bermakna dan memicu antusiasme saya.',
-        ];
-
-        $whoOptions = [
-            ['text' => 'Sepanjang Waktu', 'val' => 5],
-            ['text' => 'Sebagian Besar Waktu', 'val' => 4],
-            ['text' => 'Kadang-kadang', 'val' => 3],
-            ['text' => 'Jarang', 'val' => 2],
-            ['text' => 'Tidak Pernah', 'val' => 1],
-        ];
-
-        foreach ($whoQuestions as $idx => $qText) {
-            $question = Question::firstOrCreate(
-                ['instrument_id' => $who5->id, 'order' => $idx + 1],
-                [
-                    'dimension_id' => $dimWho->id,
-                    'question_text' => $qText,
-                    'type' => 'likert',
-                    'scoring_direction' => 'normal',
-                    'status' => 'active'
-                ]
-            );
-
-            foreach ($whoOptions as $optIdx => $opt) {
-                QuestionOption::firstOrCreate(
-                    ['question_id' => $question->id, 'option_value' => $opt['val']],
-                    ['option_text' => $opt['text'], 'order' => $optIdx + 1]
-                );
-            }
-        }
 
 
         // 11. Institution, Program & Assessment Period setup

@@ -347,27 +347,57 @@
             </div>
         </div>
 
-        <!-- General Info -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-            <h3 class="font-bold font-serif text-slate-900 text-sm border-b border-slate-100 pb-2">Identitas Lembaga & Penggagas</h3>
-            <div class="grid grid-cols-2 gap-4">
+        <!-- Dedicated Founder Profile (Prof. Dr. Iskandar Nazari) Settings -->
+        <div id="founder" class="bg-white p-6 rounded-2xl border-2 border-[#C9A24D]/30 shadow-md space-y-4 scroll-mt-6">
+            <h3 class="font-bold font-serif text-slate-900 text-sm border-b border-slate-100 pb-2 flex items-center justify-between">
+                <span class="flex items-center gap-2">
+                    <span>👨‍🏫</span>
+                    <span>Profil Founder & Inisiator Teori Ruhiologi (Prof. Dr. Iskandar Nazari)</span>
+                </span>
+                <span class="text-[10px] font-mono bg-amber-50 text-amber-900 px-2.5 py-0.5 rounded-full font-bold">Dynamic Admin CMS</span>
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1">Nama Institute</label>
-                    <input type="text" name="institute_name" value="{{ $settings['institute_name'] ?? 'RUHIOLOGY INSTITUTE' }}" required class="w-full p-2.5 rounded border border-slate-300">
+                    <label class="block font-bold text-slate-700 mb-1">Nama Lengkap & Gelar Founder *</label>
+                    <input type="text" name="founder_name" value="{{ $settings['founder_name'] ?? 'Prof. Dr. Iskandar Nazari, S.Ag., M.Pd., M.S.I., M.H., Ph.D.' }}" required class="w-full p-2.5 rounded border border-slate-300 font-bold text-slate-900">
                 </div>
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1">Tagline</label>
-                    <input type="text" name="tagline" value="{{ $settings['tagline'] ?? 'Mengenal Diri. Mengembangkan Potensi. Menumbuhkan Ruh.' }}" required class="w-full p-2.5 rounded border border-slate-300">
+                    <label class="block font-bold text-slate-700 mb-1">Jabatan & Institusi Founder *</label>
+                    <input type="text" name="founder_title" value="{{ $settings['founder_title'] ?? 'Founder Ruhiology Institute & Guru Besar UIN Sulthan Thaha Saifuddin Jambi' }}" required class="w-full p-2.5 rounded border border-slate-300">
                 </div>
             </div>
-            <div class="grid grid-cols-2 gap-4">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1">Nama Penggagas Teori RQ</label>
-                    <input type="text" name="founder_name" value="{{ $settings['founder_name'] ?? 'Prof. Dr. Iskandar Nazari, S.Ag., M.Pd., M.S.I., M.H., Ph.D.' }}" required class="w-full p-2.5 rounded border border-slate-300">
+                    <label class="block font-bold text-slate-700 mb-1">Upload Foto Resmi Founder (Prof. Dr. Iskandar Nazari)</label>
+                    <input type="file" name="founder_photo_file" accept="image/*" class="w-full p-2 rounded border border-slate-300 bg-slate-50">
+                    <p class="text-[11px] text-slate-400 mt-1">Format: JPG, PNG. Rekomendasi rasio portrait 3:4 atau 1:1.</p>
                 </div>
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1">Gelar / Jabatan Penggagas</label>
-                    <input type="text" name="founder_title" value="{{ $settings['founder_title'] ?? 'Founder Ruhiology Institute & Guru Besar UIN STS Jambi' }}" required class="w-full p-2.5 rounded border border-slate-300">
+                    <label class="block font-bold text-slate-700 mb-1">URL Foto Founder (Opsional)</label>
+                    <input type="text" name="founder_photo" value="{{ $settings['founder_photo'] ?? asset('images/settings/founder_photo.jpg') }}" class="w-full p-2.5 rounded border border-slate-300">
+                </div>
+            </div>
+
+            <div>
+                <label class="block font-bold text-slate-700 mb-1">Kata Hikmah / Kutipan Inspirasi Utama Founder</label>
+                <textarea name="founder_quote" rows="2" class="w-full p-2.5 rounded border border-slate-300 font-serif italic text-slate-800">{{ $settings['founder_quote'] ?? 'Ruh bukan sekadar dorongan mistis, melainkan pusat inteligensi tertinggi (Ruhiology Quotient) yang mengendalikan orientasi nilai, kebersihan batin, intuisi kebenaran, serta komitmen etis dalam kehidupan nyata.' }}</textarea>
+            </div>
+
+            <div>
+                <label class="block font-bold text-slate-700 mb-1">Biografi Singkat & Perjalanan Ilmiah Founder</label>
+                <textarea name="founder_bio" rows="3" class="w-full p-2.5 rounded border border-slate-300 text-slate-700">{{ $settings['founder_bio'] ?? 'Prof. Dr. Iskandar Nazari merumuskan konsep Ruhiology Quotient (RQ) sebagai navigasi potensi manusia. Penyelidikan ilmiah beliau memadukan prinsip kecerdasan wahyu dengan penyusunan metodologi psikometri ilmiah.' }}</textarea>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Riwayat Pendidikan (1 baris per jenjang)</label>
+                    <textarea name="founder_education" rows="3" class="w-full p-2.5 rounded border border-slate-300 font-mono text-[11px]">{{ $settings['founder_education'] ?? "S1 UIN Sulthan Thaha Saifuddin Jambi\nS2 & S3 Psikologi Pendidikan & Studi Islam\nPh.D. & Guru Besar UIN Sulthan Thaha Saifuddin Jambi" }}</textarea>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Publikasi & Karya Buku Utama (1 baris per karya)</label>
+                    <textarea name="founder_publications" rows="3" class="w-full p-2.5 rounded border border-slate-300 font-mono text-[11px]">{{ $settings['founder_publications'] ?? "Buku: Inventori Kecerdasan Ruhiologi (RQI-15 & RQI-30M)\nBuku: Psikologi Pendidikan Berbasis Ruhiologi\nJurnal: Ruhiology Quotient as a Predictor of Mental Well-being (WHO-5)" }}</textarea>
                 </div>
             </div>
         </div>

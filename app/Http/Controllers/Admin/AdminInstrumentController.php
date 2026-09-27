@@ -234,4 +234,197 @@ class AdminInstrumentController extends Controller
 
         return back()->with('success', 'Konfigurasi scoring engine berhasil diperbarui.');
     }
+
+    public function toggleAccessType(Instrument $instrument)
+    {
+        $newAccess = ($instrument->access_type === 'public') ? 'event_only' : 'public';
+        $instrument->update(['access_type' => $newAccess]);
+
+        $label = ($newAccess === 'public') ? '🌐 Akses Publik (ON)' : '🔒 Khusus Event';
+        return back()->with('success', 'Tipe akses paket "' . $instrument->name . '" berhasil diubah menjadi ' . $label . '.');
+    }
+
+    public function downloadTemplate()
+    {
+        $filename = "template_import_paket_soal.csv";
+        $headers = [
+            "Content-Type" => "text/csv; charset=UTF-8",
+            "Content-Disposition" => "attachment; filename=\"$filename\"",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0"
+        ];
+
+        $callback = function() {
+            $handle = fopen('php://output', 'w');
+            fputs($handle, "\xEF\xBB\xBF");
+
+            fputcsv($handle, ['Kode Dimensi', 'Nama Dimensi', 'Teks Pertanyaan', 'Skoring']);
+            fputcsv($handle, ['DIM-1', 'Kesadaran Diri Hakiki', 'Saya menyadari bahwa diri saya bukan sekadar fisik melainkan ruh yang sedang berproses.', 'normal']);
+            fputcsv($handle, ['DIM-1', 'Kesadaran Diri Hakiki', 'Saya sering merasa cemas dan hampa meskipun meraih pencapaian materi.', 'reverse']);
+            fputcsv($handle, ['DIM-WHO5', 'Indeks Kesejahteraan Mental (WHO-5)', 'Saya merasa bersemangat, ceria, dan termotivasi dalam menjalani hari-hari.', 'normal']);
+
+            fclose($handle);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    public function exportCsv(Instrument $instrument)
+    {
+        $instrument->load('questions.dimension');
+        $filename = "paket_soal_" . \Illuminate\Support\Str::slug($instrument->code) . ".csv";
+
+        $headers = [
+            "Content-Type" => "text/csv; charset=UTF-8",
+            "Content-Disposition" => "attachment; filename=\"$filename\"",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0"
+        ];
+
+        $callback = function() use ($instrument) {
+            $handle = fopen('php://output', 'w');
+            fputs($handle, "\xEF\xBB\xBF");
+
+            fputcsv($handle, ['Kode Dimensi', 'Nama Dimensi', 'Teks Pertanyaan', 'Skoring']);
+
+            foreach ($instrument->questions as $q) {
+                fputcsv($handle, [
+                    $q->dimension->code ?? 'DIM-1',
+                    $q->dimension->name ?? 'Dimensi Utama',
+                    $q->question_text,
+                    $q->scoring_direction ?? 'normal'
+                ]);
+            }
+
+            fclose($handle);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    public function importCsv(Request $request, ?Instrument $instrument = null)
+    {
+        $request->validate([
+            'file' => ['required', 'file', 'max:5120'],
+        ]);
+
+        if (!$instrument && $request->has('instrument_id')) {
+            $instrument = Instrument::find($request->input('instrument_id'));
+        }
+
+        if (!$instrument) {
+            $instrument = Instrument::create([
+                'code' => 'RQI-IMP-' . strtoupper(\Illuminate\Support\Str::random(4)),
+                'name' => 'Hasil Import Paket Soal Excel (' . date('d M Y H:i') . ')',
+                'description' => 'Paket Soal yang diimpor dari file Excel / CSV.',
+                'version' => '1.0',
+                'instructions' => 'Pilih frekuensi yang paling menggambarkan kondisi dan perasaan Anda yang sebenarnya.',
+                'status' => 'active',
+                'access_type' => 'event_only'
+            ]);
+            ScoringRule::create([
+                'instrument_id' => $instrument->id,
+                'scale_min' => 1,
+                'scale_max' => 5,
+                'reverse_mapping' => ['1' => 5, '2' => 4, '3' => 3, '4' => 2, '5' => 1],
+            ]);
+        }
+
+        $file = $request->file('file');
+        $path = $file->getRealPath();
+        
+        $handle = fopen($path, 'r');
+        if (!$handle) {
+            return back()->with('error', 'Gagal membaca file Excel/CSV.');
+        }
+
+        $bom = fread($handle, 3);
+        if ($bom !== "\xEF\xBB\xBF") {
+            rewind($handle);
+        }
+
+        $header = fgetcsv($handle, 2000, ',');
+        $delimiter = ',';
+        if ($header && count($header) == 1 && str_contains($header[0], ';')) {
+            rewind($handle);
+            if ($bom === "\xEF\xBB\xBF") fread($handle, 3);
+            $header = fgetcsv($handle, 2000, ';');
+            $delimiter = ';';
+        }
+
+        $importedCount = 0;
+        $order = Question::where('instrument_id', $instrument->id)->max('order') ?? 0;
+
+        while (($data = fgetcsv($handle, 2000, $delimiter)) !== FALSE) {
+            if (empty($data) || (count($data) == 1 && trim($data[0]) === '')) continue;
+
+            $dimCode = trim($data[0] ?? 'DIM-1');
+            $dimName = trim($data[1] ?? '');
+            $questionText = trim($data[2] ?? '');
+            $scoring = strtolower(trim($data[3] ?? 'normal'));
+
+            if (empty($questionText) || str_contains(strtolower($dimCode), 'kode dimensi') || str_contains(strtolower($questionText), 'teks pertanyaan')) {
+                if (empty($questionText) && !empty($dimName) && !str_contains(strtolower($dimName), 'nama dimensi')) {
+                    $questionText = $dimName;
+                    $dimName = 'Dimensi ' . $dimCode;
+                } else {
+                    continue;
+                }
+            }
+
+            if (empty($dimName)) {
+                $dimName = 'Dimensi ' . $dimCode;
+            }
+
+            $dimension = Dimension::firstOrCreate(
+                ['instrument_id' => $instrument->id, 'code' => $dimCode],
+                ['name' => $dimName, 'order' => Dimension::where('instrument_id', $instrument->id)->count() + 1]
+            );
+
+            $scoringDirection = str_contains($scoring, 'reverse') ? 'reverse' : 'normal';
+            $order++;
+
+            $question = Question::create([
+                'instrument_id' => $instrument->id,
+                'dimension_id' => $dimension->id,
+                'question_text' => $questionText,
+                'type' => 'likert',
+                'scoring_direction' => $scoringDirection,
+                'order' => $order,
+                'status' => 'active',
+            ]);
+
+            $isWho5 = str_contains(strtolower($dimCode), 'who') || str_contains(strtolower($dimName), 'who');
+            $options = $isWho5 ? [
+                ['text' => 'Tidak Pernah', 'val' => 1],
+                ['text' => 'Jarang', 'val' => 2],
+                ['text' => 'Kadang-kadang', 'val' => 3],
+                ['text' => 'Sebagian Besar Waktu', 'val' => 4],
+                ['text' => 'Sepanjang Waktu', 'val' => 5],
+            ] : [
+                ['text' => 'Sangat Tidak Sesuai', 'val' => 1],
+                ['text' => 'Tidak Sesuai', 'val' => 2],
+                ['text' => 'Netral / Ragu-ragu', 'val' => 3],
+                ['text' => 'Sesuai', 'val' => 4],
+                ['text' => 'Sangat Sesuai', 'val' => 5],
+            ];
+
+            foreach ($options as $optIdx => $opt) {
+                QuestionOption::create([
+                    'question_id' => $question->id,
+                    'option_text' => $opt['text'],
+                    'option_value' => $opt['val'],
+                    'order' => $optIdx + 1,
+                ]);
+            }
+
+            $importedCount++;
+        }
+
+        fclose($handle);
+
+        return back()->with('success', "Berhasil mengimpor {$importedCount} pertanyaan dari file Excel ke Paket Soal \"{$instrument->name}\".");
+    }
 }

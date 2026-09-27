@@ -17,7 +17,19 @@ class AdminSettingController extends Controller
 
     public function update(Request $request)
     {
-        $data = $request->except(['_token', 'hero_card_image_file', 'about_image_file', 'founder_signature_file', 'certificate_logo_file', 'certificate_bg_file', 'story_bg_file']);
+        $data = $request->except(['_token', 'hero_card_image_file', 'about_image_file', 'founder_signature_file', 'founder_photo_file', 'certificate_logo_file', 'certificate_bg_file', 'story_bg_file']);
+
+        // Handle Founder Photo Upload
+        if ($request->hasFile('founder_photo_file')) {
+            $file = $request->file('founder_photo_file');
+            $filename = 'founder_photo_' . time() . '.' . $file->getClientOriginalExtension();
+            $path = public_path('images/settings');
+            if (!file_exists($path)) {
+                mkdir($path, 0755, true);
+            }
+            $file->move($path, $filename);
+            $data['founder_photo'] = asset('images/settings/' . $filename);
+        }
 
         // Handle Hero Card Image Upload
         if ($request->hasFile('hero_card_image_file')) {

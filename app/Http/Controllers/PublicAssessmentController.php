@@ -26,21 +26,37 @@ class PublicAssessmentController extends Controller
     public function index()
     {
         try {
+            $publicInstruments = Instrument::where('status', 'active')
+                ->where('access_type', 'public')
+                ->withCount('questions')
+                ->get();
+
             $activePeriods = AssessmentPeriod::where('status', 'active')
+                ->whereHas('instrument', function ($q) {
+                    $q->where('access_type', 'public');
+                })
                 ->with(['program.institution', 'instrument'])
                 ->get();
+
             $activeEvents = \App\Models\Event::where('status', 'active')
                 ->where('access_type', 'EVENT_PROGRAM')
                 ->orderBy('title', 'asc')
                 ->get();
+
+            $regenciesMap = \App\Models\Regency::where('status', 'active')
+                ->orderBy('name', 'asc')
+                ->get(['id', 'province_id', 'name', 'type'])
+                ->groupBy('province_id');
         } catch (\Throwable $e) {
+            $publicInstruments = collect([]);
             $activePeriods = collect([]);
             $activeEvents = collect([]);
+            $regenciesMap = collect([]);
         }
 
         $defaultPeriod = $activePeriods->first();
 
-        return view('public.assessment.index', compact('activePeriods', 'defaultPeriod', 'activeEvents'));
+        return view('public.assessment.index', compact('activePeriods', 'defaultPeriod', 'activeEvents', 'publicInstruments', 'regenciesMap'));
     }
 
     /**
@@ -87,16 +103,20 @@ class PublicAssessmentController extends Controller
             // Pelajar fields
             'school_level' => ['required_if:category,Pelajar', 'nullable', 'string'],
             'school_class' => ['nullable', 'string', 'max:100'],
+            'school_custom' => ['nullable', 'string', 'max:255'],
+            'school_name' => ['nullable', 'string', 'max:255'],
             
             // Mahasiswa/i fields
-            'university_id' => ['required_if:category,Mahasiswa/i', 'nullable', 'exists:universities,id'],
-            'faculty_id' => ['nullable', 'exists:faculties,id'],
-            'study_program_id' => ['nullable', 'exists:study_programs,id'],
+            'university_id' => ['nullable'],
+            'university_custom' => ['nullable', 'string', 'max:255'],
+            'university_name' => ['nullable', 'string', 'max:255'],
+            'faculty_id' => ['nullable'],
+            'study_program_id' => ['nullable'],
             'semester' => ['nullable', 'integer', 'min:1', 'max:14'],
             'entry_year' => ['nullable', 'string'],
 
             // Umum fields
-            'occupation_id' => ['nullable', 'exists:occupations,id'],
+            'occupation_id' => ['nullable'],
             'occupation_custom' => ['nullable', 'string', 'max:255'],
             
             'sub_category' => ['nullable', 'string', 'max:255'],
@@ -125,6 +145,19 @@ class PublicAssessmentController extends Controller
                     'instrument_id' => $event->instrument_id,
                     'title' => 'Periode Event ' . $event->title,
                     'period_code' => 'RQI-PER-' . $event->event_code,
+                    'status' => 'active',
+                ]);
+            }
+        } elseif (!empty($request->input('instrument_id'))) {
+            $targetInstId = (int) $request->input('instrument_id');
+            $period = AssessmentPeriod::where('instrument_id', $targetInstId)->where('status', 'active')->first();
+            if (!$period) {
+                $targetInst = Instrument::find($targetInstId);
+                $period = AssessmentPeriod::create([
+                    'program_id' => 1,
+                    'instrument_id' => $targetInstId,
+                    'title' => 'Periode Asesmen ' . ($targetInst->name ?? 'Publik'),
+                    'period_code' => 'PER-PUB-' . strtoupper(Str::random(6)),
                     'status' => 'active',
                 ]);
             }
@@ -170,7 +203,9 @@ class PublicAssessmentController extends Controller
             'province_id' => $validated['province_id'],
             'regency_id' => $validated['regency_id'],
             'school_id' => null,
-            'university_id' => $validated['university_id'] ?? null,
+            'school_custom' => $validated['school_custom'] ?? $validated['school_name'] ?? null,
+            'university_id' => null,
+            'university_custom' => $validated['university_custom'] ?? $validated['university_name'] ?? null,
             'faculty_id' => $validated['faculty_id'] ?? null,
             'study_program_id' => $validated['study_program_id'] ?? null,
             'school_level' => $validated['school_level'] ?? null,
@@ -273,21 +308,35 @@ class PublicAssessmentController extends Controller
 
         $participant = Participant::findOrFail($intake['participant_id']);
 
-        // Load RQI-30M questions (30 items) + WHO-5 questions (5 items)
-        $rqiQuestions = Question::where('instrument_id', $period->instrument_id)
+        // Load all active questions for the period's instrument
+        $allQuestions = Question::where('instrument_id', $period->instrument_id)
             ->where('status', 'active')
             ->with(['options' => function ($q) { $q->orderBy('order', 'asc'); }, 'dimension'])
             ->orderBy('order', 'asc')
             ->get();
 
-        $who5Instrument = Instrument::where('code', 'WHO-5')->first();
-        $who5Questions = collect();
-        if ($who5Instrument) {
-            $who5Questions = Question::where('instrument_id', $who5Instrument->id)
-                ->where('status', 'active')
-                ->with(['options' => function ($q) { $q->orderBy('order', 'asc'); }, 'dimension'])
-                ->orderBy('order', 'asc')
-                ->get();
+        $rqiQuestions = $allQuestions->filter(function ($q) {
+            $dimCode = strtolower($q->dimension->code ?? '');
+            $dimName = strtolower($q->dimension->name ?? '');
+            return !str_contains($dimCode, 'who') && !str_contains($dimName, 'who');
+        })->values();
+
+        $who5Questions = $allQuestions->filter(function ($q) {
+            $dimCode = strtolower($q->dimension->code ?? '');
+            $dimName = strtolower($q->dimension->name ?? '');
+            return str_contains($dimCode, 'who') || str_contains($dimName, 'who');
+        })->values();
+
+        // Fallback if who5Questions is empty but a separate WHO-5 instrument exists
+        if ($who5Questions->isEmpty()) {
+            $who5Instrument = Instrument::where('code', 'WHO-5')->first();
+            if ($who5Instrument) {
+                $who5Questions = Question::where('instrument_id', $who5Instrument->id)
+                    ->where('status', 'active')
+                    ->with(['options' => function ($q) { $q->orderBy('order', 'asc'); }, 'dimension'])
+                    ->orderBy('order', 'asc')
+                    ->get();
+            }
         }
 
         return view('public.assessment.take', compact('period', 'participant', 'type', 'rqiQuestions', 'who5Questions'));

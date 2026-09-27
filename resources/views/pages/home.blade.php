@@ -272,6 +272,125 @@
         </div>
     </section>
 
+    <!-- SECTION: PROFIL FOUNDER & INISIATOR TEORI RUHIOLOGI (PROF. DR. ISKANDAR NAZARI) -->
+    <section id="founder" class="py-16 sm:py-24 bg-gradient-to-b from-[#071E30] via-[#0F3759] to-[#071E30] text-white border-y border-[#C9A24D]/30 relative overflow-hidden scroll-mt-20">
+        <!-- Ambient Gold Glow Background -->
+        <div class="absolute -top-32 -left-32 w-96 h-96 bg-[#C9A24D]/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-[#C9A24D]/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-[1280px] mx-auto px-4 sm:px-10 relative z-10">
+            
+            <!-- Section Header -->
+            <div class="text-center max-w-3xl mx-auto mb-12 sm:mb-16 space-y-3">
+                <div class="inline-flex items-center space-x-2 bg-[#C9A24D]/20 text-[#C9A24D] text-xs font-mono font-bold px-4 py-1.5 rounded-full border border-[#C9A24D]/40 uppercase tracking-widest">
+                    <span>👨‍🏫 PROFIL FOUNDER & INISIATOR</span>
+                </div>
+                <h2 class="font-serif text-3xl sm:text-5xl font-bold text-white tracking-tight leading-tight">
+                    {{ \App\Models\Setting::get('founder_name', 'Prof. Dr. Iskandar Nazari, S.Ag., M.Pd., M.S.I., M.H., Ph.D.') }}
+                </h2>
+                <p class="text-[#C9A24D] text-xs sm:text-base font-medium font-serif italic">
+                    {{ \App\Models\Setting::get('founder_title', 'Founder Ruhiology Institute & Guru Besar UIN Sulthan Thaha Saifuddin Jambi') }}
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 items-start">
+                
+                <!-- Left: Founder Photo & Quote Card (5 cols) -->
+                <div class="lg:col-span-5 space-y-6">
+                    <div class="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-[#C9A24D]/40 bg-[#0B2A43] group max-w-md mx-auto lg:max-w-none">
+                        <img src="{{ \App\Models\Setting::get('founder_photo', asset('images/settings/founder_photo.jpg')) }}" 
+                             alt="Prof. Dr. Iskandar Nazari" 
+                             onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=Iskandar+Nazari&size=512&background=0F3759&color=C9A24D';"
+                             class="w-full h-auto max-h-[480px] object-cover object-top group-hover:scale-105 transition duration-700">
+                        <div class="absolute inset-0 bg-gradient-to-t from-[#071E30] via-transparent to-transparent opacity-85"></div>
+                        <div class="absolute bottom-4 left-4 right-4 text-center">
+                            <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest block bg-[#071E30]/90 py-1.5 px-3 rounded-full border border-[#C9A24D]/30 backdrop-blur-md">
+                                FOUNDER & GURU BESAR RUHIOLOGI
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Quote Card -->
+                    <div class="bg-white/5 p-6 rounded-2xl border border-[#C9A24D]/30 backdrop-blur-md space-y-2">
+                        <span class="text-2xl text-[#C9A24D] font-serif leading-none block">“</span>
+                        <p class="font-serif italic text-slate-200 text-xs sm:text-sm leading-relaxed">
+                            {{ \App\Models\Setting::get('founder_quote', 'Ruh bukan sekadar dorongan mistis, melainkan pusat inteligensi tertinggi (Ruhiology Quotient) yang mengendalikan orientasi nilai, kebersihan batin, intuisi kebenaran, serta komitmen etis dalam kehidupan nyata.') }}
+                        </p>
+                        <span class="text-[11px] font-bold text-[#C9A24D] block text-right font-serif">— Prof. Dr. Iskandar Nazari</span>
+                    </div>
+                </div>
+
+                <!-- Right: Bio, Education, & Publications (7 cols) -->
+                <div class="lg:col-span-7 space-y-6">
+                    
+                    <!-- Bio Box -->
+                    <div class="bg-white/5 p-6 sm:p-8 rounded-3xl border border-white/10 space-y-4 backdrop-blur-md">
+                        <h3 class="font-serif font-bold text-lg sm:text-2xl text-white flex items-center gap-2 border-b border-white/10 pb-3">
+                            <span>📖</span> <span>Biografi & Rekam Jejak Akademis</span>
+                        </h3>
+                        <p class="text-xs sm:text-sm text-slate-200 leading-relaxed font-normal">
+                            {{ \App\Models\Setting::get('founder_bio', 'Prof. Dr. Iskandar Nazari merumuskan konsep Ruhiology Quotient (RQ) sebagai navigasi potensi manusia. Penyelidikan ilmiah beliau memadukan prinsip kecerdasan wahyu dengan penyusunan metodologi psikometri ilmiah untuk mengukur ketahanan spiritual dan kesejahteraan mental (WHO-5 Index).') }}
+                        </p>
+                    </div>
+
+                    <!-- Education Grid -->
+                    <div class="bg-white/5 p-6 sm:p-8 rounded-3xl border border-white/10 space-y-4 backdrop-blur-md">
+                        <h3 class="font-serif font-bold text-base sm:text-xl text-[#C9A24D] flex items-center gap-2 border-b border-white/10 pb-3">
+                            <span>🎓</span> <span>Riwayat Pendidikan & Kepakaran</span>
+                        </h3>
+                        <ul class="space-y-2.5 text-xs text-slate-200">
+                            @php
+                                $eduLines = explode("\n", \App\Models\Setting::get('founder_education', "S1 UIN Sulthan Thaha Saifuddin Jambi\nS2 & S3 Psikologi Pendidikan & Studi Islam\nPh.D. & Guru Besar UIN Sulthan Thaha Saifuddin Jambi"));
+                            @endphp
+                            @foreach($eduLines as $edu)
+                                @if(trim($edu))
+                                    <li class="flex items-start gap-3 bg-white/5 p-3 rounded-xl border border-white/5">
+                                        <span class="w-5 h-5 rounded-full bg-[#C9A24D]/20 text-[#C9A24D] flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">✓</span>
+                                        <span class="font-medium text-slate-100">{{ trim($edu) }}</span>
+                                    </li>
+                                @endif
+                            @endforeach
+                        </ul>
+                    </div>
+
+                    <!-- Publications & Main Works -->
+                    <div class="bg-white/5 p-6 sm:p-8 rounded-3xl border border-white/10 space-y-4 backdrop-blur-md">
+                        <h3 class="font-serif font-bold text-base sm:text-xl text-[#C9A24D] flex items-center gap-2 border-b border-white/10 pb-3">
+                            <span>📚</span> <span>Publikasi & Karya Ilmiah Utama</span>
+                        </h3>
+                        <ul class="space-y-2.5 text-xs text-slate-200">
+                            @php
+                                $pubLines = explode("\n", \App\Models\Setting::get('founder_publications', "Buku: Inventori Kecerdasan Ruhiologi (RQI-15 & RQI-30M)\nBuku: Psikologi Pendidikan Berbasis Ruhiologi\nJurnal: Ruhiology Quotient as a Predictor of Mental Well-being (WHO-5)"));
+                            @endphp
+                            @foreach($pubLines as $pub)
+                                @if(trim($pub))
+                                    <li class="flex items-start gap-3 bg-white/5 p-3 rounded-xl border border-white/5">
+                                        <span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">📘</span>
+                                        <span class="font-medium text-slate-100">{{ trim($pub) }}</span>
+                                    </li>
+                                @endif
+                            @endforeach
+                        </ul>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="pt-2 flex flex-wrap items-center gap-4">
+                        <a href="{{ route('catalog.index') }}" class="px-6 py-3.5 bg-[#C9A24D] hover:bg-[#B48A16] text-[#071E30] font-bold text-xs rounded-xl shadow-lg transition transform hover:scale-105 flex items-center gap-2">
+                            <span>📚 Lihat Karya & Buku Founder</span>
+                            <span>→</span>
+                        </a>
+                        <a href="{{ route('consultation.index') }}" class="px-6 py-3.5 bg-white/10 hover:bg-white/20 text-white font-bold text-xs rounded-xl border border-white/20 transition flex items-center gap-2">
+                            <span>💬 Konsultasi & Pendampingan</span>
+                        </a>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
     <!-- SPOTLIGHT RISET & LANDASAN TEORI PROF. ISKANDAR NAZARI -->
     <section class="py-14 sm:py-20 bg-[#0B2A43] text-white border-b border-slate-800">
         <div class="max-w-[1280px] mx-auto px-4 sm:px-10">

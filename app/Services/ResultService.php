@@ -40,9 +40,12 @@ class ResultService
             if (!$question) continue;
 
             $dimensionId = $question->dimension_id;
+            $dimCode = strtolower($question->dimension->code ?? '');
+            $dimName = strtolower($question->dimension->name ?? '');
 
-            if ($question->instrument_id != $instrument->id) {
-                // WHO-5 item
+            $isWho5Item = ($question->instrument_id != $instrument->id) || str_contains($dimCode, 'who') || str_contains($dimName, 'who');
+
+            if ($isWho5Item) {
                 $hasWho5 = true;
                 $val = (int) $answer->raw_value;
                 $who5ItemScore = match($val) {
@@ -54,24 +57,28 @@ class ResultService
                     default => max(0, min(5, $val)),
                 };
                 $who5RawScore += $who5ItemScore;
-                continue;
             }
 
-            if (!isset($dimensionScores[$dimensionId])) {
-                $dimensionScores[$dimensionId] = [
-                    'dimension_id' => $dimensionId,
-                    'score' => 0,
-                    'max_score' => 0,
-                ];
+            if ($dimensionId) {
+                if (!isset($dimensionScores[$dimensionId])) {
+                    $dimensionScores[$dimensionId] = [
+                        'dimension_id' => $dimensionId,
+                        'score' => 0,
+                        'max_score' => 0,
+                    ];
+                }
+
+                $optionMax = $scoringRule?->scale_max ?? 5;
+                $dimensionScores[$dimensionId]['score'] += $answer->calculated_score;
+                $dimensionScores[$dimensionId]['max_score'] += $optionMax;
             }
 
-            $optionMax = $scoringRule?->scale_max ?? 5;
-
-            $dimensionScores[$dimensionId]['score'] += $answer->calculated_score;
-            $dimensionScores[$dimensionId]['max_score'] += $optionMax;
-
-            $totalScore += $answer->calculated_score;
-            $maxScore += $optionMax;
+            // Only accumulate to RQI totalScore if not a WHO-5 item
+            if (!$isWho5Item) {
+                $optionMax = $scoringRule?->scale_max ?? 5;
+                $totalScore += $answer->calculated_score;
+                $maxScore += $optionMax;
+            }
         }
 
         $maxScore = $maxScore > 0 ? $maxScore : 75;

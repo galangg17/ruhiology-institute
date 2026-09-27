@@ -129,7 +129,10 @@
             <div class="pt-4 pb-1 px-3.5 text-[10px] font-extrabold text-slate-400 uppercase tracking-widest font-mono">Pengaturan Sistem</div>
 
             <a href="{{ route('admin.settings.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl transition-all {{ request()->routeIs('admin.settings.*') ? 'bg-slate-800 text-[#C9A24D] font-bold border-l-4 border-[#C9A24D]' : 'hover:bg-slate-900 text-slate-300 hover:text-white' }}">
-                <span>⚙️</span> <span>Pengaturan Landing & Sertifikat</span>
+                <span>⚙️</span> <span>Pengaturan Landing & CMS</span>
+            </a>
+            <a href="{{ route('admin.settings.index') }}#founder" class="flex items-center gap-3 px-3.5 py-2 rounded-xl transition-all text-amber-300/90 hover:bg-slate-900 hover:text-white">
+                <span>👨‍🏫</span> <span>Profil Founder (Prof. Iskandar)</span>
             </a>
             <a href="{{ route('admin.users.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl transition-all {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.audit_logs.*') ? 'bg-slate-800 text-[#C9A24D] font-bold border-l-4 border-[#C9A24D]' : 'hover:bg-slate-900 text-slate-300 hover:text-white' }}">
                 <span>🔑</span> <span>Manajemen User & Audit Log</span>

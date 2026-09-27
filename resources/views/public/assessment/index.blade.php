@@ -25,9 +25,12 @@ window.rqAssessmentIndex = function rqAssessmentIndex() {
         isCategoryLocked: false,
         eventGroupLabel: '',
         eventSubcategories: [],
+        publicInstruments: @json($publicInstruments ?? []),
+        regenciesMap: @json($regenciesMap ?? []),
 
         form: {
             event_code: new URLSearchParams(window.location.search).get('event') || '',
+            instrument_id: '',
             name: '',
             birth_date: '',
             gender: 'Laki-laki',
@@ -40,7 +43,9 @@ window.rqAssessmentIndex = function rqAssessmentIndex() {
             regency_id: null,
             school_level: 'SMA',
             school_class: '',
+            school_custom: '',
             university_id: null,
+            university_custom: '',
             faculty_id: null,
             study_program_id: null,
             semester: 1,
@@ -175,9 +180,12 @@ window.rqAssessmentIndex = function rqAssessmentIndex() {
 
         onProvinceChange() {
             this.form.regency_id = null;
-            this.filteredRegencies = [];
-            if (this.form.province_id) {
+            if (this.form.province_id && this.regenciesMap[this.form.province_id]) {
+                this.filteredRegencies = this.regenciesMap[this.form.province_id];
+            } else if (this.form.province_id) {
                 this.searchRegencies();
+            } else {
+                this.filteredRegencies = [];
             }
         },
 
@@ -619,19 +627,25 @@ document.addEventListener('alpine:init', () => {
                                 <template x-if="form.category === 'Pelajar'">
                                     <div class="p-3.5 bg-amber-50/80 rounded-2xl border border-amber-200/90 space-y-3">
                                         <div>
-                                            <label class="block font-bold text-slate-800 text-xs mb-1">Jenjang Pendidikan *</label>
-                                            <select x-model="form.school_level" class="w-full p-2.5 text-xs font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
-                                                <option value="SMA">SMA (Sekolah Menengah Atas)</option>
-                                                <option value="SMK">SMK (Sekolah Menengah Kejuruan)</option>
-                                                <option value="MA">MA (Madrasah Aliyah)</option>
-                                                <option value="SMP">SMP / MTs (Sekolah Menengah Pertama)</option>
-                                                <option value="SD">SD / MI (Sekolah Dasar)</option>
-                                                <option value="Sederajat">Sederajat / Lainnya</option>
-                                            </select>
+                                            <label class="block font-bold text-slate-800 text-xs mb-1">Nama Sekolah / Madrasah *</label>
+                                            <input type="text" name="school_custom" x-model="form.school_custom" required placeholder="Contoh: SMAN 1 Kota Jambi / SMA Titian Teras" class="w-full p-2.5 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white font-medium">
                                         </div>
-                                        <div>
-                                            <label class="block font-bold text-slate-800 text-xs mb-1">Kelas / Rombel (Opsional)</label>
-                                            <input type="text" x-model="form.school_class" placeholder="Contoh: Kelas X IPA 1 / XI IPS 2" class="w-full p-2.5 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
+                                        <div class="grid grid-cols-2 gap-2.5">
+                                            <div>
+                                                <label class="block font-bold text-slate-800 text-xs mb-1">Jenjang Pendidikan *</label>
+                                                <select x-model="form.school_level" class="w-full p-2.5 text-xs font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
+                                                    <option value="SMA">SMA (Sekolah Menengah Atas)</option>
+                                                    <option value="SMK">SMK (Sekolah Menengah Kejuruan)</option>
+                                                    <option value="MA">MA (Madrasah Aliyah)</option>
+                                                    <option value="SMP">SMP / MTs (Sekolah Menengah Pertama)</option>
+                                                    <option value="SD">SD / MI (Sekolah Dasar)</option>
+                                                    <option value="Sederajat">Sederajat / Lainnya</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label class="block font-bold text-slate-800 text-xs mb-1">Kelas / Rombel (Opsional)</label>
+                                                <input type="text" x-model="form.school_class" placeholder="Contoh: Kelas X IPA 1 / XI IPS 2" class="w-full p-2.5 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
+                                            </div>
                                         </div>
                                     </div>
                                 </template>
@@ -639,17 +653,9 @@ document.addEventListener('alpine:init', () => {
                                 <!-- Mahasiswa Fields -->
                                 <template x-if="form.category === 'Mahasiswa/i'">
                                     <div class="p-3.5 bg-blue-50/70 rounded-2xl border border-blue-200/80 space-y-3">
-                                        <div class="relative">
-                                            <label class="block font-bold text-slate-800 text-xs mb-1">Perguruan Tinggi / Kampus *</label>
-                                            <input type="text" x-model="universityQuery" @focus="showUniversityDropdown = true" @input="searchUniversities()" placeholder="Ketik nama perguruan tinggi..." class="w-full p-2.5 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
-                                            <div x-show="showUniversityDropdown" @click.away="showUniversityDropdown = false" class="absolute z-50 left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-48 overflow-y-auto">
-                                                <template x-for="u in filteredUniversities" :key="u.id">
-                                                    <div @click="selectUniversity(u)" class="p-2 hover:bg-slate-100 cursor-pointer text-xs flex justify-between items-center border-b border-slate-100">
-                                                        <span x-text="u.name" class="font-bold text-[#0B2A43]"></span>
-                                                        <span class="text-[10px] text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded font-mono">Pilih</span>
-                                                    </div>
-                                                </template>
-                                            </div>
+                                        <div>
+                                            <label class="block font-bold text-slate-800 text-xs mb-1">Perguruan Tinggi / Nama Kampus *</label>
+                                            <input type="text" name="university_custom" x-model="form.university_custom" required placeholder="Contoh: Universitas Jambi / UNJA / UI / UGM" class="w-full p-2.5 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white font-medium">
                                         </div>
                                         <div class="grid grid-cols-2 gap-2.5">
                                             <div>

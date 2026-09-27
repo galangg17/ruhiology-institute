@@ -125,10 +125,15 @@ Route::middleware(['auth', \App\Http\Middleware\EnsureAdminAccess::class])
 
         // Assessment Engine: Paket Soal, Bank Soal, Dimensions & Scoring
         Route::get('/instruments', [AdminInstrumentController::class, 'index'])->name('instruments.index');
+        Route::get('/instruments/template/download', [AdminInstrumentController::class, 'downloadTemplate'])->name('instruments.template.download');
+        Route::post('/instruments/import', [AdminInstrumentController::class, 'importCsv'])->name('instruments.import');
         Route::get('/instruments/{instrument}', [AdminInstrumentController::class, 'show'])->name('instruments.show');
         Route::post('/instruments', [AdminInstrumentController::class, 'storeInstrument'])->name('instruments.store');
         Route::put('/instruments/{instrument}', [AdminInstrumentController::class, 'updateInstrument'])->name('instruments.update');
         Route::delete('/instruments/{instrument}', [AdminInstrumentController::class, 'destroyInstrument'])->name('instruments.destroy');
+        Route::post('/instruments/{instrument}/toggle-access', [AdminInstrumentController::class, 'toggleAccessType'])->name('instruments.toggle_access');
+        Route::get('/instruments/{instrument}/export', [AdminInstrumentController::class, 'exportCsv'])->name('instruments.export');
+        Route::post('/instruments/{instrument}/import', [AdminInstrumentController::class, 'importCsv'])->name('instruments.import_specific');
         Route::post('/instruments/{instrument}/dimensions', [AdminInstrumentController::class, 'storeDimension'])->name('instruments.dimensions.store');
         Route::delete('/instruments/{instrument}/dimensions/{dimension}', [AdminInstrumentController::class, 'destroyDimension'])->name('instruments.dimensions.destroy');
         Route::post('/instruments/{instrument}/questions', [AdminInstrumentController::class, 'storeQuestion'])->name('instruments.questions.store');

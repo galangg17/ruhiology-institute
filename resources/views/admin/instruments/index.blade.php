@@ -1,18 +1,26 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="space-y-6" x-data="{ createModal: false, editModal: false, editData: {} }">
+<div class="space-y-6" x-data="{ createModal: false, editModal: false, importModal: false, editData: {} }">
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
         <div>
             <div class="flex items-center gap-2 text-xs text-[#C9A24D] font-bold uppercase tracking-wider">
                 <span>📦 BANK SOAL & INSTRUMEN ASESMEN</span>
             </div>
             <h2 class="text-2xl font-bold font-serif text-[#0B2A43] mt-1">Kelola Paket Soal</h2>
-            <p class="text-xs text-slate-500 mt-0.5">Buat, ganti nama, edit, dan atur berbagai paket instrumen soal asesmen untuk disesuaikan dengan jenis peserta & event.</p>
+            <p class="text-xs text-slate-500 mt-0.5">Buat, impor/ekspor Excel, ganti nama, edit, dan atur akses publik vs event untuk setiap paket instrumen.</p>
         </div>
-        <button @click="createModal = true" class="px-5 py-2.5 bg-[#0B2A43] hover:bg-[#123B59] text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-2 shrink-0">
-            <span>+</span> <span>Buat Paket Soal Baru</span>
-        </button>
+        <div class="flex items-center gap-2 shrink-0">
+            <a href="{{ route('admin.instruments.template.download') }}" class="px-3.5 py-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1.5" title="Download Template Format Excel / CSV">
+                <span>📥</span> <span>Template Excel</span>
+            </a>
+            <button @click="importModal = true" class="px-3.5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5">
+                <span>📊</span> <span>Import Excel</span>
+            </button>
+            <button @click="createModal = true" class="px-4 py-2.5 bg-[#0B2A43] hover:bg-[#123B59] text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5">
+                <span>+</span> <span>Buat Paket Baru</span>
+            </button>
+        </div>
     </div>
 
     <!-- Instruments / Question Packages Grid -->
@@ -24,9 +32,18 @@
                         <span class="text-[10px] font-mono font-bold text-[#0B2A43] bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200 shadow-xs">
                             {{ $inst->code }} • V{{ $inst->version }}
                         </span>
-                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider {{ $inst->status === 'active' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-slate-100 text-slate-600 border border-slate-300' }}">
-                            {{ $inst->status }}
-                        </span>
+                        
+                        <!-- Interactive Access Toggle Badge Button -->
+                        <form action="{{ route('admin.instruments.toggle_access', $inst->id) }}" method="POST" class="inline">
+                            @csrf
+                            <button type="submit" class="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1 shadow-2xs cursor-pointer {{ $inst->access_type === 'public' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 hover:bg-emerald-200' : 'bg-slate-100 text-slate-700 border border-slate-300 hover:bg-slate-200' }}" title="Klik untuk mengubah status akses publik / event">
+                                @if($inst->access_type === 'public')
+                                    <span>🌐 Publik (ON)</span>
+                                @else
+                                    <span>🔒 Khusus Event</span>
+                                @endif
+                            </button>
+                        </form>
                     </div>
 
                     <h3 class="font-bold font-serif text-[#0B2A43] text-base line-clamp-1" title="{{ $inst->name }}">
@@ -48,7 +65,7 @@
                 </div>
 
                 <div class="px-5 py-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2">
-                    <div class="flex items-center gap-1">
+                    <div class="flex items-center gap-1.5">
                         <button @click="editData = {
                             id: {{ $inst->id }},
                             code: '{{ addslashes($inst->code) }}',
@@ -61,16 +78,20 @@
                             ✏️ <span>Edit</span>
                         </button>
 
+                        <a href="{{ route('admin.instruments.export', $inst->id) }}" class="p-1.5 hover:bg-emerald-100 rounded-lg text-emerald-800 transition-all text-xs font-bold flex items-center gap-1" title="Export Paket Soal ke Excel / CSV">
+                            📊 <span>Export</span>
+                        </a>
+
                         <form action="{{ route('admin.instruments.destroy', $inst->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus Paket Soal {{ addslashes($inst->name) }}?');" class="inline">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="p-1.5 hover:bg-rose-100 rounded-lg text-rose-600 transition-all text-xs font-bold flex items-center gap-1" title="Hapus Paket Soal">
-                                🗑️ <span>Hapus</span>
+                                🗑️
                             </button>
                         </form>
                     </div>
 
-                    <a href="{{ route('admin.instruments.show', $inst->id) }}" class="px-3.5 py-1.5 bg-[#0B2A43] hover:bg-[#123B59] text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center gap-1">
+                    <a href="{{ route('admin.instruments.show', $inst->id) }}" class="px-3 py-1.5 bg-[#0B2A43] hover:bg-[#123B59] text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center gap-1">
                         <span>Kelola Soal</span> <span>→</span>
                     </a>
                 </div>
@@ -79,7 +100,7 @@
             <div class="col-span-full bg-white p-12 rounded-2xl border border-slate-200 text-center space-y-3">
                 <div class="text-4xl">📦</div>
                 <h3 class="font-bold text-slate-800 text-base">Belum Ada Paket Soal</h3>
-                <p class="text-xs text-slate-500">Klik tombol "Buat Paket Soal Baru" di atas untuk menambah bank soal pertama Anda.</p>
+                <p class="text-xs text-slate-500">Klik tombol "Buat Paket Soal Baru" atau "Import Excel" untuk menambahkan paket pertama Anda.</p>
             </div>
         @endforelse
     </div>
@@ -174,6 +195,51 @@
                 <div class="pt-3 flex justify-end gap-2 border-t border-slate-100">
                     <button type="button" @click="editModal = false" class="px-4 py-2 border rounded-xl font-semibold text-slate-600">Batal</button>
                     <button type="submit" class="px-5 py-2 bg-[#0B2A43] hover:bg-[#123B59] text-white font-bold rounded-xl shadow">Perbarui Paket Soal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Import Excel Modal -->
+    <div x-show="importModal" x-cloak class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl">📊</span>
+                    <h3 class="font-bold font-serif text-[#0B2A43] text-base">Import Paket Soal dari Excel</h3>
+                </div>
+                <button @click="importModal = false" class="text-slate-400 hover:text-slate-600">✕</button>
+            </div>
+            
+            <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 space-y-1">
+                <strong class="font-bold block">💡 Petunjuk Format File Excel (.csv / .xlsx):</strong>
+                <p>Gunakan format 3 kolom simpel: <code>Kode Dimensi</code>, <code>Nama Dimensi</code>, <code>Teks Pertanyaan</code>, dan <code>Skoring (opsional: normal / reverse)</code>.</p>
+                <a href="{{ route('admin.instruments.template.download') }}" class="inline-flex items-center gap-1 text-emerald-900 font-bold underline mt-1">
+                    📥 Download File Contoh Template Excel Di Sini
+                </a>
+            </div>
+
+            <form action="{{ route('admin.instruments.import') }}" method="POST" enctype="multipart/form-data" class="space-y-4 text-xs">
+                @csrf
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Target Paket Soal (Opsional)</label>
+                    <select name="instrument_id" class="w-full p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
+                        <option value="">-- Buat Paket Soal Baru Otomatis --</option>
+                        @foreach($instruments as $targetInst)
+                            <option value="{{ $targetInst->id }}">Gabungkan ke: {{ $targetInst->name }} ({{ $targetInst->code }})</option>
+                        @endforeach
+                    </select>
+                    <p class="text-[11px] text-slate-400 mt-1">Jika dikosongkan, sistem akan otomatis membuatkan Paket Soal baru dari file Excel yang diunggah.</p>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Pilih File Excel / CSV (.csv, .xlsx) *</label>
+                    <input type="file" name="file" accept=".csv,.xlsx,.txt" required class="w-full p-2 rounded-xl border border-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-[#0B2A43] file:text-white hover:file:bg-[#123B59] cursor-pointer">
+                </div>
+
+                <div class="pt-3 flex justify-end gap-2 border-t border-slate-100">
+                    <button type="button" @click="importModal = false" class="px-4 py-2 border rounded-xl font-semibold text-slate-600">Batal</button>
+                    <button type="submit" class="px-5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl shadow">Proses Import Excel</button>
                 </div>
             </form>
         </div>

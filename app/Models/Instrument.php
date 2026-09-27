@@ -17,6 +17,7 @@ class Instrument extends Model
         'version',
         'instructions',
         'status',
+        'access_type',
     ];
 
     public function dimensions()
