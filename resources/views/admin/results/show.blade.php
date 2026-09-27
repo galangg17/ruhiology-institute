@@ -31,21 +31,21 @@
     </div>
 
     <!-- Pretest vs Posttest Delta Comparison Banner if available -->
-    @if($pretestSubmission && $posttestSubmission)
-        <div class="bg-gradient-to-r from-slate-900 to-navy-900 text-white p-6 rounded-2xl border border-slate-800 shadow-xl space-y-4">
-            <h3 class="text-amber-400 font-bold text-xs uppercase tracking-wider font-serif">🔄 Komparasi Hasil Pretest vs Posttest</h3>
+    @if(isset($pretestSubmission) && isset($posttestSubmission) && $pretestSubmission && $posttestSubmission && $pretestSubmission->result && $posttestSubmission->result)
+        <div class="bg-gradient-to-r from-[#0B2A43] to-[#123B59] text-white p-6 rounded-2xl border border-[#C9A24D]/30 shadow-xl space-y-4 font-sans">
+            <h3 class="text-[#C9A24D] font-bold text-xs uppercase tracking-wider font-serif">🔄 Komparasi Hasil Pretest vs Posttest</h3>
             
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
-                <div class="bg-navy-950 p-4 rounded-xl border border-slate-800">
-                    <span class="text-[10px] text-slate-400 uppercase block font-bold">Skor Pretest</span>
-                    <span class="text-2xl font-bold text-sky-400">{{ number_format($pretestSubmission->result->percentage, 1) }}%</span>
+                <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700/80">
+                    <span class="text-[10px] text-slate-400 uppercase block font-bold font-mono">Skor Pretest</span>
+                    <span class="text-2xl font-bold text-sky-400 font-mono">{{ number_format($pretestSubmission->result->percentage, 1) }}%</span>
                 </div>
-                <div class="bg-navy-950 p-4 rounded-xl border border-slate-800">
-                    <span class="text-[10px] text-slate-400 uppercase block font-bold">Skor Posttest</span>
-                    <span class="text-2xl font-bold text-emerald-400">{{ number_format($posttestSubmission->result->percentage, 1) }}%</span>
+                <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700/80">
+                    <span class="text-[10px] text-slate-400 uppercase block font-bold font-mono">Skor Posttest</span>
+                    <span class="text-2xl font-bold text-emerald-400 font-mono">{{ number_format($posttestSubmission->result->percentage, 1) }}%</span>
                 </div>
-                <div class="bg-navy-950 p-4 rounded-xl border border-slate-800">
-                    <span class="text-[10px] text-slate-400 uppercase block font-bold">Perkembangan Delta</span>
+                <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700/80">
+                    <span class="text-[10px] text-slate-400 uppercase block font-bold font-mono">Perkembangan Delta</span>
                     <span class="text-2xl font-bold font-mono {{ ($posttestSubmission->result->percentage - $pretestSubmission->result->percentage) >= 0 ? 'text-emerald-400' : 'text-rose-400' }}">
                         {{ ($posttestSubmission->result->percentage - $pretestSubmission->result->percentage) >= 0 ? '+' : '' }}{{ number_format($posttestSubmission->result->percentage - $pretestSubmission->result->percentage, 1) }}%
                     </span>

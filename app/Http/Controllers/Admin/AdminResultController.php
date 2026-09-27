@@ -74,7 +74,24 @@ class AdminResultController extends Controller
             'answers.option'
         ]);
 
-        return view('admin.results.show', compact('submission'));
+        $pretestSubmission = null;
+        $posttestSubmission = null;
+
+        if ($submission->participant_id && $submission->period_id) {
+            $pretestSubmission = AssessmentSubmission::where('participant_id', $submission->participant_id)
+                ->where('period_id', $submission->period_id)
+                ->whereIn('submission_type', ['pretest', 'PRETEST'])
+                ->with('result')
+                ->first();
+
+            $posttestSubmission = AssessmentSubmission::where('participant_id', $submission->participant_id)
+                ->where('period_id', $submission->period_id)
+                ->whereIn('submission_type', ['posttest', 'POSTTEST'])
+                ->with('result')
+                ->first();
+        }
+
+        return view('admin.results.show', compact('submission', 'pretestSubmission', 'posttestSubmission'));
     }
 
     public function exportCsv(Request $request)
