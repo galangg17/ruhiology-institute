@@ -34,11 +34,25 @@ class AdminCmsController extends Controller
             'content' => ['required', 'string'],
             'author' => ['required', 'string'],
             'status' => ['required', 'in:draft,published'],
+            'featured_image' => ['nullable', 'string'],
+            'image_file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
         ]);
+
+        if ($request->hasFile('image_file')) {
+            $file = $request->file('image_file');
+            $filename = 'article_' . time() . '_' . Str::random(5) . '.' . $file->getClientOriginalExtension();
+            $path = public_path('images/articles');
+            if (!file_exists($path)) {
+                mkdir($path, 0755, true);
+            }
+            $file->move($path, $filename);
+            $validated['featured_image'] = asset('images/articles/' . $filename);
+        }
 
         $validated['slug'] = Str::slug($validated['title']) . '-' . Str::random(5);
         $validated['published_at'] = $validated['status'] === 'published' ? now() : null;
 
+        unset($validated['image_file']);
         $article = Article::create($validated);
 
         AuditLogService::log(
@@ -49,7 +63,64 @@ class AdminCmsController extends Controller
             changes: $validated
         );
 
-        return back()->with('success', 'Konten berhasil disimpan.');
+        return back()->with('success', 'Konten artikel / berita berhasil disimpan.');
+    }
+
+    public function updateArticle(Request $request, Article $article)
+    {
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'type' => ['required', 'in:article,news'],
+            'category_id' => ['nullable', 'exists:article_categories,id'],
+            'excerpt' => ['nullable', 'string'],
+            'content' => ['required', 'string'],
+            'author' => ['required', 'string'],
+            'status' => ['required', 'in:draft,published'],
+            'featured_image' => ['nullable', 'string'],
+            'image_file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
+        ]);
+
+        if ($request->hasFile('image_file')) {
+            $file = $request->file('image_file');
+            $filename = 'article_' . time() . '_' . Str::random(5) . '.' . $file->getClientOriginalExtension();
+            $path = public_path('images/articles');
+            if (!file_exists($path)) {
+                mkdir($path, 0755, true);
+            }
+            $file->move($path, $filename);
+            $validated['featured_image'] = asset('images/articles/' . $filename);
+        }
+
+        if ($validated['status'] === 'published' && !$article->published_at) {
+            $validated['published_at'] = now();
+        }
+
+        unset($validated['image_file']);
+        $article->update($validated);
+
+        AuditLogService::log(
+            action: 'update_article',
+            module: 'CMS',
+            recordType: 'Article',
+            recordId: (string) $article->id,
+            changes: $validated
+        );
+
+        return back()->with('success', 'Konten artikel / berita berhasil diperbarui.');
+    }
+
+    public function destroyArticle(Article $article)
+    {
+        AuditLogService::log(
+            action: 'delete_article',
+            module: 'CMS',
+            recordType: 'Article',
+            recordId: (string) $article->id,
+            changes: ['title' => $article->title]
+        );
+
+        $article->delete();
+        return back()->with('success', 'Artikel / berita berhasil dihapus.');
     }
 
     // QUOTES

@@ -184,6 +184,8 @@ Route::middleware(['auth', \App\Http\Middleware\EnsureAdminAccess::class])
         // CMS (Articles, Quotes, Testimonials)
         Route::get('/articles', [AdminCmsController::class, 'articles'])->name('articles.index');
         Route::post('/articles', [AdminCmsController::class, 'storeArticle'])->name('articles.store');
+        Route::put('/articles/{article}', [AdminCmsController::class, 'updateArticle'])->name('articles.update');
+        Route::delete('/articles/{article}', [AdminCmsController::class, 'destroyArticle'])->name('articles.destroy');
         Route::get('/quotes', [AdminCmsController::class, 'quotes'])->name('quotes.index');
         Route::post('/quotes', [AdminCmsController::class, 'storeQuote'])->name('quotes.store');
         Route::get('/testimonials', [AdminCmsController::class, 'testimonials'])->name('testimonials.index');
