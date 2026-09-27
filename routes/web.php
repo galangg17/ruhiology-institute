@@ -121,6 +121,9 @@ Route::middleware(['auth', \App\Http\Middleware\EnsureAdminAccess::class])
         Route::resource('programs', AdminProgramController::class);
 
         // Participant Management
+        Route::get('/participants/export', [AdminParticipantController::class, 'exportCsv'])->name('participants.export');
+        Route::get('/participants/template/download', [AdminParticipantController::class, 'downloadTemplate'])->name('participants.template.download');
+        Route::post('/participants/import', [AdminParticipantController::class, 'importCsv'])->name('participants.import');
         Route::resource('participants', AdminParticipantController::class);
 
         // Assessment Engine: Paket Soal, Bank Soal, Dimensions & Scoring
