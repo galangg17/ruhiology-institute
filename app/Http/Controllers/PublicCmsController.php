@@ -49,8 +49,14 @@ class PublicCmsController extends Controller
 
     public function newsShow(string $slug)
     {
-        $article = Article::where('slug', $slug)->firstOrFail();
-        return view('public.cms.article_show', compact('article'));
+        $article = Article::where('slug', $slug)->with('category')->firstOrFail();
+        $recentArticles = Article::where('status', 'published')
+            ->where('id', '!=', $article->id)
+            ->latest('published_at')
+            ->take(3)
+            ->get();
+
+        return view('public.cms.article_show', compact('article', 'recentArticles'));
     }
 
     public function quotes()
