@@ -942,7 +942,8 @@
                         <x-article-card 
                             :title="$article->title"
                             :category="$article->type === 'news' ? 'Berita' : 'Artikel'"
-                            :date="$article->published_at ? \Carbon\Carbon::parse($article->published_at)->format('d M Y') : '12 Mar 2025'"
+                            :date="$article->published_at ? \Carbon\Carbon::parse($article->published_at)->format('d M Y · H:i') . ' WIB' : '12 Mar 2025'"
+                            :image="$article->featured_image"
                             :url="route('articles.show', $article->slug)"
                         />
                     @endforeach

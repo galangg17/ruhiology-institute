@@ -12,12 +12,18 @@
         excerpt: '',
         content: '',
         author: 'Prof. Dr. Iskandar Nazari',
+        published_at: '',
         status: 'published',
         featured_image: ''
     },
     editPreviewUrl: '',
     createPreviewUrl: '',
     openEdit(art) {
+        let pubAtFormatted = '';
+        if (art.published_at) {
+            let d = new Date(art.published_at);
+            pubAtFormatted = d.toISOString().slice(0, 16);
+        }
         this.editData = {
             id: art.id,
             title: art.title,
@@ -26,6 +32,7 @@
             excerpt: art.excerpt || '',
             content: art.content || '',
             author: art.author || 'Prof. Dr. Iskandar Nazari',
+            published_at: pubAtFormatted,
             status: art.status || 'published',
             featured_image: art.featured_image || ''
         };
@@ -49,7 +56,7 @@
     <div class="flex justify-between items-center">
         <div>
             <h2 class="text-xl sm:text-2xl font-bold font-serif text-slate-900 tracking-tight">Kelola Artikel & Berita Institusi</h2>
-            <p class="text-xs text-slate-500 mt-0.5">Publikasi karya ilmiah, kajian ruhiologi, rilis pers, dan berita resmi institute.</p>
+            <p class="text-xs text-slate-500 mt-0.5">Publikasi karya ilmiah, kajian ruhiologi, rilis pers, serta tanggal & jam tayang berita resmi institute.</p>
         </div>
         <button @click="createModal = true" class="px-4 py-2.5 bg-[#0B2A43] hover:bg-[#123B59] text-white font-bold text-xs rounded-xl shadow-md border border-[#C9A24D]/30 transition flex items-center gap-1.5 cursor-pointer">
             <span>+</span> <span>Tambah Artikel / Berita Baru</span>
@@ -104,7 +111,7 @@
                         <th class="px-4 py-3.5 whitespace-nowrap">Tipe</th>
                         <th class="px-4 py-3.5 whitespace-nowrap">Kategori</th>
                         <th class="px-4 py-3.5 whitespace-nowrap">Penulis</th>
-                        <th class="px-4 py-3.5 whitespace-nowrap">Tanggal Rilis</th>
+                        <th class="px-4 py-3.5 whitespace-nowrap">Tanggal & Jam Rilis</th>
                         <th class="px-4 py-3.5 whitespace-nowrap text-center">Status</th>
                         <th class="px-4 py-3.5 text-right whitespace-nowrap">Aksi</th>
                     </tr>
@@ -152,9 +159,14 @@
                                 <span class="text-slate-800 font-bold text-xs">{{ $art->author ?: 'Prof. Dr. Iskandar Nazari' }}</span>
                             </td>
 
-                            <!-- Date -->
+                            <!-- Date and Time -->
                             <td class="p-4 font-mono text-[11px] text-slate-600">
-                                {{ $art->published_at ? $art->published_at->format('d/m/Y') : '-' }}
+                                @if($art->published_at)
+                                    <span class="font-bold text-slate-800 block">{{ $art->published_at->format('d M Y') }}</span>
+                                    <span class="text-[10px] text-amber-800 font-bold">⏰ {{ $art->published_at->format('H:i') }} WIB</span>
+                                @else
+                                    <span>-</span>
+                                @endif
                             </td>
 
                             <!-- Status -->
@@ -206,7 +218,7 @@
         </div>
     </div>
 
-    <!-- MODAL 1: CREATE NEW ARTICLE / NEWS WITH IMAGE UPLOADER -->
+    <!-- MODAL 1: CREATE NEW ARTICLE / NEWS WITH IMAGE UPLOADER & DATETIME PICKER -->
     <div x-show="createModal" x-cloak class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
@@ -279,10 +291,14 @@
                     <textarea name="content" rows="6" required placeholder="Tuliskan narasi artikel secara lengkap di sini..." class="w-full p-2.5 rounded-xl border border-slate-300 font-sans"></textarea>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
                         <label class="block font-bold text-slate-700 mb-1">Nama Penulis / Author *</label>
                         <input type="text" name="author" value="Prof. Dr. Iskandar Nazari" required class="w-full p-2.5 rounded-xl border border-slate-300">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Tanggal & Jam Rilis ⏰</label>
+                        <input type="datetime-local" name="published_at" value="{{ date('Y-m-d\TH:i') }}" class="w-full p-2.5 rounded-xl border border-slate-300 font-mono text-xs">
                     </div>
                     <div>
                         <label class="block font-bold text-slate-700 mb-1">Status Publikasi *</label>
@@ -301,7 +317,7 @@
         </div>
     </div>
 
-    <!-- MODAL 2: EDIT ARTICLE / NEWS WITH IMAGE UPLOADER -->
+    <!-- MODAL 2: EDIT ARTICLE / NEWS WITH IMAGE UPLOADER & DATETIME PICKER -->
     <div x-show="editModal" x-cloak class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
@@ -375,10 +391,14 @@
                     <textarea name="content" x-model="editData.content" rows="6" required class="w-full p-2.5 rounded-xl border border-slate-300 font-sans"></textarea>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
                         <label class="block font-bold text-slate-700 mb-1">Nama Penulis / Author *</label>
                         <input type="text" name="author" x-model="editData.author" required class="w-full p-2.5 rounded-xl border border-slate-300">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Tanggal & Jam Rilis ⏰</label>
+                        <input type="datetime-local" name="published_at" x-model="editData.published_at" class="w-full p-2.5 rounded-xl border border-slate-300 font-mono text-xs">
                     </div>
                     <div>
                         <label class="block font-bold text-slate-700 mb-1">Status Publikasi *</label>

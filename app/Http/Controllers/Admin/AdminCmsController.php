@@ -34,6 +34,7 @@ class AdminCmsController extends Controller
             'content' => ['required', 'string'],
             'author' => ['required', 'string'],
             'status' => ['required', 'in:draft,published'],
+            'published_at' => ['nullable', 'date'],
             'featured_image' => ['nullable', 'string'],
             'image_file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
         ]);
@@ -50,7 +51,11 @@ class AdminCmsController extends Controller
         }
 
         $validated['slug'] = Str::slug($validated['title']) . '-' . Str::random(5);
-        $validated['published_at'] = $validated['status'] === 'published' ? now() : null;
+        if ($request->filled('published_at')) {
+            $validated['published_at'] = \Carbon\Carbon::parse($request->published_at);
+        } else {
+            $validated['published_at'] = $validated['status'] === 'published' ? now() : null;
+        }
 
         unset($validated['image_file']);
         $article = Article::create($validated);
@@ -76,6 +81,7 @@ class AdminCmsController extends Controller
             'content' => ['required', 'string'],
             'author' => ['required', 'string'],
             'status' => ['required', 'in:draft,published'],
+            'published_at' => ['nullable', 'date'],
             'featured_image' => ['nullable', 'string'],
             'image_file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
         ]);
@@ -91,7 +97,9 @@ class AdminCmsController extends Controller
             $validated['featured_image'] = asset('images/articles/' . $filename);
         }
 
-        if ($validated['status'] === 'published' && !$article->published_at) {
+        if ($request->filled('published_at')) {
+            $validated['published_at'] = \Carbon\Carbon::parse($request->published_at);
+        } elseif ($validated['status'] === 'published' && !$article->published_at) {
             $validated['published_at'] = now();
         }
 

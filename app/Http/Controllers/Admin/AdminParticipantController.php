@@ -36,7 +36,8 @@ class AdminParticipantController extends Controller
             'regency',
             'school',
             'university',
-            'submissions.instrument'
+            'submissions.period.instrument',
+            'submissions.result'
         ]);
 
         if ($request->filled('access_type')) {
@@ -101,8 +102,8 @@ class AdminParticipantController extends Controller
             'regency',
             'school',
             'university',
-            'submissions.period',
-            'submissions.instrument'
+            'submissions.period.instrument',
+            'submissions.result'
         ]);
 
         if (request()->wantsJson() || request()->ajax()) {
