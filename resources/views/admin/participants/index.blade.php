@@ -4,6 +4,7 @@
 <div class="space-y-6" x-data="{ 
     createModal: false, 
     importModal: false,
+    importServerModal: false,
     editModal: false,
     drawerOpen: false,
     drawerTab: 'profile',
@@ -80,8 +81,11 @@
             <a href="{{ route('admin.participants.export', request()->all()) }}" class="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer">
                 <span>📊</span> <span>Export CSV</span>
             </a>
+            <button @click="importServerModal = true" class="px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer">
+                <span>📥</span> <span>Impor Data Server (.csv)</span>
+            </button>
             <button @click="importModal = true" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer">
-                <span>📥</span> <span>Import Excel / CSV</span>
+                <span>📥</span> <span>Import Template Peserta</span>
             </button>
             <button @click="createModal = true" class="px-4 py-2 bg-[#0B2A43] hover:bg-[#123B59] text-white font-bold text-xs rounded-xl shadow-md border border-[#C9A24D]/30 transition flex items-center gap-1.5 cursor-pointer">
                 <span>+</span> <span>Tambah Peserta Baru</span>
@@ -803,6 +807,50 @@
                 <div class="pt-2 flex justify-end gap-2 border-t border-slate-100">
                     <button type="button" @click="importModal = false" class="px-4 py-2 border rounded-xl font-bold text-slate-600">Batal</button>
                     <button type="submit" class="px-6 py-2 bg-[#0B2A43] text-white font-bold rounded-xl shadow-md cursor-pointer">Mulai Import Data</button>
+                </div>
+            </form>
+        </div>
+    <!-- MODAL IMPOR DATA SERVER ONLINE (.CSV) -->
+    <div x-show="importServerModal" x-cloak class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-white max-w-xl w-full rounded-3xl p-6 border border-slate-200 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="font-serif font-bold text-lg text-[#0B2A43] flex items-center gap-2">
+                    <span>🌐</span> <span>Impor Data Asesmen Server Online (.csv)</span>
+                </h3>
+                <button @click="importServerModal = false" class="text-slate-400 hover:text-slate-600 text-lg font-bold">✕</button>
+            </div>
+
+            <div class="p-3.5 bg-amber-50 rounded-2xl border border-amber-200 text-xs text-amber-900 space-y-1.5">
+                <strong class="font-bold block flex items-center gap-1 text-amber-950">
+                    <span>💡</span> <span>Sinkronisasi Otomatis Bebas Duplikasi:</span>
+                </strong>
+                <ul class="list-disc list-inside text-[11px] leading-relaxed space-y-0.5 text-amber-900">
+                    <li>Unggah file hasil ekspor CSV langsung dari server online.</li>
+                    <li>Sistem mengecek <strong>Kode Assessment</strong> (`SUB-...`). Data yang sudah ada di lokal akan <strong>otomatis dilewati (Skip)</strong>.</li>
+                    <li>Peserta tanpa nama/anonim otomatis dikategorikan sebagai <strong>Peserta Mandiri (Publik)</strong>.</li>
+                    <li>Otomatis memetakan 38 Provinsi, Kabupaten/Kota, Skor RQI (0-100), dan WHO-5 (%).</li>
+                </ul>
+            </div>
+
+            <form action="{{ route('admin.participants.import_server_csv') }}" method="POST" enctype="multipart/form-data" class="space-y-4 text-xs font-sans">
+                @csrf
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Opsi 1: Unggah File CSV Server (.csv)</label>
+                    <input type="file" name="csv_file" accept=".csv,text/csv" class="w-full p-2.5 rounded-xl border border-slate-300 bg-slate-50">
+                </div>
+
+                <div class="text-center font-bold text-slate-400 text-[10px] uppercase tracking-wider">— ATAU —</div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Opsi 2: Tempelkan Teks CSV Langsung</label>
+                    <textarea name="csv_text" rows="4" placeholder="Tempelkan baris teks CSV dari server di sini..." class="w-full p-2.5 rounded-xl border border-slate-300 bg-slate-50 font-mono text-[11px]"></textarea>
+                </div>
+
+                <div class="pt-3 flex justify-end gap-2 border-t border-slate-100">
+                    <button type="button" @click="importServerModal = false" class="px-4 py-2 border rounded-xl font-bold text-slate-600">Batal</button>
+                    <button type="submit" class="px-6 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl shadow-md cursor-pointer flex items-center gap-1.5">
+                        <span>📥</span> <span>Proses Impor & Sinkronisasi</span>
+                    </button>
                 </div>
             </form>
         </div>

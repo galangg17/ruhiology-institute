@@ -432,4 +432,39 @@ class AdminParticipantController extends Controller
 
         return back()->with('success', "Import Data Peserta berhasil: {$created} peserta ditambahkan, {$skipped} dilewati/duplikat.");
     }
+
+    public function importServerCsv(Request $request)
+    {
+        $request->validate([
+            'csv_file' => ['nullable', 'file', 'mimes:csv,txt,excel', 'max:10240'],
+            'csv_text' => ['nullable', 'string'],
+        ]);
+
+        $csvContent = null;
+        if ($request->hasFile('csv_file')) {
+            $csvContent = file_get_contents($request->file('csv_file')->getRealPath());
+        } elseif ($request->filled('csv_text')) {
+            $csvContent = $request->csv_text;
+        }
+
+        if (!$csvContent) {
+            return back()->with('error', 'Silakan pilih file CSV atau tempelkan teks CSV.');
+        }
+
+        $result = \App\Services\CsvImportService::importFromCsvContent($csvContent);
+
+        if (!empty($result['error'])) {
+            return back()->with('error', $result['error']);
+        }
+
+        AuditLogService::log(
+            action: 'import_server_csv',
+            module: 'Participants',
+            recordType: 'AssessmentSubmission',
+            recordId: 'batch_server_import',
+            changes: ['imported' => $result['imported'], 'skipped' => $result['skipped'], 'total' => $result['total']]
+        );
+
+        return back()->with('success', "Impor data asesmen server berhasil: {$result['imported']} data baru ditambahkan, {$result['skipped']} data duplikat dilewati.");
+    }
 }
