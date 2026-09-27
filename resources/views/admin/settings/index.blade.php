@@ -259,53 +259,58 @@
 
                         <!-- 1. Header with Logo -->
                         <div class="space-y-0.5 pt-0.5 flex flex-col items-center">
-                            <img :src="certLogoUrl" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=RQ&background=0B2A43&color=C9A24D';" class="h-6 w-6 object-contain mx-auto" alt="Logo">
-                            <span class="block text-[7px] font-bold tracking-widest uppercase text-[#0B2A43]" x-text="'RUHIOLOGY INSTITUTE'"></span>
-                            <h4 class="font-serif font-black text-[10px] uppercase text-[#0B2A43] leading-tight" x-text="certTitle"></h4>
-                            <p class="text-[6px] italic text-amber-800 font-serif" x-text="certSubtitle"></p>
+                            <img :src="certLogoUrl" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=RQ&background=0B2A43&color=C9A24D';" class="h-5 w-5 object-contain mx-auto" alt="Logo">
+                            <span class="block text-[6px] font-bold tracking-widest uppercase text-[#0B2A43]" x-text="'RUHIOLOGY INSTITUTE'"></span>
+                            <h4 class="font-serif font-black text-[9px] uppercase text-[#0B2A43] leading-tight" x-text="certTitle"></h4>
+                            <p class="text-[5px] italic text-amber-800 font-serif" x-text="certSubtitle"></p>
                         </div>
 
                         <!-- 2. Body Centered -->
                         <div class="space-y-0.5 my-0.5">
                             <span class="text-[5px] uppercase font-serif tracking-widest text-slate-500 font-bold block">Diberikan Kepada :</span>
-                            <h5 class="font-serif font-bold text-[11px] text-[#0B2A43] border-b border-amber-400 inline-block px-3" x-text="'NAMA PESERTA CONTOH'"></h5>
-                            <p class="text-[6px] text-slate-600 line-clamp-2 leading-tight px-2" x-text="certBody"></p>
+                            <h5 class="font-serif font-bold text-[10px] text-[#0B2A43] border-b border-amber-400 inline-block px-3" x-text="'NAMA PESERTA CONTOH'"></h5>
+                            <p class="text-[5px] text-slate-600 line-clamp-1 leading-tight px-2" x-text="certBody"></p>
                             
-                            <!-- Main Score Badge -->
-                            <div class="text-[6px] font-bold text-amber-900 bg-amber-100/90 px-2 py-0.5 rounded-full inline-block border border-amber-300">
-                                Skor RQI: 85.0 (Tinggi / Paripurna)
+                            <!-- Dual Main Score Badges (RQI + WHO-5) -->
+                            <div class="grid grid-cols-2 gap-1 max-w-[90%] mx-auto py-0.5">
+                                <div class="bg-amber-50/90 p-0.5 rounded border border-amber-300 text-center">
+                                    <span class="block text-[4.5px] font-mono font-bold text-amber-900 uppercase">Skor RQI: 85.0</span>
+                                    <span class="text-[4.5px] font-bold text-[#0B2A43] truncate block">✦ Level 5: Paripurna</span>
+                                </div>
+                                <div class="bg-emerald-50/90 p-0.5 rounded border border-emerald-300 text-center">
+                                    <span class="block text-[4.5px] font-mono font-bold text-emerald-900 uppercase">Indeks WHO-5: 88%</span>
+                                    <span class="text-[4.5px] font-bold text-emerald-800 truncate block">🌱 Kesejahteraan Baik</span>
+                                </div>
                             </div>
 
                             <!-- 5-Dimension Mini Grid Preview -->
-                            <div class="grid grid-cols-5 gap-1 max-w-[90%] mx-auto pt-0.5">
-                                <div class="bg-white/80 p-0.5 rounded text-[5px] border border-amber-200 text-center font-mono">Nafl: 88%</div>
-                                <div class="bg-white/80 p-0.5 rounded text-[5px] border border-amber-200 text-center font-mono">Nurani: 84%</div>
-                                <div class="bg-white/80 p-0.5 rounded text-[5px] border border-amber-200 text-center font-mono">Resil: 80%</div>
-                                <div class="bg-white/80 p-0.5 rounded text-[5px] border border-amber-200 text-center font-mono">Wahyu: 85%</div>
-                                <div class="bg-white/80 p-0.5 rounded text-[5px] border border-amber-200 text-center font-mono">Etis: 88%</div>
+                            <div class="grid grid-cols-5 gap-0.5 max-w-[90%] mx-auto">
+                                <div class="bg-white/80 p-0.5 rounded text-[4.5px] border border-amber-200 text-center font-mono">Nafl: 88%</div>
+                                <div class="bg-white/80 p-0.5 rounded text-[4.5px] border border-amber-200 text-center font-mono">Nurani: 84%</div>
+                                <div class="bg-white/80 p-0.5 rounded text-[4.5px] border border-amber-200 text-center font-mono">Resil: 80%</div>
+                                <div class="bg-white/80 p-0.5 rounded text-[4.5px] border border-amber-200 text-center font-mono">Wahyu: 85%</div>
+                                <div class="bg-white/80 p-0.5 rounded text-[4.5px] border border-amber-200 text-center font-mono">Etis: 88%</div>
                             </div>
                         </div>
 
-                        <!-- 3. Footer & Signature -->
+                        <!-- 3. Footer & QR Verification (Opsi A) -->
                         <div class="space-y-0.5">
-                            <p class="text-[5px] font-serif italic text-slate-500 line-clamp-1">"Ruh adalah pusat inteligensi tertinggi yang mengendalikan orientasi nilai." — Prof. Iskandar Nazari</p>
+                            <p class="text-[4.5px] font-serif italic text-slate-500 line-clamp-1">"Ruh adalah pusat inteligensi tertinggi yang mengendalikan orientasi nilai." — Prof. Iskandar Nazari</p>
                             
                             <div class="flex justify-between items-end pt-0.5 border-t border-amber-200 text-[5px]">
                                 <div class="text-left">
-                                    <span class="font-mono text-slate-400 block">NO: CERT/RQI/2026/SAMPLE</span>
-                                    <span class="text-emerald-700 font-bold">✓ Terverifikasi Resmi</span>
+                                    <span class="font-mono text-slate-400 block text-[4.5px]">NO: CERT/RQI/2026/SAMPLE</span>
+                                    <span class="text-emerald-700 font-bold text-[4.5px]">✓ Terverifikasi Resmi</span>
                                 </div>
-                                <div class="text-center space-y-0.5 min-w-[80px]">
-                                    <div class="h-5 flex items-center justify-center">
-                                        <template x-if="signatureUrl">
-                                            <img :src="signatureUrl" class="max-h-5 max-w-[70px] object-contain">
-                                        </template>
-                                        <template x-if="!signatureUrl">
-                                            <span class="italic text-slate-400 text-[6px] border-b border-dashed border-slate-300">Prof. Iskandar Nazari</span>
-                                        </template>
+                                <div class="text-center space-y-0.5 min-w-[70px]">
+                                    <!-- QR Code Menggantikan TTD (Opsi A) -->
+                                    <div class="h-6 flex items-center justify-center">
+                                        <div class="p-0.5 bg-white border border-amber-300 rounded inline-block">
+                                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=50x50&data=https%3A%2F%2Fruhiology.id%2Fsample" class="h-5 w-5 object-contain mx-auto" alt="QR Verifikasi">
+                                        </div>
                                     </div>
-                                    <span class="font-bold block text-[6px] text-[#0B2A43] leading-tight" x-text="founderName"></span>
-                                    <span class="text-amber-800 text-[5px] block" x-text="founderTitle"></span>
+                                    <span class="font-bold block text-[5px] text-[#0B2A43] leading-tight" x-text="founderName"></span>
+                                    <span class="text-amber-800 text-[4.5px] block truncate" x-text="founderTitle"></span>
                                 </div>
                             </div>
                         </div>
