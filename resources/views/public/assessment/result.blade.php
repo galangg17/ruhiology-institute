@@ -578,18 +578,35 @@ function rqResultPage() {
                 const categoryText = '✦ {{ addslashes($catName) }}';
                 ctx.fillStyle = '#C9A24D';
                 ctx.beginPath();
-                ctx.roundRect(120, 890, 840, 90, 45);
+                ctx.roundRect(120, 830, 840, 80, 40);
                 ctx.fill();
 
                 ctx.fillStyle = '#0B2A43';
-                let fontSize = 32;
+                let fontSize = 30;
                 if (categoryText.length > 35) {
-                    fontSize = 24;
+                    fontSize = 22;
                 } else if (categoryText.length > 25) {
-                    fontSize = 28;
+                    fontSize = 26;
                 }
                 ctx.font = `bold ${fontSize}px "Outfit", sans-serif`;
-                ctx.fillText(categoryText, 540, 945);
+                ctx.fillText(categoryText, 540, 880);
+
+                // WHO-5 Mental Well-Being Badge
+                @php
+                    $who5PctCanvas = number_format($submission->result->who5_percentage ?? 0, 0);
+                    $who5NoteCanvas = addslashes($submission->result->who5_screening_note ?? (($submission->result->who5_percentage ?? 0) >= 50 ? 'Kesejahteraan Baik' : 'Indikasi Perlu Skrining'));
+                @endphp
+                ctx.fillStyle = 'rgba(16, 185, 129, 0.2)';
+                ctx.beginPath();
+                ctx.roundRect(120, 930, 840, 65, 32);
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(52, 211, 153, 0.5)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.fillStyle = '#6ee7b7';
+                ctx.font = 'bold 22px "Plus Jakarta Sans", sans-serif';
+                ctx.fillText('🌱 WHO-5 MENTAL WELL-BEING: {{ $who5PctCanvas }}% ({{ $who5NoteCanvas }})', 540, 972);
 
                 // Minimalist Narrative Quote Box
                 ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';

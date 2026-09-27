@@ -316,35 +316,60 @@
                         </div>
                     </div>
 
-                    <!-- PREVIEW TAB 2: KARTU HASIL STORY 9:16 -->
-                    <div x-show="activeTab === 'story'" class="relative aspect-[9/16] max-w-[220px] mx-auto w-full bg-[#0B2A43] text-white p-4 rounded-2xl border-2 border-slate-700 shadow-2xl overflow-hidden flex flex-col justify-between text-center select-none"
+                    <!-- PREVIEW TAB 2: KARTU HASIL STORY 9:16 (ULTRA MODERN GLASSMORPHIC) -->
+                    <div x-show="activeTab === 'story'" class="relative aspect-[9/16] max-w-[240px] mx-auto w-full bg-gradient-to-b from-[#071E30] via-[#0B2A43] to-[#071E30] text-white p-3.5 rounded-3xl border-2 border-[#C9A24D]/50 shadow-2xl overflow-hidden flex flex-col justify-between text-center select-none"
                          :style="storyBgUrl ? `background-image: url('${storyBgUrl}'); background-size: cover; background-position: center;` : ''">
                         
+                        <!-- Ambient Radial Glow -->
+                        <div class="absolute -top-10 -left-10 w-32 h-32 bg-[#C9A24D]/20 rounded-full blur-2xl pointer-events-none"></div>
+
                         <!-- Top Header -->
-                        <div class="space-y-1 pt-2">
-                            <span class="text-[7px] font-bold font-mono text-[#C9A24D] uppercase tracking-widest block">RUHIOLOGY INSTITUTE</span>
-                            <span class="text-[6px] font-mono text-slate-300 block">INDEKS KECERDASAN RUHIOLOGI (RQI)</span>
+                        <div class="space-y-0.5 pt-1 relative z-10">
+                            <img :src="certLogoUrl" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=RQ&background=0B2A43&color=C9A24D';" class="h-6 w-6 object-contain mx-auto" alt="Logo">
+                            <span class="text-[7.5px] font-bold font-serif-gold text-[#C9A24D] uppercase tracking-widest block">RUHIOLOGY INSTITUTE</span>
+                            <span class="text-[5.5px] font-mono text-slate-300 uppercase tracking-wider block">LAPORAN HASIL RQI & WHO-5</span>
                         </div>
 
-                        <!-- Central Score -->
-                        <div class="my-2 py-2 bg-white/10 rounded-xl border border-white/15 backdrop-blur space-y-1">
-                            <span class="text-[7px] text-[#C9A24D] font-mono uppercase block">PESERTA: CONTOH PESERTA</span>
-                            <div class="text-2xl font-black font-serif text-white">85.0</div>
-                            <span class="text-[7px] bg-[#C9A24D] text-slate-950 font-bold px-2 py-0.5 rounded-full inline-block">✦ Tinggi / Paripurna</span>
+                        <!-- Participant Glass Box -->
+                        <div class="my-1 py-1.5 px-2 bg-white/10 rounded-xl border border-white/20 backdrop-blur-md space-y-0.5 relative z-10">
+                            <span class="text-[5.5px] text-[#C9A24D] font-mono font-bold uppercase block">PESERTA ASESMEN</span>
+                            <div class="text-[10px] font-bold font-serif text-white truncate" x-text="'NAMA PESERTA CONTOH'"></div>
                         </div>
 
-                        <!-- Footer Signature -->
-                        <div class="space-y-1 pb-1 border-t border-white/20 pt-2">
-                            <div class="h-6 flex items-center justify-center">
-                                <template x-if="signatureUrl">
-                                    <img :src="signatureUrl" class="max-h-6 max-w-[80px] object-contain">
-                                </template>
-                                <template x-if="!signatureUrl">
-                                    <span class="italic text-slate-400 text-[7px]">Prof. Iskandar Nazari</span>
-                                </template>
+                        <!-- Central RQI & WHO-5 Score Badges -->
+                        <div class="space-y-1 my-1 relative z-10">
+                            <div class="p-2 bg-gradient-to-b from-white/15 to-white/5 rounded-2xl border border-[#C9A24D]/40 backdrop-blur-md shadow-inner space-y-0.5">
+                                <span class="text-[5.5px] font-mono font-bold text-[#C9A24D] uppercase block">SKOR RQI-15</span>
+                                <div class="text-3xl font-black font-serif-gold text-white tracking-tight">85.0</div>
+                                <span class="text-[5.5px] bg-[#C9A24D] text-[#0B2A43] font-bold px-2 py-0.5 rounded-full inline-block font-mono">✦ Level 5: Paripurna</span>
                             </div>
-                            <span class="font-bold block text-[7px] text-white" x-text="founderName"></span>
-                            <span class="text-slate-300 text-[6px] block" x-text="founderTitle"></span>
+
+                            <div class="p-1 bg-emerald-500/20 rounded-xl border border-emerald-400/40 text-center">
+                                <span class="text-[5.5px] font-mono font-bold text-emerald-300 block">🌱 WHO-5 MENTAL WELL-BEING: 88% (BAIK)</span>
+                            </div>
+                        </div>
+
+                        <!-- 5 Dimension Mini Grid -->
+                        <div class="grid grid-cols-5 gap-0.5 text-[4.5px] font-mono relative z-10">
+                            <div class="bg-white/10 p-0.5 rounded border border-white/15 text-slate-200">Nafl 88%</div>
+                            <div class="bg-white/10 p-0.5 rounded border border-white/15 text-slate-200">Nurani 84%</div>
+                            <div class="bg-white/10 p-0.5 rounded border border-white/15 text-slate-200">Resil 80%</div>
+                            <div class="bg-white/10 p-0.5 rounded border border-white/15 text-slate-200">Wahyu 85%</div>
+                            <div class="bg-white/10 p-0.5 rounded border border-white/15 text-slate-200">Etis 88%</div>
+                        </div>
+
+                        <!-- Footer QR Code Verification (Opsi A) -->
+                        <div class="space-y-1 pb-0.5 border-t border-white/20 pt-1.5 relative z-10">
+                            <div class="flex items-center justify-center gap-1.5">
+                                <div class="p-0.5 bg-white border border-amber-300 rounded inline-block">
+                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=40x40&data=https%3A%2F%2Fruhiology.id%2Fsample" class="h-5 w-5 object-contain" alt="QR Verifikasi">
+                                </div>
+                                <div class="text-left leading-tight">
+                                    <span class="font-bold block text-[5.5px] text-white" x-text="founderName"></span>
+                                    <span class="text-slate-300 text-[4.5px] block truncate" x-text="founderTitle"></span>
+                                    <span class="text-[#C9A24D] text-[4.5px] font-mono font-bold block">🔑 Terverifikasi QR Digital</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
