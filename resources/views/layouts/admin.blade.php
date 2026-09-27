@@ -94,7 +94,7 @@
                 @endif
             </a>
             <a href="{{ route('admin.instruments.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl transition-all {{ request()->routeIs('admin.instruments.*') ? 'bg-slate-800 text-[#C9A24D] font-bold border-l-4 border-[#C9A24D]' : 'hover:bg-slate-900 text-slate-300 hover:text-white' }}">
-                <span>⚙️</span> <span>Instrumen & Scoring</span>
+                <span>📦</span> <span>Paket Soal & Bank Soal</span>
             </a>
 
             <!-- Group 2: Layanan & Program -->

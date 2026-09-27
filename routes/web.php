@@ -123,12 +123,17 @@ Route::middleware(['auth', \App\Http\Middleware\EnsureAdminAccess::class])
         // Participant Management
         Route::resource('participants', AdminParticipantController::class);
 
-        // Assessment Engine: Instruments, Dimensions, Questions & Scoring
+        // Assessment Engine: Paket Soal, Bank Soal, Dimensions & Scoring
         Route::get('/instruments', [AdminInstrumentController::class, 'index'])->name('instruments.index');
         Route::get('/instruments/{instrument}', [AdminInstrumentController::class, 'show'])->name('instruments.show');
         Route::post('/instruments', [AdminInstrumentController::class, 'storeInstrument'])->name('instruments.store');
+        Route::put('/instruments/{instrument}', [AdminInstrumentController::class, 'updateInstrument'])->name('instruments.update');
+        Route::delete('/instruments/{instrument}', [AdminInstrumentController::class, 'destroyInstrument'])->name('instruments.destroy');
         Route::post('/instruments/{instrument}/dimensions', [AdminInstrumentController::class, 'storeDimension'])->name('instruments.dimensions.store');
+        Route::delete('/instruments/{instrument}/dimensions/{dimension}', [AdminInstrumentController::class, 'destroyDimension'])->name('instruments.dimensions.destroy');
         Route::post('/instruments/{instrument}/questions', [AdminInstrumentController::class, 'storeQuestion'])->name('instruments.questions.store');
+        Route::put('/instruments/{instrument}/questions/{question}', [AdminInstrumentController::class, 'updateQuestion'])->name('instruments.questions.update');
+        Route::delete('/instruments/{instrument}/questions/{question}', [AdminInstrumentController::class, 'destroyQuestion'])->name('instruments.questions.destroy');
         Route::post('/instruments/{instrument}/scoring', [AdminInstrumentController::class, 'updateScoringRule'])->name('instruments.scoring.update');
 
         // Assessment Events Management (Event / Batch Program)

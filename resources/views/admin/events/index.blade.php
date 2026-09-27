@@ -198,6 +198,16 @@
                         </div>
 
                         <div>
+                            <label class="block font-bold text-slate-800 text-xs mb-1">Pilih Paket Soal / Instrumen *</label>
+                            <select name="instrument_id" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50 font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-[#0B2A43] text-xs">
+                                <option value="">-- Pilih Paket Soal --</option>
+                                @foreach($instruments as $inst)
+                                    <option value="{{ $inst->id }}">{{ $inst->code }} - {{ $inst->name }} ({{ $inst->questions_count ?? $inst->questions->count() }} Soal)</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div>
                             <label class="block font-bold text-slate-800 text-xs mb-1">Preset Target Kategori Peserta</label>
                             <select name="target_category" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50 font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-[#0B2A43] text-xs">
                                 <option value="">🔘 Bebas / Fleksibel (Peserta memilih sendiri)</option>

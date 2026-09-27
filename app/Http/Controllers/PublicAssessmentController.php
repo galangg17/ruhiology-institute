@@ -116,17 +116,31 @@ class PublicAssessmentController extends Controller
         }
 
         $periodCode = $validated['period_code'] ?? 'RQI-PERIOD-2026';
-        $period = AssessmentPeriod::where('period_code', $periodCode)->first() 
-            ?? AssessmentPeriod::where('status', 'active')->first();
 
-        if (!$period) {
-            $period = AssessmentPeriod::create([
-                'program_id' => 1,
-                'instrument_id' => 1,
-                'title' => 'Default Periode Asesmen 2026',
-                'period_code' => 'RQI-PERIOD-2026',
-                'status' => 'active',
-            ]);
+        if (!empty($eventId) && isset($event) && $event->instrument_id) {
+            $period = AssessmentPeriod::where('instrument_id', $event->instrument_id)->where('status', 'active')->first();
+            if (!$period) {
+                $period = AssessmentPeriod::create([
+                    'program_id' => $event->program_id ?? 1,
+                    'instrument_id' => $event->instrument_id,
+                    'title' => 'Periode Event ' . $event->title,
+                    'period_code' => 'RQI-PER-' . $event->event_code,
+                    'status' => 'active',
+                ]);
+            }
+        } else {
+            $period = AssessmentPeriod::where('period_code', $periodCode)->first() 
+                ?? AssessmentPeriod::where('status', 'active')->first();
+
+            if (!$period) {
+                $period = AssessmentPeriod::create([
+                    'program_id' => 1,
+                    'instrument_id' => 1,
+                    'title' => 'Default Periode Asesmen 2026',
+                    'period_code' => 'RQI-PERIOD-2026',
+                    'status' => 'active',
+                ]);
+            }
         }
 
         $assessmentCode = Participant::generateUniqueAssessmentCode();
