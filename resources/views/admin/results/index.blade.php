@@ -3,6 +3,28 @@
 @section('content')
 <div class="space-y-6">
 
+    <!-- HUB NAV BAR (UNIFIED SWITCHER FOR PESERTA & HASIL EVALUASI) -->
+    <div class="bg-white p-2 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-2 font-sans">
+        <div class="flex items-center gap-2">
+            <a href="{{ route('admin.participants.index') }}" 
+               class="px-5 py-2.5 rounded-xl font-bold text-xs transition flex items-center gap-2 {{ request()->routeIs('admin.participants.*') ? 'bg-[#0B2A43] text-white shadow-md' : 'text-slate-600 hover:bg-slate-100' }}">
+                <span>👥</span>
+                <span>Tab 1: Data Peserta & Demografi</span>
+            </a>
+
+            <a href="{{ route('admin.results.index') }}" 
+               class="px-5 py-2.5 rounded-xl font-bold text-xs transition flex items-center gap-2 {{ request()->routeIs('admin.results.*') ? 'bg-[#0B2A43] text-white shadow-md' : 'text-slate-600 hover:bg-slate-100' }}">
+                <span>📈</span>
+                <span>Tab 2: Lembar Sesi & Hasil Evaluasi</span>
+            </a>
+        </div>
+
+        <a href="{{ route('admin.reports.export_pdf') }}" target="_blank" class="px-4 py-2 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-bold text-xs rounded-xl transition flex items-center gap-1.5">
+            <span>📄</span>
+            <span>Laporan PDF Agregat</span>
+        </a>
+    </div>
+
     <!-- HEADER TITLE & DYNAMIC EXPORT BUTTONS -->
     <div class="flex flex-wrap justify-between items-center gap-4">
         <div>

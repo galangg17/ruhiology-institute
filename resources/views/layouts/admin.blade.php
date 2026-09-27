@@ -79,11 +79,8 @@
             <a href="{{ route('admin.events.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl transition-all {{ request()->routeIs('admin.events.*') ? 'bg-slate-800 text-[#C9A24D] font-bold border-l-4 border-[#C9A24D]' : 'hover:bg-slate-900 text-slate-300 hover:text-white' }}">
                 <span>🎯</span> <span>Manajemen Event / Acara</span>
             </a>
-            <a href="{{ route('admin.participants.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl transition-all {{ request()->routeIs('admin.participants.*') ? 'bg-slate-800 text-[#C9A24D] font-bold border-l-4 border-[#C9A24D]' : 'hover:bg-slate-900 text-slate-300 hover:text-white' }}">
-                <span>👥</span> <span>Data Peserta</span>
-            </a>
-            <a href="{{ route('admin.results.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl transition-all {{ request()->routeIs('admin.results.*') ? 'bg-slate-800 text-[#C9A24D] font-bold border-l-4 border-[#C9A24D]' : 'hover:bg-slate-900 text-slate-300 hover:text-white' }}">
-                <span>📈</span> <span>Hasil & Rekap Asesmen</span>
+            <a href="{{ route('admin.participants.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl transition-all {{ request()->routeIs('admin.participants.*') || request()->routeIs('admin.results.*') ? 'bg-slate-800 text-[#C9A24D] font-bold border-l-4 border-[#C9A24D]' : 'hover:bg-slate-900 text-slate-300 hover:text-white' }}">
+                <span>📊</span> <span>Data Peserta & Hasil Evaluasi</span>
             </a>
             <a href="{{ route('admin.master_data.index') }}" class="flex items-center justify-between px-3.5 py-2 rounded-xl transition-all {{ request()->routeIs('admin.master_data.*') ? 'bg-slate-800 text-[#C9A24D] font-bold border-l-4 border-[#C9A24D]' : 'hover:bg-slate-900 text-slate-300 hover:text-white' }}">
                 <div class="flex items-center gap-3">
