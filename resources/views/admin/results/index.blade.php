@@ -120,10 +120,10 @@
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
                 <!-- 4. Kabupaten / Kota -->
                 <div>
-                    <select name="regency_id" class="w-full p-2 rounded-xl border border-slate-300 text-xs bg-white">
-                        <option value="">Semua Kota/Kabupaten</option>
+                    <select name="regency_id" onchange="this.form.submit()" {{ !request('province_id') ? 'disabled' : '' }} class="w-full p-2 rounded-xl border border-slate-300 text-xs bg-white disabled:bg-slate-100 disabled:text-slate-400">
+                        <option value="">{{ request('province_id') ? 'Semua Kota/Kabupaten' : 'Pilih Provinsi Dahulu' }}</option>
                         @foreach($regencies as $reg)
-                            <option value="{{ $reg->id }}" {{ request('regency_id') == $reg->id ? 'selected' : '' }}>{{ $reg->name }}</option>
+                            <option value="{{ $reg->id }}" {{ request('regency_id') == $reg->id ? 'selected' : '' }}>{{ ($reg->type ? $reg->type . ' ' : '') . $reg->name }}</option>
                         @endforeach
                     </select>
                 </div>

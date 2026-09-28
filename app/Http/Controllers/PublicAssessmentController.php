@@ -43,6 +43,10 @@ class PublicAssessmentController extends Controller
                 ->orderBy('title', 'asc')
                 ->get();
 
+            $provinces = \App\Models\Province::where('status', 'active')
+                ->orderBy('name', 'asc')
+                ->get(['id', 'code', 'name']);
+
             $regenciesMap = \App\Models\Regency::where('status', 'active')
                 ->orderBy('name', 'asc')
                 ->get(['id', 'province_id', 'name', 'type'])
@@ -51,12 +55,13 @@ class PublicAssessmentController extends Controller
             $publicInstruments = collect([]);
             $activePeriods = collect([]);
             $activeEvents = collect([]);
+            $provinces = collect([]);
             $regenciesMap = collect([]);
         }
 
         $defaultPeriod = $activePeriods->first();
 
-        return view('public.assessment.index', compact('activePeriods', 'defaultPeriod', 'activeEvents', 'publicInstruments', 'regenciesMap'));
+        return view('public.assessment.index', compact('activePeriods', 'defaultPeriod', 'activeEvents', 'publicInstruments', 'provinces', 'regenciesMap'));
     }
 
     /**

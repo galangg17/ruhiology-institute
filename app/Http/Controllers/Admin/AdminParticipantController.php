@@ -89,8 +89,12 @@ class AdminParticipantController extends Controller
         $institutions = Institution::all();
         $programs = Program::all();
         $provinces = Province::orderBy('name')->get();
+        $regencies = $request->filled('province_id')
+            ? Regency::where('province_id', $request->province_id)->orderBy('name')->get()
+            : collect([]);
+        $regenciesMap = Regency::where('status', 'active')->orderBy('name')->get(['id', 'province_id', 'name', 'type'])->groupBy('province_id');
 
-        return view('admin.participants.index', compact('participants', 'institutions', 'programs', 'provinces', 'stats'));
+        return view('admin.participants.index', compact('participants', 'institutions', 'programs', 'provinces', 'regencies', 'regenciesMap', 'stats'));
     }
 
     public function show(Participant $participant)

@@ -9,6 +9,14 @@
     drawerOpen: false,
     drawerTab: 'profile',
     selectedParticipant: null,
+    regenciesMap: @json($regenciesMap ?? []),
+    createProvinceId: '',
+    createRegencyId: '',
+    getRegencies(provId) {
+        if (!provId) return [];
+        const pid = String(provId);
+        return this.regenciesMap[pid] || this.regenciesMap[Number(pid)] || [];
+    },
     editData: {
         id: '',
         participant_code: '',
@@ -20,6 +28,7 @@
         institution_id: '',
         program_id: '',
         province_id: '',
+        regency_id: '',
         school_custom: '',
         university_custom: '',
         status: 'active'
@@ -36,6 +45,7 @@
             institution_id: part.institution_id || '',
             program_id: part.program_id || '',
             province_id: part.province_id || '',
+            regency_id: part.regency_id || '',
             school_custom: part.school_custom || '',
             university_custom: part.university_custom || '',
             status: part.status || 'active'
@@ -218,10 +228,19 @@
             <!-- Secondary Filters row -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
                 <div>
-                    <select name="province_id" class="w-full p-2 rounded-xl border border-slate-300 text-xs bg-white">
+                    <select name="province_id" onchange="this.form.submit()" class="w-full p-2 rounded-xl border border-slate-300 text-xs bg-white font-medium">
                         <option value="">Semua Provinsi (Demografi)</option>
                         @foreach($provinces as $prov)
                             <option value="{{ $prov->id }}" {{ request('province_id') == $prov->id ? 'selected' : '' }}>{{ $prov->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div>
+                    <select name="regency_id" onchange="this.form.submit()" {{ !request('province_id') ? 'disabled' : '' }} class="w-full p-2 rounded-xl border border-slate-300 text-xs bg-white font-medium disabled:bg-slate-100 disabled:text-slate-400">
+                        <option value="">{{ request('province_id') ? 'Semua Kab/Kota' : 'Pilih Provinsi Dahulu' }}</option>
+                        @foreach($regencies as $reg)
+                            <option value="{{ $reg->id }}" {{ request('regency_id') == $reg->id ? 'selected' : '' }}>{{ ($reg->type ? $reg->type . ' ' : '') . $reg->name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -616,14 +635,23 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
                         <label class="block font-bold text-slate-700 mb-1">Provinsi (Demografi)</label>
-                        <select name="province_id" class="w-full p-2.5 rounded-xl border border-slate-300 bg-white">
+                        <select name="province_id" x-model="createProvinceId" @change="createRegencyId = ''" class="w-full p-2.5 rounded-xl border border-slate-300 bg-white">
                             <option value="">-- Pilih Provinsi --</option>
                             @foreach($provinces as $prov)
                                 <option value="{{ $prov->id }}">{{ $prov->name }}</option>
                             @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Kabupaten / Kota</label>
+                        <select name="regency_id" x-model="createRegencyId" :disabled="!createProvinceId" class="w-full p-2.5 rounded-xl border border-slate-300 bg-white disabled:bg-slate-100 disabled:text-slate-400">
+                            <option value="" x-text="createProvinceId ? '-- Pilih Kab/Kota --' : 'Pilih Provinsi Dahulu'"></option>
+                            <template x-for="reg in getRegencies(createProvinceId)" :key="reg.id">
+                                <option :value="reg.id" x-text="(reg.type ? reg.type + ' ' : '') + reg.name"></option>
+                            </template>
                         </select>
                     </div>
                     <div>
@@ -723,14 +751,23 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
                         <label class="block font-bold text-slate-700 mb-1">Provinsi (Demografi)</label>
-                        <select name="province_id" x-model="editData.province_id" class="w-full p-2.5 rounded-xl border border-slate-300">
+                        <select name="province_id" x-model="editData.province_id" @change="editData.regency_id = ''" class="w-full p-2.5 rounded-xl border border-slate-300">
                             <option value="">-- Pilih Provinsi --</option>
                             @foreach($provinces as $prov)
                                 <option value="{{ $prov->id }}">{{ $prov->name }}</option>
                             @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Kabupaten / Kota</label>
+                        <select name="regency_id" x-model="editData.regency_id" :disabled="!editData.province_id" class="w-full p-2.5 rounded-xl border border-slate-300 disabled:bg-slate-100 disabled:text-slate-400">
+                            <option value="" x-text="editData.province_id ? '-- Pilih Kab/Kota --' : 'Pilih Provinsi Dahulu'"></option>
+                            <template x-for="reg in getRegencies(editData.province_id)" :key="reg.id">
+                                <option :value="reg.id" x-text="(reg.type ? reg.type + ' ' : '') + reg.name"></option>
+                            </template>
                         </select>
                     </div>
                     <div>
