@@ -55,7 +55,22 @@ window.rqAssessmentIndex = function rqAssessmentIndex() {
             last_education: 'S1/D4'
         },
 
-        filteredProvinces: @json($provinces ?? []),
+        provincesList: @json($provinces ?? []),
+        fallbackProvinces: [
+            { id: 1, name: 'Aceh' }, { id: 2, name: 'Sumatera Utara' }, { id: 3, name: 'Sumatera Barat' },
+            { id: 4, name: 'Riau' }, { id: 5, name: 'Jambi' }, { id: 6, name: 'Sumatera Selatan' },
+            { id: 7, name: 'Bengkulu' }, { id: 8, name: 'Lampung' }, { id: 9, name: 'Kepulauan Bangka Belitung' },
+            { id: 10, name: 'Kepulauan Riau' }, { id: 11, name: 'DKI Jakarta' }, { id: 12, name: 'Jawa Barat' },
+            { id: 13, name: 'Jawa Tengah' }, { id: 14, name: 'DI Yogyakarta' }, { id: 15, name: 'Jawa Timur' },
+            { id: 16, name: 'Banten' }, { id: 17, name: 'Bali' }, { id: 18, name: 'Nusa Tenggara Barat' },
+            { id: 19, name: 'Nusa Tenggara Timur' }, { id: 20, name: 'Kalimantan Barat' }, { id: 21, name: 'Kalimantan Tengah' },
+            { id: 22, name: 'Kalimantan Selatan' }, { id: 23, name: 'Kalimantan Timur' }, { id: 24, name: 'Kalimantan Utara' },
+            { id: 25, name: 'Sulawesi Utara' }, { id: 26, name: 'Sulawesi Tengah' }, { id: 27, name: 'Sulawesi Selatan' },
+            { id: 28, name: 'Sulawesi Tenggara' }, { id: 29, name: 'Gorontalo' }, { id: 30, name: 'Sulawesi Barat' },
+            { id: 31, name: 'Maluku' }, { id: 32, name: 'Maluku Utara' }, { id: 33, name: 'Papua Barat' },
+            { id: 34, name: 'Papua' }, { id: 35, name: 'Papua Selatan' }, { id: 36, name: 'Papua Tengah' },
+            { id: 37, name: 'Papua Pegunungan' }, { id: 38, name: 'Papua Barat Daya' }
+        ],
         filteredRegencies: [],
         filteredUniversities: [],
         occupations: [],
@@ -177,6 +192,16 @@ window.rqAssessmentIndex = function rqAssessmentIndex() {
             } else {
                 this.searchRegencies();
             }
+        },
+
+        getProvincesHtml() {
+            const items = (this.provincesList && this.provincesList.length > 0) ? this.provincesList : this.fallbackProvinces;
+            let html = '<option value="">-- Pilih --</option>';
+            items.forEach(p => {
+                const selected = String(p.id) === String(this.form.province_id) ? 'selected' : '';
+                html += `<option value="${p.id}" ${selected}>${p.name}</option>`;
+            });
+            return html;
         },
 
         getRegenciesHtml() {
@@ -608,11 +633,7 @@ document.addEventListener('alpine:init', () => {
                                 <div class="grid grid-cols-2 gap-2.5">
                                     <div>
                                         <label class="block font-bold text-slate-700 text-xs mb-1">Provinsi *</label>
-                                        <select x-model="form.province_id" @change="onProvinceChange()" required class="w-full p-2.5 text-xs font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
-                                            <option value="">-- Pilih --</option>
-                                            @foreach($provinces as $p)
-                                                <option value="{{ $p->id }}">{{ $p->name }}</option>
-                                            @endforeach
+                                        <select x-model="form.province_id" x-html="getProvincesHtml()" @change="onProvinceChange()" required class="w-full p-2.5 text-xs font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
                                         </select>
                                     </div>
                                     <div>
