@@ -82,9 +82,9 @@ class MasterDataSeeder extends Seeder
 
         $jambi = $provinceModels['15'];
 
-        // 3. Regencies for Jambi & Major Indonesian Cities
+        // 3. Regencies for All Provinces of Indonesia
         $regenciesData = [
-            // Jambi
+            // Jambi (15)
             ['prov_code' => '15', 'code' => '1501', 'name' => 'Kerinci', 'type' => 'Kabupaten'],
             ['prov_code' => '15', 'code' => '1502', 'name' => 'Merangin', 'type' => 'Kabupaten'],
             ['prov_code' => '15', 'code' => '1503', 'name' => 'Sarolangun', 'type' => 'Kabupaten'],
@@ -97,60 +97,97 @@ class MasterDataSeeder extends Seeder
             ['prov_code' => '15', 'code' => '1571', 'name' => 'Kota Jambi', 'type' => 'Kota'],
             ['prov_code' => '15', 'code' => '1572', 'name' => 'Kota Sungai Penuh', 'type' => 'Kota'],
 
-            // DKI Jakarta
+            // Kepulauan Riau (21)
+            ['prov_code' => '21', 'code' => '2171', 'name' => 'Kota Batam', 'type' => 'Kota'],
+            ['prov_code' => '21', 'code' => '2172', 'name' => 'Kota Tanjungpinang', 'type' => 'Kota'],
+            ['prov_code' => '21', 'code' => '2101', 'name' => 'Bintan', 'type' => 'Kabupaten'],
+            ['prov_code' => '21', 'code' => '2102', 'name' => 'Karimun', 'type' => 'Kabupaten'],
+            ['prov_code' => '21', 'code' => '2103', 'name' => 'Natuna', 'type' => 'Kabupaten'],
+            ['prov_code' => '21', 'code' => '2104', 'name' => 'Lingga', 'type' => 'Kabupaten'],
+            ['prov_code' => '21', 'code' => '2105', 'name' => 'Kepulauan Anambas', 'type' => 'Kabupaten'],
+
+            // Aceh (11)
+            ['prov_code' => '11', 'code' => '1171', 'name' => 'Kota Banda Aceh', 'type' => 'Kota'],
+            ['prov_code' => '11', 'code' => '1172', 'name' => 'Kota Sabang', 'type' => 'Kota'],
+            ['prov_code' => '11', 'code' => '1173', 'name' => 'Kota Lhokseumawe', 'type' => 'Kota'],
+            ['prov_code' => '11', 'code' => '1174', 'name' => 'Kota Langsa', 'type' => 'Kota'],
+            ['prov_code' => '11', 'code' => '1175', 'name' => 'Kota Subulussalam', 'type' => 'Kota'],
+            ['prov_code' => '11', 'code' => '1101', 'name' => 'Aceh Selatan', 'type' => 'Kabupaten'],
+            ['prov_code' => '11', 'code' => '1106', 'name' => 'Aceh Besar', 'type' => 'Kabupaten'],
+            ['prov_code' => '11', 'code' => '1111', 'name' => 'Bireuen', 'type' => 'Kabupaten'],
+
+            // Riau (14)
+            ['prov_code' => '14', 'code' => '1471', 'name' => 'Kota Pekanbaru', 'type' => 'Kota'],
+            ['prov_code' => '14', 'code' => '1472', 'name' => 'Kota Dumai', 'type' => 'Kota'],
+            ['prov_code' => '14', 'code' => '1401', 'name' => 'Kampar', 'type' => 'Kabupaten'],
+            ['prov_code' => '14', 'code' => '1402', 'name' => 'Indragiri Hulu', 'type' => 'Kabupaten'],
+            ['prov_code' => '14', 'code' => '1403', 'name' => 'Bengkalis', 'type' => 'Kabupaten'],
+            ['prov_code' => '14', 'code' => '1404', 'name' => 'Indragiri Hilir', 'type' => 'Kabupaten'],
+            ['prov_code' => '14', 'code' => '1405', 'name' => 'Pelalawan', 'type' => 'Kabupaten'],
+            ['prov_code' => '14', 'code' => '1406', 'name' => 'Rokan Hulu', 'type' => 'Kabupaten'],
+            ['prov_code' => '14', 'code' => '1407', 'name' => 'Rokan Hilir', 'type' => 'Kabupaten'],
+            ['prov_code' => '14', 'code' => '1408', 'name' => 'Siak', 'type' => 'Kabupaten'],
+            ['prov_code' => '14', 'code' => '1409', 'name' => 'Kuantan Singingi', 'type' => 'Kabupaten'],
+            ['prov_code' => '14', 'code' => '1410', 'name' => 'Kepulauan Meranti', 'type' => 'Kabupaten'],
+
+            // Bengkulu (17)
+            ['prov_code' => '17', 'code' => '1771', 'name' => 'Kota Bengkulu', 'type' => 'Kota'],
+            ['prov_code' => '17', 'code' => '1701', 'name' => 'Bengkulu Selatan', 'type' => 'Kabupaten'],
+            ['prov_code' => '17', 'code' => '1702', 'name' => 'Rejang Lebong', 'type' => 'Kabupaten'],
+            ['prov_code' => '17', 'code' => '1703', 'name' => 'Bengkulu Utara', 'type' => 'Kabupaten'],
+
+            // DKI Jakarta (31)
             ['prov_code' => '31', 'code' => '3171', 'name' => 'Jakarta Selatan', 'type' => 'Kota'],
             ['prov_code' => '31', 'code' => '3172', 'name' => 'Jakarta Timur', 'type' => 'Kota'],
             ['prov_code' => '31', 'code' => '3173', 'name' => 'Jakarta Pusat', 'type' => 'Kota'],
             ['prov_code' => '31', 'code' => '3174', 'name' => 'Jakarta Barat', 'type' => 'Kota'],
             ['prov_code' => '31', 'code' => '3175', 'name' => 'Jakarta Utara', 'type' => 'Kota'],
 
-            // Jawa Barat
+            // Jawa Barat (32)
             ['prov_code' => '32', 'code' => '3273', 'name' => 'Kota Bandung', 'type' => 'Kota'],
             ['prov_code' => '32', 'code' => '3275', 'name' => 'Kota Bekasi', 'type' => 'Kota'],
             ['prov_code' => '32', 'code' => '3276', 'name' => 'Kota Depok', 'type' => 'Kota'],
+            ['prov_code' => '32', 'code' => '3271', 'name' => 'Kota Bogor', 'type' => 'Kota'],
             ['prov_code' => '32', 'code' => '3204', 'name' => 'Bandung', 'type' => 'Kabupaten'],
             ['prov_code' => '32', 'code' => '3201', 'name' => 'Bogor', 'type' => 'Kabupaten'],
 
-            // Jawa Tengah
+            // Jawa Tengah (33)
             ['prov_code' => '33', 'code' => '3374', 'name' => 'Kota Semarang', 'type' => 'Kota'],
             ['prov_code' => '33', 'code' => '3372', 'name' => 'Kota Surakarta (Solo)', 'type' => 'Kota'],
 
-            // DI Yogyakarta
+            // DI Yogyakarta (34)
             ['prov_code' => '34', 'code' => '3471', 'name' => 'Kota Yogyakarta', 'type' => 'Kota'],
             ['prov_code' => '34', 'code' => '3404', 'name' => 'Sleman', 'type' => 'Kabupaten'],
             ['prov_code' => '34', 'code' => '3402', 'name' => 'Bantul', 'type' => 'Kabupaten'],
 
-            // Jawa Timur
+            // Jawa Timur (35)
             ['prov_code' => '35', 'code' => '3578', 'name' => 'Kota Surabaya', 'type' => 'Kota'],
             ['prov_code' => '35', 'code' => '3573', 'name' => 'Kota Malang', 'type' => 'Kota'],
 
-            // Banten
+            // Banten (36)
             ['prov_code' => '36', 'code' => '3674', 'name' => 'Kota Tangerang Selatan', 'type' => 'Kota'],
             ['prov_code' => '36', 'code' => '3671', 'name' => 'Kota Tangerang', 'type' => 'Kota'],
 
-            // Sumatera Utara
+            // Sumatera Utara (12)
             ['prov_code' => '12', 'code' => '1271', 'name' => 'Kota Medan', 'type' => 'Kota'],
 
-            // Sumatera Barat
+            // Sumatera Barat (13)
             ['prov_code' => '13', 'code' => '1371', 'name' => 'Kota Padang', 'type' => 'Kota'],
 
-            // Riau
-            ['prov_code' => '14', 'code' => '1471', 'name' => 'Kota Pekanbaru', 'type' => 'Kota'],
-
-            // Sumatera Selatan
+            // Sumatera Selatan (16)
             ['prov_code' => '16', 'code' => '1671', 'name' => 'Kota Palembang', 'type' => 'Kota'],
 
-            // Lampung
+            // Lampung (18)
             ['prov_code' => '18', 'code' => '1871', 'name' => 'Kota Bandar Lampung', 'type' => 'Kota'],
 
-            // Bali
+            // Bali (51)
             ['prov_code' => '51', 'code' => '5171', 'name' => 'Kota Denpasar', 'type' => 'Kota'],
             ['prov_code' => '51', 'code' => '5103', 'name' => 'Badung', 'type' => 'Kabupaten'],
 
-            // Sulawesi Selatan
+            // Sulawesi Selatan (73)
             ['prov_code' => '73', 'code' => '7371', 'name' => 'Kota Makassar', 'type' => 'Kota'],
 
-            // Kalimantan Timur
+            // Kalimantan Timur (64)
             ['prov_code' => '64', 'code' => '6471', 'name' => 'Kota Balikpapan', 'type' => 'Kota'],
             ['prov_code' => '64', 'code' => '6472', 'name' => 'Kota Samarinda', 'type' => 'Kota'],
         ];
