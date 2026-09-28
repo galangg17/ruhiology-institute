@@ -179,6 +179,22 @@ window.rqAssessmentIndex = function rqAssessmentIndex() {
             }
         },
 
+        getRegenciesHtml() {
+            if (!this.form.province_id) {
+                return '<option value="">Provinsi dahulu</option>';
+            }
+            if (!this.filteredRegencies || this.filteredRegencies.length === 0) {
+                return '<option value="">-- Memuat / Tidak Ada Data --</option>';
+            }
+            let html = '<option value="">-- Pilih --</option>';
+            this.filteredRegencies.forEach(r => {
+                const typeStr = r.type ? r.type + ' ' : '';
+                const selected = String(r.id) === String(this.form.regency_id) ? 'selected' : '';
+                html += `<option value="${r.id}" ${selected}>${typeStr}${r.name}</option>`;
+            });
+            return html;
+        },
+
         searchRegencies() {
             if (!this.form.province_id) return;
             fetch(`/api/master/regencies?province_id=${this.form.province_id}`)
@@ -601,11 +617,7 @@ document.addEventListener('alpine:init', () => {
                                     </div>
                                     <div>
                                         <label class="block font-bold text-slate-700 text-xs mb-1">Kab/Kota *</label>
-                                        <select x-model="form.regency_id" :disabled="!form.province_id" required class="w-full p-2.5 text-xs font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white disabled:bg-slate-100">
-                                            <option value="" x-text="form.province_id ? '-- Pilih --' : 'Provinsi dahulu'"></option>
-                                            <template x-for="r in filteredRegencies" :key="r.id">
-                                                <option :value="r.id" x-text="(r.type ? r.type + ' ' : '') + r.name"></option>
-                                            </template>
+                                        <select x-model="form.regency_id" x-html="getRegenciesHtml()" :disabled="!form.province_id" required class="w-full p-2.5 text-xs font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white disabled:bg-slate-100">
                                         </select>
                                     </div>
                                 </div>
