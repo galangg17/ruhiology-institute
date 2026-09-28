@@ -454,7 +454,7 @@ class MasterDataSeeder extends Seeder
             ]
         );
 
-        AssessmentPeriod::firstOrCreate(
+        AssessmentPeriod::updateOrCreate(
             ['period_code' => 'RQI-PERIOD-2026'],
             [
                 'program_id' => $prog->id,
@@ -467,5 +467,8 @@ class MasterDataSeeder extends Seeder
                 'status' => 'active'
             ]
         );
+
+        // Ensure all active periods without an instrument link to RQI-20
+        AssessmentPeriod::whereNull('instrument_id')->update(['instrument_id' => $rqi->id]);
     }
 }

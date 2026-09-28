@@ -332,16 +332,28 @@ class PublicAssessmentController extends Controller
             return str_contains($dimCode, 'who') || str_contains($dimName, 'who');
         })->values();
 
-        // Fallback if who5Questions is empty but a separate WHO-5 instrument exists
+        // Robust fallback if who5Questions is empty: fetch active questions from WHO dimension
         if ($who5Questions->isEmpty()) {
-            $who5Instrument = Instrument::where('code', 'WHO-5')->first();
-            if ($who5Instrument) {
-                $who5Questions = Question::where('instrument_id', $who5Instrument->id)
-                    ->where('status', 'active')
-                    ->with(['options' => function ($q) { $q->orderBy('order', 'asc'); }, 'dimension'])
-                    ->orderBy('order', 'asc')
-                    ->get();
-            }
+            $who5Questions = Question::whereHas('dimension', function ($q) {
+                $q->where('code', 'like', '%who%')
+                  ->orWhere('name', 'like', '%who%');
+            })
+            ->where('status', 'active')
+            ->with(['options' => function ($q) { $q->orderBy('order', 'asc'); }, 'dimension'])
+            ->orderBy('order', 'asc')
+            ->get();
+        }
+
+        // Robust fallback if rqiQuestions is empty: fetch active questions from RQI dimensions
+        if ($rqiQuestions->isEmpty()) {
+            $rqiQuestions = Question::whereHas('dimension', function ($q) {
+                $q->where('code', 'not like', '%who%')
+                  ->where('name', 'not like', '%who%');
+            })
+            ->where('status', 'active')
+            ->with(['options' => function ($q) { $q->orderBy('order', 'asc'); }, 'dimension'])
+            ->orderBy('order', 'asc')
+            ->get();
         }
 
         return view('public.assessment.take', compact('period', 'participant', 'type', 'rqiQuestions', 'who5Questions'));
