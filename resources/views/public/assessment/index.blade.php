@@ -171,8 +171,9 @@ window.rqAssessmentIndex = function rqAssessmentIndex() {
                 return;
             }
             const pid = String(this.form.province_id);
-            if (this.regenciesMap && (this.regenciesMap[pid] || this.regenciesMap[Number(pid)])) {
-                this.filteredRegencies = this.regenciesMap[pid] || this.regenciesMap[Number(pid)];
+            const cached = this.regenciesMap ? (this.regenciesMap[pid] || this.regenciesMap[Number(pid)]) : null;
+            if (cached && cached.length > 0) {
+                this.filteredRegencies = cached;
             } else {
                 this.searchRegencies();
             }
@@ -183,7 +184,9 @@ window.rqAssessmentIndex = function rqAssessmentIndex() {
             fetch(`/api/master/regencies?province_id=${this.form.province_id}`)
                 .then(res => res.json())
                 .then(res => {
-                    this.filteredRegencies = res.data || [];
+                    if (res && res.data) {
+                        this.filteredRegencies = res.data;
+                    }
                 })
                 .catch(() => {});
         },
@@ -591,9 +594,9 @@ document.addEventListener('alpine:init', () => {
                                         <label class="block font-bold text-slate-700 text-xs mb-1">Provinsi *</label>
                                         <select x-model="form.province_id" @change="onProvinceChange()" required class="w-full p-2.5 text-xs font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
                                             <option value="">-- Pilih --</option>
-                                            <template x-for="p in filteredProvinces" :key="p.id">
-                                                <option :value="p.id" x-text="p.name"></option>
-                                            </template>
+                                            @foreach($provinces as $p)
+                                                <option value="{{ $p->id }}">{{ $p->name }}</option>
+                                            @endforeach
                                         </select>
                                     </div>
                                     <div>
