@@ -90,7 +90,12 @@
                 </span>
             </div>
             <div>
-                <span class="text-slate-400 uppercase font-bold text-[10px] block font-mono">Wilayah asal</span>
+                <div class="flex items-center justify-between">
+                    <span class="text-slate-400 uppercase font-bold text-[10px] block font-mono">Wilayah asal</span>
+                    <button type="button" @click="openEditRegionModal()" class="no-print text-[10px] text-amber-700 hover:text-amber-900 font-bold underline cursor-pointer inline-flex items-center gap-0.5">
+                        <span>✏️</span> <span>Ubah</span>
+                    </button>
+                </div>
                 <span class="font-bold text-[#0B2A43] text-xs block mt-0.5">
                     {{ $submission->participant->regency->name ?? '' }}{{ isset($submission->participant->regency) && isset($submission->participant->province) ? ', ' : '' }}{{ $submission->participant->province->name ?? '-' }}
                 </span>
@@ -464,6 +469,50 @@
         </div>
     </div>
 
+        <!-- MODAL UBAH WILAYAH ASAL PESERTA -->
+        <div x-show="showEditRegionModal" x-cloak class="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm no-print">
+            <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-100">
+                <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                    <h3 class="font-bold font-serif text-[#0B2A43] text-base flex items-center gap-2">
+                        <span>📍</span> <span>Perbarui Wilayah Asal Peserta</span>
+                    </h3>
+                    <button @click="showEditRegionModal = false" class="text-slate-400 hover:text-slate-600 text-lg font-bold">✕</button>
+                </div>
+
+                <form action="{{ route('assessment.update_region', $submission->submission_code) }}" method="POST" class="space-y-4 text-xs">
+                    @csrf
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Provinsi *</label>
+                        <select name="province_id" x-model="editProvinceId" @change="onEditProvinceChange()" required class="w-full p-2.5 rounded-xl border border-slate-300 font-bold bg-white text-slate-800 focus:ring-2 focus:ring-[#0B2A43] outline-none">
+                            <option value="">-- Pilih Provinsi --</option>
+                            <template x-for="p in provincesList" :key="p.id">
+                                <option :value="p.id" x-text="p.name" :selected="String(p.id) === String(editProvinceId)"></option>
+                            </template>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Kabupaten / Kota *</label>
+                        <select name="regency_id" x-model="editRegencyId" :disabled="!editProvinceId" required class="w-full p-2.5 rounded-xl border border-slate-300 font-bold bg-white text-slate-800 disabled:bg-slate-100 disabled:text-slate-400 focus:ring-2 focus:ring-[#0B2A43] outline-none">
+                            <option value="" x-text="editProvinceId ? '-- Pilih Kab/Kota --' : 'Pilih Provinsi Dahulu'"></option>
+                            <template x-for="r in filteredEditRegencies" :key="r.id">
+                                <option :value="r.id" x-text="(r.type ? r.type + ' ' : '') + r.name" :selected="String(r.id) === String(editRegencyId)"></option>
+                            </template>
+                        </select>
+                    </div>
+
+                    <div class="flex gap-2 pt-2">
+                        <button type="button" @click="showEditRegionModal = false" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition cursor-pointer">
+                            Batal
+                        </button>
+                        <button type="submit" class="flex-1 py-3 bg-[#0B2A43] hover:bg-[#123B59] text-[#C9A24D] font-extrabold rounded-xl transition shadow cursor-pointer">
+                            Simpan Perubahan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
 </div>
 
 @push('scripts')
@@ -471,6 +520,29 @@
 function rqResultPage() {
     return {
         showStoryModal: false,
+        showEditRegionModal: false,
+        editProvinceId: '{{ $submission->participant->province_id ?? '' }}',
+        editRegencyId: '{{ $submission->participant->regency_id ?? '' }}',
+        provincesList: @json($provinces ?? []),
+        regenciesMap: @json($regenciesMap ?? []),
+        filteredEditRegencies: [],
+
+        openEditRegionModal() {
+            this.showEditRegionModal = true;
+            this.onEditProvinceChange(true);
+        },
+
+        onEditProvinceChange(keepRegency = false) {
+            if (!keepRegency) {
+                this.editRegencyId = '';
+            }
+            if (!this.editProvinceId) {
+                this.filteredEditRegencies = [];
+                return;
+            }
+            const pid = String(this.editProvinceId);
+            this.filteredEditRegencies = this.regenciesMap[pid] || this.regenciesMap[Number(pid)] || [];
+        },
 
         openStoryModal() {
             this.showStoryModal = true;

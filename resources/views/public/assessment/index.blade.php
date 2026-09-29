@@ -154,7 +154,7 @@ window.rqAssessmentIndex = function rqAssessmentIndex() {
                         this.isCategoryLocked = false;
                     }
 
-                    if (evt.province_id) {
+                    if (evt.province_id && !this.form.province_id) {
                         this.form.province_id = evt.province_id;
                         this.onProvinceChange();
                         if (evt.regency_id) {

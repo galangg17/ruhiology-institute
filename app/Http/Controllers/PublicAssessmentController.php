@@ -72,11 +72,11 @@ class PublicAssessmentController extends Controller
         if (!empty($request->input('event_code'))) {
             $eventModel = \App\Models\Event::where('event_code', strtoupper(trim($request->input('event_code'))))->first();
             if ($eventModel) {
-                if (empty($request->input('province_id'))) {
-                    $request->merge(['province_id' => $eventModel->province_id ?? 5]);
+                if (empty($request->input('province_id')) && !empty($eventModel->province_id)) {
+                    $request->merge(['province_id' => $eventModel->province_id]);
                 }
-                if (empty($request->input('regency_id'))) {
-                    $request->merge(['regency_id' => $eventModel->regency_id ?? 10]);
+                if (empty($request->input('regency_id')) && !empty($eventModel->regency_id)) {
+                    $request->merge(['regency_id' => $eventModel->regency_id]);
                 }
                 if (empty($request->input('category'))) {
                     $request->merge(['category' => $eventModel->target_category ?? 'Pelajar']);
@@ -84,12 +84,6 @@ class PublicAssessmentController extends Controller
             }
         }
 
-        if (empty($request->input('province_id'))) {
-            $request->merge(['province_id' => 5]);
-        }
-        if (empty($request->input('regency_id'))) {
-            $request->merge(['regency_id' => 10]);
-        }
         if (($request->input('category') === 'Pelajar' || empty($request->input('category'))) && empty($request->input('school_level'))) {
             $request->merge(['school_level' => 'SMA']);
         }
@@ -433,7 +427,37 @@ class PublicAssessmentController extends Controller
                 ->first();
         }
 
-        return view('public.assessment.result', compact('submission', 'preSubmission', 'postSubmission'));
+        $provinces = \App\Models\Province::where('status', 'active')->orderBy('name', 'asc')->get(['id', 'code', 'name']);
+        $regenciesMap = \App\Models\Regency::where('status', 'active')->orderBy('name', 'asc')->get(['id', 'province_id', 'name', 'type'])->groupBy('province_id');
+
+        return view('public.assessment.result', compact('submission', 'preSubmission', 'postSubmission', 'provinces', 'regenciesMap'));
+    }
+
+    /**
+     * Update participant's region (Province & Regency) from the result page.
+     */
+    public function updateRegion(Request $request, string $submissionCode)
+    {
+        $validated = $request->validate([
+            'province_id' => ['required', 'exists:provinces,id'],
+            'regency_id' => ['required', 'exists:regencies,id'],
+        ]);
+
+        $submission = AssessmentSubmission::where('submission_code', $submissionCode)->firstOrFail();
+        $participant = $submission->participant;
+        
+        $participant->update([
+            'province_id' => $validated['province_id'],
+            'regency_id' => $validated['regency_id'],
+        ]);
+
+        $regency = \App\Models\Regency::find($validated['regency_id']);
+        $province = \App\Models\Province::find($validated['province_id']);
+
+        $regencyStr = ($regency->type ? $regency->type . ' ' : '') . $regency->name;
+        $provinceStr = $province->name;
+
+        return back()->with('success', "Wilayah asal berhasil diperbarui menjadi {$regencyStr}, {$provinceStr}.");
     }
 
     /**

@@ -62,6 +62,7 @@ Route::post('/assessment/submit/{period_code}/{type}', [PublicAssessmentControll
 Route::get('/assessment/result/{submission_code}', [PublicAssessmentController::class, 'result'])->name('assessment.result');
 Route::get('/assessment/result/{submission_code}/certificate', [PublicAssessmentController::class, 'certificate'])->name('assessment.certificate');
 Route::post('/assessment/reflection/{submission_code}', [PublicAssessmentController::class, 'submitReflection'])->name('assessment.reflection');
+Route::post('/assessment/update-region/{submission_code}', [PublicAssessmentController::class, 'updateRegion'])->name('assessment.update_region');
 
 // Training Center
 Route::get('/training', [PublicTrainingController::class, 'index'])->name('training.index');

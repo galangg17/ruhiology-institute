@@ -766,7 +766,7 @@
                         <select name="regency_id" x-model="editData.regency_id" :disabled="!editData.province_id" class="w-full p-2.5 rounded-xl border border-slate-300 disabled:bg-slate-100 disabled:text-slate-400">
                             <option value="" x-text="editData.province_id ? '-- Pilih Kab/Kota --' : 'Pilih Provinsi Dahulu'"></option>
                             <template x-for="reg in getRegencies(editData.province_id)" :key="reg.id">
-                                <option :value="reg.id" x-text="(reg.type ? reg.type + ' ' : '') + reg.name"></option>
+                                <option :value="reg.id" x-text="(reg.type ? reg.type + ' ' : '') + reg.name" :selected="String(reg.id) === String(editData.regency_id)"></option>
                             </template>
                         </select>
                     </div>
