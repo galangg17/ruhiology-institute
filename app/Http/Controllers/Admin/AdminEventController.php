@@ -138,6 +138,8 @@ class AdminEventController extends Controller
         $who5SehatCount = $results->filter(fn($r) => $r->who5_percentage >= 50)->count();
         $who5PerluSkriningCount = $results->filter(fn($r) => $r->who5_percentage < 50)->count();
 
+        $instruments = Instrument::where('status', 'active')->get();
+
         return view('admin.events.show', compact(
             'event',
             'submissions',
@@ -146,7 +148,8 @@ class AdminEventController extends Controller
             'avgRqi',
             'avgWho5',
             'who5SehatCount',
-            'who5PerluSkriningCount'
+            'who5PerluSkriningCount',
+            'instruments'
         ));
     }
 
@@ -154,7 +157,10 @@ class AdminEventController extends Controller
     {
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
+            'event_code' => ['nullable', 'string', 'max:50', 'unique:events,event_code,' . $event->id],
             'institution_name' => ['nullable', 'string', 'max:255'],
+            'instrument_id' => ['nullable', 'exists:instruments,id'],
+            'program_id' => ['nullable', 'exists:programs,id'],
             'target_category' => ['nullable', 'in:Pelajar,Mahasiswa/i,Umum'],
             'group_label' => ['nullable', 'string', 'max:100'],
             'custom_subcategories' => ['nullable'],
@@ -173,12 +179,28 @@ class AdminEventController extends Controller
             'description' => ['nullable', 'string'],
         ]);
 
-        if (isset($validated['custom_subcategories']) && is_string($validated['custom_subcategories'])) {
-            $items = array_map('trim', explode(',', $validated['custom_subcategories']));
-            $validated['custom_subcategories'] = array_values(array_filter($items));
+        if (!empty($validated['event_code'])) {
+            $validated['event_code'] = strtoupper(Str::slug($validated['event_code'], '-'));
+        }
+
+        if (isset($validated['custom_subcategories'])) {
+            if (is_string($validated['custom_subcategories'])) {
+                $items = array_map('trim', explode(',', $validated['custom_subcategories']));
+                $validated['custom_subcategories'] = array_values(array_filter($items));
+            } elseif (is_array($validated['custom_subcategories'])) {
+                $validated['custom_subcategories'] = array_values(array_filter(array_map('trim', $validated['custom_subcategories'])));
+            }
         }
 
         $event->update($validated);
+
+        AuditLogService::log(
+            action: 'update_event',
+            module: 'Event',
+            recordType: 'Event',
+            recordId: (string) $event->id,
+            changes: $validated
+        );
 
         return back()->with('success', 'Data Event "' . $event->title . '" berhasil diperbarui.');
     }

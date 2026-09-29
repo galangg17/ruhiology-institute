@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="space-y-6" x-data="{ createModal: false, qrModal: false, activeQrUrl: '', activeQrTitle: '', assessmentType: 'single' }">
+<div class="space-y-6" x-data="adminEventsManager()">
     
     <!-- HEADER -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm">
@@ -104,23 +104,42 @@
                                 <div>📅 Posttest: <strong>{{ $event->posttest_start ? $event->posttest_start->format('d/m/Y') : '-' }} s/d {{ $event->posttest_end ? $event->posttest_end->format('d/m/Y') : '-' }}</strong></div>
                             </div>
                         @endif
+
+                        <!-- Display Dynamic Subcategory / Class Badges -->
+                        @if(!empty($event->custom_subcategories) && is_array($event->custom_subcategories))
+                            <div class="pt-2 border-t border-slate-200/60 space-y-1">
+                                <span class="text-[10px] font-bold text-slate-600 block">🏷️ {{ $event->group_label ?: 'Opsi Pilihan (Kelas/Sub-kategori)' }}:</span>
+                                <div class="flex flex-wrap gap-1">
+                                    @foreach(array_slice($event->custom_subcategories, 0, 4) as $subCat)
+                                        <span class="px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200/80 rounded-md text-[10px] font-semibold">{{ $subCat }}</span>
+                                    @endforeach
+                                    @if(count($event->custom_subcategories) > 4)
+                                        <span class="px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded-md text-[10px] font-bold">+{{ count($event->custom_subcategories) - 4 }} opsi</span>
+                                    @endif
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
 
                 <!-- Action Footer -->
-                <div class="p-4 bg-white border-t border-slate-100 flex items-center justify-between gap-2 text-xs">
-                    <a href="{{ route('admin.events.show', $event) }}" class="flex-1 py-2.5 bg-[#0B2A43] hover:bg-[#123B59] text-white font-bold text-center rounded-xl transition">
-                        📊 Analytic Event
+                <div class="p-3.5 bg-white border-t border-slate-100 flex items-center justify-between gap-1.5 text-xs">
+                    <a href="{{ route('admin.events.show', $event) }}" class="flex-1 py-2 bg-[#0B2A43] hover:bg-[#123B59] text-white font-bold text-center rounded-xl transition text-[11px]">
+                        📊 Analytic
                     </a>
 
-                    <button @click="activeQrUrl = '{{ $event->direct_access_url }}'; activeQrTitle = '{{ addslashes($event->title) }}'; qrModal = true" type="button" title="QR Code & Copy Link" class="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition cursor-pointer">
-                        📱 QR
+                    <button @click="openEdit({{ json_encode($event) }}, '{{ route('admin.events.update', $event) }}')" type="button" title="Edit Event & Tambah Opsi Kelas" class="px-3 py-2 bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold rounded-xl transition cursor-pointer text-[11px] flex items-center gap-1">
+                        <span>✏️ Edit</span>
+                    </button>
+
+                    <button @click="activeQrUrl = '{{ $event->direct_access_url }}'; activeQrTitle = '{{ addslashes($event->title) }}'; qrModal = true" type="button" title="QR Code & Copy Link" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition cursor-pointer text-[11px]">
+                        📱
                     </button>
 
                     <form action="{{ route('admin.events.destroy', $event) }}" method="POST" onsubmit="return confirm('Yakin menghapus event ini? Data peserta terkait tidak akan terhapus.')">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" title="Hapus Event" class="p-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold rounded-xl transition cursor-pointer">
+                        <button type="submit" title="Hapus Event" class="p-2 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold rounded-xl transition cursor-pointer text-[11px]">
                             🗑️
                         </button>
                     </form>
@@ -140,7 +159,7 @@
         {{ $events->links() }}
     </div>
 
-    <!-- CREATE EVENT MODAL (COMPACT 2-COLUMN DESIGN - NO EXCESSIVE SCROLLING) -->
+    <!-- CREATE EVENT MODAL -->
     <div x-show="createModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/70 backdrop-blur-md animate-fadeIn">
         <div @click.away="createModal = false" class="bg-white rounded-3xl max-w-4xl w-full shadow-2xl relative border border-slate-100 flex flex-col max-h-[92vh] overflow-hidden">
             
@@ -315,6 +334,186 @@
         </div>
     </div>
 
+    <!-- EDIT EVENT MODAL -->
+    <div x-show="editModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/70 backdrop-blur-md animate-fadeIn">
+        <div @click.away="editModal = false" class="bg-white rounded-3xl max-w-4xl w-full shadow-2xl relative border border-slate-100 flex flex-col max-h-[92vh] overflow-hidden">
+            
+            <!-- Edit Modal Header -->
+            <div class="px-6 py-4 bg-[#0B2A43] text-white flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-amber-500 text-white font-bold flex items-center justify-center text-base shadow">
+                        ✏️
+                    </div>
+                    <div>
+                        <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest block">UPDATE EVENT & OPTIONS</span>
+                        <h3 class="text-base font-serif font-bold text-white">Edit Event & Tambah Opsi Pilihan</h3>
+                    </div>
+                </div>
+                <button @click="editModal = false" type="button" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white flex items-center justify-center transition">✕</button>
+            </div>
+
+            <!-- Edit Modal Body -->
+            <form :action="editUrl" method="POST" class="p-6 sm:p-7 text-xs overflow-y-auto flex-1 space-y-5">
+                @csrf
+                @method('PUT')
+                <input type="hidden" name="access_type" :value="editData.access_type">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- LEFT COLUMN: Informasi Utama & Akses -->
+                    <div class="space-y-4">
+                        <div class="pb-2 border-b border-slate-100 font-bold text-[#0B2A43] flex items-center gap-1.5 text-xs">
+                            <span>📌 1. Identitas & Target Event</span>
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-slate-800 text-xs mb-1">Nama Event / Kegiatan *</label>
+                            <input type="text" name="title" x-model="editData.title" required placeholder="Contoh: Uji Ruhiologi Pemda Jambi 2026" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-[#0B2A43] outline-none font-medium text-xs">
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-slate-800 text-xs mb-1">Tempat / Instansi Kegiatan *</label>
+                            <input type="text" name="institution_name" x-model="editData.institution_name" required placeholder="Contoh: SMAN Titian Teras Jambi / Aula Pemda" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-[#0B2A43] outline-none font-medium text-xs">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block font-bold text-slate-800 text-xs mb-1">Kode Event (Unique)</label>
+                                <input type="text" name="event_code" x-model="editData.event_code" placeholder="Contoh: RQ-JAMBI-26" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 font-mono bg-slate-50/50 focus:bg-white uppercase font-bold text-xs outline-none">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-800 text-xs mb-1">Status Event *</label>
+                                <select name="status" x-model="editData.status" required class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 font-semibold text-slate-800 outline-none text-xs">
+                                    <option value="active">🟢 Active</option>
+                                    <option value="draft">⚪ Draft</option>
+                                    <option value="completed">🔵 Completed</option>
+                                    <option value="archived">🔴 Archived</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-slate-800 text-xs mb-1">Pilih Paket Soal / Instrumen *</label>
+                            <select name="instrument_id" x-model="editData.instrument_id" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50 font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-[#0B2A43] text-xs">
+                                <option value="">-- Pilih Paket Soal --</option>
+                                @foreach($instruments as $inst)
+                                    <option value="{{ $inst->id }}">{{ $inst->code }} - {{ $inst->name }} ({{ $inst->questions_count ?? $inst->questions->count() }} Soal)</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-slate-800 text-xs mb-1">Preset Target Kategori Peserta</label>
+                            <select name="target_category" x-model="editData.target_category" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50 font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-[#0B2A43] text-xs">
+                                <option value="">🔘 Bebas / Fleksibel (Peserta memilih sendiri)</option>
+                                <option value="Pelajar">🏫 Pelajar (Siswa SD / SMP / SMA / SMK)</option>
+                                <option value="Mahasiswa/i">🎓 Mahasiswa / Mahasiswi</option>
+                                <option value="Umum">👤 Personal / Mandiri (Umum)</option>
+                            </select>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block font-bold text-slate-800 text-xs mb-1">Tanggal Mulai</label>
+                                <input type="date" name="start_date" x-model="editData.start_date" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white text-xs outline-none">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-800 text-xs mb-1">Tanggal Selesai</label>
+                                <input type="date" name="end_date" x-model="editData.end_date" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white text-xs outline-none">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-slate-800 text-xs mb-1">Target Kuota Peserta</label>
+                            <input type="number" name="quota" x-model="editData.quota" placeholder="Contoh: 250" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white outline-none font-medium text-xs">
+                        </div>
+                    </div>
+
+                    <!-- RIGHT COLUMN: Pengaturan Mode & Kelompok Custom -->
+                    <div class="space-y-4">
+                        <div class="pb-2 border-b border-slate-100 font-bold text-[#0B2A43] flex items-center gap-1.5 text-xs">
+                            <span>⚙️ 2. Mode Asesmen & Opsi Kelompok</span>
+                        </div>
+
+                        <!-- Mode Asesmen -->
+                        <div class="p-3 bg-amber-50/60 rounded-2xl border border-amber-200/80 space-y-2">
+                            <label class="block font-bold text-[#0B2A43] text-xs">Mode Asesmen Event *</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button type="button" @click="editData.assessment_type = 'single'" :class="editData.assessment_type === 'single' ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'" class="p-2.5 rounded-xl border text-[11px] text-center transition">
+                                    <span>📝 Sekali Tes</span>
+                                </button>
+                                <button type="button" @click="editData.assessment_type = 'prepost'" :class="editData.assessment_type === 'prepost' ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'" class="p-2.5 rounded-xl border text-[11px] text-center transition">
+                                    <span>🔄 Pre & Posttest</span>
+                                </button>
+                            </div>
+                            <input type="hidden" name="assessment_type" :value="editData.assessment_type">
+
+                            <template x-if="editData.assessment_type === 'prepost'">
+                                <div class="pt-2 space-y-2">
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label class="block font-bold text-slate-700 text-[10px] mb-0.5">Mulai Pretest</label>
+                                            <input type="datetime-local" name="pretest_start" x-model="editData.pretest_start" class="w-full p-2 rounded-lg border border-slate-300 bg-white font-medium text-[11px]">
+                                        </div>
+                                        <div>
+                                            <label class="block font-bold text-slate-700 text-[10px] mb-0.5">Selesai Pretest</label>
+                                            <input type="datetime-local" name="pretest_end" x-model="editData.pretest_end" class="w-full p-2 rounded-lg border border-slate-300 bg-white font-medium text-[11px]">
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label class="block font-bold text-slate-700 text-[10px] mb-0.5">Mulai Posttest</label>
+                                            <input type="datetime-local" name="posttest_start" x-model="editData.posttest_start" class="w-full p-2 rounded-lg border border-slate-300 bg-white font-medium text-[11px]">
+                                        </div>
+                                        <div>
+                                            <label class="block font-bold text-slate-700 text-[10px] mb-0.5">Selesai Posttest</label>
+                                            <input type="datetime-local" name="posttest_end" x-model="editData.posttest_end" class="w-full p-2 rounded-lg border border-slate-300 bg-white font-medium text-[11px]">
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+
+                        <!-- Custom Group / Subcategories Editor -->
+                        <div class="p-3 bg-blue-50/60 rounded-2xl border border-blue-200/80 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <label class="block font-bold text-[#0B2A43] text-xs">Opsi Kelompok / Kelas / Divisi (Custom)</label>
+                                <span class="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">Bisa Ditambah Kapan Saja</span>
+                            </div>
+
+                            <div>
+                                <label class="block font-bold text-slate-700 text-[10px] mb-0.5">Judul Label Form Peserta</label>
+                                <input type="text" name="group_label" x-model="editData.group_label" placeholder="Contoh: Pilih Kelas / Pilih Divisi" class="w-full p-2 rounded-xl border border-slate-300 bg-white text-xs">
+                            </div>
+
+                            <div>
+                                <label class="block font-bold text-slate-700 text-[10px] mb-0.5">Opsi Pilihan (Pisahkan Koma)</label>
+                                <input type="text" name="custom_subcategories" x-model="editData.custom_subcategories_str" placeholder="Contoh: Kelas X-A, Kelas X-B, Kelas XI IPA 1" class="w-full p-2.5 rounded-xl border border-slate-300 bg-white text-xs font-medium focus:ring-2 focus:ring-[#0B2A43]">
+                                <p class="text-[10px] text-slate-500 mt-1">Gunakan tanda koma (<code>,</code>) untuk memisahkan setiap kelas / divisi / kelompok baru.</p>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-slate-800 text-xs mb-1">Catatan / Deskripsi Event</label>
+                            <textarea name="description" x-model="editData.description" rows="2" placeholder="Catatan peruntukan kegiatan..." class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white outline-none text-xs font-medium"></textarea>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Modal Footer Actions -->
+                <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-3 shrink-0">
+                    <button @click="editModal = false" type="button" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition cursor-pointer text-xs">
+                        Batal
+                    </button>
+                    <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-extrabold rounded-xl shadow-lg transition transform hover:-translate-y-0.5 cursor-pointer text-xs flex items-center gap-2">
+                        <span>💾 Simpan Perubahan Event →</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- QR CODE & SHARE MODAL -->
     <div x-show="qrModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
         <div @click.away="qrModal = false" class="bg-white rounded-3xl max-w-md w-full p-6 text-center space-y-4 border border-slate-100 shadow-2xl relative">
@@ -339,4 +538,66 @@
     </div>
 
 </div>
+
+@push('scripts')
+<script>
+function adminEventsManager() {
+    return {
+        createModal: false,
+        editModal: false,
+        qrModal: false,
+        activeQrUrl: '',
+        activeQrTitle: '',
+        assessmentType: 'single',
+
+        editUrl: '',
+        editData: {
+            title: '',
+            institution_name: '',
+            event_code: '',
+            status: 'active',
+            instrument_id: '',
+            target_category: '',
+            start_date: '',
+            end_date: '',
+            quota: '',
+            assessment_type: 'single',
+            pretest_start: '',
+            pretest_end: '',
+            posttest_start: '',
+            posttest_end: '',
+            group_label: '',
+            custom_subcategories_str: '',
+            description: '',
+            access_type: 'EVENT_PROGRAM',
+        },
+
+        openEdit(eventData, updateUrl) {
+            this.editUrl = updateUrl;
+            this.editData = {
+                title: eventData.title || '',
+                institution_name: eventData.institution_name || '',
+                event_code: eventData.event_code || '',
+                status: eventData.status || 'active',
+                instrument_id: eventData.instrument_id || '',
+                target_category: eventData.target_category || '',
+                start_date: eventData.start_date ? eventData.start_date.substring(0, 10) : '',
+                end_date: eventData.end_date ? eventData.end_date.substring(0, 10) : '',
+                quota: eventData.quota || '',
+                assessment_type: eventData.assessment_type || 'single',
+                pretest_start: eventData.pretest_start ? eventData.pretest_start.replace(' ', 'T').substring(0, 16) : '',
+                pretest_end: eventData.pretest_end ? eventData.pretest_end.replace(' ', 'T').substring(0, 16) : '',
+                posttest_start: eventData.posttest_start ? eventData.posttest_start.replace(' ', 'T').substring(0, 16) : '',
+                posttest_end: eventData.posttest_end ? eventData.posttest_end.replace(' ', 'T').substring(0, 16) : '',
+                group_label: eventData.group_label || '',
+                custom_subcategories_str: Array.isArray(eventData.custom_subcategories) ? eventData.custom_subcategories.join(', ') : (eventData.custom_subcategories || ''),
+                description: eventData.description || '',
+                access_type: eventData.access_type || 'EVENT_PROGRAM',
+            };
+            this.editModal = true;
+        }
+    }
+}
+</script>
+@endpush
 @endsection
