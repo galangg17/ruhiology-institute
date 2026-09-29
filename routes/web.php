@@ -153,6 +153,9 @@ Route::middleware(['auth', \App\Http\Middleware\EnsureAdminAccess::class])
         Route::get('/events/{event}', [AdminEventController::class, 'show'])->name('events.show');
         Route::put('/events/{event}', [AdminEventController::class, 'update'])->name('events.update');
         Route::delete('/events/{event}', [AdminEventController::class, 'destroy'])->name('events.destroy');
+        Route::get('/events/{event}/export', [AdminEventController::class, 'exportCsv'])->name('events.export_csv');
+        Route::post('/events/{event}/import', [AdminEventController::class, 'importCsv'])->name('events.import_csv');
+        Route::post('/events/{event}/bulk-region', [AdminEventController::class, 'bulkUpdateRegion'])->name('events.bulk_region');
 
         // Assessment Periods (Pretest / Posttest)
         Route::get('/periods', [AdminPeriodController::class, 'index'])->name('periods.index');

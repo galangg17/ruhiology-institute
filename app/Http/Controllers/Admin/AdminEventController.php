@@ -8,6 +8,7 @@ use App\Models\Instrument;
 use App\Models\Program;
 use App\Models\AssessmentSubmission;
 use App\Models\Province;
+use App\Models\Regency;
 use App\Services\AuditLogService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -139,6 +140,8 @@ class AdminEventController extends Controller
         $who5PerluSkriningCount = $results->filter(fn($r) => $r->who5_percentage < 50)->count();
 
         $instruments = Instrument::where('status', 'active')->get();
+        $provinces = Province::orderBy('name', 'asc')->get();
+        $regenciesMap = Regency::where('status', 'active')->orderBy('name', 'asc')->get(['id', 'province_id', 'name', 'type'])->groupBy('province_id');
 
         return view('admin.events.show', compact(
             'event',
@@ -149,7 +152,9 @@ class AdminEventController extends Controller
             'avgWho5',
             'who5SehatCount',
             'who5PerluSkriningCount',
-            'instruments'
+            'instruments',
+            'provinces',
+            'regenciesMap'
         ));
     }
 
@@ -209,5 +214,281 @@ class AdminEventController extends Controller
     {
         $event->delete();
         return redirect()->route('admin.events.index')->with('success', 'Event berhasil dihapus.');
+    }
+
+    /**
+     * 1-Click Mass Region Update for all participants of this Event.
+     */
+    public function bulkUpdateRegion(Request $request, Event $event)
+    {
+        $validated = $request->validate([
+            'province_id' => ['required', 'exists:provinces,id'],
+            'regency_id' => ['required', 'exists:regencies,id'],
+            'only_from_regency_id' => ['nullable', 'integer'],
+        ]);
+
+        $eventId = $event->id;
+        $eventCode = $event->event_code;
+
+        // Query participants associated with this event
+        $query = \App\Models\Participant::where(function ($q) use ($eventId, $eventCode) {
+            $q->where('event_id', $eventId)
+              ->orWhere('sub_category', 'like', "%{$eventCode}%")
+              ->orWhereHas('submissions', function ($sq) use ($eventId) {
+                  $sq->where('event_id', $eventId);
+              });
+        });
+
+        if (!empty($validated['only_from_regency_id'])) {
+            $query->where('regency_id', $validated['only_from_regency_id']);
+        }
+
+        $count = $query->count();
+
+        $query->update([
+            'province_id' => $validated['province_id'],
+            'regency_id' => $validated['regency_id'],
+        ]);
+
+        $regency = Regency::find($validated['regency_id']);
+        $province = Province::find($validated['province_id']);
+        $regencyStr = ($regency?->type ? $regency->type . ' ' : '') . ($regency?->name ?? '');
+
+        AuditLogService::log(
+            action: 'bulk_update_region',
+            module: 'Event',
+            recordType: 'Event',
+            recordId: (string) $event->id,
+            changes: ['count' => $count, 'province_id' => $validated['province_id'], 'regency_id' => $validated['regency_id']]
+        );
+
+        return back()->with('success', "Berhasil memperbarui wilayah asal {$count} peserta pada Event \"{$event->title}\" menjadi {$regencyStr}, {$province?->name}.");
+    }
+
+    /**
+     * Export CSV of participants for this specific Event.
+     */
+    public function exportCsv(Event $event)
+    {
+        $eventId = $event->id;
+        $eventCode = $event->event_code;
+
+        $participants = \App\Models\Participant::where(function ($q) use ($eventId, $eventCode) {
+            $q->where('event_id', $eventId)
+              ->orWhere('sub_category', 'like', "%{$eventCode}%")
+              ->orWhereHas('submissions', function ($sq) use ($eventId) {
+                  $sq->where('event_id', $eventId);
+              });
+        })->with(['province', 'regency', 'school', 'university'])->get();
+
+        $filename = 'peserta_event_' . Str::slug($event->event_code) . '_' . date('Y-m-d') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
+        ];
+
+        $callback = function () use ($participants) {
+            $file = fopen('php://output', 'w');
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+
+            fputcsv($file, [
+                'Kode Peserta',
+                'Kode Asesmen',
+                'Nama Lengkap',
+                'Email',
+                'Telepon',
+                'Jenis Kelamin',
+                'Provinsi',
+                'Kabupaten / Kota',
+                'Sekolah / Kampus',
+                'Sub Kategori / Sesi',
+                'Status'
+            ]);
+
+            foreach ($participants as $p) {
+                $schoolOrUni = $p->school_custom ?: ($p->university_custom ?: ($p->school?->name ?: ($p->university?->name ?: '-')));
+                fputcsv($file, [
+                    $p->participant_code,
+                    $p->assessment_code ?? '-',
+                    $p->name,
+                    $p->email,
+                    $p->phone ?? '-',
+                    $p->gender ?? '-',
+                    $p->province?->name ?? '-',
+                    $p->regency?->name ?? '-',
+                    $schoolOrUni,
+                    $p->sub_category ?? '-',
+                    strtoupper($p->status)
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Import / Mass Update CSV of participants for this specific Event.
+     */
+    public function importCsv(Request $request, Event $event)
+    {
+        $request->validate([
+            'csv_file' => ['required', 'file', 'mimes:csv,txt', 'max:10240'],
+        ]);
+
+        $file = $request->file('csv_file');
+        $handle = fopen($file->getRealPath(), 'r');
+        if (!$handle) {
+            return back()->with('error', 'Gagal membaca file CSV.');
+        }
+
+        $headerLine = fgets($handle);
+        if (!$headerLine) {
+            fclose($handle);
+            return back()->with('error', 'File CSV kosong.');
+        }
+
+        $headerLine = preg_replace('/[\x{EF}\x{BB}\x{BF}]/u', '', $headerLine);
+        $header = str_getcsv($headerLine);
+
+        $headerMap = [];
+        foreach ($header as $index => $colName) {
+            $cleaned = strtolower(trim(preg_replace('/[\x00-\x1F\x7F-\xFF]/', '', $colName)));
+            $headerMap[$cleaned] = $index;
+        }
+
+        $created = 0;
+        $updated = 0;
+        $skipped = 0;
+
+        $provinces = Province::all();
+        $regencies = Regency::all();
+
+        while (($row = fgetcsv($handle)) !== false) {
+            if (empty(array_filter($row))) continue;
+
+            $getValue = function(...$keys) use ($row, $headerMap) {
+                foreach ($keys as $k) {
+                    $kClean = strtolower(trim($k));
+                    if (isset($headerMap[$kClean]) && isset($row[$headerMap[$kClean]])) {
+                        $val = trim($row[$headerMap[$kClean]]);
+                        if ($val !== '' && $val !== '-') return $val;
+                    }
+                }
+                return null;
+            };
+
+            $partCode = $getValue('kode peserta', 'participant_code');
+            $assCode = $getValue('kode asesmen', 'kode assessment', 'assessment_code');
+            $name = $getValue('nama lengkap', 'nama peserta', 'nama', 'name');
+            $email = $getValue('email');
+            $phone = $getValue('telepon', 'phone', 'hp');
+            $gender = $getValue('jenis kelamin', 'gender');
+            $provName = $getValue('provinsi', 'province');
+            $regName = $getValue('kabupaten / kota', 'kabupaten/kota', 'kota', 'regency');
+            $schoolOrUni = $getValue('sekolah / kampus', 'sekolah', 'kampus', 'institusi asal');
+
+            if (!$name && !$email && !$partCode && !$assCode) {
+                $skipped++;
+                continue;
+            }
+
+            $provinceId = null;
+            if ($provName) {
+                $provMatch = $provinces->first(function($p) use ($provName) {
+                    return stripos($p->name, $provName) !== false || stripos($provName, $p->name) !== false;
+                });
+                if ($provMatch) $provinceId = $provMatch->id;
+            }
+
+            $regencyId = null;
+            if ($regName) {
+                $regMatch = $regencies->first(function($r) use ($regName, $provinceId) {
+                    $matchName = stripos($r->name, $regName) !== false || stripos($regName, $r->name) !== false;
+                    return $provinceId ? ($matchName && $r->province_id == $provinceId) : $matchName;
+                });
+                if ($regMatch) $regencyId = $regMatch->id;
+            }
+
+            $participant = null;
+            if ($partCode) {
+                $participant = \App\Models\Participant::where('participant_code', $partCode)->first();
+            }
+            if (!$participant && $assCode) {
+                $participant = \App\Models\Participant::where('assessment_code', $assCode)->first();
+            }
+            if (!$participant && $email) {
+                $participant = \App\Models\Participant::where('email', $email)->first();
+            }
+            if (!$participant && $name) {
+                $participant = \App\Models\Participant::where('name', $name)->first();
+            }
+
+            $schoolCustom = null;
+            $universityCustom = null;
+            if ($schoolOrUni) {
+                if (Str::contains(strtolower($schoolOrUni), ['uin', 'univ', 'universitas', 'stkip', 'stain', 'stit', 'stikp', 'kampus', 'iaic'])) {
+                    $universityCustom = $schoolOrUni;
+                } else {
+                    $schoolCustom = $schoolOrUni;
+                }
+            }
+
+            if ($participant) {
+                $updateData = ['event_id' => $event->id];
+                if ($name) $updateData['name'] = $name;
+                if ($email && filter_var($email, FILTER_VALIDATE_EMAIL)) $updateData['email'] = $email;
+                if ($phone) $updateData['phone'] = $phone;
+                if ($gender) $updateData['gender'] = $gender;
+                if ($provinceId) $updateData['province_id'] = $provinceId;
+                if ($regencyId) $updateData['regency_id'] = $regencyId;
+                if ($schoolCustom) $updateData['school_custom'] = $schoolCustom;
+                if ($universityCustom) $updateData['university_custom'] = $universityCustom;
+
+                $participant->update($updateData);
+                $updated++;
+            } else {
+                if (!$name) {
+                    $skipped++;
+                    continue;
+                }
+                $dummyEmail = ($email && filter_var($email, FILTER_VALIDATE_EMAIL)) ? $email : (Str::slug($name) . '.' . strtolower(Str::random(5)) . '@participant.ruhiology.id');
+                \App\Models\Participant::create([
+                    'event_id' => $event->id,
+                    'access_type' => 'event',
+                    'participant_code' => $partCode ?: ('PST-' . date('Ym') . '-' . str_pad(rand(1, 999), 3, '0', STR_PAD_LEFT)),
+                    'assessment_code' => $assCode ?: \App\Models\Participant::generateUniqueAssessmentCode(),
+                    'name' => $name,
+                    'email' => $dummyEmail,
+                    'phone' => $phone,
+                    'gender' => $gender ?: 'Laki-laki',
+                    'category' => $event->target_category ?? 'Pelajar',
+                    'province_id' => $provinceId,
+                    'regency_id' => $regencyId,
+                    'school_custom' => $schoolCustom,
+                    'university_custom' => $universityCustom,
+                    'batch' => 'Angkatan ' . date('Y'),
+                    'status' => 'active',
+                ]);
+                $created++;
+            }
+        }
+
+        fclose($handle);
+
+        AuditLogService::log(
+            action: 'import_update_event_participants',
+            module: 'Event',
+            recordType: 'Event',
+            recordId: (string) $event->id,
+            changes: ['updated' => $updated, 'created' => $created, 'skipped' => $skipped]
+        );
+
+        return back()->with('success', "Proses Impor/Update Peserta Event \"{$event->title}\" Berhasil: {$updated} peserta diperbarui, {$created} peserta baru ditambahkan.");
     }
 }

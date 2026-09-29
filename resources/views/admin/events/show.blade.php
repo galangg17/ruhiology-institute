@@ -33,14 +33,20 @@
             </div>
 
             <div class="flex flex-wrap items-center gap-2">
-                <button @click="openEdit({{ json_encode($event) }}, '{{ route('admin.events.update', $event) }}')" type="button" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5 cursor-pointer">
-                    <span>✏️ Edit Event & Opsi Kelas</span>
+                <button @click="openEdit({{ json_encode($event) }}, '{{ route('admin.events.update', $event) }}')" type="button" class="px-3.5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5 cursor-pointer">
+                    <span>✏️ Edit Event & Opsi</span>
                 </button>
-                <a href="{{ route('admin.reports.export_csv', ['event_id' => $event->id]) }}" class="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5">
-                    <span>📥 Export Excel (.xlsx)</span>
+                <button type="button" @click="showBulkRegionModal = true" class="px-3.5 py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-xs rounded-xl shadow transition flex items-center gap-1.5 cursor-pointer" title="Ubah wilayah seluruh peserta event ini sekaligus">
+                    <span>⚡ Ganti Wilayah Massal</span>
+                </button>
+                <a href="{{ route('admin.events.export_csv', $event) }}" class="px-3.5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5" title="Export CSV peserta event ini saja">
+                    <span>📥 Export CSV</span>
                 </a>
-                <a href="{{ route('admin.reports.export_pdf', ['event_id' => $event->id]) }}" target="_blank" class="px-4 py-2.5 bg-rose-700 hover:bg-rose-800 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5">
-                    <span>📄 Export Laporan PDF</span>
+                <button type="button" @click="showImportModal = true" class="px-3.5 py-2.5 bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5 cursor-pointer" title="Update peserta event ini via CSV">
+                    <span>📤 Update CSV</span>
+                </button>
+                <a href="{{ route('admin.reports.export_pdf', ['event_id' => $event->id]) }}" target="_blank" class="px-3.5 py-2.5 bg-rose-700 hover:bg-rose-800 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5">
+                    <span>📄 PDF Laporan</span>
                 </a>
             </div>
         </div>
@@ -363,6 +369,91 @@
         </div>
     </div>
 
+    <!-- MODAL GANTI WILAYAH MASSAL KHUSUS EVENT INI -->
+    <div x-show="showBulkRegionModal" x-cloak class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-100">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="font-bold font-serif text-[#0B2A43] text-base flex items-center gap-2">
+                    <span>⚡</span> <span>Ganti Wilayah Massal Peserta Event</span>
+                </h3>
+                <button @click="showBulkRegionModal = false" class="text-slate-400 hover:text-slate-600 text-lg font-bold cursor-pointer">✕</button>
+            </div>
+
+            <p class="text-xs text-slate-600 leading-relaxed">
+                Fitur ini akan secara instan memperbarui wilayah asal <strong>seluruh peserta</strong> yang terdaftar pada Event <strong>"{{ $event->title }}"</strong> (KODE: {{ $event->event_code }}) menjadi Provinsi & Kota yang Anda pilih di bawah ini.
+            </p>
+
+            <form action="{{ route('admin.events.bulk_region', $event) }}" method="POST" class="space-y-4 text-xs">
+                @csrf
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Provinsi Baru *</label>
+                    <select name="province_id" x-model="bulkProvinceId" @change="onBulkProvinceChange()" required class="w-full p-2.5 rounded-xl border border-slate-300 font-bold bg-white text-slate-800 focus:ring-2 focus:ring-[#0B2A43] outline-none">
+                        <option value="">-- Pilih Provinsi --</option>
+                        <template x-for="p in provincesList" :key="p.id">
+                            <option :value="p.id" x-text="p.name"></option>
+                        </template>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Kabupaten / Kota Baru *</label>
+                    <select name="regency_id" x-model="bulkRegencyId" :disabled="!bulkProvinceId" required class="w-full p-2.5 rounded-xl border border-slate-300 font-bold bg-white text-slate-800 disabled:bg-slate-100 disabled:text-slate-400 focus:ring-2 focus:ring-[#0B2A43] outline-none">
+                        <option value="" x-text="bulkProvinceId ? '-- Pilih Kab/Kota --' : 'Pilih Provinsi Dahulu'"></option>
+                        <template x-for="r in filteredBulkRegencies" :key="r.id">
+                            <option :value="r.id" x-text="(r.type ? r.type + ' ' : '') + r.name"></option>
+                        </template>
+                    </select>
+                </div>
+
+                <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-[11px] text-amber-900">
+                    ⚠️ <strong>Perhatian:</strong> Tindakan ini akan secara otomatis mengubah domisili seluruh peserta pada event ini secara langsung.
+                </div>
+
+                <div class="flex gap-2 pt-2">
+                    <button type="button" @click="showBulkRegionModal = false" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition cursor-pointer">
+                        Batal
+                    </button>
+                    <button type="submit" class="flex-1 py-3 bg-[#0B2A43] hover:bg-[#123B59] text-[#C9A24D] font-extrabold rounded-xl transition shadow cursor-pointer">
+                        ⚡ Terapkan Perubahan Massal
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL IMPORT / UPDATE CSV KHUSUS EVENT INI -->
+    <div x-show="showImportModal" x-cloak class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="font-bold font-serif text-slate-900 text-base flex items-center gap-2">
+                    <span>📤</span> <span>Update / Impor CSV Peserta Event Ini</span>
+                </h3>
+                <button @click="showImportModal = false" class="text-slate-400 hover:text-slate-600 text-lg font-bold cursor-pointer">✕</button>
+            </div>
+
+            <p class="text-xs text-slate-600 leading-relaxed">
+                Unduh file CSV peserta khusus event ini melalui tombol <strong>Export CSV</strong>, perbaiki data di Excel, lalu unggah kembali filenya di bawah ini untuk memperbarui data peserta Event <strong>"{{ $event->title }}"</strong>.
+            </p>
+
+            <form action="{{ route('admin.events.import_csv', $event) }}" method="POST" enctype="multipart/form-data" class="space-y-4 pt-2 text-xs">
+                @csrf
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Pilih File CSV (*.csv) *</label>
+                    <input type="file" name="csv_file" accept=".csv,.txt" required class="w-full p-2.5 rounded-xl border border-slate-300 text-xs bg-slate-50 font-mono">
+                </div>
+
+                <div class="flex gap-2 pt-2">
+                    <button type="button" @click="showImportModal = false" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition cursor-pointer">
+                        Batal
+                    </button>
+                    <button type="submit" class="flex-1 py-3 bg-[#0B2A43] hover:bg-[#123B59] text-[#C9A24D] font-extrabold rounded-xl transition shadow cursor-pointer">
+                        Proses Update CSV Event →
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 </div>
 
 @push('scripts')
@@ -370,9 +461,27 @@
 function adminEventsManager() {
     return {
         editModal: false,
+        showBulkRegionModal: false,
+        showImportModal: false,
+        bulkProvinceId: '',
+        bulkRegencyId: '',
+        provincesList: @json($provinces ?? []),
+        regenciesMap: @json($regenciesMap ?? []),
+        filteredBulkRegencies: [],
         editUrl: '',
         newOptionText: '',
         editSubcategoriesList: [],
+
+        onBulkProvinceChange() {
+            this.bulkRegencyId = '';
+            if (!this.bulkProvinceId) {
+                this.filteredBulkRegencies = [];
+                return;
+            }
+            const pid = String(this.bulkProvinceId);
+            this.filteredBulkRegencies = this.regenciesMap[pid] || this.regenciesMap[Number(pid)] || [];
+        },
+
         editData: {
             title: '',
             institution_name: '',
