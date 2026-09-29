@@ -363,7 +363,7 @@ class AdminParticipantController extends Controller
     public function importCsv(Request $request)
     {
         $request->validate([
-            'csv_file' => ['required', 'file', 'mimes:csv,txt', 'max:5120'],
+            'csv_file' => ['required', 'file', 'mimes:csv,txt', 'max:10240'],
         ]);
 
         $file = $request->file('csv_file');
@@ -372,70 +372,152 @@ class AdminParticipantController extends Controller
             return back()->with('error', 'Gagal membaca file CSV.');
         }
 
-        $header = fgetcsv($handle);
-        if (!$header) {
+        $headerLine = fgets($handle);
+        if (!$headerLine) {
             fclose($handle);
             return back()->with('error', 'File CSV kosong.');
         }
 
-        $cleanHeader = array_map(function ($h) {
-            return strtolower(trim(preg_replace('/[\x00-\x1F\x7F-\xFF]/', '', $h)));
-        }, $header);
+        $headerLine = preg_replace('/[\x{EF}\x{BB}\x{BF}]/u', '', $headerLine);
+        $header = str_getcsv($headerLine);
+
+        $headerMap = [];
+        foreach ($header as $index => $colName) {
+            $cleaned = strtolower(trim(preg_replace('/[\x00-\x1F\x7F-\xFF]/', '', $colName)));
+            $headerMap[$cleaned] = $index;
+        }
 
         $created = 0;
+        $updated = 0;
         $skipped = 0;
+
+        $provinces = Province::all();
+        $regencies = Regency::all();
 
         while (($row = fgetcsv($handle)) !== false) {
             if (empty(array_filter($row))) continue;
 
-            $data = [];
-            foreach ($cleanHeader as $index => $key) {
-                $data[$key] = isset($row[$index]) ? trim($row[$index]) : null;
-            }
+            $getValue = function(...$keys) use ($row, $headerMap) {
+                foreach ($keys as $k) {
+                    $kClean = strtolower(trim($k));
+                    if (isset($headerMap[$kClean]) && isset($row[$headerMap[$kClean]])) {
+                        $val = trim($row[$headerMap[$kClean]]);
+                        if ($val !== '' && $val !== '-') return $val;
+                    }
+                }
+                return null;
+            };
 
-            $code = $data['participant_code'] ?? ('PST-' . date('Ym') . '-' . str_pad(rand(1, 999), 3, '0', STR_PAD_LEFT));
-            $name = $data['name'] ?? null;
-            $email = $data['email'] ?? null;
+            $partCode = $getValue('kode peserta', 'participant_code');
+            $assCode = $getValue('kode asesmen', 'kode assessment', 'assessment_code');
+            $name = $getValue('nama lengkap', 'nama peserta', 'nama', 'name');
+            $email = $getValue('email');
+            $phone = $getValue('telepon', 'phone', 'hp');
+            $gender = $getValue('jenis kelamin', 'gender');
+            $provName = $getValue('provinsi', 'province');
+            $regName = $getValue('kabupaten / kota', 'kabupaten/kota', 'kota', 'regency');
+            $schoolOrUni = $getValue('sekolah / kampus', 'sekolah', 'kampus', 'institusi asal');
+            $batch = $getValue('angkatan / batch', 'batch', 'angkatan') ?? 'Angkatan ' . date('Y');
+            $status = strtolower($getValue('status') ?? 'active');
 
-            if (!$name || !$email) {
+            if (!$name && !$email && !$partCode && !$assCode) {
                 $skipped++;
                 continue;
             }
 
-            if (Participant::where('participant_code', $code)->orWhere('email', $email)->exists()) {
-                $skipped++;
-                continue;
+            $provinceId = null;
+            if ($provName) {
+                $provMatch = $provinces->first(function($p) use ($provName) {
+                    return stripos($p->name, $provName) !== false || stripos($provName, $p->name) !== false;
+                });
+                if ($provMatch) $provinceId = $provMatch->id;
             }
 
-            Participant::create([
-                'institution_id' => !empty($data['institution_id']) ? (int)$data['institution_id'] : (Institution::first()?->id ?? 1),
-                'program_id' => !empty($data['program_id']) ? (int)$data['program_id'] : (Program::first()?->id ?? 1),
-                'participant_code' => $code,
-                'assessment_code' => Participant::generateUniqueAssessmentCode(),
-                'name' => $name,
-                'email' => $email,
-                'phone' => $data['phone'] ?? null,
-                'gender' => $data['gender'] ?? 'Laki-laki',
-                'batch' => $data['batch'] ?? 'Angkatan ' . date('Y'),
-                'school_custom' => $data['school_custom'] ?? null,
-                'university_custom' => $data['university_custom'] ?? null,
-                'status' => in_array($data['status'] ?? '', ['active', 'inactive']) ? $data['status'] : 'active',
-            ]);
+            $regencyId = null;
+            if ($regName) {
+                $regMatch = $regencies->first(function($r) use ($regName, $provinceId) {
+                    $matchName = stripos($r->name, $regName) !== false || stripos($regName, $r->name) !== false;
+                    return $provinceId ? ($matchName && $r->province_id == $provinceId) : $matchName;
+                });
+                if ($regMatch) $regencyId = $regMatch->id;
+            }
 
-            $created++;
+            $participant = null;
+            if ($partCode) {
+                $participant = Participant::where('participant_code', $partCode)->first();
+            }
+            if (!$participant && $assCode) {
+                $participant = Participant::where('assessment_code', $assCode)->first();
+            }
+            if (!$participant && $email) {
+                $participant = Participant::where('email', $email)->first();
+            }
+            if (!$participant && $name) {
+                $participant = Participant::where('name', $name)->first();
+            }
+
+            $schoolCustom = null;
+            $universityCustom = null;
+            if ($schoolOrUni) {
+                if (\Illuminate\Support\Str::contains(strtolower($schoolOrUni), ['uin', 'univ', 'universitas', 'stkip', 'stain', 'stit', 'stikp', 'kampus', 'iaic'])) {
+                    $universityCustom = $schoolOrUni;
+                } else {
+                    $schoolCustom = $schoolOrUni;
+                }
+            }
+
+            if ($participant) {
+                $updateData = [];
+                if ($name) $updateData['name'] = $name;
+                if ($email && filter_var($email, FILTER_VALIDATE_EMAIL)) $updateData['email'] = $email;
+                if ($phone) $updateData['phone'] = $phone;
+                if ($gender) $updateData['gender'] = $gender;
+                if ($provinceId) $updateData['province_id'] = $provinceId;
+                if ($regencyId) $updateData['regency_id'] = $regencyId;
+                if ($schoolCustom) $updateData['school_custom'] = $schoolCustom;
+                if ($universityCustom) $updateData['university_custom'] = $universityCustom;
+                if ($batch) $updateData['batch'] = $batch;
+                if (in_array($status, ['active', 'inactive'])) $updateData['status'] = $status;
+
+                $participant->update($updateData);
+                $updated++;
+            } else {
+                if (!$name) {
+                    $skipped++;
+                    continue;
+                }
+                $dummyEmail = ($email && filter_var($email, FILTER_VALIDATE_EMAIL)) ? $email : (\Illuminate\Support\Str::slug($name) . '.' . strtolower(\Illuminate\Support\Str::random(5)) . '@participant.ruhiology.id');
+                Participant::create([
+                    'institution_id' => Institution::first()?->id ?? 1,
+                    'program_id' => Program::first()?->id ?? 1,
+                    'participant_code' => $partCode ?: ('PST-' . date('Ym') . '-' . str_pad(rand(1, 999), 3, '0', STR_PAD_LEFT)),
+                    'assessment_code' => $assCode ?: Participant::generateUniqueAssessmentCode(),
+                    'name' => $name,
+                    'email' => $dummyEmail,
+                    'phone' => $phone,
+                    'gender' => $gender ?: 'Laki-laki',
+                    'province_id' => $provinceId,
+                    'regency_id' => $regencyId,
+                    'school_custom' => $schoolCustom,
+                    'university_custom' => $universityCustom,
+                    'batch' => $batch,
+                    'status' => in_array($status, ['active', 'inactive']) ? $status : 'active',
+                ]);
+                $created++;
+            }
         }
 
         fclose($handle);
 
         AuditLogService::log(
-            action: 'import',
+            action: 'import_update',
             module: 'Participants',
             recordType: 'Participant',
-            recordId: 'batch_import',
-            changes: ['created' => $created, 'skipped' => $skipped]
+            recordId: 'batch_mass_update',
+            changes: ['updated' => $updated, 'created' => $created, 'skipped' => $skipped]
         );
 
-        return back()->with('success', "Import Data Peserta berhasil: {$created} peserta ditambahkan, {$skipped} dilewati/duplikat.");
+        return back()->with('success', "Proses Impor/Update Data Peserta Berhasil: {$updated} data peserta diperbarui (termasuk Kota/Provinsi), {$created} peserta baru ditambahkan, {$skipped} dilewati.");
     }
 
     public function importServerCsv(Request $request)

@@ -1,9 +1,9 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="space-y-8">
+<div class="space-y-8" x-data="{ showImportModal: false }">
     
-    <!-- EXECUTIVE QUICK ACTION BAR -->
+    <!-- EXECUTIVE COMMAND CENTER HEADER -->
     <div class="bg-gradient-to-r from-[#0B2A43] via-[#123B59] to-[#08141E] text-white p-6 rounded-3xl shadow-xl border border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div class="space-y-1">
             <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest block">EXECUTIVE COMMAND CENTER</span>
@@ -12,14 +12,14 @@
         </div>
         
         <div class="flex flex-wrap gap-2.5 shrink-0">
-            <a href="{{ route('admin.participants.index') }}" class="px-4 py-2.5 bg-[#C9A24D] hover:bg-[#B48A16] text-[#0B2A43] font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5">
-                <span>👥</span> <span>+ Registrasi Peserta</span>
+            <a href="{{ route('admin.participants.export') }}" class="px-3.5 py-2.5 bg-[#C9A24D] hover:bg-[#B48A16] text-[#0B2A43] font-extrabold text-xs rounded-xl shadow transition flex items-center gap-1.5" title="Ekspor seluruh data peserta ke file CSV/Excel">
+                <span>📥</span> <span>Export CSV Peserta</span>
             </a>
-            <a href="{{ route('admin.reports.export_csv') }}" class="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white border border-white/20 font-bold text-xs rounded-xl transition flex items-center gap-1.5">
-                <span>📊</span> <span>Export Rekap CSV</span>
-            </a>
-            <a href="{{ route('admin.master_data.index', ['tab' => 'pending']) }}" class="px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5">
-                <span>⚡</span> <span>Verifikasi Kampus ({{ $kpis['pending_institutions'] ?? 0 }})</span>
+            <button type="button" @click="showImportModal = true" class="px-3.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow transition flex items-center gap-1.5 cursor-pointer" title="Update Kota/Wilayah & Data Peserta via Excel">
+                <span>📤</span> <span>Update Massal CSV</span>
+            </button>
+            <a href="{{ route('admin.participants.index') }}" class="px-3.5 py-2.5 bg-white/10 hover:bg-white/20 text-white border border-white/20 font-bold text-xs rounded-xl transition flex items-center gap-1.5">
+                <span>👥</span> <span>Kelola Peserta</span>
             </a>
         </div>
     </div>
@@ -231,6 +231,49 @@
 
         </div>
 
+    <!-- MODAL IMPORT / UPDATE MASSAL DATA PESERTA VIA EXCEL/CSV -->
+    <div x-show="showImportModal" x-cloak class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="font-bold font-serif text-slate-900 text-base flex items-center gap-2">
+                    <span>📤</span> <span>Update Massal / Impor Data Peserta (CSV)</span>
+                </h3>
+                <button @click="showImportModal = false" class="text-slate-400 hover:text-slate-600 text-lg font-bold cursor-pointer">✕</button>
+            </div>
+
+            <p class="text-xs text-slate-600 leading-relaxed">
+                Fitur ini dapat digunakan untuk <strong>memperbarui data wilayah (Provinsi & Kota)</strong> atau profil peserta secara sekaligus.
+                <br>Silakan ekspor data CSV terlebih dahulu, perbaiki kolom <code>Provinsi</code> dan <code>Kabupaten / Kota</code> di Excel, lalu unggah kembali filenya di bawah ini.
+            </p>
+
+            <div class="p-3 bg-amber-50 rounded-2xl border border-amber-200 text-[11px] text-amber-900 font-medium space-y-1">
+                <p class="font-bold text-amber-950">💡 Langkah Mudah Update Kota/Provinsi Massal:</p>
+                <ol class="list-decimal list-inside space-y-0.5 text-slate-700">
+                    <li>Klik <a href="{{ route('admin.participants.export') }}" class="font-bold underline text-amber-900">Unduh Export CSV Peserta Saat Ini</a>.</li>
+                    <li>Buka file CSV tersebut di Microsoft Excel / Google Sheets.</li>
+                    <li>Ubah isi kolom <strong>Provinsi</strong> (misal: <em>Kepulauan Riau</em>) dan <strong>Kabupaten / Kota</strong> (misal: <em>Kota Batam</em>).</li>
+                    <li>Simpan (*.csv) lalu upload file tersebut melalui tombol pilih file di bawah ini.</li>
+                </ol>
+            </div>
+
+            <form action="{{ route('admin.participants.import') }}" method="POST" enctype="multipart/form-data" class="space-y-4 pt-2">
+                @csrf
+                <div>
+                    <label class="block font-bold text-slate-700 text-xs mb-1">Pilih File CSV (*.csv) *</label>
+                    <input type="file" name="csv_file" accept=".csv,.txt" required class="w-full p-2.5 rounded-xl border border-slate-300 text-xs bg-slate-50 font-mono">
+                </div>
+
+                <div class="flex gap-2 pt-2">
+                    <button type="button" @click="showImportModal = false" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition cursor-pointer">
+                        Batal
+                    </button>
+                    <button type="submit" class="flex-1 py-3 bg-[#0B2A43] hover:bg-[#123B59] text-[#C9A24D] font-extrabold rounded-xl text-xs transition shadow cursor-pointer">
+                        Proses Update / Impor →
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
+
 </div>
 @endsection
