@@ -246,7 +246,7 @@ class AdminInstrumentController extends Controller
 
     public function downloadTemplate()
     {
-        $filename = "template_import_paket_soal.csv";
+        $filename = "template_import_paket_soal_20_butir.csv";
         $headers = [
             "Content-Type" => "text/csv; charset=UTF-8",
             "Content-Disposition" => "attachment; filename=\"$filename\"",
@@ -259,15 +259,119 @@ class AdminInstrumentController extends Controller
             $handle = fopen('php://output', 'w');
             fputs($handle, "\xEF\xBB\xBF");
 
-            fputcsv($handle, ['Kode Dimensi', 'Nama Dimensi', 'Teks Pertanyaan', 'Skoring']);
-            fputcsv($handle, ['DIM-1', 'Kesadaran Diri Hakiki', 'Saya menyadari bahwa diri saya bukan sekadar fisik melainkan ruh yang sedang berproses.', 'normal']);
-            fputcsv($handle, ['DIM-1', 'Kesadaran Diri Hakiki', 'Saya sering merasa cemas dan hampa meskipun meraih pencapaian materi.', 'reverse']);
-            fputcsv($handle, ['DIM-WHO5', 'Indeks Kesejahteraan Mental (WHO-5)', 'Saya merasa bersemangat, ceria, dan termotivasi dalam menjalani hari-hari.', 'normal']);
+            fputcsv($handle, ['Kode Dimensi', 'Nama Dimensi', 'Teks Pertanyaan', 'Skoring (normal/reverse)']);
+            
+            // 20 Questions Pre-Structured Template (15 RQI + 5 WHO-5)
+            $templateData = [
+                // DIM-1 (3 Questions)
+                ['DIM-1', 'Pengenalan & Kesadaran Diri Hakiki', 'Saya menyadari bahwa diri saya bukan sekadar fisik atau status sosial, melainkan ruh yang sedang berproses.', 'normal'],
+                ['DIM-1', 'Pengenalan & Kesadaran Diri Hakiki', 'Ketika rasa penat atau godaan gawai datang, saya sadar kapan harus segera rem darurat.', 'normal'],
+                ['DIM-1', 'Pengenalan & Kesadaran Diri Hakiki', 'Saat merasa gagal atau tertinggal dari orang lain, batin saya tetap tenang.', 'normal'],
+
+                // DIM-2 (3 Questions)
+                ['DIM-2', 'Pengenalan Ketuhanan (God Spot)', 'Di tengah kesibukan, ada ruang sunyi dalam diri saya yang merindukan ketenangan mengingat Tuhan.', 'normal'],
+                ['DIM-2', 'Pengenalan Ketuhanan (God Spot)', 'Saya meyakini secara mendalam bahwa setiap masalah adalah rancangan kasih sayang Tuhan.', 'normal'],
+                ['DIM-2', 'Pengenalan Ketuhanan (God Spot)', 'Ketika menghadapi masalah frustrasi, saya langsung berserah dan memohon petunjuk ke-Nya.', 'normal'],
+
+                // DIM-3 (3 Questions)
+                ['DIM-3', 'Ketaatan Ibadah', 'Saya menunaikan ibadah dengan tenang dan penuh penghayatan (thuma\'ninah).', 'normal'],
+                ['DIM-3', 'Ketaatan Ibadah', 'Saya rutin meluangkan waktu untuk mengevaluasi diri (muhasabah).', 'normal'],
+                ['DIM-3', 'Ketaatan Ibadah', 'Saya menjaga kedisiplinan ibadah harian atas dorongan nurani sendiri.', 'normal'],
+
+                // DIM-4 (3 Questions)
+                ['DIM-4', 'Perubahan Perilaku & Akhlak Karimah', 'Saya menjalankan peran atau komitmen kerja secara tuntas dan jujur (anti-freerider).', 'normal'],
+                ['DIM-4', 'Perubahan Perilaku & Akhlak Karimah', 'Ketika berada di lingkungan bergosip atau konflik, batin saya menolak ikut memperkeruh.', 'normal'],
+                ['DIM-4', 'Perubahan Perilaku & Akhlak Karimah', 'Saya tergerak secara tulus untuk membantu atau meringankan beban orang di sekitar.', 'normal'],
+
+                // DIM-5 (3 Questions)
+                ['DIM-5', 'Kesadaran Puncak Ketuhanan (God Light & Muraqabah)', 'Kesadaran bahwa Tuhan selalu mengawasi membuat saya menolak segala bentuk kecurangan.', 'normal'],
+                ['DIM-5', 'Kesadaran Puncak Ketuhanan (God Light & Muraqabah)', 'Ketika sedang sendirian larut malam, kesadaran bahwa Tuhan melihat menjaga kesucian pikiran.', 'normal'],
+                ['DIM-5', 'Kesadaran Puncak Ketuhanan (God Light & Muraqabah)', 'Bagi saya, proses yang jujur jauh lebih berharga daripada meraih hasil instan.', 'normal'],
+
+                // DIM-WHO5 (5 Questions)
+                ['DIM-WHO5', 'Indeks Kesejahteraan Mental (WHO-5)', 'Saya merasa bersemangat, ceria, dan termotivasi dalam menjalani hari-hari.', 'normal'],
+                ['DIM-WHO5', 'Indeks Kesejahteraan Mental (WHO-5)', 'Saya merasa tenang, damai, dan tidak terbebani oleh kecemasan berlebih.', 'normal'],
+                ['DIM-WHO5', 'Indeks Kesejahteraan Mental (WHO-5)', 'Tubuh dan pikiran saya merasa aktif, segar, dan bertenaga.', 'normal'],
+                ['DIM-WHO5', 'Indeks Kesejahteraan Mental (WHO-5)', 'Saya bisa bangun tidur pagi dengan perasaan segar dan istirahat yang cukup.', 'normal'],
+                ['DIM-WHO5', 'Indeks Kesejahteraan Mental (WHO-5)', 'Kehidupan sehari-hari saya terasa bermakna dan memicu antusiasme saya.', 'normal'],
+            ];
+
+            foreach ($templateData as $row) {
+                fputcsv($handle, $row);
+            }
 
             fclose($handle);
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    public function storeBatchQuestions(Request $request, Instrument $instrument)
+    {
+        $validated = $request->validate([
+            'questions' => ['required', 'array'],
+            'questions.*.dimension_code' => ['required', 'string'],
+            'questions.*.dimension_name' => ['required', 'string'],
+            'questions.*.question_text' => ['nullable', 'string'],
+            'questions.*.scoring_direction' => ['nullable', 'in:normal,reverse'],
+        ]);
+
+        $order = Question::where('instrument_id', $instrument->id)->max('order') ?? 0;
+        $count = 0;
+
+        foreach ($validated['questions'] as $qItem) {
+            $text = trim($qItem['question_text'] ?? '');
+            if (empty($text)) continue;
+
+            $dimCode = trim($qItem['dimension_code']);
+            $dimName = trim($qItem['dimension_name']);
+
+            $dimension = Dimension::firstOrCreate(
+                ['instrument_id' => $instrument->id, 'code' => $dimCode],
+                ['name' => $dimName, 'order' => Dimension::where('instrument_id', $instrument->id)->count() + 1]
+            );
+
+            $order++;
+            $scoring = ($qItem['scoring_direction'] ?? 'normal') === 'reverse' ? 'reverse' : 'normal';
+
+            $question = Question::create([
+                'instrument_id' => $instrument->id,
+                'dimension_id' => $dimension->id,
+                'question_text' => $text,
+                'type' => 'likert',
+                'scoring_direction' => $scoring,
+                'order' => $order,
+                'status' => 'active',
+            ]);
+
+            $isWho5 = str_contains(strtolower($dimCode), 'who') || str_contains(strtolower($dimName), 'who');
+            $options = $isWho5 ? [
+                ['text' => 'Tidak Pernah', 'val' => 1],
+                ['text' => 'Jarang', 'val' => 2],
+                ['text' => 'Kadang-kadang', 'val' => 3],
+                ['text' => 'Sebagian Besar Waktu', 'val' => 4],
+                ['text' => 'Sepanjang Waktu', 'val' => 5],
+            ] : [
+                ['text' => 'Sangat Tidak Sesuai', 'val' => 1],
+                ['text' => 'Tidak Sesuai', 'val' => 2],
+                ['text' => 'Netral / Ragu-ragu', 'val' => 3],
+                ['text' => 'Sesuai', 'val' => 4],
+                ['text' => 'Sangat Sesuai', 'val' => 5],
+            ];
+
+            foreach ($options as $optIdx => $opt) {
+                QuestionOption::create([
+                    'question_id' => $question->id,
+                    'option_text' => $opt['text'],
+                    'option_value' => $opt['val'],
+                    'order' => $optIdx + 1,
+                ]);
+            }
+
+            $count++;
+        }
+
+        return back()->with('success', "Berhasil menyimpan {$count} pertanyaan ke Paket Soal \"{$instrument->name}\".");
     }
 
     public function exportCsv(Instrument $instrument)

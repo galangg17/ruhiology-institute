@@ -141,6 +141,7 @@ Route::middleware(['auth', \App\Http\Middleware\EnsureAdminAccess::class])
         Route::post('/instruments/{instrument}/dimensions', [AdminInstrumentController::class, 'storeDimension'])->name('instruments.dimensions.store');
         Route::delete('/instruments/{instrument}/dimensions/{dimension}', [AdminInstrumentController::class, 'destroyDimension'])->name('instruments.dimensions.destroy');
         Route::post('/instruments/{instrument}/questions', [AdminInstrumentController::class, 'storeQuestion'])->name('instruments.questions.store');
+        Route::post('/instruments/{instrument}/questions/batch', [AdminInstrumentController::class, 'storeBatchQuestions'])->name('instruments.questions.store_batch');
         Route::put('/instruments/{instrument}/questions/{question}', [AdminInstrumentController::class, 'updateQuestion'])->name('instruments.questions.update');
         Route::delete('/instruments/{instrument}/questions/{question}', [AdminInstrumentController::class, 'destroyQuestion'])->name('instruments.questions.destroy');
         Route::post('/instruments/{instrument}/scoring', [AdminInstrumentController::class, 'updateScoringRule'])->name('instruments.scoring.update');
