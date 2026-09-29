@@ -240,7 +240,7 @@
                     <select name="regency_id" onchange="this.form.submit()" {{ !request('province_id') ? 'disabled' : '' }} class="w-full p-2 rounded-xl border border-slate-300 text-xs bg-white font-medium disabled:bg-slate-100 disabled:text-slate-400">
                         <option value="">{{ request('province_id') ? 'Semua Kab/Kota' : 'Pilih Provinsi Dahulu' }}</option>
                         @foreach($regencies as $reg)
-                            <option value="{{ $reg->id }}" {{ request('regency_id') == $reg->id ? 'selected' : '' }}>{{ ($reg->type ? $reg->type . ' ' : '') . $reg->name }}</option>
+                            <option value="{{ $reg->id }}" {{ request('regency_id') == $reg->id ? 'selected' : '' }}>{{ $reg->formatted_name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -650,7 +650,7 @@
                         <select name="regency_id" x-model="createRegencyId" :disabled="!createProvinceId" class="w-full p-2.5 rounded-xl border border-slate-300 bg-white disabled:bg-slate-100 disabled:text-slate-400">
                             <option value="" x-text="createProvinceId ? '-- Pilih Kab/Kota --' : 'Pilih Provinsi Dahulu'"></option>
                             <template x-for="reg in getRegencies(createProvinceId)" :key="reg.id">
-                                <option :value="reg.id" x-text="(reg.type ? reg.type + ' ' : '') + reg.name"></option>
+                                <option :value="reg.id" x-text="reg.formatted_name || ((reg.name.startsWith('Kota') || reg.name.startsWith('Kabupaten') || !reg.type) ? reg.name : (reg.type + ' ' + reg.name))"></option>
                             </template>
                         </select>
                     </div>
@@ -766,7 +766,7 @@
                         <select name="regency_id" x-model="editData.regency_id" :disabled="!editData.province_id" class="w-full p-2.5 rounded-xl border border-slate-300 disabled:bg-slate-100 disabled:text-slate-400">
                             <option value="" x-text="editData.province_id ? '-- Pilih Kab/Kota --' : 'Pilih Provinsi Dahulu'"></option>
                             <template x-for="reg in getRegencies(editData.province_id)" :key="reg.id">
-                                <option :value="reg.id" x-text="(reg.type ? reg.type + ' ' : '') + reg.name" :selected="String(reg.id) === String(editData.regency_id)"></option>
+                                <option :value="reg.id" x-text="reg.formatted_name || ((reg.name.startsWith('Kota') || reg.name.startsWith('Kabupaten') || !reg.type) ? reg.name : (reg.type + ' ' + reg.name))" :selected="String(reg.id) === String(editData.regency_id)"></option>
                             </template>
                         </select>
                     </div>

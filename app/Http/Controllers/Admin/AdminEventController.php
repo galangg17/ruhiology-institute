@@ -252,7 +252,7 @@ class AdminEventController extends Controller
 
         $regency = Regency::find($validated['regency_id']);
         $province = Province::find($validated['province_id']);
-        $regencyStr = ($regency?->type ? $regency->type . ' ' : '') . ($regency?->name ?? '');
+        $regencyStr = $regency?->formatted_name ?? '';
 
         AuditLogService::log(
             action: 'bulk_update_region',

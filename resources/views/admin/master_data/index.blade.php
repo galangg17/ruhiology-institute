@@ -117,7 +117,7 @@
                     @foreach($regencies as $reg)
                         <tr class="hover:bg-slate-50/80">
                             <td class="px-6 py-4 font-mono font-bold text-[#0B2A43]">{{ $reg->code }}</td>
-                            <td class="px-6 py-4 font-bold text-slate-900 text-sm">{{ $reg->type }} {{ $reg->name }}</td>
+                            <td class="px-6 py-4 font-bold text-slate-900 text-sm">{{ $reg->formatted_name }}</td>
                             <td class="px-6 py-4 text-slate-600 font-semibold">{{ $reg->province->name ?? '-' }}</td>
                             <td class="px-6 py-4">
                                 <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-full text-[10px] font-bold uppercase">Aktif</span>

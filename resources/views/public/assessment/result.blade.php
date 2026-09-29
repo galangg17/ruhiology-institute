@@ -496,7 +496,7 @@
                         <select name="regency_id" x-model="editRegencyId" :disabled="!editProvinceId" required class="w-full p-2.5 rounded-xl border border-slate-300 font-bold bg-white text-slate-800 disabled:bg-slate-100 disabled:text-slate-400 focus:ring-2 focus:ring-[#0B2A43] outline-none">
                             <option value="" x-text="editProvinceId ? '-- Pilih Kab/Kota --' : 'Pilih Provinsi Dahulu'"></option>
                             <template x-for="r in filteredEditRegencies" :key="r.id">
-                                <option :value="r.id" x-text="(r.type ? r.type + ' ' : '') + r.name" :selected="String(r.id) === String(editRegencyId)"></option>
+                                <option :value="r.id" x-text="r.formatted_name || ((r.name.startsWith('Kota') || r.name.startsWith('Kabupaten') || !r.type) ? r.name : (r.type + ' ' + r.name))" :selected="String(r.id) === String(editRegencyId)"></option>
                             </template>
                         </select>
                     </div>

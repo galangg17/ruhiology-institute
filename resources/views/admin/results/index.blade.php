@@ -123,7 +123,7 @@
                     <select name="regency_id" onchange="this.form.submit()" {{ !request('province_id') ? 'disabled' : '' }} class="w-full p-2 rounded-xl border border-slate-300 text-xs bg-white disabled:bg-slate-100 disabled:text-slate-400">
                         <option value="">{{ request('province_id') ? 'Semua Kota/Kabupaten' : 'Pilih Provinsi Dahulu' }}</option>
                         @foreach($regencies as $reg)
-                            <option value="{{ $reg->id }}" {{ request('regency_id') == $reg->id ? 'selected' : '' }}>{{ ($reg->type ? $reg->type . ' ' : '') . $reg->name }}</option>
+                            <option value="{{ $reg->id }}" {{ request('regency_id') == $reg->id ? 'selected' : '' }}>{{ $reg->formatted_name }}</option>
                         @endforeach
                     </select>
                 </div>

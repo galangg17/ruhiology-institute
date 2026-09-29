@@ -454,8 +454,8 @@ class PublicAssessmentController extends Controller
         $regency = \App\Models\Regency::find($validated['regency_id']);
         $province = \App\Models\Province::find($validated['province_id']);
 
-        $regencyStr = ($regency->type ? $regency->type . ' ' : '') . $regency->name;
-        $provinceStr = $province->name;
+        $regencyStr = $regency?->formatted_name ?? '';
+        $provinceStr = $province?->name ?? '';
 
         return back()->with('success', "Wilayah asal berhasil diperbarui menjadi {$regencyStr}, {$provinceStr}.");
     }

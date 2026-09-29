@@ -213,9 +213,9 @@ window.rqAssessmentIndex = function rqAssessmentIndex() {
             }
             let html = '<option value="">-- Pilih --</option>';
             this.filteredRegencies.forEach(r => {
-                const typeStr = r.type ? r.type + ' ' : '';
+                const displayName = r.formatted_name || ((r.name.startsWith('Kota') || r.name.startsWith('Kabupaten') || !r.type) ? r.name : (r.type + ' ' + r.name));
                 const selected = String(r.id) === String(this.form.regency_id) ? 'selected' : '';
-                html += `<option value="${r.id}" ${selected}>${typeStr}${r.name}</option>`;
+                html += `<option value="${r.id}" ${selected}>${displayName}</option>`;
             });
             return html;
         },
