@@ -153,7 +153,7 @@
         </div>
     </div>
 
-    <!-- EDIT EVENT MODAL -->
+    <!-- EDIT EVENT MODAL WITH FIELD LOCKING & INTERACTIVE TAG MANAGER -->
     <div x-show="editModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/70 backdrop-blur-md animate-fadeIn">
         <div @click.away="editModal = false" class="bg-white rounded-3xl max-w-4xl w-full shadow-2xl relative border border-slate-100 flex flex-col max-h-[92vh] overflow-hidden">
             
@@ -164,8 +164,8 @@
                         ✏️
                     </div>
                     <div>
-                        <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest block">UPDATE EVENT & OPTIONS</span>
-                        <h3 class="text-base font-serif font-bold text-white">Edit Event & Tambah Opsi Pilihan</h3>
+                        <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest block">SAFE EVENT EDIT & OPTIONS MANAGER</span>
+                        <h3 class="text-base font-serif font-bold text-white">Edit Event & Kelola Opsi Kelas</h3>
                     </div>
                 </div>
                 <button @click="editModal = false" type="button" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white flex items-center justify-center transition">✕</button>
@@ -179,7 +179,7 @@
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     
-                    <!-- LEFT COLUMN: Informasi Utama & Akses -->
+                    <!-- LEFT COLUMN: Informasi Utama & Akses (Locked Vital Fields) -->
                     <div class="space-y-4">
                         <div class="pb-2 border-b border-slate-100 font-bold text-[#0B2A43] flex items-center gap-1.5 text-xs">
                             <span>📌 1. Identitas & Target Event</span>
@@ -197,8 +197,12 @@
 
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block font-bold text-slate-800 text-xs mb-1">Kode Event (Unique)</label>
-                                <input type="text" name="event_code" x-model="editData.event_code" placeholder="Contoh: RQ-JAMBI-26" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 font-mono bg-slate-50/50 focus:bg-white uppercase font-bold text-xs outline-none">
+                                <label class="block font-bold text-slate-800 text-xs mb-1 flex items-center justify-between">
+                                    <span>Kode Event</span>
+                                    <span class="text-[10px] font-bold text-slate-400">🔒 Dikunci</span>
+                                </label>
+                                <input type="text" name="event_code" :value="editData.event_code" readonly class="w-full px-3 py-2.5 rounded-xl border border-slate-200 font-mono bg-slate-100/80 text-slate-500 uppercase font-bold text-xs outline-none cursor-not-allowed">
+                                <span class="text-[9px] text-slate-400 mt-0.5 block">Kode event dikunci agar Link & QR Code tidak rusak.</span>
                             </div>
                             <div>
                                 <label class="block font-bold text-slate-800 text-xs mb-1">Status Event *</label>
@@ -212,13 +216,17 @@
                         </div>
 
                         <div>
-                            <label class="block font-bold text-slate-800 text-xs mb-1">Pilih Paket Soal / Instrumen *</label>
-                            <select name="instrument_id" x-model="editData.instrument_id" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50 font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-[#0B2A43] text-xs">
-                                <option value="">-- Pilih Paket Soal --</option>
+                            <label class="block font-bold text-slate-800 text-xs mb-1 flex items-center justify-between">
+                                <span>Paket Soal / Instrumen</span>
+                                <span class="text-[10px] font-bold text-slate-400">🔒 Dikunci</span>
+                            </label>
+                            <select disabled class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-100/80 font-semibold text-slate-600 outline-none text-xs cursor-not-allowed">
                                 @foreach($instruments as $inst)
-                                    <option value="{{ $inst->id }}">{{ $inst->code }} - {{ $inst->name }} ({{ $inst->questions_count ?? $inst->questions->count() }} Soal)</option>
+                                    <option value="{{ $inst->id }}" :selected="editData.instrument_id == {{ $inst->id }}">{{ $inst->code }} - {{ $inst->name }} ({{ $inst->questions_count ?? $inst->questions->count() }} Soal)</option>
                                 @endforeach
                             </select>
+                            <input type="hidden" name="instrument_id" :value="editData.instrument_id">
+                            <span class="text-[9px] text-slate-400 mt-0.5 block">Paket soal dikunci untuk menjaga konsistensi skoring peserta.</span>
                         </div>
 
                         <div>
@@ -248,27 +256,25 @@
                         </div>
                     </div>
 
-                    <!-- RIGHT COLUMN: Pengaturan Mode & Kelompok Custom -->
+                    <!-- RIGHT COLUMN: Interactive Subcategory Tag Manager & Dates -->
                     <div class="space-y-4">
                         <div class="pb-2 border-b border-slate-100 font-bold text-[#0B2A43] flex items-center gap-1.5 text-xs">
-                            <span>⚙️ 2. Mode Asesmen & Opsi Kelompok</span>
+                            <span>⚙️ 2. Mode Asesmen & Interactive Opsi Kelompok</span>
                         </div>
 
-                        <!-- Mode Asesmen -->
-                        <div class="p-3 bg-amber-50/60 rounded-2xl border border-amber-200/80 space-y-2">
-                            <label class="block font-bold text-[#0B2A43] text-xs">Mode Asesmen Event *</label>
-                            <div class="grid grid-cols-2 gap-2">
-                                <button type="button" @click="editData.assessment_type = 'single'" :class="editData.assessment_type === 'single' ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'" class="p-2.5 rounded-xl border text-[11px] text-center transition">
-                                    <span>📝 Sekali Tes</span>
-                                </button>
-                                <button type="button" @click="editData.assessment_type = 'prepost'" :class="editData.assessment_type === 'prepost' ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'" class="p-2.5 rounded-xl border text-[11px] text-center transition">
-                                    <span>🔄 Pre & Posttest</span>
-                                </button>
+                        <!-- Mode Asesmen (Locked Indicator) -->
+                        <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200 space-y-1">
+                            <div class="flex items-center justify-between">
+                                <label class="block font-bold text-[#0B2A43] text-xs">Mode Asesmen Event</label>
+                                <span class="text-[10px] font-bold text-slate-400">🔒 Dikunci</span>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-white border border-slate-200 text-xs font-bold text-[#0B2A43] flex items-center gap-2">
+                                <span x-text="editData.assessment_type === 'prepost' ? '🔄 Pretest & Posttest' : '📝 Sekali Tes (Single Test)'"></span>
                             </div>
                             <input type="hidden" name="assessment_type" :value="editData.assessment_type">
 
                             <template x-if="editData.assessment_type === 'prepost'">
-                                <div class="pt-2 space-y-2">
+                                <div class="pt-2 space-y-2 border-t border-slate-200/60 mt-2">
                                     <div class="grid grid-cols-2 gap-2">
                                         <div>
                                             <label class="block font-bold text-slate-700 text-[10px] mb-0.5">Mulai Pretest</label>
@@ -293,23 +299,47 @@
                             </template>
                         </div>
 
-                        <!-- Custom Group / Subcategories Editor -->
-                        <div class="p-3 bg-blue-50/60 rounded-2xl border border-blue-200/80 space-y-3">
+                        <!-- Custom Group / Interactive Subcategory Tag Manager -->
+                        <div class="p-4 bg-blue-50/70 rounded-2xl border border-blue-200 space-y-3">
                             <div class="flex items-center justify-between">
-                                <label class="block font-bold text-[#0B2A43] text-xs">Opsi Kelompok / Kelas / Divisi (Custom)</label>
-                                <span class="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">Bisa Ditambah Kapan Saja</span>
+                                <label class="block font-bold text-[#0B2A43] text-xs">🏷️ Opsi Kelompok / Kelas / Divisi (Custom)</label>
+                                <span class="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">Dapat Ditambah / Dihapus Kapan Saja</span>
                             </div>
 
                             <div>
-                                <label class="block font-bold text-slate-700 text-[10px] mb-0.5">Judul Label Form Peserta</label>
-                                <input type="text" name="group_label" x-model="editData.group_label" placeholder="Contoh: Pilih Kelas / Pilih Divisi" class="w-full p-2 rounded-xl border border-slate-300 bg-white text-xs">
+                                <label class="block font-bold text-slate-700 text-[10px] mb-1">Judul Label Pada Form Peserta</label>
+                                <input type="text" name="group_label" x-model="editData.group_label" placeholder="Contoh: Pilih Kelas / Pilih Divisi" class="w-full p-2.5 rounded-xl border border-slate-300 bg-white text-xs font-medium focus:ring-2 focus:ring-[#0B2A43]">
                             </div>
 
-                            <div>
-                                <label class="block font-bold text-slate-700 text-[10px] mb-0.5">Opsi Pilihan (Pisahkan Koma)</label>
-                                <input type="text" name="custom_subcategories" x-model="editData.custom_subcategories_str" placeholder="Contoh: Kelas X-A, Kelas X-B, Kelas XI IPA 1" class="w-full p-2.5 rounded-xl border border-slate-300 bg-white text-xs font-medium focus:ring-2 focus:ring-[#0B2A43]">
-                                <p class="text-[10px] text-slate-500 mt-1">Gunakan tanda koma (<code>,</code>) untuk memisahkan setiap kelas / divisi / kelompok baru.</p>
+                            <!-- Interactive Tags Display -->
+                            <div class="space-y-1.5">
+                                <label class="block font-bold text-slate-700 text-[10px]">Daftar Opsi Pilihan Aktif Saat Ini:</label>
+                                <div class="flex flex-wrap gap-1.5 p-3 bg-white rounded-xl border border-slate-200 min-h-[52px] items-center">
+                                    <template x-for="(opt, idx) in editSubcategoriesList" :key="idx">
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-800 border border-blue-200 font-bold rounded-lg text-xs shadow-2xs">
+                                            <span x-text="opt"></span>
+                                            <button type="button" @click="removeOption(idx)" class="text-rose-500 hover:text-rose-700 hover:bg-rose-100 rounded-full w-4 h-4 inline-flex items-center justify-center font-bold text-[11px] transition" title="Hapus opsi ini">✕</button>
+                                        </span>
+                                    </template>
+                                    <template x-if="editSubcategoriesList.length === 0">
+                                        <span class="text-xs text-slate-400 italic">Belum ada opsi khusus yang ditambahkan.</span>
+                                    </template>
+                                </div>
                             </div>
+
+                            <!-- Add New Option Input Field -->
+                            <div class="space-y-1 pt-1">
+                                <label class="block font-bold text-slate-700 text-[10px]">+ Tambah Opsi Pilihan Baru:</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="text" x-model="newOptionText" @keydown.enter.prevent="addOption()" placeholder="Ketik opsi (misal: Kelas XI IPA 2) lalu tekan Enter..." class="flex-1 px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs font-medium outline-none focus:ring-2 focus:ring-[#0B2A43]">
+                                    <button type="button" @click="addOption()" class="px-4 py-2 bg-[#0B2A43] hover:bg-[#123B59] text-white font-bold rounded-xl text-xs transition cursor-pointer shrink-0">
+                                        + Tambah
+                                    </button>
+                                </div>
+                                <p class="text-[10px] text-slate-500">Opsi baru yang ditambahkan di sini akan **langsung otomatis muncul** di form pendaftaran peserta.</p>
+                            </div>
+
+                            <input type="hidden" name="custom_subcategories" :value="customSubcategoriesSubmittedString">
                         </div>
 
                         <div>
@@ -341,6 +371,8 @@ function adminEventsManager() {
     return {
         editModal: false,
         editUrl: '',
+        newOptionText: '',
+        editSubcategoriesList: [],
         editData: {
             title: '',
             institution_name: '',
@@ -357,13 +389,23 @@ function adminEventsManager() {
             posttest_start: '',
             posttest_end: '',
             group_label: '',
-            custom_subcategories_str: '',
             description: '',
             access_type: 'EVENT_PROGRAM',
         },
 
         openEdit(eventData, updateUrl) {
             this.editUrl = updateUrl;
+            
+            if (Array.isArray(eventData.custom_subcategories)) {
+                this.editSubcategoriesList = [...eventData.custom_subcategories];
+            } else if (typeof eventData.custom_subcategories === 'string' && eventData.custom_subcategories.trim() !== '') {
+                this.editSubcategoriesList = eventData.custom_subcategories.split(',').map(s => s.trim()).filter(Boolean);
+            } else {
+                this.editSubcategoriesList = [];
+            }
+
+            this.newOptionText = '';
+
             this.editData = {
                 title: eventData.title || '',
                 institution_name: eventData.institution_name || '',
@@ -380,11 +422,26 @@ function adminEventsManager() {
                 posttest_start: eventData.posttest_start ? eventData.posttest_start.replace(' ', 'T').substring(0, 16) : '',
                 posttest_end: eventData.posttest_end ? eventData.posttest_end.replace(' ', 'T').substring(0, 16) : '',
                 group_label: eventData.group_label || '',
-                custom_subcategories_str: Array.isArray(eventData.custom_subcategories) ? eventData.custom_subcategories.join(', ') : (eventData.custom_subcategories || ''),
                 description: eventData.description || '',
                 access_type: eventData.access_type || 'EVENT_PROGRAM',
             };
             this.editModal = true;
+        },
+
+        addOption() {
+            const val = this.newOptionText.trim();
+            if (val && !this.editSubcategoriesList.includes(val)) {
+                this.editSubcategoriesList.push(val);
+                this.newOptionText = '';
+            }
+        },
+
+        removeOption(index) {
+            this.editSubcategoriesList.splice(index, 1);
+        },
+
+        get customSubcategoriesSubmittedString() {
+            return this.editSubcategoriesList.join(', ');
         }
     }
 }
