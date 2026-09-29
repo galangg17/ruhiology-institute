@@ -35,8 +35,9 @@ class SyncServerData extends Command
         Artisan::call('migrate', ['--force' => true]);
         $this->info(Artisan::output());
 
-        // 2. Run Master Data Seeder (Provinces, Regencies, Occupations, RQI-20 + WHO-5 questions)
-        $this->info("2/4. Seeding Master Data (38 Provinces, 517 Regencies, 20 Questions)...");
+        // 2. Run Master Data & User Seeders
+        $this->info("2/4. Seeding Admin Users & Master Data (38 Provinces, 517 Regencies, 20 Questions)...");
+        Artisan::call('db:seed', ['--class' => 'UserSeeder', '--force' => true]);
         Artisan::call('db:seed', ['--class' => 'MasterDataSeeder', '--force' => true]);
         $this->info(Artisan::output());
 
