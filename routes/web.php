@@ -165,6 +165,7 @@ Route::middleware(['auth', \App\Http\Middleware\EnsureAdminAccess::class])
         // Assessment Results & Multi-dimensional Reporting Export
         Route::get('/results', [AdminResultController::class, 'index'])->name('results.index');
         Route::get('/results/{submission}', [AdminResultController::class, 'show'])->name('results.show');
+        Route::delete('/results/{submission}', [AdminResultController::class, 'destroy'])->name('results.destroy');
         Route::get('/reports/export-csv', [AdminResultController::class, 'exportCsv'])->name('reports.export_csv');
         Route::get('/reports/export-pdf', [AdminResultController::class, 'exportPdf'])->name('reports.export_pdf');
 

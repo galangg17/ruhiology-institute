@@ -193,9 +193,18 @@
                                 @endif
                             </td>
                             <td class="p-4 text-center">
-                                <a href="{{ route('admin.results.show', $sub) }}" class="px-3 py-1.5 bg-[#0B2A43] hover:bg-[#123B59] text-white text-[11px] font-bold rounded-lg shadow transition inline-block">
-                                    Detail Hasil →
-                                </a>
+                                <div class="flex items-center justify-center gap-1.5">
+                                    <a href="{{ route('admin.results.show', $sub) }}" class="px-2.5 py-1.5 bg-[#0B2A43] hover:bg-[#123B59] text-white text-[11px] font-bold rounded-lg shadow transition inline-flex items-center gap-1" title="Lihat detail laporan hasil peserta ini">
+                                        <span>📊 Detail</span>
+                                    </a>
+                                    <form action="{{ route('admin.results.destroy', $sub) }}" method="POST" onsubmit="return confirm('Yakin menghapus data peserta {{ addslashes($p->name ?? 'Anonim') }}? Data jawaban & hasil RQI peserta ini akan terhapus.')" class="inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 hover:text-rose-700 font-bold rounded-lg text-[11px] border border-rose-200 transition cursor-pointer flex items-center gap-1" title="Hapus data peserta dari event ini">
+                                            <span>🗑️ Hapus</span>
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     @empty

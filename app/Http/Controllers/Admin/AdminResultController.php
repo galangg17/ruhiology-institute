@@ -94,6 +94,38 @@ class AdminResultController extends Controller
         return view('admin.results.show', compact('submission', 'pretestSubmission', 'posttestSubmission'));
     }
 
+    public function destroy(AssessmentSubmission $submission)
+    {
+        $participantName = $submission->participant ? $submission->participant->name : 'Peserta';
+
+        \App\Services\AuditLogService::log(
+            action: 'delete_submission',
+            module: 'Assessment',
+            recordType: 'AssessmentSubmission',
+            recordId: (string) $submission->id,
+            changes: ['submission_code' => $submission->submission_code, 'participant_name' => $participantName]
+        );
+
+        if ($submission->result) {
+            $submission->result->dimensionResults()->delete();
+            $submission->result->delete();
+        }
+        $submission->answers()->delete();
+
+        $participantId = $submission->participant_id;
+
+        $submission->delete();
+
+        if ($participantId) {
+            $otherCount = AssessmentSubmission::where('participant_id', $participantId)->count();
+            if ($otherCount === 0) {
+                \App\Models\Participant::where('id', $participantId)->delete();
+            }
+        }
+
+        return back()->with('success', 'Data peserta "' . $participantName . '" berhasil dihapus.');
+    }
+
     public function exportCsv(Request $request)
     {
         $submissions = $this->buildFilterQuery($request)->latest('submitted_at')->get();
