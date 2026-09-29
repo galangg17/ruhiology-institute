@@ -69,8 +69,12 @@
                         <a href="{{ route('admin.events.show', $event) }}">{{ $event->title }}</a>
                     </h3>
 
-                    <p class="text-xs text-slate-500 flex items-center gap-1.5 font-medium">
+                    <p class="text-xs text-slate-500 flex items-center gap-1.5 font-medium flex-wrap">
                         <span>🏛️</span> <span>{{ $event->institution_name ?? 'Instansi Internal' }}</span>
+                        @if($event->regency || $event->province)
+                            <span class="text-slate-300">•</span>
+                            <span>📍 {{ $event->regency ? $event->regency->formatted_name : '' }}{{ $event->province ? ', ' . $event->province->name : '' }}</span>
+                        @endif
                     </p>
                 </div>
 
@@ -198,6 +202,27 @@
                         <div>
                             <label class="block font-bold text-slate-800 text-xs mb-1">Tempat / Instansi Kegiatan *</label>
                             <input type="text" name="institution_name" required placeholder="Contoh: SMAN Titian Teras Jambi / Aula Pemda" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-[#0B2A43] outline-none font-medium text-xs">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block font-bold text-slate-800 text-xs mb-1">Provinsi Event</label>
+                                <select name="province_id" x-model="createProvinceId" @change="onCreateProvinceChange()" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 font-medium text-slate-800 outline-none focus:ring-2 focus:ring-[#0B2A43] text-xs">
+                                    <option value="">-- Pilih Provinsi --</option>
+                                    <template x-for="prov in provincesList" :key="prov.id">
+                                        <option :value="prov.id" x-text="prov.name"></option>
+                                    </template>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-800 text-xs mb-1">Kabupaten / Kota Event</label>
+                                <select name="regency_id" x-model="createRegencyId" :disabled="!createProvinceId" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 font-medium text-slate-800 outline-none focus:ring-2 focus:ring-[#0B2A43] text-xs disabled:opacity-50">
+                                    <option value="">-- Pilih Kab/Kota --</option>
+                                    <template x-for="reg in filteredCreateRegencies" :key="reg.id">
+                                        <option :value="reg.id" x-text="(reg.type ? reg.type + ' ' : '') + reg.name"></option>
+                                    </template>
+                                </select>
+                            </div>
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
@@ -374,6 +399,27 @@
                         <div>
                             <label class="block font-bold text-slate-800 text-xs mb-1">Tempat / Instansi Kegiatan *</label>
                             <input type="text" name="institution_name" x-model="editData.institution_name" required placeholder="Contoh: SMAN Titian Teras Jambi / Aula Pemda" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-[#0B2A43] outline-none font-medium text-xs">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block font-bold text-slate-800 text-xs mb-1">Provinsi Event</label>
+                                <select name="province_id" x-model="editProvinceId" @change="onEditProvinceChange(true)" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 font-medium text-slate-800 outline-none focus:ring-2 focus:ring-[#0B2A43] text-xs">
+                                    <option value="">-- Pilih Provinsi --</option>
+                                    <template x-for="prov in provincesList" :key="prov.id">
+                                        <option :value="prov.id" x-text="prov.name"></option>
+                                    </template>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-800 text-xs mb-1">Kabupaten / Kota Event</label>
+                                <select name="regency_id" x-model="editRegencyId" :disabled="!editProvinceId" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 font-medium text-slate-800 outline-none focus:ring-2 focus:ring-[#0B2A43] text-xs disabled:opacity-50">
+                                    <option value="">-- Pilih Kab/Kota --</option>
+                                    <template x-for="reg in filteredEditRegencies" :key="reg.id">
+                                        <option :value="reg.id" x-text="(reg.type ? reg.type + ' ' : '') + reg.name"></option>
+                                    </template>
+                                </select>
+                            </div>
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
@@ -580,6 +626,39 @@ function adminEventsManager() {
         activeQrTitle: '',
         assessmentType: 'single',
 
+        provincesList: @json($provinces ?? []),
+        regenciesMap: @json($regenciesMap ?? []),
+
+        createProvinceId: '',
+        createRegencyId: '',
+        filteredCreateRegencies: [],
+
+        editProvinceId: '',
+        editRegencyId: '',
+        filteredEditRegencies: [],
+
+        onCreateProvinceChange() {
+            this.createRegencyId = '';
+            if (!this.createProvinceId) {
+                this.filteredCreateRegencies = [];
+                return;
+            }
+            const pid = String(this.createProvinceId);
+            this.filteredCreateRegencies = this.regenciesMap[pid] || this.regenciesMap[Number(pid)] || [];
+        },
+
+        onEditProvinceChange(resetRegency = true) {
+            if (resetRegency) {
+                this.editRegencyId = '';
+            }
+            if (!this.editProvinceId) {
+                this.filteredEditRegencies = [];
+                return;
+            }
+            const pid = String(this.editProvinceId);
+            this.filteredEditRegencies = this.regenciesMap[pid] || this.regenciesMap[Number(pid)] || [];
+        },
+
         editUrl: '',
         newOptionText: '',
         editSubcategoriesList: [],
@@ -601,6 +680,8 @@ function adminEventsManager() {
             group_label: '',
             description: '',
             access_type: 'EVENT_PROGRAM',
+            province_id: '',
+            regency_id: '',
         },
 
         openEdit(eventData, updateUrl) {
@@ -615,6 +696,10 @@ function adminEventsManager() {
             }
 
             this.newOptionText = '';
+
+            this.editProvinceId = eventData.province_id || '';
+            this.onEditProvinceChange(false);
+            this.editRegencyId = eventData.regency_id || '';
 
             this.editData = {
                 title: eventData.title || '',
@@ -634,6 +719,8 @@ function adminEventsManager() {
                 group_label: eventData.group_label || '',
                 description: eventData.description || '',
                 access_type: eventData.access_type || 'EVENT_PROGRAM',
+                province_id: eventData.province_id || '',
+                regency_id: eventData.regency_id || '',
             };
             this.editModal = true;
         },

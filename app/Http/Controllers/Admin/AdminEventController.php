@@ -41,8 +41,9 @@ class AdminEventController extends Controller
         $programs = Program::where('status', 'active')->get();
         $instruments = Instrument::where('status', 'active')->get();
         $provinces = Province::orderBy('name', 'asc')->get();
+        $regenciesMap = Regency::where('status', 'active')->orderBy('name', 'asc')->get(['id', 'province_id', 'name', 'type'])->groupBy('province_id');
 
-        return view('admin.events.index', compact('events', 'programs', 'instruments', 'provinces'));
+        return view('admin.events.index', compact('events', 'programs', 'instruments', 'provinces', 'regenciesMap'));
     }
 
     public function store(Request $request)
