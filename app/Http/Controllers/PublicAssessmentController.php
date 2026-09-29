@@ -72,16 +72,28 @@ class PublicAssessmentController extends Controller
         if (!empty($request->input('event_code'))) {
             $eventModel = \App\Models\Event::where('event_code', strtoupper(trim($request->input('event_code'))))->first();
             if ($eventModel) {
-                if (empty($request->input('province_id')) && !empty($eventModel->province_id)) {
-                    $request->merge(['province_id' => $eventModel->province_id]);
+                $defaultProvId = $eventModel->province_id ?? \App\Models\Province::where('status', 'active')->first()?->id ?? 1;
+                $defaultRegId = $eventModel->regency_id ?? \App\Models\Regency::where('province_id', $defaultProvId)->first()?->id ?? 1;
+
+                if (empty($request->input('province_id'))) {
+                    $request->merge(['province_id' => $defaultProvId]);
                 }
-                if (empty($request->input('regency_id')) && !empty($eventModel->regency_id)) {
-                    $request->merge(['regency_id' => $eventModel->regency_id]);
+                if (empty($request->input('regency_id'))) {
+                    $request->merge(['regency_id' => $defaultRegId]);
                 }
                 if (empty($request->input('category'))) {
                     $request->merge(['category' => $eventModel->target_category ?? 'Pelajar']);
                 }
             }
+        }
+
+        if (empty($request->input('province_id'))) {
+            $defaultProvId = \App\Models\Province::where('status', 'active')->first()?->id ?? 1;
+            $request->merge(['province_id' => $defaultProvId]);
+        }
+        if (empty($request->input('regency_id'))) {
+            $defaultRegId = \App\Models\Regency::where('province_id', $request->input('province_id'))->first()?->id ?? 1;
+            $request->merge(['regency_id' => $defaultRegId]);
         }
 
         if (($request->input('category') === 'Pelajar' || empty($request->input('category'))) && empty($request->input('school_level'))) {
