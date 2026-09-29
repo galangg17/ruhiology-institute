@@ -219,7 +219,7 @@
                                 <select name="regency_id" x-model="createRegencyId" :disabled="!createProvinceId" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 font-medium text-slate-800 outline-none focus:ring-2 focus:ring-[#0B2A43] text-xs disabled:opacity-50">
                                     <option value="">-- Pilih Kab/Kota --</option>
                                     <template x-for="reg in filteredCreateRegencies" :key="reg.id">
-                                        <option :value="reg.id" x-text="(reg.type ? reg.type + ' ' : '') + reg.name"></option>
+                                        <option :value="reg.id" x-text="reg.formatted_name || ((reg.name.startsWith('Kota') || reg.name.startsWith('Kabupaten') || !reg.type) ? reg.name : (reg.type + ' ' + reg.name))"></option>
                                     </template>
                                 </select>
                             </div>
@@ -416,7 +416,7 @@
                                 <select name="regency_id" x-model="editRegencyId" :disabled="!editProvinceId" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 font-medium text-slate-800 outline-none focus:ring-2 focus:ring-[#0B2A43] text-xs disabled:opacity-50">
                                     <option value="">-- Pilih Kab/Kota --</option>
                                     <template x-for="reg in filteredEditRegencies" :key="reg.id">
-                                        <option :value="reg.id" x-text="(reg.type ? reg.type + ' ' : '') + reg.name"></option>
+                                        <option :value="reg.id" x-text="reg.formatted_name || ((reg.name.startsWith('Kota') || reg.name.startsWith('Kabupaten') || !reg.type) ? reg.name : (reg.type + ' ' + reg.name))"></option>
                                     </template>
                                 </select>
                             </div>
