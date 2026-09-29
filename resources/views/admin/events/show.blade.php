@@ -23,31 +23,52 @@
                     <span>📅 {{ $event->start_date ? $event->start_date->format('d M Y') : 'Kapan Saja' }}</span>
                 </p>
                 @if(!empty($event->custom_subcategories) && is_array($event->custom_subcategories))
-                    <div class="mt-2.5 flex items-center gap-1.5 flex-wrap">
+                    <div class="mt-2.5 flex items-center gap-1.5 flex-wrap" x-data="{ showAllTags: false }">
                         <span class="text-[11px] font-bold text-slate-600">🏷️ {{ $event->group_label ?: 'Opsi Pilihan Peserta' }}:</span>
-                        @foreach($event->custom_subcategories as $subCat)
-                            <span class="px-2.5 py-0.5 bg-blue-50 text-blue-800 border border-blue-200 rounded-full text-[10px] font-semibold">{{ $subCat }}</span>
+                        @foreach($event->custom_subcategories as $idx => $subCat)
+                            <span x-show="showAllTags || {{ $idx }} < 6" class="px-2.5 py-0.5 bg-blue-50 text-blue-800 border border-blue-200/80 rounded-full text-[10px] font-semibold transition">
+                                {{ $subCat }}
+                            </span>
                         @endforeach
+                        @if(count($event->custom_subcategories) > 6)
+                            <button type="button" @click="showAllTags = !showAllTags" class="px-2.5 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-full text-[10px] font-bold transition cursor-pointer">
+                                <span x-text="showAllTags ? '▲ Sembunyikan' : '+{{ count($event->custom_subcategories) - 6 }} Opsi Lainnya'"></span>
+                            </button>
+                        @endif
                     </div>
                 @endif
             </div>
 
+            <!-- OPTION A: REORGANIZED ACTION BUTTONS HIERARCHY -->
             <div class="flex flex-wrap items-center gap-2">
-                <button @click="openEdit({{ json_encode($event) }}, '{{ route('admin.events.update', $event) }}')" type="button" class="px-3.5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5 cursor-pointer">
+                <!-- Primary CTA: Edit Event -->
+                <button @click="openEdit({{ json_encode($event) }}, '{{ route('admin.events.update', $event) }}')" type="button" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5 cursor-pointer">
                     <span>✏️ Edit Event & Opsi</span>
                 </button>
-                <button type="button" @click="showBulkRegionModal = true" class="px-3.5 py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-xs rounded-xl shadow transition flex items-center gap-1.5 cursor-pointer" title="Ubah wilayah seluruh peserta event ini sekaligus">
-                    <span>⚡ Ganti Wilayah Massal</span>
-                </button>
-                <a href="{{ route('admin.events.export_csv', $event) }}" class="px-3.5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5" title="Export CSV peserta event ini saja">
-                    <span>📥 Export CSV</span>
-                </a>
-                <button type="button" @click="showImportModal = true" class="px-3.5 py-2.5 bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5 cursor-pointer" title="Update peserta event ini via CSV">
-                    <span>📤 Update CSV</span>
-                </button>
-                <a href="{{ route('admin.reports.export_pdf', ['event_id' => $event->id]) }}" target="_blank" class="px-3.5 py-2.5 bg-rose-700 hover:bg-rose-800 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5">
+
+                <!-- Primary CTA: PDF Report -->
+                <a href="{{ route('admin.reports.export_pdf', ['event_id' => $event->id]) }}" target="_blank" class="px-4 py-2.5 bg-rose-700 hover:bg-rose-800 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5">
                     <span>📄 PDF Laporan</span>
                 </a>
+
+                <!-- Secondary Dropdown CTA: Alat Data Peserta -->
+                <div class="relative" x-data="{ openDataMenu: false }" @click.away="openDataMenu = false">
+                    <button @click="openDataMenu = !openDataMenu" type="button" class="px-4 py-2.5 bg-[#0B2A43] hover:bg-[#123B59] text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-2 cursor-pointer">
+                        <span>⚙️ Kelola Data ▾</span>
+                    </button>
+
+                    <div x-show="openDataMenu" x-cloak x-transition.origin.top.right class="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-200/80 py-2 z-30 space-y-1">
+                        <button @click="showBulkRegionModal = true; openDataMenu = false" type="button" class="w-full text-left px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-sky-50 hover:text-sky-700 flex items-center gap-2 transition cursor-pointer">
+                            <span>⚡</span> <span>Ganti Wilayah Massal</span>
+                        </button>
+                        <a href="{{ route('admin.events.export_csv', $event) }}" class="w-full text-left px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 flex items-center gap-2 transition">
+                            <span>📥</span> <span>Export Data CSV</span>
+                        </a>
+                        <button @click="showImportModal = true; openDataMenu = false" type="button" class="w-full text-left px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-purple-50 hover:text-purple-700 flex items-center gap-2 transition cursor-pointer">
+                            <span>📤</span> <span>Update Data CSV</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -79,9 +100,37 @@
 
     <!-- SUBMISSIONS TABLE FOR THIS EVENT -->
     <div class="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
-        <div class="p-5 border-b border-slate-100 flex items-center justify-between">
-            <h3 class="font-serif font-bold text-[#0B2A43] text-base">Daftar Hasil Peserta Event Ini</h3>
-            <span class="text-xs text-slate-500 font-medium">Menampilkan {{ $submissions->count() }} data</span>
+        <div class="p-5 border-b border-slate-100 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div>
+                <h3 class="font-serif font-bold text-[#0B2A43] text-base">Daftar Hasil Peserta Event Ini</h3>
+                <span class="text-xs text-slate-500 font-medium">Total: {{ $submissions->total() }} data peserta</span>
+            </div>
+
+            <!-- TABLE INTERACTIVE SEARCH & FILTERS -->
+            <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto text-xs">
+                <!-- Search Box -->
+                <div class="relative flex-1 md:w-56">
+                    <input type="text" x-model="tableSearch" placeholder="Cari nama, kode sesi..." class="w-full pl-8 pr-3 py-2 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-[#0B2A43] outline-none text-xs">
+                    <span class="absolute left-2.5 top-2 text-slate-400">🔍</span>
+                </div>
+
+                <!-- Subcategory / Class Filter -->
+                @if(!empty($event->custom_subcategories) && is_array($event->custom_subcategories))
+                    <select x-model="filterSubCat" class="py-2 px-3 rounded-xl border border-slate-300 bg-slate-50 font-medium outline-none text-xs">
+                        <option value="">Semua {{ $event->group_label ?: 'Kelas' }}</option>
+                        @foreach($event->custom_subcategories as $subCat)
+                            <option value="{{ $subCat }}">{{ $subCat }}</option>
+                        @endforeach
+                    </select>
+                @endif
+
+                <!-- WHO-5 Filter -->
+                <select x-model="filterWho5" class="py-2 px-3 rounded-xl border border-slate-300 bg-slate-50 font-medium outline-none text-xs">
+                    <option value="">Semua Status WHO-5</option>
+                    <option value="sehat">🟢 Sehat (≥50%)</option>
+                    <option value="skrining">🔴 Skrining (&lt;50%)</option>
+                </select>
+            </div>
         </div>
 
         <div class="overflow-x-auto">
@@ -103,13 +152,13 @@
                             $res = $sub->result;
                             $p = $sub->participant;
                         @endphp
-                        <tr class="hover:bg-slate-50/80 transition-colors">
+                        <tr x-show="matchesFilter('{{ addslashes($p->name ?? '') }}', '{{ addslashes($sub->submission_code ?? '') }}', '{{ addslashes($p->sub_category ?? '') }}', '{{ $res ? $res->who5_percentage : '' }}')" class="hover:bg-slate-50/80 transition-colors">
                             <td class="p-4 font-mono font-bold text-[#B48A16]">{{ $sub->submission_code }}</td>
                             <td class="p-4">
                                 <strong class="text-slate-900 block font-bold text-sm">{{ $p->name ?? 'Anonim' }}</strong>
-                                <span class="text-[10px] text-slate-400">{{ $p->assessment_code ?? '-' }}</span>
+                                <span class="text-[10px] text-slate-400 font-mono">{{ $p->assessment_code ?? '-' }}</span>
                                 @if(!empty($p->sub_category))
-                                    <span class="inline-block mt-0.5 px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-[10px] font-semibold">{{ $p->sub_category }}</span>
+                                    <span class="inline-block mt-0.5 px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-[10px] font-semibold border border-blue-200/60">{{ $p->sub_category }}</span>
                                 @endif
                             </td>
                             <td class="p-4">
@@ -119,11 +168,17 @@
                             </td>
                             <td class="p-4 text-slate-600">
                                 {{ $p->province->name ?? '-' }}
-                                <span class="block text-[10px] text-slate-400">{{ $p->regency->name ?? '' }}</span>
+                                <span class="block text-[10px] text-slate-400">{{ $p->regency ? $p->regency->formatted_name : '' }}</span>
                             </td>
                             <td class="p-4 text-center">
-                                <span class="font-bold text-sm text-[#0B2A43]">{{ $res->rqi_score ?? '-' }}</span>
-                                <span class="block text-[10px] font-bold text-amber-700">{{ $res->category_name ?? '-' }}</span>
+                                <span class="font-bold text-sm text-[#0B2A43] block">{{ $res->rqi_score ?? '-' }}</span>
+                                @if($res && $res->category_name)
+                                    <span class="inline-block mt-0.5 px-2 py-0.5 bg-amber-50 text-amber-900 border border-amber-200/80 rounded-full text-[10px] font-semibold">
+                                        {{ $res->category_name }}
+                                    </span>
+                                @else
+                                    <span class="text-slate-400 text-[10px]">-</span>
+                                @endif
                             </td>
                             <td class="p-4 text-center">
                                 @if($res && $res->who5_percentage !== null)
@@ -138,7 +193,7 @@
                                 @endif
                             </td>
                             <td class="p-4 text-center">
-                                <a href="{{ route('admin.results.show', $sub) }}" class="px-3 py-1.5 bg-[#0B2A43] hover:bg-[#123B59] text-white text-[11px] font-bold rounded-lg shadow transition">
+                                <a href="{{ route('admin.results.show', $sub) }}" class="px-3 py-1.5 bg-[#0B2A43] hover:bg-[#123B59] text-white text-[11px] font-bold rounded-lg shadow transition inline-block">
                                     Detail Hasil →
                                 </a>
                             </td>
@@ -471,6 +526,30 @@ function adminEventsManager() {
         editUrl: '',
         newOptionText: '',
         editSubcategoriesList: [],
+
+        tableSearch: '',
+        filterSubCat: '',
+        filterWho5: '',
+
+        matchesFilter(name, code, subCat, who5Pct) {
+            if (this.tableSearch) {
+                const q = this.tableSearch.toLowerCase().trim();
+                const n = (name || '').toLowerCase();
+                const c = (code || '').toLowerCase();
+                const s = (subCat || '').toLowerCase();
+                if (!n.includes(q) && !c.includes(q) && !s.includes(q)) return false;
+            }
+            if (this.filterSubCat && subCat !== this.filterSubCat) {
+                return false;
+            }
+            if (this.filterWho5 === 'sehat' && (who5Pct === '' || Number(who5Pct) < 50)) {
+                return false;
+            }
+            if (this.filterWho5 === 'skrining' && (who5Pct === '' || Number(who5Pct) >= 50)) {
+                return false;
+            }
+            return true;
+        },
 
         onBulkProvinceChange() {
             this.bulkRegencyId = '';
