@@ -223,6 +223,29 @@ class AdminResultController extends Controller
         $who5SehatCount = $results->filter(fn($r) => $r->who5_percentage >= 50)->count();
         $who5SkriningCount = $results->filter(fn($r) => $r->who5_percentage < 50)->count();
 
+        $levelCounts = [
+            5 => 0,
+            4 => 0,
+            3 => 0,
+            2 => 0,
+            1 => 0,
+        ];
+
+        foreach ($results as $res) {
+            $score = (float) ($res->rqi_score ?? 0);
+            if ($score >= 67) {
+                $levelCounts[5]++;
+            } elseif ($score >= 51) {
+                $levelCounts[4]++;
+            } elseif ($score >= 34) {
+                $levelCounts[3]++;
+            } elseif ($score >= 17) {
+                $levelCounts[2]++;
+            } else {
+                $levelCounts[1]++;
+            }
+        }
+
         return view('admin.results.export_pdf', compact(
             'submissions',
             'results',
@@ -233,6 +256,7 @@ class AdminResultController extends Controller
             'avgWho5',
             'who5SehatCount',
             'who5SkriningCount',
+            'levelCounts',
             'request'
         ));
     }
