@@ -44,20 +44,49 @@
                     </a>
                 </div>
 
-                <!-- Quick Assessment Code Checker Bar (Wired to Global Pop-Up Modal) -->
-                <div class="p-3.5 sm:p-4 bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl max-w-xl mx-auto lg:mx-0 space-y-2.5 text-left" x-data="{ heroCode: '' }">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between text-xs text-slate-200 gap-1">
-                        <span class="font-bold flex items-center gap-1.5 text-[#C9A24D]">
-                            <span>🔍</span> <span>Cek Skor Assessment Cepat</span>
-                        </span>
-                        <span class="text-[10px] text-slate-300">Masukkan kode misal: SUB-XXXXX / PAR-XXXXX</span>
-                    </div>
-                    <form @submit.prevent="$dispatch('open-quick-check', { code: heroCode })" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                        <input type="text" x-model="heroCode" required placeholder="Contoh: SUB-LIIGMH9LQL atau PAR-ABCD1234" class="flex-1 bg-slate-900/80 border border-white/20 text-white placeholder-slate-400 text-xs px-3.5 py-2.5 rounded-xl focus:outline-none focus:border-[#C9A24D] uppercase font-mono min-h-[42px]">
-                        <button type="submit" class="bg-[#C9A24D] hover:bg-[#B48A16] text-[#0B2A43] font-bold text-xs px-5 py-2.5 rounded-xl transition shrink-0 shadow cursor-pointer min-h-[42px]">
-                            Cek Hasil →
+                <!-- SMART DUAL-TAB ACCESS BAR (ENTER EVENT OR CHECK RESULT) -->
+                <div class="p-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl max-w-xl mx-auto lg:mx-0 space-y-3 text-left shadow-2xl" x-data="{ tab: 'event', eventCode: '', subCode: '' }">
+                    <!-- Tab Selector Buttons -->
+                    <div class="flex items-center gap-1.5 p-1 bg-slate-950/60 rounded-xl border border-white/10 text-xs">
+                        <button type="button" @click="tab = 'event'" :class="tab === 'event' ? 'bg-[#C9A24D] text-[#0B2A43] font-extrabold shadow' : 'text-slate-300 hover:text-white font-medium'" class="flex-1 py-1.5 px-3 rounded-lg transition text-[11px] flex items-center justify-center gap-1.5 cursor-pointer">
+                            <span>🚀</span> <span>Masuk Event Sekolah / Instansi</span>
                         </button>
-                    </form>
+                        <button type="button" @click="tab = 'check'" :class="tab === 'check' ? 'bg-[#C9A24D] text-[#0B2A43] font-extrabold shadow' : 'text-slate-300 hover:text-white font-medium'" class="flex-1 py-1.5 px-3 rounded-lg transition text-[11px] flex items-center justify-center gap-1.5 cursor-pointer">
+                            <span>🔍</span> <span>Cek Skor / Hasil Saya</span>
+                        </button>
+                    </div>
+
+                    <!-- Tab 1: Enter Event Code -->
+                    <template x-if="tab === 'event'">
+                        <div class="space-y-2 animate-fadeIn">
+                            <div class="flex justify-between text-[11px] text-slate-300">
+                                <span>Punya Kode Event dari Sekolah / Kampus Anda?</span>
+                                <span class="text-[#C9A24D] font-bold">Akses Instan</span>
+                            </div>
+                            <form action="{{ route('assessment.index') }}" method="GET" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                                <input type="text" name="event_code" x-model="eventCode" required placeholder="Ketik Kode Event (misal: SMANTT, RQ-JAMBI-26)..." class="flex-1 bg-slate-900/90 border border-white/25 text-white placeholder-slate-400 text-xs px-3.5 py-2.5 rounded-xl focus:outline-none focus:border-[#C9A24D] uppercase font-mono font-bold min-h-[42px]">
+                                <button type="submit" class="bg-gradient-to-r from-[#C9A24D] to-[#B48A16] hover:from-[#B48A16] hover:to-[#96710E] text-[#0B2A43] font-extrabold text-xs px-5 py-2.5 rounded-xl transition shrink-0 shadow cursor-pointer min-h-[42px] flex items-center justify-center gap-1.5">
+                                    <span>Masuk Event</span> <span>→</span>
+                                </button>
+                            </form>
+                        </div>
+                    </template>
+
+                    <!-- Tab 2: Check Submission Score -->
+                    <template x-if="tab === 'check'">
+                        <div class="space-y-2 animate-fadeIn">
+                            <div class="flex justify-between text-[11px] text-slate-300">
+                                <span>Cek Hasil Tes Menggunakan Kode Sesi / Peserta</span>
+                                <span class="text-emerald-400 font-bold">Hasil Real-time</span>
+                            </div>
+                            <form @submit.prevent="$dispatch('open-quick-check', { code: subCode })" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                                <input type="text" x-model="subCode" required placeholder="Contoh: SUB-GY5FRHTJRG atau RQI-XXXXX..." class="flex-1 bg-slate-900/90 border border-white/25 text-white placeholder-slate-400 text-xs px-3.5 py-2.5 rounded-xl focus:outline-none focus:border-[#C9A24D] uppercase font-mono font-bold min-h-[42px]">
+                                <button type="submit" class="bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-xs px-5 py-2.5 rounded-xl transition shrink-0 shadow cursor-pointer min-h-[42px] flex items-center justify-center gap-1.5">
+                                    <span>Cek Hasil</span> <span>→</span>
+                                </button>
+                            </form>
+                        </div>
+                    </template>
                 </div>
 
                 <!-- Quick Feature Badges -->

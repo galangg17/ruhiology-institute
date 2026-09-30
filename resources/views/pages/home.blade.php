@@ -472,6 +472,126 @@
         </div>
     </section>
 
+    <!-- SECTION: INSTITUTIONAL PARTNERS SHOWCASE -->
+    <section class="py-12 bg-white border-b border-slate-200/80">
+        <div class="max-w-[1280px] mx-auto px-4 sm:px-10 space-y-6">
+            <div class="text-center max-w-2xl mx-auto space-y-2">
+                <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest bg-amber-50 border border-amber-200 px-3 py-1 rounded-full">
+                    🏛️ EKOSISTEM & MITRA APLIKASI
+                </span>
+                <h3 class="font-serif font-bold text-xl sm:text-2xl text-[#0B2A43]">
+                    Dipercaya oleh Berbagai Perguruan Tinggi, Sekolah, & Instansi Mitra
+                </h3>
+            </div>
+
+            <!-- Partner Badges Grid -->
+            <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-xs font-bold text-[#0B2A43]">
+                <div class="px-4 py-2.5 bg-slate-50 rounded-2xl border border-slate-200/80 flex items-center gap-2 shadow-2xs">
+                    <span>🏫</span> <span>MAN 1 Kota Batam</span>
+                </div>
+                <div class="px-4 py-2.5 bg-slate-50 rounded-2xl border border-slate-200/80 flex items-center gap-2 shadow-2xs">
+                    <span>🏛️</span> <span>SMAN Titian Teras Jambi</span>
+                </div>
+                <div class="px-4 py-2.5 bg-slate-50 rounded-2xl border border-slate-200/80 flex items-center gap-2 shadow-2xs">
+                    <span>🎓</span> <span>UIN Sulthan Thaha Saifuddin Jambi</span>
+                </div>
+                <div class="px-4 py-2.5 bg-slate-50 rounded-2xl border border-slate-200/80 flex items-center gap-2 shadow-2xs">
+                    <span>🎓</span> <span>UI YASNI Bungo</span>
+                </div>
+                <div class="px-4 py-2.5 bg-slate-50 rounded-2xl border border-slate-200/80 flex items-center gap-2 shadow-2xs">
+                    <span>🎓</span> <span>UIN M. Sjech Djamil Djambek Bukittinggi</span>
+                </div>
+                <div class="px-4 py-2.5 bg-slate-50 rounded-2xl border border-slate-200/80 flex items-center gap-2 shadow-2xs">
+                    <span>👤</span> <span>Pengguna Mandiri 38+ Provinsi</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION: VERIFIKASI SERTIFIKAT & DOKUMEN RESMI PUBLIK -->
+    <section class="py-14 sm:py-18 bg-[#0B2A43] text-white border-b border-slate-800 relative overflow-hidden" x-data="{ verifCode: '', isSearching: false, verifResult: null, errorMessage: '' }">
+        <div class="max-w-[1280px] mx-auto px-4 sm:px-10 relative z-10">
+            <div class="bg-gradient-to-br from-slate-900 via-[#0B2A43] to-slate-900 p-7 sm:p-12 rounded-3xl border border-[#C9A24D]/30 shadow-2xl space-y-6">
+                
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                    <div class="lg:col-span-5 space-y-3 text-center lg:text-left">
+                        <span class="inline-flex items-center gap-1.5 text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest bg-[#C9A24D]/15 border border-[#C9A24D]/30 px-3 py-1 rounded-full">
+                            <span>🛡️</span> <span>VERIFIKASI KEASLIAN DOKUMEN</span>
+                        </span>
+                        <h2 class="font-serif text-2xl sm:text-4xl font-bold text-white tracking-tight leading-tight">
+                            Verifikasi Laporan & Sertifikat Digital
+                        </h2>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                            Setiap dokumen hasil asesmen terbitan Ruhiology Institute dilengkapi kode unik verifikasi. Masukkan Kode Sesi untuk mengecek keabsahan dokumen secara otomatis.
+                        </p>
+                    </div>
+
+                    <div class="lg:col-span-7 bg-white/5 p-6 sm:p-8 rounded-2xl border border-white/15 backdrop-blur-md space-y-4">
+                        <form @submit.prevent="
+                            isSearching = true;
+                            verifResult = null;
+                            errorMessage = '';
+                            fetch('{{ route('api.assessment.quick_check') }}', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                                body: JSON.stringify({ code: verifCode })
+                            })
+                            .then(r => r.json())
+                            .then(data => {
+                                isSearching = false;
+                                if (data.status === 'success') {
+                                    verifResult = data.data;
+                                } else {
+                                    errorMessage = data.message || 'Dokumen tidak ditemukan atau kode salah.';
+                                }
+                            })
+                            .catch(err => {
+                                isSearching = false;
+                                errorMessage = 'Gagal memverifikasi dokumen. Silakan periksa koneksi internet Anda.';
+                            });
+                        " class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                            <input type="text" x-model="verifCode" required placeholder="Masukkan Kode Sesi (misal: SUB-GY5FRHTJRG)..." class="flex-1 bg-slate-950/80 border border-white/20 text-white placeholder-slate-400 text-xs px-4 py-3 rounded-xl focus:outline-none focus:border-[#C9A24D] uppercase font-mono font-bold min-h-[44px]">
+                            <button type="submit" :disabled="isSearching" class="bg-[#C9A24D] hover:bg-[#B48A16] text-[#0B2A43] font-extrabold text-xs px-6 py-3 rounded-xl transition shadow cursor-pointer min-h-[44px] flex items-center justify-center gap-2">
+                                <span x-text="isSearching ? 'Memeriksa...' : '🛡️ Verifikasi Dokumen'"></span>
+                            </button>
+                        </form>
+
+                        <!-- Error Message -->
+                        <template x-if="errorMessage">
+                            <div class="p-3.5 bg-rose-500/20 border border-rose-500/40 rounded-xl text-xs text-rose-200 font-medium">
+                                ⚠️ <span x-text="errorMessage"></span>
+                            </div>
+                        </template>
+
+                        <!-- Verification Result Card -->
+                        <template x-if="verifResult">
+                            <div class="p-4 bg-emerald-950/60 border border-emerald-500/50 rounded-2xl space-y-3 animate-fadeIn text-xs text-emerald-100">
+                                <div class="flex items-center justify-between border-b border-emerald-500/30 pb-2">
+                                    <span class="font-bold text-emerald-300 flex items-center gap-1.5 text-xs">
+                                        <span>✅</span> <span>DOKUMEN RESMI TERVERIFIKASI SAH</span>
+                                    </span>
+                                    <span class="font-mono text-[10px] bg-emerald-900/80 text-emerald-200 px-2 py-0.5 rounded font-bold" x-text="verifResult.submission_code"></span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2 text-[11px]">
+                                    <div>Nama Peserta: <strong class="text-white block" x-text="verifResult.participant_name"></strong></div>
+                                    <div>Instansi / Event: <strong class="text-white block" x-text="verifResult.event_title || 'Mandiri Publik'"></strong></div>
+                                    <div>Skor RQI: <strong class="text-[#C9A24D] block font-bold text-sm" x-text="verifResult.rqi_score + ' / 100'"></strong></div>
+                                    <div>Status WHO-5: <strong class="text-emerald-300 block font-bold" x-text="verifResult.who5_percentage + '% (' + (verifResult.who5_percentage >= 50 ? 'Sehat' : 'Skrining') + ')'"></strong></div>
+                                </div>
+                                <div class="pt-1 border-t border-emerald-500/30 text-right">
+                                    <a :href="'/assessment/result/' + verifResult.submission_code" target="_blank" class="text-xs font-bold text-[#C9A24D] hover:underline flex items-center justify-end gap-1">
+                                        <span>Buka Laporan Hasil Lengkap →</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
     <!-- SECTION 3: RQ ASSESSMENT -->
     <section id="assessment" class="py-12 sm:py-18 bg-white scroll-mt-20">
         <div class="max-w-[1280px] mx-auto px-4 sm:px-10">
