@@ -29,8 +29,14 @@ class AdminInstrumentController extends Controller
             ['code' => 'RQI-D3', 'name' => 'Ketaatan Ibadah', 'order' => 3],
             ['code' => 'RQI-D4', 'name' => 'Perubahan Perilaku & Akhlak Karimah', 'order' => 4],
             ['code' => 'RQI-D5', 'name' => 'Kesadaran Puncak Ketuhanan (God Light & Muraqabah)', 'order' => 5],
-            ['code' => 'RQI-D6', 'name' => 'Indeks Kesejahteraan Mental (WHO-5 Wellbeing Index)', 'order' => 6],
+            ['code' => 'RQI-D6', 'name' => 'WHO-5', 'order' => 6],
         ];
+
+        // Rename old RQI-D6 name if needed
+        $d6 = Dimension::where('instrument_id', $instrument->id)->where('code', 'RQI-D6')->first();
+        if ($d6 && str_contains($d6->name, 'Indeks Kesejahteraan')) {
+            $d6->update(['name' => 'WHO-5']);
+        }
 
         if ($instrument->dimensions()->count() < 6) {
             foreach ($defaultDimensions as $dim) {
@@ -82,14 +88,84 @@ class AdminInstrumentController extends Controller
             ['code' => 'RQI-D3', 'name' => 'Ketaatan Ibadah', 'order' => 3],
             ['code' => 'RQI-D4', 'name' => 'Perubahan Perilaku & Akhlak Karimah', 'order' => 4],
             ['code' => 'RQI-D5', 'name' => 'Kesadaran Puncak Ketuhanan (God Light & Muraqabah)', 'order' => 5],
-            ['code' => 'RQI-D6', 'name' => 'Indeks Kesejahteraan Mental (WHO-5 Wellbeing Index)', 'order' => 6],
+            ['code' => 'RQI-D6', 'name' => 'WHO-5', 'order' => 6],
         ];
 
+        $createdDimensions = [];
         foreach ($defaultDimensions as $dim) {
-            Dimension::firstOrCreate(
+            $createdDimensions[$dim['code']] = Dimension::firstOrCreate(
                 ['instrument_id' => $instrument->id, 'code' => $dim['code']],
                 ['name' => $dim['name'], 'order' => $dim['order']]
             );
+        }
+
+        // Auto-seed 3 questions per dimension (18 questions total)
+        $defaultQuestions = [
+            'RQI-D1' => [
+                'Saya menyadari bahwa diri saya bukan sekadar fisik atau status sosial, melainkan ruh yang sedang berproses, sehingga saya memaknai setiap aktivitas harian sebagai sarana pembentukan jiwa.',
+                'Ketika rasa penat atau godaan gawai datang, saya sadar kapan harus segera \'rem darurat\' agar waktu dan energi saya tidak habis sia-sia.',
+                'Saat saya merasa gagal atau insecure melihat pencapaian orang lain, batin saya kembali tenang karena menyadari nilai diri saya tidak ditentukan oleh validasi duniawi.'
+            ],
+            'RQI-D2' => [
+                'Di tengah kesibukan dan kepala yang pusing karena aktivitas, ada \'ruang sunyi\' dalam diri saya yang secara alami merindukan ketenangan dengan mengingat Tuhan.',
+                'Saya meyakini secara mendalam bahwa setiap masalah, tekanan, atau jalan buntu yang saya alami adalah rancangan kasih sayang Tuhan untuk mendewasakan jiwa saya.',
+                'Ketika menghadapi masalah yang membuat frustrasi, saya membiasakan diri untuk tidak dikuasai emosi negatif, melainkan langsung berserah dan memohon petunjuk kepada-Nya.'
+            ],
+            'RQI-D3' => [
+                'Saya menunaikan ibadah dengan tenang dan penuh penghayatan (thuma\'ninah), karena saya merasakannya sebagai \'ruang jeda\' yang memulihkan kepenatan mental saya.',
+                'Saya rutin meluangkan waktu untuk mengevaluasi diri (muhasabah), sehingga ibadah dan doa yang saya lakukan benar-benar meredakan kecemasan saya terhadap masa depan.',
+                'Saya menjaga kedisiplinan ibadah harian atas dorongan nurani dan kebutuhan jiwa saya sendiri, bukan sekadar ikut-ikutan atau ingin dipuji orang lain.'
+            ],
+            'RQI-D4' => [
+                'Saya menjalankan peran, pekerjaan, atau komitmen kerja sama secara tuntas dan jujur, serta menghindari sikap lepas tangan kepada orang lain.',
+                'Ketika berada di tengah lingkungan yang suka bergosip, drama pertemanan, atau konflik, batin saya menolak untuk ikut-ikutan memperkeruh suasana.',
+                'Saya tergerak secara tulus untuk membantu, berbagi ilmu, atau meringankan beban orang di sekitar yang sedang mengalami kesulitan.'
+            ],
+            'RQI-D5' => [
+                'Kesadaran bahwa Tuhan selalu mengawasi membuat saya menolak segala bentuk kecurangan, manipulasi, atau plagiarisme sekecil apa pun.',
+                'Ketika sedang sendirian larut malam memegang gawai, kesadaran bahwa Tuhan Maha Melihat menjaga saya dari hal-hal yang merusak kesucian pikiran.',
+                'Bagi saya, proses yang jujur dan keberkahan hidup jauh lebih berharga daripada meraih hasil instan atau keuntungan dengan cara yang melanggar moral.'
+            ],
+            'RQI-D6' => [
+                'Saya merasa bersemangat, ceria, dan termotivasi dalam menjalani hari-hari.',
+                'Saya merasa tenang, damai, dan tidak terbebani oleh kecemasan berlebih.',
+                'Tubuh dan pikiran saya merasa aktif, segar, dan bertenaga.'
+            ]
+        ];
+
+        $likertOptions = [
+            ['text' => 'Sepanjang Waktu', 'val' => 5],
+            ['text' => 'Sebagian Besar Waktu', 'val' => 4],
+            ['text' => 'Kadang-kadang', 'val' => 3],
+            ['text' => 'Jarang', 'val' => 2],
+            ['text' => 'Tidak Pernah', 'val' => 1],
+        ];
+
+        $questionOrder = 1;
+        foreach ($defaultQuestions as $dimCode => $qTexts) {
+            $dimModel = $createdDimensions[$dimCode] ?? null;
+            if ($dimModel) {
+                foreach ($qTexts as $qText) {
+                    $q = Question::create([
+                        'instrument_id' => $instrument->id,
+                        'dimension_id' => $dimModel->id,
+                        'question_text' => $qText,
+                        'type' => 'likert',
+                        'scoring_direction' => 'normal',
+                        'order' => $questionOrder++,
+                        'status' => 'active'
+                    ]);
+
+                    foreach ($likertOptions as $optIdx => $opt) {
+                        QuestionOption::create([
+                            'question_id' => $q->id,
+                            'option_text' => $opt['text'],
+                            'option_value' => $opt['val'],
+                            'order' => $optIdx + 1,
+                        ]);
+                    }
+                }
+            }
         }
 
         AuditLogService::log(
