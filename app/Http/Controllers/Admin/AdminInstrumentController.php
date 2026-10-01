@@ -22,6 +22,25 @@ class AdminInstrumentController extends Controller
 
     public function show(Instrument $instrument)
     {
+        // Auto-ensure all 6 default dimensions exist for complete RQI framework
+        $defaultDimensions = [
+            ['code' => 'RQI-D1', 'name' => 'Pengenalan & Kesadaran Diri Hakiki', 'order' => 1],
+            ['code' => 'RQI-D2', 'name' => 'Pengenalan Ketuhanan (God Spot)', 'order' => 2],
+            ['code' => 'RQI-D3', 'name' => 'Ketaatan Ibadah', 'order' => 3],
+            ['code' => 'RQI-D4', 'name' => 'Perubahan Perilaku & Akhlak Karimah', 'order' => 4],
+            ['code' => 'RQI-D5', 'name' => 'Kesadaran Puncak Ketuhanan (God Light & Muraqabah)', 'order' => 5],
+            ['code' => 'RQI-D6', 'name' => 'Indeks Kesejahteraan Mental (WHO-5 Wellbeing Index)', 'order' => 6],
+        ];
+
+        if ($instrument->dimensions()->count() < 6) {
+            foreach ($defaultDimensions as $dim) {
+                Dimension::firstOrCreate(
+                    ['instrument_id' => $instrument->id, 'code' => $dim['code']],
+                    ['name' => $dim['name'], 'order' => $dim['order']]
+                );
+            }
+        }
+
         $instrument->load([
             'dimensions.indicators',
             'dimensions.questions.options',
@@ -56,22 +75,21 @@ class AdminInstrumentController extends Controller
             'reverse_mapping' => ['1' => 5, '2' => 4, '3' => 3, '4' => 2, '5' => 1],
         ]);
 
-        // Create 5 default RQI Dimensions if none exist
+        // Create 6 default RQI Dimensions for Ruhiology Institute Framework
         $defaultDimensions = [
-            ['code' => 'RQI-D1', 'name' => 'Kesadaran Ruhaniah / Spiritual Awareness', 'order' => 1],
-            ['code' => 'RQI-D2', 'name' => 'Ketenangan Batin & Regulasi Diri', 'order' => 2],
-            ['code' => 'RQI-D3', 'name' => 'Moralitas & Integritas Karakter', 'order' => 3],
-            ['code' => 'RQI-D4', 'name' => 'Empati & Hubungan Transendental', 'order' => 4],
-            ['code' => 'RQI-D5', 'name' => 'Orientasi Makna & Tujuan Hidup', 'order' => 5],
+            ['code' => 'RQI-D1', 'name' => 'Pengenalan & Kesadaran Diri Hakiki', 'order' => 1],
+            ['code' => 'RQI-D2', 'name' => 'Pengenalan Ketuhanan (God Spot)', 'order' => 2],
+            ['code' => 'RQI-D3', 'name' => 'Ketaatan Ibadah', 'order' => 3],
+            ['code' => 'RQI-D4', 'name' => 'Perubahan Perilaku & Akhlak Karimah', 'order' => 4],
+            ['code' => 'RQI-D5', 'name' => 'Kesadaran Puncak Ketuhanan (God Light & Muraqabah)', 'order' => 5],
+            ['code' => 'RQI-D6', 'name' => 'Indeks Kesejahteraan Mental (WHO-5 Wellbeing Index)', 'order' => 6],
         ];
 
         foreach ($defaultDimensions as $dim) {
-            Dimension::create([
-                'instrument_id' => $instrument->id,
-                'code' => $dim['code'],
-                'name' => $dim['name'],
-                'order' => $dim['order'],
-            ]);
+            Dimension::firstOrCreate(
+                ['instrument_id' => $instrument->id, 'code' => $dim['code']],
+                ['name' => $dim['name'], 'order' => $dim['order']]
+            );
         }
 
         AuditLogService::log(
