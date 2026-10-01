@@ -129,7 +129,9 @@ class AdminInstrumentController extends Controller
             'RQI-D6' => [
                 'Saya merasa bersemangat, ceria, dan termotivasi dalam menjalani hari-hari.',
                 'Saya merasa tenang, damai, dan tidak terbebani oleh kecemasan berlebih.',
-                'Tubuh dan pikiran saya merasa aktif, segar, dan bertenaga.'
+                'Tubuh dan pikiran saya merasa aktif, segar, dan bertenaga.',
+                'Saya bisa bangun tidur pagi dengan perasaan segar dan istirahat yang cukup.',
+                'Kehidupan sehari-hari saya terasa bermakna dan memicu antusiasme saya.'
             ]
         ];
 
