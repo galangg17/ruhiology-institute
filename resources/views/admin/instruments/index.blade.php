@@ -65,7 +65,7 @@
                     </div>
                 </div>
 
-                <div class="p-4 bg-slate-50/70 border-t border-slate-100 flex items-center justify-between gap-2 text-xs">
+                <div class="p-4 bg-slate-50/70 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs">
                     <div class="flex items-center gap-1.5">
                         <button @click="editData = {
                             id: {{ $inst->id }},
@@ -82,6 +82,14 @@
                         <a href="{{ route('admin.instruments.export', $inst->id) }}" class="px-2.5 py-1.5 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 transition" title="Export Paket Soal ke Excel">
                             <span>📤 Export</span>
                         </a>
+
+                        <form action="{{ route('admin.instruments.destroy', $inst->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus paket soal \'{{ addslashes($inst->name) }}\' ({{ $inst->code }}) beserta seluruh soal di dalamnya? Tindakan ini tidak dapat dibatalkan.')" class="inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs rounded-xl border border-rose-200 transition cursor-pointer flex items-center gap-1" title="Hapus Paket Soal Ini">
+                                <span>🗑️ Hapus</span>
+                            </button>
+                        </form>
                     </div>
 
                     <a href="{{ route('admin.instruments.show', $inst->id) }}" class="px-4 py-2 bg-[#0B2A43] hover:bg-[#123B59] text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-1">

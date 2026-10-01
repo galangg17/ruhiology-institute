@@ -18,17 +18,24 @@
             </div>
             <div class="flex flex-wrap items-center gap-2">
                 <a href="{{ route('admin.instruments.template.download') }}" class="px-3.5 py-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1.5" title="Download Template Excel 20 Soal (Terstruktur)">
-                    <span>📥</span> <span>Template Excel (20 Soal)</span>
+                    <span>📥</span> <span>Template Excel</span>
                 </a>
                 <button @click="importModal = true" class="px-3.5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center gap-1.5">
                     <span>📊</span> <span>Import Excel</span>
                 </button>
                 <button @click="batchModal = true" class="px-4 py-2.5 bg-gradient-to-r from-[#C9A24D] to-[#B48A16] hover:from-[#B48A16] hover:to-[#96710E] text-[#0B2A43] font-extrabold text-xs rounded-xl shadow transition-all flex items-center gap-1.5 cursor-pointer">
-                    <span>⚡</span> <span>Form Batch 20 Soal (Web UI)</span>
+                    <span>⚡</span> <span>Form Batch 20 Soal</span>
                 </button>
                 <button @click="dimModal = true" class="px-3.5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center gap-1.5">
                     <span>+ Dimensi</span>
                 </button>
+                <form action="{{ route('admin.instruments.destroy', $instrument->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus seluruh paket soal \'{{ addslashes($instrument->name) }}\' beserta semua dimensi & butir soal di dalamnya? Tindakan ini tidak dapat dibatalkan.');" class="inline">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="px-3.5 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer">
+                        <span>🗑️ Hapus Paket</span>
+                    </button>
+                </form>
             </div>
         </div>
     </div>
