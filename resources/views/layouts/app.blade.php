@@ -92,7 +92,7 @@
         }
     </style>
 </head>
-<body class="bg-white text-[#193247] font-sans antialiased min-h-screen flex flex-col selection:bg-[#0B2A43] selection:text-white">
+<body class="bg-white text-[#193247] font-sans antialiased min-h-screen flex flex-col selection:bg-[#0B2A43] selection:text-white overflow-x-hidden">
 
     <!-- HEADER / NAVBAR COMPONENT -->
     <x-navbar />
