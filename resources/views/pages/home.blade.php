@@ -1102,76 +1102,74 @@
         </div>
     </section>
 
-    <!-- SECTION 6.2: TESTIMONI & DUKUNGAN TOKOH/PESERTA -->
-    <section class="py-14 sm:py-20 bg-white border-b border-slate-100">
-        <div class="max-w-[1280px] mx-auto px-4 sm:px-10">
-            <div class="text-center max-w-2xl mx-auto mb-10 sm:mb-14 space-y-2">
-                <span class="text-xs font-mono font-bold text-[#C9A24D] uppercase tracking-widest block">✦ TESTIMONI & REVIEWS</span>
-                <h2 class="font-serif text-2xl sm:text-4xl font-bold text-[#0B2A43] tracking-tight">
-                    Pengalaman Peserta & Peneliti Ruhiologi
-                </h2>
-                <p class="text-xs sm:text-sm text-slate-600 font-normal">Apa kata para akademisi, praktisi, dan peserta yang telah mencoba asesmen serta pelatihan Ruhiology Institute.</p>
+    <!-- SECTION 6.2: TEKAD & REFLEKSI BATIN PESERTA (DYNAMIC & RANDOMIZED) -->
+    <section class="py-14 sm:py-20 bg-[#F8F6F0] border-b border-slate-200/80">
+        <div class="max-w-[1280px] mx-auto px-4 sm:px-10 space-y-8" 
+             x-data="{ 
+                allTekad: {{ json_encode($tekadList ?? []) }},
+                displayedTekad: [],
+                shuffleTekad() {
+                    if (!this.allTekad || this.allTekad.length === 0) return;
+                    let shuffled = [...this.allTekad].sort(() => 0.5 - Math.random());
+                    this.displayedTekad = shuffled.slice(0, 3);
+                },
+                init() {
+                    this.shuffleTekad();
+                    setInterval(() => {
+                        this.shuffleTekad();
+                    }, 6000);
+                }
+             }">
+            
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200/80 pb-6">
+                <div class="space-y-2 max-w-2xl text-left">
+                    <span class="text-xs font-mono font-bold text-[#C9A24D] uppercase tracking-widest block flex items-center gap-1.5">
+                        <span>✨</span> <span>TEKAD & REFLEKSI BATIN PESERTA</span>
+                    </span>
+                    <h2 class="font-serif text-2xl sm:text-4xl font-bold text-[#0B2A43] tracking-tight">
+                        Komitmen & Tekad Perubahan Diri Peserta
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-600 font-normal leading-relaxed">
+                        Ungkapan tekad, refleksi niat, dan komitmen perbaikan batin yang diisi secara langsung oleh para peserta setelah menyelesaikan Asesmen Ruhiology Institute.
+                    </p>
+                </div>
+
+                <!-- Refresh / Shuffle Action Button -->
+                <button type="button" @click="shuffleTekad()" class="px-4 py-2.5 bg-white hover:bg-slate-50 text-[#0B2A43] font-bold text-xs rounded-xl border border-slate-300 shadow-xs hover:shadow transition flex items-center gap-2 shrink-0 cursor-pointer">
+                    <span>🎲</span> <span>Acak Tekad Lainnya</span>
+                </button>
             </div>
 
+            <!-- Tekad Cards Grid with Random Rotation -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                
-                <!-- Testimonial 1 -->
-                <div class="bg-[#F8F6F0] p-6 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col justify-between space-y-4 hover:shadow-md transition">
-                    <div class="space-y-3">
-                        <div class="flex text-amber-400 text-sm">★★★★★</div>
-                        <p class="text-xs text-slate-700 italic leading-relaxed font-serif">
-                            "Asesmen RQI-15 sangat presisi. Sebagai pendidik, saya bisa melihat pemetaan karakter batin mahasiswa secara objektif dan terbantu dengan panduan perbaikannya."
-                        </p>
-                    </div>
-                    <div class="flex items-center gap-3 pt-3 border-t border-slate-200/80">
-                        <div class="w-10 h-10 rounded-full bg-[#0B2A43] text-[#C9A24D] font-bold text-xs flex items-center justify-center font-mono">
-                            AF
+                <template x-for="(item, idx) in displayedTekad" :key="idx">
+                    <div class="bg-white p-6 rounded-3xl border border-slate-200/90 shadow-xs flex flex-col justify-between space-y-4 hover:shadow-md transition-all">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[10px] font-mono font-bold text-[#C9A24D] bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200/80 uppercase">
+                                    📜 Tekad Perubahan
+                                </span>
+                                <span class="text-[10px] text-slate-400 font-medium" x-text="item.date"></span>
+                            </div>
+                            <p class="text-xs text-slate-700 italic leading-relaxed font-serif pt-1" x-text="'&ldquo;' + item.tekad + '&rdquo;'"></p>
                         </div>
-                        <div>
-                            <strong class="text-xs text-[#0B2A43] block font-bold">Dr. Ahmad Farhan, M.Pd.</strong>
-                            <span class="text-[10px] text-slate-500 block">Dosen & Peneliti Psikologi Pendidikan</span>
+                        
+                        <div class="flex items-center gap-3 pt-3 border-t border-slate-100">
+                            <div class="w-10 h-10 rounded-full bg-[#0B2A43] text-[#C9A24D] font-bold text-xs flex items-center justify-center font-mono shrink-0 shadow-xs" x-text="item.initials"></div>
+                            <div class="min-w-0">
+                                <strong class="text-xs text-[#0B2A43] block font-bold truncate" x-text="item.name"></strong>
+                                <span class="text-[10px] text-slate-500 block truncate" x-text="item.institution"></span>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </template>
+            </div>
 
-                <!-- Testimonial 2 -->
-                <div class="bg-[#F8F6F0] p-6 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col justify-between space-y-4 hover:shadow-md transition">
-                    <div class="space-y-3">
-                        <div class="flex text-amber-400 text-sm">★★★★★</div>
-                        <p class="text-xs text-slate-700 italic leading-relaxed font-serif">
-                            "Hasil interpretasi gaya Gen Z sangat adem dan kena di hati! Tidak menghakimi, justru memberi rekomendasi amalan dan penataan niat yang sangat pas."
-                        </p>
-                    </div>
-                    <div class="flex items-center gap-3 pt-3 border-t border-slate-200/80">
-                        <div class="w-10 h-10 rounded-full bg-emerald-700 text-white font-bold text-xs flex items-center justify-center font-mono">
-                            SR
-                        </div>
-                        <div>
-                            <strong class="text-xs text-[#0B2A43] block font-bold">Siti Rahmawati, S.Psi.</strong>
-                            <span class="text-[10px] text-slate-500 block">Praktisi HR & Behavioral Specialist</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Testimonial 3 -->
-                <div class="bg-[#F8F6F0] p-6 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col justify-between space-y-4 hover:shadow-md transition">
-                    <div class="space-y-3">
-                        <div class="flex text-amber-400 text-sm">★★★★★</div>
-                        <p class="text-xs text-slate-700 italic leading-relaxed font-serif">
-                            "Sangat merekomendasikan asesmen ini untuk civitas akademika. Pendekatan integratif wahyu dan psikometri membuat kita lebih sadar akan potensi ruh."
-                        </p>
-                    </div>
-                    <div class="flex items-center gap-3 pt-3 border-t border-slate-200/80">
-                        <div class="w-10 h-10 rounded-full bg-[#C9A24D] text-[#0B2A43] font-bold text-xs flex items-center justify-center font-mono">
-                            FA
-                        </div>
-                        <div>
-                            <strong class="text-xs text-[#0B2A43] block font-bold">Fikri Al-Ghazali, M.Ag.</strong>
-                            <span class="text-[10px] text-slate-500 block">Mahasiswa Pascasarjana & Peserta Asesmen</span>
-                        </div>
-                    </div>
-                </div>
-
+            <!-- Footer Note -->
+            <div class="text-center pt-2">
+                <span class="text-[11px] text-slate-500 font-medium inline-flex items-center gap-1.5 bg-white px-4 py-1.5 rounded-full border border-slate-200 shadow-2xs">
+                    <span>🌱</span> <span>Tekad peserta diperbarui secara acak & real-time dari hasil asesmen di seluruh Indonesia.</span>
+                </span>
             </div>
         </div>
     </section>

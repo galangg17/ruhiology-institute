@@ -96,8 +96,11 @@ class PublicAssessmentController extends Controller
             $request->merge(['regency_id' => $defaultRegId]);
         }
 
-        if (($request->input('category') === 'Pelajar' || empty($request->input('category'))) && empty($request->input('school_level'))) {
-            $request->merge(['school_level' => 'SMA']);
+        if ($request->input('category') === 'Mahasiswa') {
+            $request->merge(['category' => 'Mahasiswa/i']);
+        }
+        if ($request->input('category') === 'Mandiri') {
+            $request->merge(['category' => 'Umum']);
         }
 
         $validated = $request->validate([
@@ -106,7 +109,7 @@ class PublicAssessmentController extends Controller
             'gender' => ['nullable', 'in:Laki-laki,Perempuan'],
             'phone' => ['nullable', 'string', 'max:50'],
             'email' => ['nullable', 'email', 'max:255'],
-            'category' => ['required', 'in:Pelajar,Mahasiswa/i,Umum'],
+            'category' => ['required', 'in:Pelajar,Mahasiswa/i,Umum,Mahasiswa,Mandiri'],
             'country_id' => ['nullable', 'exists:countries,id'],
             'province_id' => ['required', 'exists:provinces,id'],
             'regency_id' => ['required', 'exists:regencies,id'],
