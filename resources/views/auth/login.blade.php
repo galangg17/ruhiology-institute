@@ -161,14 +161,11 @@
 
                 <!-- Additional Links -->
                 <div class="pt-4 border-t border-slate-100 text-center space-y-2 text-xs">
-                    <p class="text-slate-500">
-                        Belum memiliki akun peserta? 
-                        <a href="{{ route('register') }}" class="font-bold text-[#0B2A43] hover:text-[#C9A24D] transition underline">
-                            Daftar Akun Baru
-                        </a>
+                    <p class="text-slate-500 text-[11px]">
+                        Portal otentikasi khusus Pengelola, Admin, dan Staf Terverifikasi.
                     </p>
                     <p>
-                        <a href="{{ url('/') }}" class="text-[11px] text-slate-400 hover:text-slate-600 transition flex items-center justify-center gap-1">
+                        <a href="{{ url('/') }}" class="text-[11px] text-slate-500 hover:text-[#0B2A43] font-bold transition flex items-center justify-center gap-1">
                             <span>←</span> <span>Kembali ke Halaman Utama</span>
                         </a>
                     </p>

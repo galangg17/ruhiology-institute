@@ -51,40 +51,12 @@ class AuthController extends Controller
 
     public function showRegister()
     {
-        if (Auth::check()) {
-            return redirect()->route('dashboard');
-        }
-        return view('auth.register');
+        return redirect()->route('login')->with('error', 'Registrasi mandiri tidak dibuka. Akun pengelola dibuat langsung oleh Super Admin di Panel Admin.');
     }
 
     public function register(Request $request)
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'phone' => ['required', 'string', 'max:20'],
-            'password' => ['required', 'confirmed', Password::defaults()],
-        ]);
-
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'phone' => $validated['phone'],
-            'password' => Hash::make($validated['password']),
-            'role' => 'participant',
-            'status' => 'active',
-        ]);
-
-        Auth::login($user);
-
-        AuditLogService::log(
-            action: 'register',
-            module: 'System',
-            recordType: 'User',
-            recordId: (string) $user->id
-        );
-
-        return redirect()->route('dashboard')->with('success', 'Akun Anda berhasil dibuat!');
+        return redirect()->route('login')->with('error', 'Registrasi mandiri tidak dibuka. Akun pengelola dibuat langsung oleh Super Admin di Panel Admin.');
     }
 
     public function logout(Request $request)

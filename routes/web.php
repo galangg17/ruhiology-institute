@@ -207,6 +207,8 @@ Route::middleware(['auth', \App\Http\Middleware\EnsureAdminAccess::class])
         Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
         Route::post('/users', [AdminUserController::class, 'store'])->name('users.store');
         Route::put('/users/{user}/role', [AdminUserController::class, 'updateRole'])->name('users.update_role');
+        Route::put('/users/{user}', [AdminUserController::class, 'update'])->name('users.update');
+        Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
 
         // Audit Logs (Read-only)
         Route::get('/audit-logs', [AdminAuditLogController::class, 'index'])->name('audit_logs.index');
