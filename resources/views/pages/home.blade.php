@@ -472,8 +472,33 @@
         </div>
     </section>
 
-    <!-- SECTION: INSTITUTIONAL PARTNERS SHOWCASE -->
-    <section class="py-12 bg-white border-b border-slate-200/80">
+    <!-- SECTION: INSTITUTIONAL PARTNERS SHOWCASE (DYNAMIC ANIMATED MARQUEE TICKER) -->
+    <section class="py-12 bg-white border-b border-slate-200/80 overflow-hidden">
+        <style>
+            @keyframes marqueeLeft {
+                0% { transform: translateX(0%); }
+                100% { transform: translateX(-50%); }
+            }
+            @keyframes marqueeRight {
+                0% { transform: translateX(-50%); }
+                100% { transform: translateX(0%); }
+            }
+            .animate-marquee-left {
+                display: flex;
+                width: max-content;
+                animation: marqueeLeft 45s linear infinite;
+            }
+            .animate-marquee-right {
+                display: flex;
+                width: max-content;
+                animation: marqueeRight 45s linear infinite;
+            }
+            .marquee-group:hover .animate-marquee-left,
+            .marquee-group:hover .animate-marquee-right {
+                animation-play-state: paused;
+            }
+        </style>
+
         <div class="max-w-[1280px] mx-auto px-4 sm:px-10 space-y-6">
             <div class="text-center max-w-2xl mx-auto space-y-2">
                 <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest bg-amber-50 border border-amber-200 px-3 py-1 rounded-full">
@@ -482,27 +507,53 @@
                 <h3 class="font-serif font-bold text-xl sm:text-2xl text-[#0B2A43]">
                     Dipercaya oleh Berbagai Perguruan Tinggi, Sekolah, & Instansi Mitra
                 </h3>
+                <p class="text-xs text-slate-500 font-sans">
+                    Digunakan oleh {{ number_format($stats['total_institutions'] ?? 12) }}+ Perguruan Tinggi, Sekolah, & Lembaga Mitra di 38 Provinsi.
+                </p>
             </div>
 
-            <!-- Partner Badges Grid -->
-            <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-xs font-bold text-[#0B2A43]">
-                <div class="px-4 py-2.5 bg-slate-50 rounded-2xl border border-slate-200/80 flex items-center gap-2 shadow-2xs">
-                    <span>🏫</span> <span>MAN 1 Kota Batam</span>
+            @php
+                $partners = $partnerList ?? [
+                    ['name' => 'MAN 1 KOTA BATAM', 'icon' => '🏫'],
+                    ['name' => 'SMAN TITIAN TERAS JAMBI', 'icon' => '🏛️'],
+                    ['name' => 'UIN SULTHAN THAHA SAIFUDDIN JAMBI', 'icon' => '🎓'],
+                    ['name' => 'UI YASNI BUNGO', 'icon' => '🎓'],
+                    ['name' => 'UIN M. SJECH DJAMIL DJAMBEK BUKITTINGGI', 'icon' => '🎓'],
+                    ['name' => 'PENGGUNA MANDIRI 38+ PROVINSI', 'icon' => '👤']
+                ];
+                
+                $half = max(3, ceil(count($partners) / 2));
+                $row1 = array_slice($partners, 0, $half);
+                $row2 = array_slice($partners, $half);
+                if (empty($row2)) $row2 = $row1;
+
+                $row1Loop = array_merge($row1, $row1, $row1);
+                $row2Loop = array_merge($row2, $row2, $row2);
+            @endphp
+
+            <div class="relative w-full overflow-hidden marquee-group py-2">
+                <!-- Fade Gradients on edges -->
+                <div class="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-28 bg-gradient-to-r from-white via-white/80 to-transparent z-10"></div>
+                <div class="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-28 bg-gradient-to-l from-white via-white/80 to-transparent z-10"></div>
+
+                <!-- Row 1: Smooth Scroll Left -->
+                <div class="animate-marquee-left gap-3 sm:gap-4 mb-3">
+                    @foreach($row1Loop as $item)
+                        <div class="px-4 py-2.5 bg-slate-50 hover:bg-amber-50/90 rounded-2xl border border-slate-200/80 hover:border-[#C9A24D] flex items-center gap-2.5 shadow-2xs transition-all duration-300 shrink-0 cursor-default group/pill">
+                            <span class="text-sm sm:text-base group-hover/pill:scale-110 transition-transform duration-300">{{ $item['icon'] ?? '🏛️' }}</span>
+                            <span class="text-xs font-bold text-[#0B2A43] group-hover/pill:text-amber-900 whitespace-nowrap">{{ $item['name'] }}</span>
+                        </div>
+                    @endforeach
                 </div>
-                <div class="px-4 py-2.5 bg-slate-50 rounded-2xl border border-slate-200/80 flex items-center gap-2 shadow-2xs">
-                    <span>🏛️</span> <span>SMAN Titian Teras Jambi</span>
-                </div>
-                <div class="px-4 py-2.5 bg-slate-50 rounded-2xl border border-slate-200/80 flex items-center gap-2 shadow-2xs">
-                    <span>🎓</span> <span>UIN Sulthan Thaha Saifuddin Jambi</span>
-                </div>
-                <div class="px-4 py-2.5 bg-slate-50 rounded-2xl border border-slate-200/80 flex items-center gap-2 shadow-2xs">
-                    <span>🎓</span> <span>UI YASNI Bungo</span>
-                </div>
-                <div class="px-4 py-2.5 bg-slate-50 rounded-2xl border border-slate-200/80 flex items-center gap-2 shadow-2xs">
-                    <span>🎓</span> <span>UIN M. Sjech Djamil Djambek Bukittinggi</span>
-                </div>
-                <div class="px-4 py-2.5 bg-slate-50 rounded-2xl border border-slate-200/80 flex items-center gap-2 shadow-2xs">
-                    <span>👤</span> <span>Pengguna Mandiri 38+ Provinsi</span>
+
+                <!-- Row 2: Smooth Scroll Right -->
+                <div class="animate-marquee-right gap-3 sm:gap-4">
+                    @foreach($row2Loop as $item)
+                        <div class="px-4 py-2.5 bg-slate-50 hover:bg-amber-50/90 rounded-2xl border border-slate-200/80 hover:border-[#C9A24D] flex items-center gap-2.5 shadow-2xs transition-all duration-300 shrink-0 cursor-default group/pill">
+                            <span class="text-sm sm:text-base group-hover/pill:scale-110 transition-transform duration-300">{{ $item['icon'] ?? '🏛️' }}</span>
+                            <span class="text-xs font-bold text-[#0B2A43] group-hover/pill:text-amber-900 whitespace-nowrap">{{ $item['name'] }}</span>
+                        </div>
+                    @endforeach
                 </div>
             </div>
         </div>

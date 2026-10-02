@@ -105,18 +105,68 @@ class HomeController extends Controller
 
         $tekadList = array_merge($realTekad, $defaultTekad);
 
-        // Dynamic & Uppercase Normalized Total Institutions Count across Master & Custom Inputs
-        $masterInstNames = \App\Models\University::pluck('name')
-            ->merge(\App\Models\School::pluck('name'))
-            ->merge(\App\Models\Institution::pluck('name'));
-        $participantInstNames = \App\Models\Participant::whereNotNull('university_custom')->where('university_custom', '!=', '')->pluck('university_custom')
-            ->merge(\App\Models\Participant::whereNotNull('school_custom')->where('school_custom', '!=', '')->pluck('school_custom'));
+        // Dynamic Partners List (Master + Participants Custom Inputs)
+        $defaultPartners = [
+            ['name' => 'UIN SULTHAN THAHA SAIFUDDIN JAMBI', 'icon' => '🎓', 'type' => 'Perguruan Tinggi'],
+            ['name' => 'MAN 1 KOTA BATAM', 'icon' => '🏫', 'type' => 'Madrasah / Sekolah'],
+            ['name' => 'SMAN TITIAN TERAS JAMBI', 'icon' => '🏛️', 'type' => 'Sekolah Menengah'],
+            ['name' => 'UI YASNI BUNGO', 'icon' => '🎓', 'type' => 'Perguruan Tinggi'],
+            ['name' => 'UIN M. SJECH DJAMIL DJAMBEK BUKITTINGGI', 'icon' => '🎓', 'type' => 'Perguruan Tinggi'],
+            ['name' => 'MAN 2 KOTA JAMBI', 'icon' => '🏫', 'type' => 'Madrasah / Sekolah'],
+            ['name' => 'SMAN 5 KOTA SUNGAI PENUH', 'icon' => '🏫', 'type' => 'Sekolah Menengah'],
+            ['name' => 'UIN RADEN MAS SAID SURAKARTA', 'icon' => '🎓', 'type' => 'Perguruan Tinggi'],
+            ['name' => 'UIN SUNAN GUNUNG DJATI BANDUNG', 'icon' => '🎓', 'type' => 'Perguruan Tinggi'],
+            ['name' => 'UIN MAULANA MALIK IBRAHIM MALANG', 'icon' => '🎓', 'type' => 'Perguruan Tinggi'],
+            ['name' => 'UNIVERSITAS JAMBI (UNJA)', 'icon' => '🎓', 'type' => 'Perguruan Tinggi'],
+            ['name' => 'UNIVERSITAS GADJAH MADA (UGM)', 'icon' => '🎓', 'type' => 'Perguruan Tinggi'],
+            ['name' => 'UNIVERSITAS INDONESIA (UI)', 'icon' => '🎓', 'type' => 'Perguruan Tinggi'],
+            ['name' => 'PENGGUNA MANDIRI 38+ PROVINSI', 'icon' => '👤', 'type' => 'Nasional'],
+        ];
 
-        $totalInstitutionsCount = $masterInstNames->merge($participantInstNames)
-            ->map(fn($n) => strtoupper(trim(preg_replace('/\s+/', ' ', $n))))
-            ->filter()
-            ->unique()
-            ->count();
+        $dbUnivs = \App\Models\University::pluck('name')->toArray();
+        $dbSchools = \App\Models\School::pluck('name')->toArray();
+        $dbInsts = \App\Models\Institution::pluck('name')->toArray();
+        $customUnivs = \App\Models\Participant::whereNotNull('university_custom')->where('university_custom', '!=', '')->pluck('university_custom')->toArray();
+        $customSchools = \App\Models\Participant::whereNotNull('school_custom')->where('school_custom', '!=', '')->pluck('school_custom')->toArray();
+
+        $allDbNames = array_merge($dbUnivs, $dbSchools, $dbInsts, $customUnivs, $customSchools);
+        
+        $partnerNamesSeen = [];
+        $partnerList = [];
+
+        foreach ($defaultPartners as $dp) {
+            $normalized = strtoupper(trim(preg_replace('/\s+/', ' ', $dp['name'])));
+            if (!isset($partnerNamesSeen[$normalized])) {
+                $partnerNamesSeen[$normalized] = true;
+                $partnerList[] = $dp;
+            }
+        }
+
+        foreach ($allDbNames as $rawName) {
+            $normalized = strtoupper(trim(preg_replace('/\s+/', ' ', $rawName)));
+            if (empty($normalized) || strlen($normalized) < 3) continue;
+            if (!isset($partnerNamesSeen[$normalized])) {
+                $partnerNamesSeen[$normalized] = true;
+                $icon = '🏛️';
+                $type = 'Instansi / Mitra';
+
+                if (preg_match('/(UIN|UNIVERSITAS|STAIN|IAIN|POLITEKNIK|INSTITUT|COLLEGE|UNIV)/i', $normalized)) {
+                    $icon = '🎓';
+                    $type = 'Perguruan Tinggi';
+                } elseif (preg_match('/(SMAN|SMK|MAN|MTS|SMP|SMA|SD|MADRASAH|SEKOLAH)/i', $normalized)) {
+                    $icon = '🏫';
+                    $type = 'Sekolah / Madrasah';
+                }
+
+                $partnerList[] = [
+                    'name' => $normalized,
+                    'icon' => $icon,
+                    'type' => $type
+                ];
+            }
+        }
+
+        $totalInstitutionsCount = count($partnerList);
 
         $stats = [
             'total_provinces' => \App\Models\Province::count(),
@@ -125,7 +175,7 @@ class HomeController extends Controller
             'total_submissions' => \App\Models\AssessmentSubmission::count(),
         ];
 
-        return view('public.home', compact('trainings', 'books', 'articles', 'quotes', 'testimonials', 'stats', 'tekadList'));
+        return view('public.home', compact('trainings', 'books', 'articles', 'quotes', 'testimonials', 'stats', 'tekadList', 'partnerList'));
     }
 
     public function aboutRuhiology()
