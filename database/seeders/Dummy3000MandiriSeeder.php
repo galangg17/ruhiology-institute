@@ -8,6 +8,8 @@ use App\Models\Instrument;
 use App\Models\Province;
 use App\Models\Question;
 use App\Models\Regency;
+use App\Models\School;
+use App\Models\University;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -73,28 +75,28 @@ class Dummy3000MandiriSeeder extends Seeder
         $categories = ['Mahasiswa', 'Pelajar', 'Umum'];
         
         $universities = [
-            'UIN Sulthan Thaha Saifuddin Jambi',
-            'UIN Raden Mas Said Surakarta',
-            'UIN Sunan Gunung Djati Bandung',
-            'UIN Maulana Malik Ibrahim Malang',
-            'UIN Syarif Hidayatullah Jakarta',
-            'Universitas Jambi (UNJA)',
-            'Universitas Indonesia (UI)',
-            'Universitas Gadjah Mada (UGM)',
-            'STAIN Sultan Abdurrahman Kepri',
-            'Universitas Islam Yasni Bungo',
-            'Universitas Islam An-Nadwah Kuala Tungkal'
+            'UIN SULTHAN THAHA SAIFUDDIN JAMBI',
+            'UIN RADEN MAS SAID SURAKARTA',
+            'UIN SUNAN GUNUNG DJATI BANDUNG',
+            'UIN MAULANA MALIK IBRAHIM MALANG',
+            'UIN SYARIF HIDAYATULLAH JAKARTA',
+            'UNIVERSITAS JAMBI (UNJA)',
+            'UNIVERSITAS INDONESIA (UI)',
+            'UNIVERSITAS GADJAH MADA (UGM)',
+            'STAIN SULTAN ABDURRAHMAN KEPRI',
+            'UNIVERSITAS ISLAM YASNI BUNGO',
+            'UNIVERSITAS ISLAM AN-NADWAH KUALA TUNGKAL'
         ];
 
         $schools = [
-            'MAN 1 Kota Batam',
-            'MAN 2 Kota Jambi',
-            'SMAN Titian Teras Jambi',
-            'MAN 2 Kota Sungai Penuh',
-            'SMAN 1 Kota Jambi',
-            'SMAN 5 Kota Sungai Penuh',
-            'MAN 1 Bintan',
-            'MAN 1 Pekanbaru'
+            'MAN 1 KOTA BATAM',
+            'MAN 2 KOTA JAMBI',
+            'SMAN TITIAN TERAS JAMBI',
+            'MAN 2 KOTA SUNGAI PENUH',
+            'SMAN 1 KOTA JAMBI',
+            'SMAN 5 KOTA SUNGAI PENUH',
+            'MAN 1 BINTAN',
+            'MAN 1 PEKANBARU'
         ];
 
         $occupations = [
@@ -106,6 +108,34 @@ class Dummy3000MandiriSeeder extends Seeder
             'Tenaga Kesehatan',
             'Pelajar / Mahasiswa'
         ];
+
+        // Seed Master Universities & Schools with Uppercase Normalization
+        foreach ($universities as $uName) {
+            $prov = $provinces->random();
+            $reg = $prov->regencies?->first();
+            University::firstOrCreate(
+                ['name' => strtoupper(trim($uName))],
+                [
+                    'province_id' => $prov->id,
+                    'regency_id' => $reg?->id ?? 1,
+                    'status' => 'active'
+                ]
+            );
+        }
+
+        foreach ($schools as $sName) {
+            $prov = $provinces->random();
+            $reg = $prov->regencies?->first();
+            School::firstOrCreate(
+                ['name' => strtoupper(trim($sName))],
+                [
+                    'province_id' => $prov->id,
+                    'regency_id' => $reg?->id ?? 1,
+                    'level' => 'SMA',
+                    'status' => 'active'
+                ]
+            );
+        }
 
         $reflections = [
             'Asesmen ini sangat membuka mata saya mengenai pentingnya menjaga keseimbangan antara kesibukan harian dengan ketenangan jiwa (God Spot).',
@@ -156,9 +186,9 @@ class Dummy3000MandiriSeeder extends Seeder
                 $occupationCustom = null;
 
                 if ($category === 'Mahasiswa') {
-                    $universityCustom = $universities[array_rand($universities)];
+                    $universityCustom = strtoupper(trim($universities[array_rand($universities)]));
                 } elseif ($category === 'Pelajar') {
-                    $schoolCustom = $schools[array_rand($schools)];
+                    $schoolCustom = strtoupper(trim($schools[array_rand($schools)]));
                 } else {
                     $occupationCustom = $occupations[array_rand($occupations)];
                 }

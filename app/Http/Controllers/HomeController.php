@@ -105,9 +105,22 @@ class HomeController extends Controller
 
         $tekadList = array_merge($realTekad, $defaultTekad);
 
+        // Dynamic & Uppercase Normalized Total Institutions Count across Master & Custom Inputs
+        $masterInstNames = \App\Models\University::pluck('name')
+            ->merge(\App\Models\School::pluck('name'))
+            ->merge(\App\Models\Institution::pluck('name'));
+        $participantInstNames = \App\Models\Participant::whereNotNull('university_custom')->where('university_custom', '!=', '')->pluck('university_custom')
+            ->merge(\App\Models\Participant::whereNotNull('school_custom')->where('school_custom', '!=', '')->pluck('school_custom'));
+
+        $totalInstitutionsCount = $masterInstNames->merge($participantInstNames)
+            ->map(fn($n) => strtoupper(trim(preg_replace('/\s+/', ' ', $n))))
+            ->filter()
+            ->unique()
+            ->count();
+
         $stats = [
             'total_provinces' => \App\Models\Province::count(),
-            'total_institutions' => \App\Models\University::count() + \App\Models\School::count() + \App\Models\Institution::count(),
+            'total_institutions' => max(12, $totalInstitutionsCount),
             'total_participants' => \App\Models\Participant::count(),
             'total_submissions' => \App\Models\AssessmentSubmission::count(),
         ];

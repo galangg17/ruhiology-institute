@@ -45,6 +45,16 @@ class Participant extends Model
         'status',
     ];
 
+    public function setSchoolCustomAttribute($value)
+    {
+        $this->attributes['school_custom'] = $value ? strtoupper(trim(preg_replace('/\s+/', ' ', $value))) : null;
+    }
+
+    public function setUniversityCustomAttribute($value)
+    {
+        $this->attributes['university_custom'] = $value ? strtoupper(trim(preg_replace('/\s+/', ' ', $value))) : null;
+    }
+
     public function event()
     {
         return $this->belongsTo(Event::class, 'event_id');
