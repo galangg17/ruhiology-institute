@@ -220,9 +220,13 @@
                                     <span class="px-2.5 py-0.5 bg-sky-100 text-sky-800 text-[10px] font-extrabold uppercase rounded-full border border-sky-300">
                                         PRETEST
                                     </span>
-                                @else
+                                @elseif(strtolower($sub->submission_type) === 'posttest')
                                     <span class="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-extrabold uppercase rounded-full border border-emerald-300">
                                         POSTTEST
+                                    </span>
+                                @else
+                                    <span class="px-2.5 py-0.5 bg-indigo-100 text-indigo-800 text-[10px] font-extrabold uppercase rounded-full border border-indigo-300">
+                                        {{ strtoupper($sub->submission_type ?? 'MANDIRI') }}
                                     </span>
                                 @endif
                             </td>

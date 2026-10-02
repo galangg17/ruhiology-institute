@@ -17,7 +17,9 @@ class AdminDashboardController extends Controller
             'pending_orders' => \App\Models\Order::where('payment_status', 'pending')->count(),
             'new_consultations' => \App\Models\Consultation::where('status', 'new')->count(),
             'published_articles' => \App\Models\Article::where('status', 'published')->count(),
-            'total_submissions' => \App\Models\AssessmentSubmission::where('status', 'submitted')->count(),
+            'total_submissions' => \App\Models\AssessmentSubmission::where(function($q) {
+                $q->whereIn('status', ['submitted', 'completed', 'SUBMITTED', 'COMPLETED'])->orWhereNotNull('submitted_at');
+            })->count(),
             'pending_institutions' => \App\Models\PendingInstitution::where('status', 'pending')->count(),
             'avg_rq_score' => round(\App\Models\AssessmentResult::avg('percentage') ?? 0, 1),
         ];

@@ -20,12 +20,12 @@ class AdminParticipantController extends Controller
         $stats = [
             'total_participants' => Participant::count(),
             'public_participants' => Participant::where(function($w) {
-                $w->where('access_type', 'public')->orWhereNull('event_id');
+                $w->whereIn('access_type', ['public', 'PUBLIC', 'PUBLIC_SELF'])->orWhereNull('event_id');
             })->count(),
             'event_participants' => Participant::where(function($w) {
-                $w->where('access_type', 'event_only')->orWhereNotNull('event_id');
+                $w->whereIn('access_type', ['event_only', 'EVENT_PROGRAM'])->orWhereNotNull('event_id');
             })->count(),
-            'active_participants' => Participant::where('status', 'active')->count(),
+            'active_participants' => Participant::whereIn('status', ['active', 'ACTIVE'])->count(),
             'total_provinces' => Participant::whereNotNull('province_id')->distinct('province_id')->count(),
             'total_submissions' => AssessmentSubmission::count(),
         ];
@@ -44,11 +44,11 @@ class AdminParticipantController extends Controller
         if ($request->filled('access_type')) {
             if ($request->access_type === 'public') {
                 $query->where(function($w) {
-                    $w->where('access_type', 'public')->orWhereNull('event_id');
+                    $w->whereIn('access_type', ['public', 'PUBLIC', 'PUBLIC_SELF'])->orWhereNull('event_id');
                 });
             } elseif ($request->access_type === 'event_only') {
                 $query->where(function($w) {
-                    $w->where('access_type', 'event_only')->orWhereNotNull('event_id');
+                    $w->whereIn('access_type', ['event_only', 'EVENT_PROGRAM'])->orWhereNotNull('event_id');
                 });
             }
         }

@@ -263,7 +263,10 @@ class AdminResultController extends Controller
 
     private function buildFilterQuery(Request $request)
     {
-        $query = AssessmentSubmission::where('status', 'submitted')
+        $query = AssessmentSubmission::where(function ($q) {
+                $q->whereIn('status', ['submitted', 'completed', 'SUBMITTED', 'COMPLETED'])
+                  ->orWhereNotNull('submitted_at');
+            })
             ->with([
                 'participant.province',
                 'participant.regency',
@@ -277,7 +280,7 @@ class AdminResultController extends Controller
         if ($request->filled('event_id')) {
             if ($request->event_id === 'PUBLIC_SELF') {
                 $query->where(function ($q) {
-                    $q->whereNull('event_id')->orWhere('access_type', 'PUBLIC_SELF');
+                    $q->whereNull('event_id')->orWhereIn('access_type', ['PUBLIC_SELF', 'PUBLIC', 'public']);
                 });
             } else {
                 $query->where('event_id', $request->event_id);
