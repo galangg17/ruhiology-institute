@@ -486,12 +486,12 @@
             .animate-marquee-left {
                 display: flex;
                 width: max-content;
-                animation: marqueeLeft 45s linear infinite;
+                animation: marqueeLeft 160s linear infinite;
             }
             .animate-marquee-right {
                 display: flex;
                 width: max-content;
-                animation: marqueeRight 45s linear infinite;
+                animation: marqueeRight 160s linear infinite;
             }
             .marquee-group:hover .animate-marquee-left,
             .marquee-group:hover .animate-marquee-right {
@@ -527,8 +527,8 @@
                 $row2 = array_slice($partners, $half);
                 if (empty($row2)) $row2 = $row1;
 
-                $row1Loop = array_merge($row1, $row1, $row1);
-                $row2Loop = array_merge($row2, $row2, $row2);
+                $row1Loop = array_merge($row1, $row1);
+                $row2Loop = array_merge($row2, $row2);
             @endphp
 
             <div class="relative w-full overflow-hidden marquee-group py-2">
