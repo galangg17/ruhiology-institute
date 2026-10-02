@@ -493,6 +493,17 @@ class PublicAssessmentController extends Controller
             ])
             ->firstOrFail();
 
+        // Auto-generate result if missing
+        if (!$submission->result) {
+            try {
+                $resultService = app(\App\Services\ResultService::class);
+                $resultService->generateResult($submission);
+                $submission->load('result.dimensionResults.dimension');
+            } catch (\Exception $e) {
+                // Ignore fallback exception
+            }
+        }
+
         $settings = \App\Models\Setting::all()->pluck('value', 'key')->toArray();
 
         return view('public.assessment.certificate', compact('submission', 'settings'));
