@@ -486,12 +486,12 @@
             .animate-marquee-left {
                 display: flex;
                 width: max-content;
-                animation: marqueeLeft 160s linear infinite;
+                animation: marqueeLeft 450s linear infinite;
             }
             .animate-marquee-right {
                 display: flex;
                 width: max-content;
-                animation: marqueeRight 160s linear infinite;
+                animation: marqueeRight 450s linear infinite;
             }
             .marquee-group:hover .animate-marquee-left,
             .marquee-group:hover .animate-marquee-right {
@@ -513,7 +513,7 @@
             </div>
 
             @php
-                $partners = $partnerList ?? [
+                $rawPartners = $partnerList ?? [
                     ['name' => 'MAN 1 KOTA BATAM', 'icon' => '🏫'],
                     ['name' => 'SMAN TITIAN TERAS JAMBI', 'icon' => '🏛️'],
                     ['name' => 'UIN SULTHAN THAHA SAIFUDDIN JAMBI', 'icon' => '🎓'],
@@ -522,6 +522,7 @@
                     ['name' => 'PENGGUNA MANDIRI 38+ PROVINSI', 'icon' => '👤']
                 ];
                 
+                $partners = array_slice($rawPartners, 0, 30);
                 $half = max(3, ceil(count($partners) / 2));
                 $row1 = array_slice($partners, 0, $half);
                 $row2 = array_slice($partners, $half);
