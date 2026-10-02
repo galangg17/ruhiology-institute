@@ -227,7 +227,8 @@ class Dummy3000MandiriSeeder extends Seeder
                         'submission_id' => $submissionId,
                         'question_id' => $question->id,
                         'question_option_id' => $option?->id,
-                        'score' => $score,
+                        'raw_value' => $score,
+                        'calculated_score' => $score,
                         'created_at' => $submittedAt,
                         'updated_at' => $submittedAt,
                     ];
