@@ -119,16 +119,26 @@
 
                         <!-- Live Mini Score Box -->
                         <template x-if="isDone">
-                            <div class="p-4 bg-white/10 rounded-2xl border border-[#C9A24D]/40 backdrop-blur-md space-y-2 animate-fade-in">
-                                <div class="text-xs text-slate-300 font-mono">Estimasi Skor Mini-RQ:</div>
-                                <div class="flex items-baseline space-x-2">
-                                    <span class="text-3xl font-black font-mono text-[#C9A24D]" x-text="Math.round((total / 15) * 100) + '%'"></span>
-                                    <span class="text-xs font-bold text-emerald-300" x-text="category"></span>
+                            <div class="p-4 bg-white/10 rounded-2xl border border-[#C9A24D]/40 backdrop-blur-md space-y-3 animate-fade-in text-left">
+                                <div class="flex items-center justify-between text-xs text-slate-300 font-mono">
+                                    <span>Estimasi Indeks Ruhiologi (RQ):</span>
+                                    <strong class="text-[#C9A24D] font-bold text-sm font-mono" x-text="Math.round((total / 15) * 100) + '%'"></strong>
                                 </div>
-                                <button type="button" @click="$dispatch('open-assessment-intake')" class="w-full mt-2 py-3 bg-[#C9A24D] hover:bg-[#B48A16] text-[#0B2A43] font-bold text-xs rounded-xl shadow-lg transition transform hover:scale-[1.02] flex items-center justify-center gap-2 cursor-pointer">
-                                    <span>Ambil Asesmen Terstruktur Lengkap (20 Soal)</span>
+
+                                <!-- Dynamic Progress Bar -->
+                                <div class="w-full bg-slate-900/80 rounded-full h-2.5 overflow-hidden p-0.5 border border-white/10">
+                                    <div class="bg-gradient-to-r from-amber-400 to-[#C9A24D] h-full rounded-full transition-all duration-500" :style="'width: ' + Math.round((total / 15) * 100) + '%'"></div>
+                                </div>
+
+                                <div class="space-y-1 pt-1">
+                                    <span class="text-xs font-bold text-emerald-300 block" x-text="'✦ ' + category"></span>
+                                    <span class="text-[11px] block font-medium" :class="total >= 9 ? 'text-emerald-300' : 'text-amber-300'" x-text="total >= 9 ? '🟢 Prediksi WHO-5: Kesejahteraan Mental Baik' : '⚠️ Prediksi WHO-5: Indikasi Perlu Skrining Stres'"></span>
+                                </div>
+
+                                <a href="#assessment" class="w-full mt-2 py-3 bg-[#C9A24D] hover:bg-[#B48A16] text-[#0B2A43] font-black text-xs rounded-xl shadow-lg transition transform hover:scale-[1.02] flex items-center justify-center gap-2 cursor-pointer">
+                                    <span>🚀 Mulai Asesmen Terstruktur (20 Soal)</span>
                                     <span>→</span>
-                                </button>
+                                </a>
                             </div>
                         </template>
                     </div>
@@ -510,6 +520,48 @@
                 <p class="text-xs text-slate-500 font-sans">
                     Digunakan oleh {{ number_format($stats['total_institutions'] ?? 12) }}+ Perguruan Tinggi, Sekolah, & Lembaga Mitra di 38 Provinsi.
                 </p>
+
+                <!-- Interactive Live Partner Lookup Bar -->
+                <div x-data="{ 
+                        search: '', 
+                        allPartners: @json($partnerList ?? []),
+                        get results() {
+                            if (!this.search.trim()) return [];
+                            const q = this.search.toLowerCase().trim();
+                            return this.allPartners.filter(p => p.name.toLowerCase().includes(q)).slice(0, 5);
+                        }
+                     }" 
+                     class="max-w-md mx-auto relative z-30 pt-2">
+                    <div class="relative">
+                        <input type="text" x-model="search" placeholder="🔍 Cek & cari nama kampus / sekolah Anda..." class="w-full pl-9 pr-8 py-2.5 bg-slate-50 hover:bg-white focus:bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-800 focus:ring-2 focus:ring-[#0B2A43] shadow-2xs transition">
+                        <span class="absolute left-3 top-2.5 text-slate-400 text-xs">🔍</span>
+                        <button x-show="search" @click="search = ''" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 text-xs font-bold">✕</button>
+                    </div>
+
+                    <template x-if="search.trim().length > 0">
+                        <div class="absolute top-full left-0 right-0 mt-1.5 bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden z-30 p-2 space-y-1 text-xs font-sans text-left">
+                            <template x-if="results.length > 0">
+                                <div>
+                                    <span class="text-[10px] font-mono text-emerald-700 font-bold px-2 py-1 block">✅ TERDAFTAR DALAM EKOSISTEM RUHIOLOGI:</span>
+                                    <template x-for="r in results" :key="r.name">
+                                        <div class="p-2 hover:bg-amber-50 rounded-xl flex items-center justify-between transition border-b border-slate-100 last:border-0">
+                                            <div class="flex items-center gap-2">
+                                                <span x-text="r.icon || '🏛️'"></span>
+                                                <span class="font-bold text-[#0B2A43]" x-text="r.name"></span>
+                                            </div>
+                                            <span class="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full" x-text="r.type || 'Mitra'"></span>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                            <template x-if="results.length === 0">
+                                <div class="p-3 text-center text-slate-500">
+                                    <span>🏛️ Belum ada pencarian persis? Anda dapat menambahkan nama kampus/sekolah mandiri saat mengisi asesmen!</span>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                </div>
             </div>
 
             @php
@@ -1323,14 +1375,20 @@
         </div>
     </section>
 
-    <!-- FLOATING QUICK CONTACT WIDGET -->
-    <div x-data="{ showTopBtn: false }" @scroll.window="showTopBtn = (window.pageYOffset > 300)" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2.5 items-end">
-        <a href="https://wa.me/6281234567890?text=Halo%20Ruhiology%20Institute,%20saya%20ingin%20bertanya%20seputar%20Assessment%20dan%20Pelatihan" target="_blank" class="px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-bold text-xs shadow-2xl flex items-center gap-2 transition transform hover:scale-105 border-2 border-white">
-            <span class="text-base">💬</span>
+    <!-- FLOATING STICKY ACTION BAR -->
+    <div x-data="{ showFloating: false }" @scroll.window="showFloating = (window.pageYOffset > 400)" class="fixed bottom-5 right-4 sm:right-6 z-50 flex flex-col gap-2 items-end font-sans">
+        
+        <a x-show="showFloating" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" href="#assessment" class="px-4 py-2.5 bg-[#C9A24D] hover:bg-[#B48A16] text-[#0B2A43] font-black rounded-full text-xs shadow-2xl flex items-center gap-2 border-2 border-white transition transform hover:scale-105 cursor-pointer">
+            <span>✨</span>
+            <span class="font-serif">Ikuti Asesmen RQI</span>
+        </a>
+
+        <a href="https://wa.me/6281234567890?text=Halo%20Ruhiology%20Institute,%20saya%20ingin%20bertanya%20seputar%20Assessment%20dan%20Pelatihan" target="_blank" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-bold text-xs shadow-2xl flex items-center gap-2 transition transform hover:scale-105 border-2 border-white">
+            <span class="text-sm">💬</span>
             <span class="hidden sm:inline">WhatsApp Konsultasi</span>
         </a>
 
-        <button x-show="showTopBtn" x-transition @click="window.scrollTo({ top: 0, behavior: 'smooth' })" class="w-10 h-10 bg-[#0B2A43] hover:bg-[#123B59] text-white rounded-full font-bold text-xs shadow-lg flex items-center justify-center transition border-2 border-white cursor-pointer" title="Ke Atas Halaman">
+        <button x-show="showFloating" x-transition @click="window.scrollTo({ top: 0, behavior: 'smooth' })" class="w-9 h-9 bg-[#0B2A43] hover:bg-[#123B59] text-white rounded-full font-bold text-xs shadow-lg flex items-center justify-center transition border-2 border-white cursor-pointer" title="Ke Atas Halaman">
             ↑
         </button>
     </div>
