@@ -522,13 +522,16 @@
                 </p>
 
                 <!-- Interactive Live Partner Lookup Bar -->
+                <script>
+                    window.ruhiologyPartners = @json($partnerList ?? []);
+                </script>
                 <div x-data="{ 
                         search: '', 
-                        allPartners: @json($partnerList ?? []),
+                        allPartners: window.ruhiologyPartners || [],
                         get results() {
                             if (!this.search.trim()) return [];
                             const q = this.search.toLowerCase().trim();
-                            return this.allPartners.filter(p => p.name.toLowerCase().includes(q)).slice(0, 5);
+                            return this.allPartners.filter(p => (p.name || '').toLowerCase().includes(q)).slice(0, 5);
                         }
                      }" 
                      class="max-w-md mx-auto relative z-30 pt-2">
