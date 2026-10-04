@@ -88,7 +88,7 @@
                         :price="$book->price"
                         :badge="$book->category->name ?? 'Literasi Ruhiologi'"
                         :format="$book->format ?? 'Softcover · 2025'"
-                        :image="$book->image"
+                        :image="$book->cover_image ?? $book->image"
                         :description="$book->description"
                         :url="route('catalog.show', $book->slug)"
                     />

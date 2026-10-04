@@ -19,8 +19,8 @@
             <!-- Book Cover -->
             <div class="md:col-span-4">
                 <div class="w-full aspect-[3/4] bg-gradient-to-br from-[#0B2A43] to-slate-900 rounded-2xl overflow-hidden shadow-xl border border-slate-200 relative flex items-center justify-center p-3">
-                    @if($product->image)
-                        <img src="{{ $product->image }}" alt="{{ $product->title }}" class="w-full h-full object-cover rounded-xl shadow-md">
+                    @if($product->cover_image || $product->image)
+                        <img src="{{ $product->cover_image ?? $product->image }}" alt="{{ $product->title }}" class="w-full h-full object-cover rounded-xl shadow-md">
                     @else
                         <div class="text-center space-y-2 text-white/80">
                             <span class="text-4xl block">📖</span>

@@ -194,9 +194,23 @@ class AdminCmsController extends Controller
             'price' => ['required', 'numeric', 'min:0'],
             'stock' => ['required', 'integer', 'min:0'],
             'status' => ['required', 'in:draft,published,archived'],
+            'cover_image' => ['nullable', 'string'],
+            'image_file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
         ]);
 
+        if ($request->hasFile('image_file')) {
+            $file = $request->file('image_file');
+            $filename = 'product_' . time() . '_' . Str::random(5) . '.' . $file->getClientOriginalExtension();
+            $path = public_path('images/products');
+            if (!file_exists($path)) {
+                mkdir($path, 0755, true);
+            }
+            $file->move($path, $filename);
+            $validated['cover_image'] = asset('images/products/' . $filename);
+        }
+
         $validated['slug'] = Str::slug($validated['title']) . '-' . Str::random(5);
+        unset($validated['image_file']);
         $product = Product::create($validated);
 
         AuditLogService::log(
@@ -208,5 +222,62 @@ class AdminCmsController extends Controller
         );
 
         return back()->with('success', 'Buku/Produk berhasil ditambahkan ke katalog.');
+    }
+
+    public function updateProduct(Request $request, Product $product)
+    {
+        $validated = $request->validate([
+            'category_id' => ['required', 'exists:product_categories,id'],
+            'title' => ['required', 'string', 'max:255'],
+            'author' => ['required', 'string'],
+            'isbn' => ['nullable', 'string'],
+            'publisher' => ['nullable', 'string'],
+            'year' => ['nullable', 'integer'],
+            'pages' => ['nullable', 'integer'],
+            'description' => ['required', 'string'],
+            'price' => ['required', 'numeric', 'min:0'],
+            'stock' => ['required', 'integer', 'min:0'],
+            'status' => ['required', 'in:draft,published,archived'],
+            'cover_image' => ['nullable', 'string'],
+            'image_file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
+        ]);
+
+        if ($request->hasFile('image_file')) {
+            $file = $request->file('image_file');
+            $filename = 'product_' . time() . '_' . Str::random(5) . '.' . $file->getClientOriginalExtension();
+            $path = public_path('images/products');
+            if (!file_exists($path)) {
+                mkdir($path, 0755, true);
+            }
+            $file->move($path, $filename);
+            $validated['cover_image'] = asset('images/products/' . $filename);
+        }
+
+        unset($validated['image_file']);
+        $product->update($validated);
+
+        AuditLogService::log(
+            action: 'update_product',
+            module: 'Store',
+            recordType: 'Product',
+            recordId: (string) $product->id,
+            changes: $validated
+        );
+
+        return back()->with('success', 'Buku/Produk berhasil diperbarui.');
+    }
+
+    public function destroyProduct(Product $product)
+    {
+        AuditLogService::log(
+            action: 'delete_product',
+            module: 'Store',
+            recordType: 'Product',
+            recordId: (string) $product->id,
+            changes: ['title' => $product->title]
+        );
+
+        $product->delete();
+        return back()->with('success', 'Buku/Produk berhasil dihapus dari katalog.');
     }
 }

@@ -6,11 +6,21 @@
     <title>Ruhiology Institute — Mengenal Diri. Mengembangkan Potensi. Menumbuhkan Ruh.</title>
     <meta name="description" content="Ruhiology Institute adalah ekosistem pendidikan, assessment, training, konsultasi, dan pengembangan berbasis Kecerdasan Ruhiologi.">
 
-    <!-- Open Graph SEO Tags -->
-    <meta property="og:title" content="Ruhiology Institute — Mengenal Diri. Mengembangkan Potensi. Menumbuhkan Ruh.">
-    <meta property="og:description" content="Ruhiology Institute adalah ekosistem pendidikan, assessment, training, konsultasi, dan pengembangan berbasis Kecerdasan Ruhiologi.">
-    <meta property="og:image" content="{{ asset('images/ruhiology-logo.png') }}">
-    <meta property="og:type" content="website">
+    <!-- Open Graph & Social SEO Meta Tags -->
+    @hasSection('og_meta')
+        @yield('og_meta')
+    @else
+        <meta property="og:title" content="Ruhiology Institute — Mengenal Diri. Mengembangkan Potensi. Menumbuhkan Ruh.">
+        <meta property="og:description" content="Ruhiology Institute adalah ekosistem pendidikan, assessment, training, konsultasi, dan pengembangan berbasis Kecerdasan Ruhiologi.">
+        <meta property="og:image" content="{{ asset('images/ruhiology-logo.png') }}">
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="{{ request()->fullUrl() }}">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="Ruhiology Institute — Mengenal Diri. Mengembangkan Potensi. Menumbuhkan Ruh.">
+        <meta name="twitter:description" content="Ruhiology Institute adalah ekosistem pendidikan, assessment, training, konsultasi, dan pengembangan berbasis Kecerdasan Ruhiologi.">
+        <meta name="twitter:image" content="{{ asset('images/ruhiology-logo.png') }}">
+    @endif
+    @stack('meta')
 
     <!-- Tailwind CSS & Alpine.js -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>

@@ -180,6 +180,8 @@ Route::middleware(['auth', \App\Http\Middleware\EnsureAdminAccess::class])
         // Store & Order Management
         Route::get('/products', [AdminCmsController::class, 'products'])->name('products.index');
         Route::post('/products', [AdminCmsController::class, 'storeProduct'])->name('products.store');
+        Route::put('/products/{product}', [AdminCmsController::class, 'updateProduct'])->name('products.update');
+        Route::delete('/products/{product}', [AdminCmsController::class, 'destroyProduct'])->name('products.destroy');
         Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
         Route::get('/orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
         Route::put('/orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.update_status');

@@ -1,6 +1,5 @@
 @extends('layouts.app')
 
-@section('content')
 @php
     $imageUrl = null;
     if (!empty($article->featured_image)) {
@@ -16,7 +15,30 @@
     // Estimate read time based on word count
     $wordCount = str_word_count(strip_tags($article->content ?? ''));
     $readTime = max(1, ceil($wordCount / 200));
+
+    $shareDescription = !empty($article->excerpt) 
+        ? $article->excerpt 
+        : \Illuminate\Support\Str::limit(strip_tags($article->content ?? ''), 160);
+    $shareImage = $imageUrl ?: asset('images/ruhiology-logo.png');
 @endphp
+
+@section('og_meta')
+    <title>{{ $article->title }} — Ruhiology Institute</title>
+    <meta name="description" content="{{ $shareDescription }}">
+    <meta property="og:title" content="{{ $article->title }}">
+    <meta property="og:description" content="{{ $shareDescription }}">
+    <meta property="og:image" content="{{ $shareImage }}">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="{{ request()->fullUrl() }}">
+    <meta property="article:published_time" content="{{ $article->published_at ? $article->published_at->toIso8601String() : '' }}">
+    <meta property="article:author" content="{{ $article->author ?? 'Tim Redaksi Ruhiology Institute' }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $article->title }}">
+    <meta name="twitter:description" content="{{ $shareDescription }}">
+    <meta name="twitter:image" content="{{ $shareImage }}">
+@endsection
+
+@section('content')
 
 <div x-data="{ showImageModal: false, copiedToast: false }">
 
