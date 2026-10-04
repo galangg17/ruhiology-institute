@@ -28,6 +28,13 @@ class PublicCmsController extends Controller
     public function articleShow(string $slug)
     {
         $article = Article::where('slug', $slug)->with('category')->firstOrFail();
+        
+        $sessionKey = 'viewed_article_' . $article->id;
+        if (!session()->has($sessionKey)) {
+            $article->increment('views_count');
+            session()->put($sessionKey, true);
+        }
+
         $recentArticles = Article::where('status', 'published')
             ->where('id', '!=', $article->id)
             ->latest('published_at')
@@ -50,6 +57,13 @@ class PublicCmsController extends Controller
     public function newsShow(string $slug)
     {
         $article = Article::where('slug', $slug)->with('category')->firstOrFail();
+
+        $sessionKey = 'viewed_article_' . $article->id;
+        if (!session()->has($sessionKey)) {
+            $article->increment('views_count');
+            session()->put($sessionKey, true);
+        }
+
         $recentArticles = Article::where('status', 'published')
             ->where('id', '!=', $article->id)
             ->latest('published_at')

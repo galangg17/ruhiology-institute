@@ -59,7 +59,11 @@
                         </div>
 
                         <div class="pt-4 border-t border-slate-100 flex justify-between items-center text-[11px] text-slate-400 font-mono">
-                            <span>✍️ {{ $art->author }}</span>
+                            <div class="flex items-center gap-2">
+                                <span>✍️ {{ $art->author }}</span>
+                                <span>·</span>
+                                <span class="text-amber-800 font-bold">👁️ {{ number_format($art->views_count ?? 0, 0, ',', '.') }} dibaca</span>
+                            </div>
                             <a href="{{ route('articles.show', $art->slug) }}" class="text-[#0B2A43] font-bold group-hover:text-[#C9A24D] flex items-center gap-1 transition">
                                 <span>Baca</span> <span>→</span>
                             </a>

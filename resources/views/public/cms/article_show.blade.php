@@ -77,6 +77,9 @@
                 <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-slate-800/80 text-slate-300 border border-slate-700 text-xs font-mono">
                     <span>⏱️</span> <span>{{ $readTime }} Min Baca</span>
                 </span>
+                <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#C9A24D]/10 text-[#C9A24D] border border-[#C9A24D]/30 text-xs font-mono font-bold">
+                    <span>👁️</span> <span>{{ number_format($article->views_count ?? 0, 0, ',', '.') }} Pembaca</span>
+                </span>
             </div>
 
             <!-- TITLE -->
@@ -96,10 +99,14 @@
                     </div>
                 </div>
 
-                <div class="flex items-center gap-4 text-slate-300 font-mono text-[11px] sm:text-xs">
+                <div class="flex items-center gap-3 text-slate-300 font-mono text-[11px] sm:text-xs">
                     <span class="flex items-center gap-1.5 bg-slate-800/90 px-3 py-1.5 rounded-xl border border-slate-700">
                         <span>📅</span>
                         <span>{{ $article->published_at ? $article->published_at->format('d M Y · H:i') . ' WIB' : 'Draft' }}</span>
+                    </span>
+                    <span class="flex items-center gap-1.5 bg-slate-800/90 px-3 py-1.5 rounded-xl border border-slate-700 text-[#C9A24D] font-bold">
+                        <span>👁️</span>
+                        <span>{{ number_format($article->views_count ?? 0, 0, ',', '.') }} Pembaca</span>
                     </span>
                 </div>
             </div>

@@ -59,9 +59,13 @@
                         </div>
 
                         <div class="pt-4 border-t border-slate-100 flex justify-between items-center text-[11px] text-slate-400 font-mono">
-                            <span>✍️ {{ $n->author }}</span>
+                            <div class="flex items-center gap-2">
+                                <span>✍️ {{ $n->author }}</span>
+                                <span>·</span>
+                                <span class="text-amber-800 font-bold">👁️ {{ number_format($n->views_count ?? 0, 0, ',', '.') }} dibaca</span>
+                            </div>
                             <a href="{{ route('news.show', $n->slug) }}" class="text-[#0B2A43] font-bold group-hover:text-[#C9A24D] flex items-center gap-1 transition">
-                                <span>Baca Selengkapnya</span> <span>→</span>
+                                <span>Baca</span> <span>→</span>
                             </a>
                         </div>
                     </div>

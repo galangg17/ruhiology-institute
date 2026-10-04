@@ -21,10 +21,12 @@ class Article extends Model
         'author',
         'published_at',
         'status',
+        'views_count',
     ];
 
     protected $casts = [
         'published_at' => 'datetime',
+        'views_count' => 'integer',
     ];
 
     public function category()

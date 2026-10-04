@@ -112,6 +112,7 @@
                         <th class="px-4 py-3.5 whitespace-nowrap">Kategori</th>
                         <th class="px-4 py-3.5 whitespace-nowrap">Penulis</th>
                         <th class="px-4 py-3.5 whitespace-nowrap">Tanggal & Jam Rilis</th>
+                        <th class="px-4 py-3.5 whitespace-nowrap text-center">Dibaca</th>
                         <th class="px-4 py-3.5 whitespace-nowrap text-center">Status</th>
                         <th class="px-4 py-3.5 text-right whitespace-nowrap">Aksi</th>
                     </tr>
@@ -167,6 +168,13 @@
                                 @else
                                     <span>-</span>
                                 @endif
+                            </td>
+
+                            <!-- Total Views -->
+                            <td class="p-4 text-center font-mono">
+                                <span class="px-2.5 py-1 bg-amber-50 text-amber-900 border border-amber-200 rounded-lg text-xs font-bold inline-flex items-center gap-1">
+                                    <span>👁️</span> <span>{{ number_format($art->views_count ?? 0, 0, ',', '.') }}</span>
+                                </span>
                             </td>
 
                             <!-- Status -->
