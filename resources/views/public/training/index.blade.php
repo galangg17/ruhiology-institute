@@ -18,27 +18,43 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             @foreach($trainings as $t)
-                <div class="bg-white border-2 border-slate-200/80 rounded-3xl overflow-hidden shadow-md flex flex-col justify-between hover:border-[#1B4332] transition p-6 space-y-4">
-                    <div class="space-y-3">
-                        <span class="inline-block px-3 py-1 bg-[#FFF9E6] text-[#92400E] border border-[#FDE68A] text-[10px] font-black rounded-full uppercase tracking-wider">
-                            {{ $t->category }}
-                        </span>
-                        <h3 class="font-extrabold font-sans text-[#1B4332] text-lg leading-snug">{{ $t->title }}</h3>
-                        <p class="text-xs text-slate-600 line-clamp-3 leading-relaxed font-medium">{{ $t->description }}</p>
-                        <div class="space-y-1.5 text-xs text-slate-500 border-t border-slate-100 pt-3 font-semibold">
-                            <div>👨‍🏫 <strong>Trainer:</strong> {{ $t->trainer }}</div>
-                            <div>⏳ <strong>Durasi:</strong> {{ $t->duration }}</div>
-                            <div>📍 <strong>Lokasi:</strong> {{ $t->location }}</div>
+                <div class="bg-white border-2 border-slate-200/80 rounded-3xl overflow-hidden shadow-md flex flex-col justify-between hover:border-[#1B4332] transition group">
+                    <div>
+                        <!-- Training Cover Banner Image -->
+                        <div class="relative h-48 bg-slate-900 overflow-hidden">
+                            @if($t->image)
+                                <img src="{{ $t->image }}" alt="{{ $t->title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            @else
+                                <div class="w-full h-full bg-gradient-to-r from-[#0B2A43] via-[#123B59] to-[#0B2A43] p-6 flex flex-col justify-center items-center text-center space-y-2">
+                                    <span class="text-3xl block">🎓</span>
+                                    <span class="font-bold text-xs text-[#C9A24D] uppercase tracking-widest font-mono">RUHIOLOGY TRAINING CENTER</span>
+                                </div>
+                            @endif
+                            <span class="absolute top-3 left-3 px-3 py-1 bg-[#FFF9E6]/90 text-[#92400E] border border-[#FDE68A] text-[10px] font-black rounded-full uppercase tracking-wider backdrop-blur-xs shadow-sm">
+                                {{ $t->category }}
+                            </span>
+                        </div>
+
+                        <div class="p-6 space-y-3">
+                            <h3 class="font-extrabold font-sans text-[#1B4332] text-lg leading-snug group-hover:text-[#C9A24D] transition-colors">{{ $t->title }}</h3>
+                            <p class="text-xs text-slate-600 line-clamp-3 leading-relaxed font-medium">{{ $t->description }}</p>
+                            <div class="space-y-1.5 text-xs text-slate-500 border-t border-slate-100 pt-3 font-semibold">
+                                <div>👨‍🏫 <strong>Trainer:</strong> {{ $t->trainer }}</div>
+                                <div>⏳ <strong>Durasi:</strong> {{ $t->duration }}</div>
+                                <div>📍 <strong>Lokasi:</strong> {{ $t->location }}</div>
+                            </div>
                         </div>
                     </div>
-                    <div class="pt-4 border-t border-slate-100 flex justify-between items-center">
-                        <div>
-                            <span class="text-[10px] text-slate-500 uppercase block font-bold">Investasi</span>
-                            <span class="text-base font-black text-[#1B4332]">Rp {{ number_format($t->price, 0, ',', '.') }}</span>
+                    <div class="p-6 pt-0">
+                        <div class="pt-4 border-t border-slate-100 flex justify-between items-center">
+                            <div>
+                                <span class="text-[10px] text-slate-500 uppercase block font-bold">Investasi</span>
+                                <span class="text-base font-black text-[#1B4332]">Rp {{ number_format($t->price, 0, ',', '.') }}</span>
+                            </div>
+                            <a href="{{ route('training.show', $t->slug) }}" style="background: linear-gradient(135deg, #1B4332 0%, #2D6A4F 100%); color: #D4AF37;" class="px-5 py-2.5 font-extrabold rounded-full text-xs shadow-md hover:scale-105 transition">
+                                Detail & Daftar ↗
+                            </a>
                         </div>
-                        <a href="{{ route('training.show', $t->slug) }}" style="background: linear-gradient(135deg, #1B4332 0%, #2D6A4F 100%); color: #D4AF37;" class="px-5 py-2.5 font-extrabold rounded-full text-xs shadow-md hover:scale-105 transition">
-                            Detail & Daftar ↗
-                        </a>
                     </div>
                 </div>
             @endforeach

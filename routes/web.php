@@ -173,6 +173,8 @@ Route::middleware(['auth', \App\Http\Middleware\EnsureAdminAccess::class])
         Route::get('/training', [AdminTrainingController::class, 'index'])->name('training.index');
         Route::get('/training/create', [AdminTrainingController::class, 'create'])->name('training.create');
         Route::post('/training', [AdminTrainingController::class, 'store'])->name('training.store');
+        Route::put('/training/{training}', [AdminTrainingController::class, 'update'])->name('training.update');
+        Route::delete('/training/{training}', [AdminTrainingController::class, 'destroy'])->name('training.destroy');
         Route::post('/training/{training}/batches', [AdminTrainingController::class, 'storeBatch'])->name('training.batches.store');
         Route::get('/training-registrations', [AdminTrainingController::class, 'registrations'])->name('training.registrations');
         Route::put('/training-registrations/{registration}', [AdminTrainingController::class, 'updateRegistrationStatus'])->name('training.registrations.update');

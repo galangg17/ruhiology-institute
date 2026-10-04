@@ -17,6 +17,12 @@
             
             <!-- Left Detail Column -->
             <div class="lg:col-span-7 space-y-6">
+                @if($training->image)
+                    <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                        <img src="{{ $training->image }}" alt="{{ $training->title }}" class="w-full h-auto max-h-[420px] object-cover rounded-xl">
+                    </div>
+                @endif
+
                 <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm space-y-4">
                     <h2 class="text-xl font-bold font-serif text-slate-900">Deskripsi Program Pelatihan</h2>
                     <div class="prose prose-sm text-slate-700 leading-relaxed text-xs">

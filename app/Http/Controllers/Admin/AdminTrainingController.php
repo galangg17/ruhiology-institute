@@ -36,9 +36,23 @@ class AdminTrainingController extends Controller
             'price' => ['required', 'numeric', 'min:0'],
             'quota' => ['required', 'integer', 'min:1'],
             'status' => ['required', 'in:draft,published,archived'],
+            'image' => ['nullable', 'string'],
+            'image_file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
         ]);
 
+        if ($request->hasFile('image_file')) {
+            $file = $request->file('image_file');
+            $filename = 'training_' . time() . '_' . Str::random(5) . '.' . $file->getClientOriginalExtension();
+            $path = public_path('images/trainings');
+            if (!file_exists($path)) {
+                mkdir($path, 0755, true);
+            }
+            $file->move($path, $filename);
+            $validated['image'] = asset('images/trainings/' . $filename);
+        }
+
         $validated['slug'] = Str::slug($validated['title']) . '-' . Str::random(5);
+        unset($validated['image_file']);
         $training = TrainingProgram::create($validated);
 
         AuditLogService::log(
@@ -50,6 +64,62 @@ class AdminTrainingController extends Controller
         );
 
         return redirect()->route('admin.training.index')->with('success', 'Program pelatihan berhasil dibuat.');
+    }
+
+    public function update(Request $request, TrainingProgram $training)
+    {
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string'],
+            'category' => ['required', 'string'],
+            'trainer' => ['required', 'string'],
+            'duration' => ['required', 'string'],
+            'location' => ['required', 'string'],
+            'is_online' => ['required', 'boolean'],
+            'price' => ['required', 'numeric', 'min:0'],
+            'quota' => ['required', 'integer', 'min:1'],
+            'status' => ['required', 'in:draft,published,archived'],
+            'image' => ['nullable', 'string'],
+            'image_file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
+        ]);
+
+        if ($request->hasFile('image_file')) {
+            $file = $request->file('image_file');
+            $filename = 'training_' . time() . '_' . Str::random(5) . '.' . $file->getClientOriginalExtension();
+            $path = public_path('images/trainings');
+            if (!file_exists($path)) {
+                mkdir($path, 0755, true);
+            }
+            $file->move($path, $filename);
+            $validated['image'] = asset('images/trainings/' . $filename);
+        }
+
+        unset($validated['image_file']);
+        $training->update($validated);
+
+        AuditLogService::log(
+            action: 'update_training',
+            module: 'Training',
+            recordType: 'TrainingProgram',
+            recordId: (string) $training->id,
+            changes: $validated
+        );
+
+        return back()->with('success', 'Program pelatihan berhasil diperbarui.');
+    }
+
+    public function destroy(TrainingProgram $training)
+    {
+        AuditLogService::log(
+            action: 'delete_training',
+            module: 'Training',
+            recordType: 'TrainingProgram',
+            recordId: (string) $training->id,
+            changes: ['title' => $training->title]
+        );
+
+        $training->delete();
+        return back()->with('success', 'Program pelatihan berhasil dihapus.');
     }
 
     public function storeBatch(Request $request, TrainingProgram $training)
