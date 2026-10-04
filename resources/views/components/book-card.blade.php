@@ -21,23 +21,16 @@
 <div x-data="{}" class="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
     <div>
         <!-- Book Cover Visual Container -->
-        <div class="relative aspect-[3/4] bg-slate-100 overflow-hidden cursor-pointer"
+        <div class="relative aspect-square bg-slate-50 border-b border-slate-100 overflow-hidden cursor-pointer flex items-center justify-center p-2.5"
              onclick="window.dispatchEvent(new CustomEvent('open-order-modal', { detail: { id: '{{ $productId }}', title: '{{ addslashes($title) }}', price: '{{ addslashes($formattedPrice) }}' } }))"
              @click="$dispatch('open-order-modal', { id: '{{ $productId }}', title: '{{ addslashes($title) }}', price: '{{ addslashes($formattedPrice) }}' })">
             
-            <img src="{{ $bookImage }}" alt="{{ $title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+            <img src="{{ $bookImage }}" alt="{{ $title }}" class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300 rounded-lg">
 
             <!-- Category Top-Left Badge -->
-            <div class="absolute top-2.5 left-2.5 bg-[#0B2A43] text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-sm">
+            <div class="absolute top-2.5 left-2.5 bg-[#0B2A43]/90 text-white text-[9px] font-bold px-2 py-0.5 rounded-md shadow-sm backdrop-blur-xs">
                 {{ $badge }}
             </div>
-
-            <!-- Format Bottom-Right Badge -->
-            @if($format)
-                <div class="absolute bottom-2.5 right-2.5 bg-slate-900/80 text-white text-[10px] font-semibold px-2 py-0.5 rounded-md backdrop-blur-sm">
-                    {{ $format }}
-                </div>
-            @endif
         </div>
 
         <!-- Book Metadata Content -->
