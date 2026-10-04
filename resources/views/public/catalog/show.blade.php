@@ -17,14 +17,14 @@
         <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-md grid grid-cols-1 md:grid-cols-12 gap-8">
             
             <!-- Book Cover -->
-            <div class="md:col-span-4">
-                <div class="w-full aspect-[3/4] bg-gradient-to-br from-[#0B2A43] to-slate-900 rounded-2xl overflow-hidden shadow-xl border border-slate-200 relative flex items-center justify-center p-3">
+            <div class="md:col-span-4 flex justify-center">
+                <div class="w-full rounded-2xl overflow-hidden shadow-md border border-slate-200/80 bg-white">
                     @if($product->cover_image || $product->image)
-                        <img src="{{ $product->cover_image ?? $product->image }}" alt="{{ $product->title }}" class="w-full h-full object-cover rounded-xl shadow-md">
+                        <img src="{{ $product->cover_image ?? $product->image }}" alt="{{ $product->title }}" class="w-full h-auto object-contain block rounded-2xl">
                     @else
-                        <div class="text-center space-y-2 text-white/80">
+                        <div class="w-full aspect-[3/4] bg-[#0B2A43] rounded-2xl flex flex-col items-center justify-center text-white/80 p-6 text-center space-y-2">
                             <span class="text-4xl block">📖</span>
-                            <span class="font-serif font-bold text-sm block px-2">{{ $product->title }}</span>
+                            <span class="font-serif font-bold text-sm block">{{ $product->title }}</span>
                         </div>
                     @endif
                 </div>

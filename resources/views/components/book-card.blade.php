@@ -21,7 +21,7 @@
 <div x-data="{}" class="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
     <div>
         <!-- Book Cover Visual Container -->
-        <div class="relative aspect-square bg-slate-100 overflow-hidden cursor-pointer"
+        <div class="relative aspect-[3/4] bg-slate-100 overflow-hidden cursor-pointer"
              onclick="window.dispatchEvent(new CustomEvent('open-order-modal', { detail: { id: '{{ $productId }}', title: '{{ addslashes($title) }}', price: '{{ addslashes($formattedPrice) }}' } }))"
              @click="$dispatch('open-order-modal', { id: '{{ $productId }}', title: '{{ addslashes($title) }}', price: '{{ addslashes($formattedPrice) }}' })">
             
