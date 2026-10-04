@@ -1101,6 +1101,8 @@
                             :author="$book->author ?? 'Prof. Dr. Iskandar Nazari'"
                             :price="$book->price"
                             :badge="$loop->first ? 'Karya Utama' : 'Literasi Ruhiologi'"
+                            :image="$book->cover_image ?? $book->image"
+                            :description="$book->description"
                             :url="route('catalog.show', $book->slug)"
                         />
                     @endforeach
