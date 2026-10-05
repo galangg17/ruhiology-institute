@@ -202,15 +202,15 @@
                             </td>
                             <td class="p-2 text-slate-600 leading-snug">{{ $regionDisplay }}</td>
                             <td class="p-2 text-center whitespace-nowrap">
-                                <strong class="font-extrabold text-sm text-[#0B2A43] block">{{ $res->rqi_score ?? '-' }}</strong>
+                                <strong class="font-extrabold text-sm text-[#0B2A43] block">{{ $res?->rqi_score ?? '-' }}</strong>
                                 @if($res && $res->category_name)
                                     <span class="inline-block text-[8px] font-bold text-amber-900 bg-amber-50 border border-amber-200/80 px-1.5 py-0.5 rounded-md mt-0.5">
                                         {{ $res->category_name }}
                                     </span>
                                 @endif
                             </td>
-                            <td class="p-2 text-center font-bold whitespace-nowrap {{ ($res->who5_percentage ?? 0) >= 50 ? 'text-emerald-700' : 'text-rose-700' }}">
-                                {{ $res->who5_percentage !== null ? $res->who5_percentage . '%' : '-' }}
+                            <td class="p-2 text-center font-bold whitespace-nowrap {{ ($res?->who5_percentage ?? 0) >= 50 ? 'text-emerald-700' : 'text-rose-700' }}">
+                                {{ ($res && $res->who5_percentage !== null) ? $res->who5_percentage . '%' : '-' }}
                             </td>
                             <td class="p-2 text-center font-bold text-[9px] whitespace-nowrap">
                                 @if($res && $res->who5_percentage !== null)
