@@ -200,6 +200,12 @@ class AdminEventController extends Controller
 
         $event->update($validated);
 
+        if (!empty($validated['instrument_id'])) {
+            \App\Models\AssessmentPeriod::where('period_code', 'RQI-PER-' . $event->event_code)
+                ->orWhere('title', 'like', '%' . $event->title . '%')
+                ->update(['instrument_id' => $validated['instrument_id']]);
+        }
+
         AuditLogService::log(
             action: 'update_event',
             module: 'Event',

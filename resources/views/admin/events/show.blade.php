@@ -286,17 +286,14 @@
                         </div>
 
                         <div>
-                            <label class="block font-bold text-slate-800 text-xs mb-1 flex items-center justify-between">
-                                <span>Paket Soal / Instrumen</span>
-                                <span class="text-[10px] font-bold text-slate-400">🔒 Dikunci</span>
-                            </label>
-                            <select disabled class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-100/80 font-semibold text-slate-600 outline-none text-xs cursor-not-allowed">
+                            <label class="block font-bold text-slate-800 text-xs mb-1">Paket Soal / Instrumen *</label>
+                            <select name="instrument_id" x-model="editData.instrument_id" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-[#0B2A43] text-xs">
+                                <option value="">-- Pilih Paket Soal --</option>
                                 @foreach($instruments as $inst)
-                                    <option value="{{ $inst->id }}" :selected="editData.instrument_id == {{ $inst->id }}">{{ $inst->code }} - {{ $inst->name }} ({{ $inst->questions_count ?? $inst->questions->count() }} Soal)</option>
+                                    <option value="{{ $inst->id }}">{{ $inst->code }} - {{ $inst->name }} ({{ $inst->questions_count ?? $inst->questions->count() }} Soal)</option>
                                 @endforeach
                             </select>
-                            <input type="hidden" name="instrument_id" :value="editData.instrument_id">
-                            <span class="text-[9px] text-slate-400 mt-0.5 block">Paket soal dikunci untuk menjaga konsistensi skoring peserta.</span>
+                            <span class="text-[9px] text-amber-700 font-medium mt-0.5 block">Pilih paket soal / instrumen yang digunakan untuk event ini.</span>
                         </div>
 
                         <div>

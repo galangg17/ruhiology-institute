@@ -322,7 +322,7 @@ class PublicAssessmentController extends Controller
 
         $participant = Participant::findOrFail($intake['participant_id']);
 
-        // Load all active questions for the period's instrument
+        // Load all active questions strictly belonging to the period's instrument
         $allQuestions = Question::where('instrument_id', $period->instrument_id)
             ->where('status', 'active')
             ->with(['options' => function ($q) { $q->orderBy('order', 'asc'); }, 'dimension'])
@@ -341,28 +341,29 @@ class PublicAssessmentController extends Controller
             return str_contains($dimCode, 'who') || str_contains($dimName, 'who');
         })->values();
 
-        // Robust fallback if who5Questions is empty: fetch active questions from WHO dimension
-        if ($who5Questions->isEmpty()) {
-            $who5Questions = Question::whereHas('dimension', function ($q) {
-                $q->where('code', 'like', '%who%')
-                  ->orWhere('name', 'like', '%who%');
-            })
-            ->where('status', 'active')
-            ->with(['options' => function ($q) { $q->orderBy('order', 'asc'); }, 'dimension'])
-            ->orderBy('order', 'asc')
-            ->get();
+        // Fallback scoped strictly to the period's instrument if division resulted in empty set
+        if ($who5Questions->isEmpty() && $allQuestions->count() > 0) {
+            $who5Questions = Question::where('instrument_id', $period->instrument_id)
+                ->where('status', 'active')
+                ->whereHas('dimension', function ($q) {
+                    $q->where('code', 'like', '%who%')
+                      ->orWhere('name', 'like', '%who%');
+                })
+                ->with(['options' => function ($q) { $q->orderBy('order', 'asc'); }, 'dimension'])
+                ->orderBy('order', 'asc')
+                ->get();
         }
 
-        // Robust fallback if rqiQuestions is empty: fetch active questions from RQI dimensions
-        if ($rqiQuestions->isEmpty()) {
-            $rqiQuestions = Question::whereHas('dimension', function ($q) {
-                $q->where('code', 'not like', '%who%')
-                  ->where('name', 'not like', '%who%');
-            })
-            ->where('status', 'active')
-            ->with(['options' => function ($q) { $q->orderBy('order', 'asc'); }, 'dimension'])
-            ->orderBy('order', 'asc')
-            ->get();
+        if ($rqiQuestions->isEmpty() && $allQuestions->count() > 0) {
+            $rqiQuestions = Question::where('instrument_id', $period->instrument_id)
+                ->where('status', 'active')
+                ->whereHas('dimension', function ($q) {
+                    $q->where('code', 'not like', '%who%')
+                      ->where('name', 'not like', '%who%');
+                })
+                ->with(['options' => function ($q) { $q->orderBy('order', 'asc'); }, 'dimension'])
+                ->orderBy('order', 'asc')
+                ->get();
         }
 
         return view('public.assessment.take', compact('period', 'participant', 'type', 'rqiQuestions', 'who5Questions'));
