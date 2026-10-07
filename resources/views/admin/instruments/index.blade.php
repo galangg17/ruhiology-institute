@@ -168,6 +168,16 @@
                     </select>
                 </div>
 
+                <div class="p-3.5 bg-amber-50/80 border border-amber-200 rounded-2xl">
+                    <label class="flex items-center gap-2.5 cursor-pointer text-xs font-bold text-slate-800">
+                        <input type="checkbox" name="auto_seed" value="1" checked class="w-4 h-4 text-[#0B2A43] rounded border-slate-300 focus:ring-[#0B2A43]">
+                        <span>Isi Otomatis dengan 20 Soal Template Standar (RQI + WHO-5)</span>
+                    </label>
+                    <p class="text-[10px] text-slate-500 mt-1 ml-6 leading-relaxed">
+                        Jika dicentang, sistem akan otomatis mengisikan 6 dimensi & 20 butir soal bawaan. Kosongkan centang jika Anda ingin membuat paket soal kosong dari awal.
+                    </p>
+                </div>
+
                 <!-- Modal Footer Actions -->
                 <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-3 shrink-0">
                     <button @click="createModal = false" type="button" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition cursor-pointer text-xs">
