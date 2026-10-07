@@ -10,9 +10,11 @@ use App\Models\University;
 use App\Models\Faculty;
 use App\Models\StudyProgram;
 use App\Models\Occupation;
+use App\Models\ParticipantCategory;
 use App\Models\PendingInstitution;
 use App\Services\MasterDataImportService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Exception;
 
 class AdminMasterDataController extends Controller
@@ -33,10 +35,11 @@ class AdminMasterDataController extends Controller
         $schools = School::with(['province', 'regency'])->orderBy('name', 'asc')->paginate(15, ['*'], 'sch_page');
         $universities = University::with(['province', 'regency'])->withCount(['faculties', 'studyPrograms'])->orderBy('name', 'asc')->paginate(15, ['*'], 'uni_page');
         $occupations = Occupation::orderBy('name', 'asc')->paginate(15, ['*'], 'occ_page');
+        $participantCategories = ParticipantCategory::withCount('participants')->orderBy('order', 'asc')->paginate(15, ['*'], 'cat_page');
         $pendingInstitutions = PendingInstitution::orderBy('created_at', 'desc')->paginate(15, ['*'], 'pending_page');
 
         return view('admin.master_data.index', compact(
-            'tab', 'provinces', 'regencies', 'schools', 'universities', 'occupations', 'pendingInstitutions'
+            'tab', 'provinces', 'regencies', 'schools', 'universities', 'occupations', 'participantCategories', 'pendingInstitutions'
         ));
     }
 
@@ -108,6 +111,48 @@ class AdminMasterDataController extends Controller
         Occupation::create($validated + ['status' => 'active']);
 
         return back()->with('success', 'Pekerjaan berhasil ditambahkan.');
+    }
+
+    public function storeParticipantCategory(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255', 'unique:participant_categories,name'],
+            'icon' => ['nullable', 'string', 'max:10'],
+            'description' => ['nullable', 'string'],
+            'order' => ['nullable', 'integer'],
+            'status' => ['required', 'in:active,inactive'],
+        ]);
+
+        $validated['code'] = Str::slug($validated['name']);
+        $validated['order'] = $validated['order'] ?? (ParticipantCategory::count() + 1);
+
+        ParticipantCategory::create($validated);
+
+        return back()->with('success', 'Kategori Peserta "' . $validated['name'] . '" berhasil ditambahkan.');
+    }
+
+    public function updateParticipantCategory(Request $request, ParticipantCategory $participantCategory)
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255', 'unique:participant_categories,name,' . $participantCategory->id],
+            'icon' => ['nullable', 'string', 'max:10'],
+            'description' => ['nullable', 'string'],
+            'order' => ['nullable', 'integer'],
+            'status' => ['required', 'in:active,inactive'],
+        ]);
+
+        $validated['code'] = Str::slug($validated['name']);
+        $participantCategory->update($validated);
+
+        return back()->with('success', 'Kategori Peserta "' . $participantCategory->name . '" berhasil diperbarui.');
+    }
+
+    public function destroyParticipantCategory(ParticipantCategory $participantCategory)
+    {
+        $name = $participantCategory->name;
+        $participantCategory->delete();
+
+        return back()->with('success', 'Kategori Peserta "' . $name . '" berhasil dihapus.');
     }
 
     public function updatePendingStatus(Request $request, PendingInstitution $pending)

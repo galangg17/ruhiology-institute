@@ -255,9 +255,9 @@
                             <label class="block font-bold text-slate-800 text-xs mb-1">Preset Target Kategori Peserta</label>
                             <select name="target_category" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50 font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-[#0B2A43] text-xs">
                                 <option value="">🔘 Bebas / Fleksibel (Peserta memilih sendiri)</option>
-                                <option value="Pelajar">🏫 Pelajar (Siswa SD / SMP / SMA / SMK)</option>
-                                <option value="Mahasiswa/i">🎓 Mahasiswa / Mahasiswi</option>
-                                <option value="Umum">👤 Personal / Mandiri (Umum)</option>
+                                @foreach($categories as $cat)
+                                    <option value="{{ $cat->name }}">{{ $cat->icon ?? '🏷️' }} {{ $cat->name }}</option>
+                                @endforeach
                             </select>
                         </div>
 
@@ -457,9 +457,9 @@
                             <label class="block font-bold text-slate-800 text-xs mb-1">Preset Target Kategori Peserta</label>
                             <select name="target_category" x-model="editData.target_category" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50 font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-[#0B2A43] text-xs">
                                 <option value="">🔘 Bebas / Fleksibel (Peserta memilih sendiri)</option>
-                                <option value="Pelajar">🏫 Pelajar (Siswa SD / SMP / SMA / SMK)</option>
-                                <option value="Mahasiswa/i">🎓 Mahasiswa / Mahasiswi</option>
-                                <option value="Umum">👤 Personal / Mandiri (Umum)</option>
+                                @foreach($categories as $cat)
+                                    <option value="{{ $cat->name }}">{{ $cat->icon ?? '🏷️' }} {{ $cat->name }}</option>
+                                @endforeach
                             </select>
                         </div>
 

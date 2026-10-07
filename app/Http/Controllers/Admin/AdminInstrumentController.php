@@ -82,25 +82,26 @@ class AdminInstrumentController extends Controller
             'reverse_mapping' => ['1' => 5, '2' => 4, '3' => 3, '4' => 2, '5' => 1],
         ]);
 
+        // Always create 6 default RQI Dimensions for Ruhiology Institute Framework
+        $defaultDimensions = [
+            ['code' => 'RQI-D1', 'name' => 'Pengenalan & Kesadaran Diri Hakiki', 'order' => 1],
+            ['code' => 'RQI-D2', 'name' => 'Pengenalan Ketuhanan (God Spot)', 'order' => 2],
+            ['code' => 'RQI-D3', 'name' => 'Ketaatan Ibadah', 'order' => 3],
+            ['code' => 'RQI-D4', 'name' => 'Perubahan Perilaku & Akhlak Karimah', 'order' => 4],
+            ['code' => 'RQI-D5', 'name' => 'Kesadaran Puncak Ketuhanan (God Light & Muraqabah)', 'order' => 5],
+            ['code' => 'RQI-D6', 'name' => 'WHO-5', 'order' => 6],
+        ];
+
+        $createdDimensions = [];
+        foreach ($defaultDimensions as $dim) {
+            $createdDimensions[$dim['code']] = Dimension::firstOrCreate(
+                ['instrument_id' => $instrument->id, 'code' => $dim['code']],
+                ['name' => $dim['name'], 'order' => $dim['order']]
+            );
+        }
+
+        // Only populate default questions if auto_seed checkbox is checked
         if ($request->boolean('auto_seed')) {
-            // Create 6 default RQI Dimensions for Ruhiology Institute Framework
-            $defaultDimensions = [
-                ['code' => 'RQI-D1', 'name' => 'Pengenalan & Kesadaran Diri Hakiki', 'order' => 1],
-                ['code' => 'RQI-D2', 'name' => 'Pengenalan Ketuhanan (God Spot)', 'order' => 2],
-                ['code' => 'RQI-D3', 'name' => 'Ketaatan Ibadah', 'order' => 3],
-                ['code' => 'RQI-D4', 'name' => 'Perubahan Perilaku & Akhlak Karimah', 'order' => 4],
-                ['code' => 'RQI-D5', 'name' => 'Kesadaran Puncak Ketuhanan (God Light & Muraqabah)', 'order' => 5],
-                ['code' => 'RQI-D6', 'name' => 'WHO-5', 'order' => 6],
-            ];
-
-            $createdDimensions = [];
-            foreach ($defaultDimensions as $dim) {
-                $createdDimensions[$dim['code']] = Dimension::firstOrCreate(
-                    ['instrument_id' => $instrument->id, 'code' => $dim['code']],
-                    ['name' => $dim['name'], 'order' => $dim['order']]
-                );
-            }
-
             // Auto-seed 3 questions per dimension (18 questions total)
             $defaultQuestions = [
                 'RQI-D1' => [

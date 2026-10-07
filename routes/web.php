@@ -112,6 +112,9 @@ Route::middleware(['auth', \App\Http\Middleware\EnsureAdminAccess::class])
         Route::post('/master-data/schools', [AdminMasterDataController::class, 'storeSchool'])->name('master_data.schools.store');
         Route::post('/master-data/universities', [AdminMasterDataController::class, 'storeUniversity'])->name('master_data.universities.store');
         Route::post('/master-data/occupations', [AdminMasterDataController::class, 'storeOccupation'])->name('master_data.occupations.store');
+        Route::post('/master-data/participant-categories', [AdminMasterDataController::class, 'storeParticipantCategory'])->name('master_data.participant_categories.store');
+        Route::put('/master-data/participant-categories/{participantCategory}', [AdminMasterDataController::class, 'updateParticipantCategory'])->name('master_data.participant_categories.update');
+        Route::delete('/master-data/participant-categories/{participantCategory}', [AdminMasterDataController::class, 'destroyParticipantCategory'])->name('master_data.participant_categories.destroy');
         Route::put('/master-data/pending/{pending}', [AdminMasterDataController::class, 'updatePendingStatus'])->name('master_data.pending.update');
         Route::post('/master-data/import', [AdminMasterDataController::class, 'importCsv'])->name('master_data.import');
 

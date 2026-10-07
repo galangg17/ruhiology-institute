@@ -27,6 +27,7 @@ window.rqAssessmentIndex = function rqAssessmentIndex() {
         eventSubcategories: [],
         publicInstruments: @json($publicInstruments ?? []),
         regenciesMap: @json($regenciesMap ?? []),
+        participantCategoriesList: @json($participantCategories ?? []),
 
         form: {
             event_code: new URLSearchParams(window.location.search).get('event') || '',
@@ -616,15 +617,15 @@ document.addEventListener('alpine:init', () => {
                                 <div>
                                     <label class="block font-bold text-slate-700 mb-1">Kategori Peserta *</label>
                                     <div class="grid grid-cols-3 gap-1.5">
-                                        <template x-for="cat in [
-                                            { key: 'Pelajar', label: 'Pelajar' },
-                                            { key: 'Mahasiswa/i', label: 'Mahasiswa' },
-                                            { key: 'Umum', label: 'Mandiri' }
-                                        ]" :key="cat.key">
-                                            <button type="button" @click="setCategory(cat.key)"
-                                                :class="form.category === cat.key ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'"
-                                                class="py-2 px-2 rounded-xl border text-[11px] transition-colors text-center">
-                                                <span x-text="cat.label"></span>
+                                        <template x-for="cat in (participantCategoriesList && participantCategoriesList.length > 0 ? participantCategoriesList : [
+                                            { name: 'Pelajar', icon: '🏫' },
+                                            { name: 'Mahasiswa/i', icon: '🎓' },
+                                            { name: 'Umum', icon: '👤' }
+                                        ])" :key="cat.name">
+                                            <button type="button" @click="setCategory(cat.name)"
+                                                :class="form.category === cat.name ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'"
+                                                class="py-2 px-1.5 rounded-xl border text-[11px] transition-colors text-center truncate">
+                                                <span x-text="(cat.icon ? cat.icon + ' ' : '') + cat.name"></span>
                                             </button>
                                         </template>
                                     </div>

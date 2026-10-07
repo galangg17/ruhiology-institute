@@ -51,17 +51,20 @@ class PublicAssessmentController extends Controller
                 ->orderBy('name', 'asc')
                 ->get(['id', 'province_id', 'name', 'type'])
                 ->groupBy('province_id');
+
+            $participantCategories = \App\Models\ParticipantCategory::getAllActive();
         } catch (\Throwable $e) {
             $publicInstruments = collect([]);
             $activePeriods = collect([]);
             $activeEvents = collect([]);
             $provinces = collect([]);
             $regenciesMap = collect([]);
+            $participantCategories = collect([]);
         }
 
         $defaultPeriod = $activePeriods->first();
 
-        return view('public.assessment.index', compact('activePeriods', 'defaultPeriod', 'activeEvents', 'publicInstruments', 'provinces', 'regenciesMap'));
+        return view('public.assessment.index', compact('activePeriods', 'defaultPeriod', 'activeEvents', 'publicInstruments', 'provinces', 'regenciesMap', 'participantCategories'));
     }
 
     /**
@@ -109,7 +112,7 @@ class PublicAssessmentController extends Controller
             'gender' => ['nullable', 'in:Laki-laki,Perempuan'],
             'phone' => ['nullable', 'string', 'max:50'],
             'email' => ['nullable', 'email', 'max:255'],
-            'category' => ['required', 'in:Pelajar,Mahasiswa/i,Umum,Mahasiswa,Mandiri'],
+            'category' => ['required', 'string'],
             'country_id' => ['nullable', 'exists:countries,id'],
             'province_id' => ['required', 'exists:provinces,id'],
             'regency_id' => ['required', 'exists:regencies,id'],

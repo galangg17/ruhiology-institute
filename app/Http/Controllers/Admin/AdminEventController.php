@@ -42,8 +42,9 @@ class AdminEventController extends Controller
         $instruments = Instrument::where('status', 'active')->get();
         $provinces = Province::orderBy('name', 'asc')->get();
         $regenciesMap = Regency::where('status', 'active')->orderBy('name', 'asc')->get(['id', 'province_id', 'name', 'type'])->groupBy('province_id');
+        $categories = \App\Models\ParticipantCategory::getAllActive();
 
-        return view('admin.events.index', compact('events', 'programs', 'instruments', 'provinces', 'regenciesMap'));
+        return view('admin.events.index', compact('events', 'programs', 'instruments', 'provinces', 'regenciesMap', 'categories'));
     }
 
     public function store(Request $request)
@@ -53,7 +54,7 @@ class AdminEventController extends Controller
             'event_code' => ['nullable', 'string', 'max:50', 'unique:events,event_code'],
             'access_type' => ['required', 'in:EVENT_PROGRAM,PUBLIC_SELF'],
             'assessment_type' => ['required', 'in:single,prepost'],
-            'target_category' => ['nullable', 'in:Pelajar,Mahasiswa/i,Umum'],
+            'target_category' => ['nullable', 'string', 'max:100'],
             'group_label' => ['nullable', 'string', 'max:100'],
             'custom_subcategories' => ['nullable'],
             'institution_name' => ['nullable', 'string', 'max:255'],
@@ -143,6 +144,7 @@ class AdminEventController extends Controller
         $instruments = Instrument::where('status', 'active')->get();
         $provinces = Province::orderBy('name', 'asc')->get();
         $regenciesMap = Regency::where('status', 'active')->orderBy('name', 'asc')->get(['id', 'province_id', 'name', 'type'])->groupBy('province_id');
+        $categories = \App\Models\ParticipantCategory::getAllActive();
 
         return view('admin.events.show', compact(
             'event',
@@ -155,7 +157,8 @@ class AdminEventController extends Controller
             'who5PerluSkriningCount',
             'instruments',
             'provinces',
-            'regenciesMap'
+            'regenciesMap',
+            'categories'
         ));
     }
 
@@ -167,7 +170,7 @@ class AdminEventController extends Controller
             'institution_name' => ['nullable', 'string', 'max:255'],
             'instrument_id' => ['nullable', 'exists:instruments,id'],
             'program_id' => ['nullable', 'exists:programs,id'],
-            'target_category' => ['nullable', 'in:Pelajar,Mahasiswa/i,Umum'],
+            'target_category' => ['nullable', 'string', 'max:100'],
             'group_label' => ['nullable', 'string', 'max:100'],
             'custom_subcategories' => ['nullable'],
             'province_id' => ['nullable', 'exists:provinces,id'],

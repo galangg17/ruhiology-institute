@@ -50,6 +50,9 @@
         <button @click="currentTab = 'occupations'" :class="currentTab === 'occupations' ? 'bg-[#0B2A43] text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'" class="px-4 py-2.5 rounded-xl transition">
             Pekerjaan ({{ $occupations->total() }})
         </button>
+        <button @click="currentTab = 'categories'" :class="currentTab === 'categories' ? 'bg-[#0B2A43] text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'" class="px-4 py-2.5 rounded-xl transition">
+            🏷️ Kategori Peserta ({{ $participantCategories->total() }})
+        </button>
         <button @click="currentTab = 'pending'" :class="currentTab === 'pending' ? 'bg-amber-600 text-white shadow-md' : 'text-amber-900 hover:bg-amber-50'" class="px-4 py-2.5 rounded-xl transition">
             Usulan Baru ({{ $pendingInstitutions->total() }})
         </button>
@@ -233,6 +236,123 @@
         </table>
         <div class="p-4 border-t border-slate-100 flex justify-center">
             {{ $occupations->appends(['tab' => 'occupations'])->links() }}
+        </div>
+    </div>
+
+    <!-- TAB CONTENT 5.5: KATEGORI PESERTA -->
+    <div x-show="currentTab === 'categories'" class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden" x-data="{ editCatModal: false, editCatData: {} }">
+        <div class="p-5 border-b border-slate-100 flex justify-between items-center">
+            <div>
+                <h3 class="font-serif font-bold text-[#0B2A43] text-base">Kelola Kategori Peserta Asesmen</h3>
+                <p class="text-xs text-slate-500">Tambah, edit nama, ikon, deskripsi, dan status kategori peserta (misal: Pelajar, Mahasiswa, Umum, ASN, dll).</p>
+            </div>
+            <button @click="showAddModal = true" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5 cursor-pointer">
+                <span>🏷️</span> <span>+ Tambah Kategori Baru</span>
+            </button>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider border-b border-slate-200">
+                    <tr>
+                        <th class="px-6 py-3.5">Urutan</th>
+                        <th class="px-6 py-3.5">Nama & Ikon Kategori</th>
+                        <th class="px-6 py-3.5">Kode Slug</th>
+                        <th class="px-6 py-3.5">Deskripsi</th>
+                        <th class="px-6 py-3.5">Total Peserta</th>
+                        <th class="px-6 py-3.5">Status</th>
+                        <th class="px-6 py-3.5 text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 font-medium">
+                    @foreach($participantCategories as $cat)
+                        <tr class="hover:bg-slate-50/80">
+                            <td class="px-6 py-4 font-mono font-bold text-slate-500">#{{ $cat->order }}</td>
+                            <td class="px-6 py-4 font-bold text-slate-900 text-sm">
+                                <span class="mr-1 text-base">{{ $cat->icon ?? '🏷️' }}</span> {{ $cat->name }}
+                            </td>
+                            <td class="px-6 py-4 font-mono text-slate-500">{{ $cat->code }}</td>
+                            <td class="px-6 py-4 text-slate-600 max-w-xs truncate">{{ $cat->description ?? '-' }}</td>
+                            <td class="px-6 py-4 font-bold text-[#0B2A43]">{{ $cat->participants_count ?? 0 }} Peserta</td>
+                            <td class="px-6 py-4">
+                                @if($cat->status === 'active')
+                                    <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-full text-[10px] font-bold uppercase">🟢 Aktif</span>
+                                @else
+                                    <span class="px-2.5 py-1 bg-slate-100 text-slate-600 rounded-full text-[10px] font-bold uppercase">⚪ Non-Aktif</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="flex items-center justify-center gap-1.5">
+                                    <button @click="editCatData = {
+                                        id: {{ $cat->id }},
+                                        name: '{{ addslashes($cat->name) }}',
+                                        icon: '{{ addslashes($cat->icon ?? '') }}',
+                                        description: '{{ addslashes($cat->description ?? '') }}',
+                                        order: {{ $cat->order }},
+                                        status: '{{ $cat->status }}'
+                                    }; editCatModal = true" class="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-xs rounded-xl transition cursor-pointer">
+                                        ✏️ Edit
+                                    </button>
+
+                                    <form action="{{ route('admin.master_data.participant_categories.destroy', $cat->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus kategori \'{{ addslashes($cat->name) }}\'?')" class="inline">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs rounded-xl border border-rose-200 transition cursor-pointer">
+                                            🗑️ Hapus
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        <div class="p-4 border-t border-slate-100 flex justify-center">
+            {{ $participantCategories->appends(['tab' => 'categories'])->links() }}
+        </div>
+
+        <!-- EDIT MODAL FOR PARTICIPANT CATEGORY -->
+        <div x-show="editCatModal" x-cloak class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/65 backdrop-blur-sm animate-fadeIn">
+            <div @click.away="editCatModal = false" class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative border border-slate-100" @click.stop>
+                <button @click="editCatModal = false" class="absolute top-5 right-5 text-slate-400 hover:text-slate-700 font-bold">✕</button>
+
+                <div class="mb-5 pb-3 border-b border-slate-100">
+                    <span class="text-[10px] font-mono font-bold text-amber-600 uppercase tracking-widest block">EDIT KATEGORI PESERTA</span>
+                    <h3 class="text-lg font-serif font-bold text-[#0B2A43]">Edit Data Kategori</h3>
+                </div>
+
+                <form :action="'/admin/master-data/participant-categories/' + editCatData.id" method="POST" class="space-y-3.5 text-xs">
+                    @csrf
+                    @method('PUT')
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Nama Kategori Peserta *</label>
+                        <input type="text" name="name" x-model="editCatData.name" required class="w-full p-3 rounded-xl border border-slate-300 font-bold text-slate-800">
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Ikon (Emoji)</label>
+                            <input type="text" name="icon" x-model="editCatData.icon" placeholder="🏫 / 🎓" class="w-full p-3 rounded-xl border border-slate-300 text-center font-bold">
+                        </div>
+                        <div class="col-span-2">
+                            <label class="block font-bold text-slate-700 mb-1">Urutan *</label>
+                            <input type="number" name="order" x-model="editCatData.order" required class="w-full p-3 rounded-xl border border-slate-300 font-mono">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Deskripsi Singkat</label>
+                        <textarea name="description" x-model="editCatData.description" rows="2" class="w-full p-3 rounded-xl border border-slate-300 text-xs"></textarea>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Status Kategori *</label>
+                        <select name="status" x-model="editCatData.status" required class="w-full p-3 rounded-xl border border-slate-300 font-semibold">
+                            <option value="active">🟢 Aktif</option>
+                            <option value="inactive">⚪ Non-Aktif</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="w-full py-3 bg-[#0B2A43] hover:bg-[#123B59] text-white font-bold rounded-xl shadow cursor-pointer">
+                        💾 Simpan Perubahan Kategori
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -436,6 +556,38 @@
                         <input type="text" name="name" required placeholder="Contoh: Guru / Pendidik" class="w-full p-3 rounded-xl border border-slate-300">
                     </div>
                     <button type="submit" class="w-full py-3 bg-[#0B2A43] text-white font-bold rounded-xl shadow">Simpan Pekerjaan</button>
+                </form>
+            </template>
+
+            <template x-if="currentTab === 'categories'">
+                <form action="{{ route('admin.master_data.participant_categories.store') }}" method="POST" class="space-y-3.5 text-xs">
+                    @csrf
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Nama Kategori Peserta *</label>
+                        <input type="text" name="name" required placeholder="Contoh: ASN / Pegawai Negeri" class="w-full p-3 rounded-xl border border-slate-300 font-bold">
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Ikon (Emoji)</label>
+                            <input type="text" name="icon" placeholder="👔" class="w-full p-3 rounded-xl border border-slate-300 text-center font-bold">
+                        </div>
+                        <div class="col-span-2">
+                            <label class="block font-bold text-slate-700 mb-1">Urutan (Opsional)</label>
+                            <input type="number" name="order" placeholder="4" class="w-full p-3 rounded-xl border border-slate-300 font-mono">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Deskripsi Singkat (Opsional)</label>
+                        <textarea name="description" rows="2" placeholder="Jelaskan peruntukan kelompok peserta ini..." class="w-full p-3 rounded-xl border border-slate-300 text-xs"></textarea>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Status Kategori *</label>
+                        <select name="status" required class="w-full p-3 rounded-xl border border-slate-300 font-semibold">
+                            <option value="active">🟢 Aktif</option>
+                            <option value="inactive">⚪ Non-Aktif</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="w-full py-3 bg-[#0B2A43] text-white font-bold rounded-xl shadow cursor-pointer">Simpan Kategori Peserta</button>
                 </form>
             </template>
         </div>
