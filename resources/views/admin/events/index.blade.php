@@ -217,7 +217,7 @@
                         📱
                     </button>
 
-                    <a href="{{ route('admin.results.export_pdf', ['event_id' => $event->id]) }}" target="_blank" title="Export Laporan PDF Event" class="p-2 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-xl transition text-[11px] flex items-center justify-center">
+                    <a href="{{ route('admin.reports.export_pdf', ['event_id' => $event->id]) }}" target="_blank" title="Export Laporan PDF Event" class="p-2 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-xl transition text-[11px] flex items-center justify-center">
                         📄
                     </a>
 
