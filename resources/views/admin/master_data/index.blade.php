@@ -584,7 +584,7 @@
 
             <div class="mb-5 pb-3 border-b border-slate-100">
                 <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest block">TAMBAH REKORD MASTER</span>
-                <h3 class="text-lg font-serif font-bold text-[#0B2A43]" x-text="'Tambah Data ' + currentTab.toUpperCase()"></h3>
+                <h3 class="text-lg font-serif font-bold text-[#0B2A43]" x-text="currentTab === 'categories' ? 'Tambah Kategori & Sub-Kategori Peserta' : ('Tambah Data ' + currentTab.toUpperCase())"></h3>
             </div>
 
             <!-- Form Dynamic based on currentTab -->
@@ -677,34 +677,62 @@
             </template>
 
             <template x-if="currentTab === 'categories'">
-                <form action="{{ route('admin.master_data.participant_categories.store') }}" method="POST" class="space-y-3.5 text-xs">
+                <form action="{{ route('admin.master_data.participant_categories.store') }}" method="POST" class="space-y-3.5 text-xs" x-data="{ newSubCats: [{ name: '', detail_label: '' }] }">
                     @csrf
                     <div>
-                        <label class="block font-bold text-slate-700 mb-1">Nama Kategori Peserta *</label>
-                        <input type="text" name="name" required placeholder="Contoh: ASN / Pegawai Negeri" class="w-full p-3 rounded-xl border border-slate-300 font-bold">
+                        <label class="block font-bold text-slate-800 mb-1">Nama Kategori Utama (Level 1) *</label>
+                        <input type="text" name="name" required placeholder="Contoh: APH / POLRI / ASN / GURU" class="w-full p-2.5 rounded-xl border border-slate-300 font-bold focus:ring-2 focus:ring-[#0B2A43] outline-none">
                     </div>
                     <div class="grid grid-cols-3 gap-2">
                         <div>
                             <label class="block font-bold text-slate-700 mb-1">Ikon (Emoji)</label>
-                            <input type="text" name="icon" placeholder="👔" class="w-full p-3 rounded-xl border border-slate-300 text-center font-bold">
+                            <input type="text" name="icon" placeholder="👔" class="w-full p-2.5 rounded-xl border border-slate-300 text-center font-bold">
                         </div>
                         <div class="col-span-2">
                             <label class="block font-bold text-slate-700 mb-1">Urutan (Opsional)</label>
-                            <input type="number" name="order" placeholder="4" class="w-full p-3 rounded-xl border border-slate-300 font-mono">
+                            <input type="number" name="order" placeholder="4" class="w-full p-2.5 rounded-xl border border-slate-300 font-mono">
                         </div>
                     </div>
                     <div>
                         <label class="block font-bold text-slate-700 mb-1">Deskripsi Singkat (Opsional)</label>
-                        <textarea name="description" rows="2" placeholder="Jelaskan peruntukan kelompok peserta ini..." class="w-full p-3 rounded-xl border border-slate-300 text-xs"></textarea>
+                        <textarea name="description" rows="2" placeholder="Jelaskan peruntukan kelompok peserta ini..." class="w-full p-2.5 rounded-xl border border-slate-300 text-xs"></textarea>
                     </div>
+
+                    <!-- Dynamic Sub-Categories Input Section (Level 2) -->
+                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+                        <div class="flex items-center justify-between border-b border-slate-200 pb-1.5">
+                            <label class="block font-bold text-[#0B2A43] text-xs">Tambah Sub-Kategori / Jenis (Level 2)</label>
+                            <button type="button" @click="newSubCats.push({ name: '', detail_label: '' })" class="text-[10px] font-bold text-emerald-700 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded-lg flex items-center gap-1 cursor-pointer">
+                                <span>+ Tambah Sub</span>
+                            </button>
+                        </div>
+                        <div class="space-y-2 max-h-40 overflow-y-auto pr-1">
+                            <template x-for="(sub, idx) in newSubCats" :key="idx">
+                                <div class="grid grid-cols-12 gap-1.5 items-center bg-white p-2 rounded-xl border border-slate-200 shadow-2xs">
+                                    <div class="col-span-6">
+                                        <input type="text" :name="'sub_categories[' + idx + '][name]'" x-model="sub.name" placeholder="Nama Sub (misal: POLRI)" class="w-full p-1.5 text-xs rounded-lg border border-slate-300 font-semibold outline-none">
+                                    </div>
+                                    <div class="col-span-5">
+                                        <input type="text" :name="'sub_categories[' + idx + '][detail_label]'" x-model="sub.detail_label" placeholder="Label L3 (misal: Nama Polda)" class="w-full p-1.5 text-xs rounded-lg border border-slate-300 outline-none">
+                                    </div>
+                                    <div class="col-span-1 text-center">
+                                        <button type="button" @click="if (newSubCats.length > 1) newSubCats.splice(idx, 1)" class="text-rose-500 hover:text-rose-700 text-xs font-bold" title="Hapus Sub">✕</button>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
                     <div>
                         <label class="block font-bold text-slate-700 mb-1">Status Kategori *</label>
-                        <select name="status" required class="w-full p-3 rounded-xl border border-slate-300 font-semibold">
+                        <select name="status" required class="w-full p-2.5 rounded-xl border border-slate-300 font-semibold">
                             <option value="active">🟢 Aktif</option>
                             <option value="inactive">⚪ Non-Aktif</option>
                         </select>
                     </div>
-                    <button type="submit" class="w-full py-3 bg-[#0B2A43] text-white font-bold rounded-xl shadow cursor-pointer">Simpan Kategori Peserta</button>
+                    <button type="submit" class="w-full py-3 bg-[#0B2A43] text-white font-bold rounded-xl shadow-md cursor-pointer hover:bg-[#123B59] transition">
+                        ✨ Simpan Kategori & Sub-Kategori Peserta
+                    </button>
                 </form>
             </template>
         </div>

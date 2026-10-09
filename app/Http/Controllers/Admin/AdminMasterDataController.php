@@ -121,14 +121,34 @@ class AdminMasterDataController extends Controller
             'description' => ['nullable', 'string'],
             'order' => ['nullable', 'integer'],
             'status' => ['required', 'in:active,inactive'],
+            'sub_categories' => ['nullable', 'array'],
         ]);
 
         $validated['code'] = Str::slug($validated['name']);
         $validated['order'] = $validated['order'] ?? (ParticipantCategory::count() + 1);
 
-        ParticipantCategory::create($validated);
+        $cat = ParticipantCategory::create($validated);
 
-        return back()->with('success', 'Kategori Peserta "' . $validated['name'] . '" berhasil ditambahkan.');
+        if (!empty($request->input('sub_categories')) && is_array($request->input('sub_categories'))) {
+            $orderCounter = 1;
+            foreach ($request->input('sub_categories') as $sub) {
+                $subName = is_array($sub) ? ($sub['name'] ?? '') : (string)$sub;
+                $subLabel = is_array($sub) ? ($sub['detail_label'] ?? null) : null;
+                $subName = trim($subName);
+                if (!empty($subName)) {
+                    \App\Models\ParticipantSubCategory::create([
+                        'category_id' => $cat->id,
+                        'name' => $subName,
+                        'code' => Str::slug($subName),
+                        'detail_label' => $subLabel ?: ('Nama ' . $subName),
+                        'order' => $orderCounter++,
+                        'status' => 'active',
+                    ]);
+                }
+            }
+        }
+
+        return back()->with('success', 'Kategori Peserta "' . $validated['name'] . '" beserta sub-kategori berhasil ditambahkan.');
     }
 
     public function updateParticipantCategory(Request $request, ParticipantCategory $participantCategory)

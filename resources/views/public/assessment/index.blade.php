@@ -717,10 +717,10 @@ document.addEventListener('alpine:init', () => {
                             <div class="space-y-3.5 bg-slate-50/80 p-4 sm:p-5 rounded-2xl border border-slate-200">
                                 <h4 class="font-serif font-bold text-xs text-[#0B2A43] border-b border-slate-200 pb-1.5 uppercase font-mono tracking-wider">Langkah 2: Kategori & Instansi Peserta</h4>
 
-                                <!-- Level 1: Kategori Utama Grid -->
+                                <!-- Level 1: Kategori Utama Dropdown -->
                                 <div>
-                                    <label class="block font-bold text-slate-700 text-xs mb-1.5">1. Kategori Utama *</label>
-                                    <div class="grid grid-cols-3 gap-1.5">
+                                    <label class="block font-bold text-slate-800 text-xs mb-1">1. Kategori Utama *</label>
+                                    <select x-model="form.category" @change="setCategory(form.category)" required class="w-full p-2.5 text-xs font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white text-slate-900 shadow-xs">
                                         <template x-for="cat in (participantCategoriesList && participantCategoriesList.length > 0 ? participantCategoriesList : [
                                             { name: 'GURU', icon: '👨‍🏫' },
                                             { name: 'DOSEN', icon: '🧑‍🏫' },
@@ -732,14 +732,9 @@ document.addEventListener('alpine:init', () => {
                                             { name: 'WARGA BINAAN', icon: '🤝' },
                                             { name: 'UMUM', icon: '👤' }
                                         ])" :key="cat.name">
-                                            <button type="button" @click="setCategory(cat.name)"
-                                                :class="form.category === cat.name ? 'bg-[#0B2A43] text-[#C9A24D] font-extrabold border-[#0B2A43] shadow-xs' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100 font-semibold'"
-                                                class="py-2 px-1 rounded-xl border text-[10px] sm:text-[11px] transition-colors text-center truncate cursor-pointer flex items-center justify-center gap-1">
-                                                <span x-text="cat.icon || '📌'"></span>
-                                                <span x-text="cat.name"></span>
-                                            </button>
+                                            <option :value="cat.name" x-text="(cat.icon ? cat.icon + ' ' : '') + cat.name"></option>
                                         </template>
-                                    </div>
+                                    </select>
                                 </div>
 
                                 <!-- Level 2: Sub-Kategori / Jenis Dropdown -->

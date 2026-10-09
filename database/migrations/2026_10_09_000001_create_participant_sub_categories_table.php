@@ -64,6 +64,15 @@ return new class extends Migration
                 ['name' => 'Perguruan Tinggi Keagamaan (PTKI)', 'code' => 'ptki', 'detail_label' => 'Nama PTKI / IAIN / UIN'],
                 ['name' => 'Perguruan Tinggi Kedinasan', 'code' => 'kedinasan', 'detail_label' => 'Nama Sekolah Tinggi Kedinasan'],
             ],
+            // PELAJAR
+            'pelajar' => [
+                ['name' => 'SMA / Sederajat', 'code' => 'sma', 'detail_label' => 'Nama Sekolah (misal: SMAN 1 Jambi)'],
+                ['name' => 'SMK / Sederajat', 'code' => 'smk', 'detail_label' => 'Nama Sekolah (misal: SMKN 1 Jambi)'],
+                ['name' => 'MA (Madrasah Aliyah)', 'code' => 'ma', 'detail_label' => 'Nama Madrasah (misal: MAN 1 Jambi)'],
+                ['name' => 'SMP / MTs', 'code' => 'smp', 'detail_label' => 'Nama SMP / MTs'],
+                ['name' => 'SD / MI', 'code' => 'sd', 'detail_label' => 'Nama SD / MI'],
+                ['name' => 'Sederajat Lainnya', 'code' => 'sederajat_lainnya', 'detail_label' => 'Nama Sekolah / Lembaga'],
+            ],
             // MURID
             'murid' => [
                 ['name' => 'SMA / Sederajat', 'code' => 'sma', 'detail_label' => 'Nama Sekolah (misal: SMAN 1 Jambi)'],
