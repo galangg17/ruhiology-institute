@@ -38,13 +38,21 @@ class AdminEventController extends Controller
 
         $events = $query->paginate(12);
 
+        $stats = [
+            'total_events' => Event::count(),
+            'active_events' => Event::where('status', 'active')->count(),
+            'event_participants' => \App\Models\Participant::whereNotNull('event_id')->count(),
+            'event_submissions' => AssessmentSubmission::whereNotNull('event_id')->count(),
+            'total_institutions' => Event::whereNotNull('institution_name')->where('institution_name', '!=', '')->distinct('institution_name')->count('institution_name'),
+        ];
+
         $programs = Program::where('status', 'active')->get();
         $instruments = Instrument::where('status', 'active')->get();
         $provinces = Province::orderBy('name', 'asc')->get();
         $regenciesMap = Regency::where('status', 'active')->orderBy('name', 'asc')->get(['id', 'province_id', 'name', 'type'])->groupBy('province_id');
         $categories = \App\Models\ParticipantCategory::getAllActive();
 
-        return view('admin.events.index', compact('events', 'programs', 'instruments', 'provinces', 'regenciesMap', 'categories'));
+        return view('admin.events.index', compact('events', 'programs', 'instruments', 'provinces', 'regenciesMap', 'categories', 'stats'));
     }
 
     public function store(Request $request)

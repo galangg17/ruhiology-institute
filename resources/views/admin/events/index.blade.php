@@ -19,6 +19,45 @@
         </div>
     </div>
 
+    <!-- EXECUTIVE QUICK STATS BAR -->
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4">
+        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center text-lg font-bold">🎯</div>
+            <div>
+                <span class="text-[10px] font-bold uppercase text-slate-400 block tracking-wider">Total Event</span>
+                <strong class="text-lg font-bold text-[#0B2A43]">{{ $stats['total_events'] ?? 0 }}</strong>
+            </div>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center text-lg font-bold">🟢</div>
+            <div>
+                <span class="text-[10px] font-bold uppercase text-slate-400 block tracking-wider">Event Aktif</span>
+                <strong class="text-lg font-bold text-emerald-600">{{ $stats['active_events'] ?? 0 }}</strong>
+            </div>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center text-lg font-bold">👥</div>
+            <div>
+                <span class="text-[10px] font-bold uppercase text-slate-400 block tracking-wider">Total Peserta</span>
+                <strong class="text-lg font-bold text-[#0B2A43]">{{ $stats['event_participants'] ?? 0 }}</strong>
+            </div>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center text-lg font-bold">📝</div>
+            <div>
+                <span class="text-[10px] font-bold uppercase text-slate-400 block tracking-wider">Submissions</span>
+                <strong class="text-lg font-bold text-purple-700">{{ $stats['event_submissions'] ?? 0 }}</strong>
+            </div>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs flex items-center gap-3 col-span-2 md:col-span-1">
+            <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center text-lg font-bold">🏛️</div>
+            <div>
+                <span class="text-[10px] font-bold uppercase text-slate-400 block tracking-wider">Instansi Mitra</span>
+                <strong class="text-lg font-bold text-indigo-700">{{ $stats['total_institutions'] ?? 0 }}</strong>
+            </div>
+        </div>
+    </div>
+
     <!-- SEARCH & STATUS FILTER BAR -->
     <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col md:flex-row items-center justify-between gap-3 text-xs">
         <form action="{{ route('admin.events.index') }}" method="GET" class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
@@ -44,6 +83,14 @@
     <!-- EVENTS GRID -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @forelse($events as $event)
+            @php
+                $timeStatus = 'ongoing';
+                if ($event->start_date && $event->start_date->isFuture()) {
+                    $timeStatus = 'upcoming';
+                } elseif ($event->end_date && $event->end_date->isPast()) {
+                    $timeStatus = 'finished';
+                }
+            @endphp
             <div class="bg-white rounded-3xl border border-slate-200/80 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden relative group">
                 <!-- Status Badge Header -->
                 <div class="p-5 border-b border-slate-100 space-y-3">
@@ -51,12 +98,27 @@
                         <span class="font-mono text-[11px] font-extrabold text-[#C9A24D] bg-[#0B2A43] px-3 py-1 rounded-full uppercase tracking-wider">
                             {{ $event->event_code }}
                         </span>
-                        <div class="flex items-center gap-1.5">
+                        <div class="flex items-center gap-1.5 flex-wrap justify-end">
                             @if($event->assessment_type === 'prepost')
                                 <span class="px-2 py-0.5 bg-amber-50 text-amber-800 border border-amber-300 rounded-full text-[10px] font-bold">Pre & Post</span>
                             @endif
-                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide
-                                {{ $event->status === 'active' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : '' }}
+                            
+                            @if($timeStatus === 'upcoming')
+                                <span class="px-2 py-0.5 bg-amber-100 text-amber-800 border border-amber-300 rounded-full text-[10px] font-extrabold flex items-center gap-1" title="Event Belum Dimulai">
+                                    <span>🟡</span> Belum Dimulai
+                                </span>
+                            @elseif($timeStatus === 'finished')
+                                <span class="px-2 py-0.5 bg-rose-100 text-rose-800 border border-rose-300 rounded-full text-[10px] font-extrabold flex items-center gap-1" title="Event Sudah Selesai">
+                                    <span>🔴</span> Selesai
+                                </span>
+                            @else
+                                <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-full text-[10px] font-extrabold flex items-center gap-1 animate-pulse" title="Event Sedang Berlangsung">
+                                    <span>🟢</span> Berlangsung
+                                </span>
+                            @endif
+
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide
+                                {{ $event->status === 'active' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : '' }}
                                 {{ $event->status === 'draft' ? 'bg-slate-100 text-slate-700 border border-slate-300' : '' }}
                                 {{ $event->status === 'completed' ? 'bg-blue-100 text-blue-800 border border-blue-300' : '' }}
                                 {{ $event->status === 'archived' ? 'bg-rose-100 text-rose-800 border border-rose-300' : '' }}">
@@ -90,6 +152,21 @@
                             <strong class="text-base font-bold text-emerald-600">{{ $event->submissions_count }}</strong>
                         </div>
                     </div>
+
+                    @if($event->quota)
+                        @php
+                            $quotaPct = min(100, round(($event->participants_count / $event->quota) * 100));
+                        @endphp
+                        <div class="pt-2 border-t border-slate-200/60 space-y-1">
+                            <div class="flex justify-between text-[10px] font-bold">
+                                <span class="text-slate-500">Kuota Terisi:</span>
+                                <span class="{{ $quotaPct >= 90 ? 'text-rose-600 font-extrabold' : 'text-slate-800' }}">{{ $event->participants_count }} / {{ $event->quota }} ({{ $quotaPct }}%)</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                                <div class="h-full {{ $quotaPct >= 90 ? 'bg-rose-500' : ($quotaPct >= 75 ? 'bg-amber-500' : 'bg-emerald-500') }} rounded-full transition-all duration-500" style="width: {{ $quotaPct }}%"></div>
+                            </div>
+                        </div>
+                    @endif
 
                     <div class="text-[11px] text-slate-500 space-y-1">
                         <div class="flex justify-between">
@@ -136,9 +213,13 @@
                         <span>✏️ Edit</span>
                     </button>
 
-                    <button @click="activeQrUrl = '{{ $event->direct_access_url }}'; activeQrTitle = '{{ addslashes($event->title) }}'; qrModal = true" type="button" title="QR Code & Copy Link" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition cursor-pointer text-[11px]">
+                    <button @click="activeQrUrl = '{{ $event->direct_access_url }}'; activeQrTitle = '{{ addslashes($event->title) }}'; activeInstitution = '{{ addslashes($event->institution_name ?? '') }}'; activeStartDate = '{{ $event->start_date ? $event->start_date->format('d M Y') : 'Kapan Saja' }}'; qrModal = true" type="button" title="QR Code & Broadcast WA" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition cursor-pointer text-[11px]">
                         📱
                     </button>
+
+                    <a href="{{ route('admin.results.export_pdf', ['event_id' => $event->id]) }}" target="_blank" title="Export Laporan PDF Event" class="p-2 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-xl transition text-[11px] flex items-center justify-center">
+                        📄
+                    </a>
 
                     <form action="{{ route('admin.events.destroy', $event) }}" method="POST" onsubmit="return confirm('Yakin menghapus event ini? Data peserta terkait tidak akan terhapus.')">
                         @csrf
@@ -252,8 +333,13 @@
                         </div>
 
                         <div>
-                            <label class="block font-bold text-slate-800 text-xs mb-1">Preset Target Kategori Peserta</label>
-                            <select name="target_category" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50 font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-[#0B2A43] text-xs">
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="block font-bold text-slate-800 text-xs">Preset Target Kategori Peserta</label>
+                                <button type="button" @click="autoLoadSubCategories('create')" class="text-[10px] font-bold text-[#0B2A43] bg-blue-50 hover:bg-blue-100 px-2 py-0.5 rounded-md border border-blue-200 transition cursor-pointer">
+                                    ⚡ Auto-isi Sub-Kategori
+                                </button>
+                            </div>
+                            <select name="target_category" x-model="createTargetCategory" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50 font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-[#0B2A43] text-xs">
                                 <option value="">🔘 Bebas / Fleksibel (Peserta memilih sendiri)</option>
                                 @foreach($categories as $cat)
                                     <option value="{{ $cat->name }}">{{ $cat->icon ?? '🏷️' }} {{ $cat->name }}</option>
@@ -334,7 +420,7 @@
 
                             <div>
                                 <label class="block font-bold text-slate-700 text-[10px] mb-0.5">Opsi Pilihan (Pisahkan Koma)</label>
-                                <input type="text" name="custom_subcategories" placeholder="Contoh: Kelas X-A, Kelas X-B, Kelas XI IPA 1" class="w-full p-2 rounded-xl border border-slate-300 bg-white text-xs">
+                                <input type="text" name="custom_subcategories" x-model="createCustomSubcategories" placeholder="Contoh: Kelas X-A, Kelas X-B, Kelas XI IPA 1" class="w-full p-2 rounded-xl border border-slate-300 bg-white text-xs">
                             </div>
                         </div>
 
@@ -454,7 +540,12 @@
                         </div>
 
                         <div>
-                            <label class="block font-bold text-slate-800 text-xs mb-1">Preset Target Kategori Peserta</label>
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="block font-bold text-slate-800 text-xs">Preset Target Kategori Peserta</label>
+                                <button type="button" @click="autoLoadSubCategories('edit')" class="text-[10px] font-bold text-[#0B2A43] bg-blue-50 hover:bg-blue-100 px-2 py-0.5 rounded-md border border-blue-200 transition cursor-pointer">
+                                    ⚡ Impor Sub-Kategori Kategori
+                                </button>
+                            </div>
                             <select name="target_category" x-model="editData.target_category" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50 font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-[#0B2A43] text-xs">
                                 <option value="">🔘 Bebas / Fleksibel (Peserta memilih sendiri)</option>
                                 @foreach($categories as $cat)
@@ -589,22 +680,32 @@
 
     <!-- QR CODE & SHARE MODAL -->
     <div x-show="qrModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
-        <div @click.away="qrModal = false" class="bg-white rounded-3xl max-w-md w-full p-6 text-center space-y-4 border border-slate-100 shadow-2xl relative">
-            <button @click="qrModal = false" type="button" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700">✕</button>
+        <div @click.away="qrModal = false" class="bg-white rounded-3xl max-w-lg w-full p-6 text-center space-y-4 border border-slate-100 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <button @click="qrModal = false" type="button" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 font-bold">✕</button>
 
-            <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-wider block">QR CODE & LINK EVENT</span>
+            <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-wider block">QR CODE & BROADCAST EVENT</span>
             <h3 class="font-serif font-bold text-lg text-[#0B2A43]" x-text="activeQrTitle"></h3>
 
             <!-- QR Image via API -->
             <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 inline-block mx-auto">
-                <img :src="'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(activeQrUrl)" alt="QR Code Event" class="w-48 h-48 mx-auto rounded-lg shadow-sm">
+                <img :src="'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(activeQrUrl)" alt="QR Code Event" class="w-44 h-44 mx-auto rounded-lg shadow-sm">
             </div>
 
-            <div class="space-y-2">
-                <span class="text-[11px] text-slate-400 block">Link Akses Langsung Peserta:</span>
+            <div class="space-y-2 text-left">
+                <span class="text-[11px] font-bold text-slate-600 block">🔗 Link Akses Langsung Peserta:</span>
                 <input type="text" :value="activeQrUrl" readonly class="w-full p-2.5 text-xs text-center font-mono bg-slate-100 rounded-xl border border-slate-300 select-all font-bold text-[#0B2A43]">
-                <button type="button" @click="navigator.clipboard.writeText(activeQrUrl); alert('Link berhasil disalin!')" class="w-full py-2.5 bg-[#C9A24D] hover:bg-[#B48A16] text-[#0B2A43] font-bold text-xs rounded-xl transition shadow cursor-pointer">
+                <button type="button" @click="navigator.clipboard.writeText(activeQrUrl); alert('Link pendaftaran berhasil disalin!')" class="w-full py-2.5 bg-[#C9A24D] hover:bg-[#B48A16] text-[#0B2A43] font-bold text-xs rounded-xl transition shadow cursor-pointer">
                     📋 Salin Link Pendaftaran
+                </button>
+            </div>
+
+            <div class="pt-3 border-t border-slate-200 text-left space-y-2">
+                <span class="text-[11px] font-bold text-[#0B2A43] flex items-center gap-1.5">
+                    <span>💬</span> Format Broadcast WhatsApp Panitia:
+                </span>
+                <textarea readonly :value="waBroadcastText" rows="5" class="w-full p-3 text-xs font-mono bg-slate-50 border border-slate-200 rounded-xl text-slate-700 leading-relaxed outline-none"></textarea>
+                <button type="button" @click="navigator.clipboard.writeText(waBroadcastText); alert('Format Broadcast WhatsApp berhasil disalin!')" class="w-full py-2.5 bg-[#0B2A43] hover:bg-[#123B59] text-white font-bold text-xs rounded-xl transition shadow cursor-pointer">
+                    📱 Salin Format Broadcast WA Panitia
                 </button>
             </div>
         </div>
@@ -621,10 +722,15 @@ function adminEventsManager() {
         qrModal: false,
         activeQrUrl: '',
         activeQrTitle: '',
+        activeInstitution: '',
+        activeStartDate: '',
         assessmentType: 'single',
+        createTargetCategory: '',
+        createCustomSubcategories: '',
 
         provincesList: @json($provinces ?? []),
         regenciesMap: @json($regenciesMap ?? []),
+        categoriesList: @json($categories ?? []),
 
         createProvinceId: '',
         createRegencyId: '',
@@ -633,6 +739,41 @@ function adminEventsManager() {
         editProvinceId: '',
         editRegencyId: '',
         filteredEditRegencies: [],
+
+        autoLoadSubCategories(modalType) {
+            const targetCat = modalType === 'create' ? this.createTargetCategory : this.editData.target_category;
+            if (!targetCat) {
+                alert('Pilih target kategori terlebih dahulu!');
+                return;
+            }
+
+            const cat = this.categoriesList.find(c => c.name === targetCat);
+            if (!cat || !cat.sub_categories || cat.sub_categories.length === 0) {
+                alert('Tidak ada sub-kategori yang ditemukan untuk kategori ' + targetCat);
+                return;
+            }
+
+            const subCatNames = cat.sub_categories.map(s => s.name);
+            if (modalType === 'create') {
+                this.createCustomSubcategories = subCatNames.join(', ');
+                alert(`Berhasil memuat ${subCatNames.length} sub-kategori ke Opsi Kelompok!`);
+            } else {
+                let addedCount = 0;
+                subCatNames.forEach(name => {
+                    if (!this.editSubcategoriesList.includes(name)) {
+                        this.editSubcategoriesList.push(name);
+                        addedCount++;
+                    }
+                });
+                alert(`Berhasil menambahkan ${addedCount} sub-kategori baru ke Opsi Kelompok!`);
+            }
+        },
+
+        get waBroadcastText() {
+            const instText = this.activeInstitution ? `\n🏛️ Instansi: *${this.activeInstitution}*` : '';
+            const dateText = this.activeStartDate ? `\n📅 Jadwal: *${this.activeStartDate}*` : '';
+            return `Assalamu'alaikum Wr. Wb.\n\nYth. Bapak/Ibu/Peserta Uji Ruhiologi,\n\nBerikut adalah Link & QR Code pendaftaran resmi untuk kegiatan:\n📌 *${this.activeQrTitle}*${instText}${dateText}\n\nSilakan melakukan registrasi & pengisian asesmen mandiri melalui link di bawah ini:\n🔗 ${this.activeQrUrl}\n\nTerima kasih.\n*Ruhiology Institute*`;
+        },
 
         onCreateProvinceChange() {
             this.createRegencyId = '';
