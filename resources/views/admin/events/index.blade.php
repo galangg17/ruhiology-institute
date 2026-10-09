@@ -58,30 +58,68 @@
         </div>
     </div>
 
-    <!-- SEARCH & STATUS FILTER BAR -->
-    <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col md:flex-row items-center justify-between gap-3 text-xs">
-        <form action="{{ route('admin.events.index') }}" method="GET" class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
-            <div class="relative w-full sm:w-72">
-                <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari nama event, kode, instansi..." class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none">
-                <span class="absolute left-3 top-3 text-slate-400">🔍</span>
-            </div>
-            <select name="status" onchange="this.form.submit()" class="w-full sm:w-44 py-2.5 px-3 rounded-xl border border-slate-300 bg-slate-50 font-medium outline-none">
-                <option value="">Semua Status</option>
-                <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>🟢 Active</option>
-                <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>⚪ Draft</option>
-                <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>🔵 Completed</option>
-                <option value="archived" {{ request('status') === 'archived' ? 'selected' : '' }}>🔴 Archived</option>
-            </select>
-            <button type="submit" class="px-4 py-2.5 bg-[#0B2A43] text-white font-bold rounded-xl hover:bg-[#123B59] transition">Filter</button>
-        </form>
+    <!-- SEARCH, STATUS TABS & VIEW TOGGLE BAR -->
+    <div class="space-y-3">
+        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col md:flex-row items-center justify-between gap-3 text-xs">
+            <form action="{{ route('admin.events.index') }}" method="GET" class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+                <div class="relative w-full sm:w-72">
+                    <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari nama event, kode, instansi..." class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none">
+                    <span class="absolute left-3 top-3 text-slate-400">🔍</span>
+                </div>
+                <select name="status" onchange="this.form.submit()" class="w-full sm:w-40 py-2.5 px-3 rounded-xl border border-slate-300 bg-slate-50 font-medium outline-none">
+                    <option value="">Semua Status</option>
+                    <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>🟢 Active</option>
+                    <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>⚪ Draft</option>
+                    <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>🔵 Completed</option>
+                    <option value="archived" {{ request('status') === 'archived' ? 'selected' : '' }}>🔴 Archived</option>
+                </select>
+                <button type="submit" class="px-4 py-2.5 bg-[#0B2A43] text-white font-bold rounded-xl hover:bg-[#123B59] transition">Filter</button>
+            </form>
 
-        <div class="text-slate-500 font-medium text-right w-full md:w-auto">
-            Total Event: <strong class="text-[#0B2A43]">{{ $events->total() }}</strong>
+            <div class="flex items-center justify-between md:justify-end gap-4 w-full md:w-auto">
+                <div class="text-slate-500 font-medium text-xs">
+                    Total: <strong class="text-[#0B2A43]">{{ $events->total() }}</strong>
+                </div>
+
+                <!-- View Switcher (Grid vs Table) -->
+                <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200">
+                    <button type="button" @click="toggleViewMode('grid')" :class="viewMode === 'grid' ? 'bg-white text-[#0B2A43] shadow-xs font-bold' : 'text-slate-500 hover:text-slate-800'" class="px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition cursor-pointer">
+                        <span>🎴</span> <span class="hidden sm:inline">Grid Kartu</span>
+                    </button>
+                    <button type="button" @click="toggleViewMode('table')" :class="viewMode === 'table' ? 'bg-white text-[#0B2A43] shadow-xs font-bold' : 'text-slate-500 hover:text-slate-800'" class="px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition cursor-pointer">
+                        <span>📊</span> <span class="hidden sm:inline">Tabel Ringkas</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- QUICK STATUS FILTER TABS -->
+        <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
+            <a href="{{ route('admin.events.index', array_merge(request()->except('status', 'page'), ['status' => ''])) }}" 
+               class="px-3.5 py-1.5 rounded-xl font-bold transition whitespace-nowrap {{ !request('status') ? 'bg-[#0B2A43] text-white shadow-xs' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50' }}">
+                🎯 Semua Event ({{ $stats['total_events'] ?? 0 }})
+            </a>
+            <a href="{{ route('admin.events.index', array_merge(request()->except('status', 'page'), ['status' => 'active'])) }}" 
+               class="px-3.5 py-1.5 rounded-xl font-bold transition whitespace-nowrap {{ request('status') === 'active' ? 'bg-emerald-600 text-white shadow-xs' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50' }}">
+                🟢 Active ({{ $stats['active_events'] ?? 0 }})
+            </a>
+            <a href="{{ route('admin.events.index', array_merge(request()->except('status', 'page'), ['status' => 'draft'])) }}" 
+               class="px-3.5 py-1.5 rounded-xl font-bold transition whitespace-nowrap {{ request('status') === 'draft' ? 'bg-slate-700 text-white shadow-xs' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50' }}">
+                ⚪ Draft
+            </a>
+            <a href="{{ route('admin.events.index', array_merge(request()->except('status', 'page'), ['status' => 'completed'])) }}" 
+               class="px-3.5 py-1.5 rounded-xl font-bold transition whitespace-nowrap {{ request('status') === 'completed' ? 'bg-blue-600 text-white shadow-xs' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50' }}">
+                🔵 Completed
+            </a>
+            <a href="{{ route('admin.events.index', array_merge(request()->except('status', 'page'), ['status' => 'archived'])) }}" 
+               class="px-3.5 py-1.5 rounded-xl font-bold transition whitespace-nowrap {{ request('status') === 'archived' ? 'bg-rose-600 text-white shadow-xs' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50' }}">
+                🔴 Archived
+            </a>
         </div>
     </div>
 
-    <!-- EVENTS GRID -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- VIEW MODE 1: UNIFORM GRID CARDS VIEW -->
+    <div x-show="viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @forelse($events as $event)
             @php
                 $timeStatus = 'ongoing';
@@ -91,33 +129,33 @@
                     $timeStatus = 'finished';
                 }
             @endphp
-            <div class="bg-white rounded-3xl border border-slate-200/80 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden relative group">
-                <!-- Status Badge Header -->
-                <div class="p-5 border-b border-slate-100 space-y-3">
+            <div class="bg-white rounded-3xl border border-slate-200/80 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden relative group h-full">
+                <!-- Header Status -->
+                <div class="p-5 border-b border-slate-100 space-y-2.5">
                     <div class="flex items-center justify-between">
-                        <span class="font-mono text-[11px] font-extrabold text-[#C9A24D] bg-[#0B2A43] px-3 py-1 rounded-full uppercase tracking-wider">
+                        <span class="font-mono text-[11px] font-extrabold text-[#C9A24D] bg-[#0B2A43] px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                             {{ $event->event_code }}
                         </span>
-                        <div class="flex items-center gap-1.5 flex-wrap justify-end">
+                        <div class="flex items-center gap-1 flex-wrap justify-end">
                             @if($event->assessment_type === 'prepost')
-                                <span class="px-2 py-0.5 bg-amber-50 text-amber-800 border border-amber-300 rounded-full text-[10px] font-bold">Pre & Post</span>
+                                <span class="px-2 py-0.5 bg-amber-50 text-amber-800 border border-amber-300 rounded-full text-[9px] font-bold">Pre & Post</span>
                             @endif
                             
                             @if($timeStatus === 'upcoming')
-                                <span class="px-2 py-0.5 bg-amber-100 text-amber-800 border border-amber-300 rounded-full text-[10px] font-extrabold flex items-center gap-1" title="Event Belum Dimulai">
+                                <span class="px-2 py-0.5 bg-amber-100 text-amber-800 border border-amber-300 rounded-full text-[9px] font-extrabold flex items-center gap-0.5" title="Event Belum Dimulai">
                                     <span>🟡</span> Belum Dimulai
                                 </span>
                             @elseif($timeStatus === 'finished')
-                                <span class="px-2 py-0.5 bg-rose-100 text-rose-800 border border-rose-300 rounded-full text-[10px] font-extrabold flex items-center gap-1" title="Event Sudah Selesai">
+                                <span class="px-2 py-0.5 bg-rose-100 text-rose-800 border border-rose-300 rounded-full text-[9px] font-extrabold flex items-center gap-0.5" title="Event Sudah Selesai">
                                     <span>🔴</span> Selesai
                                 </span>
                             @else
-                                <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-full text-[10px] font-extrabold flex items-center gap-1 animate-pulse" title="Event Sedang Berlangsung">
+                                <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-full text-[9px] font-extrabold flex items-center gap-0.5 animate-pulse" title="Event Sedang Berlangsung">
                                     <span>🟢</span> Berlangsung
                                 </span>
                             @endif
 
-                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide
+                            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wide
                                 {{ $event->status === 'active' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : '' }}
                                 {{ $event->status === 'draft' ? 'bg-slate-100 text-slate-700 border border-slate-300' : '' }}
                                 {{ $event->status === 'completed' ? 'bg-blue-100 text-blue-800 border border-blue-300' : '' }}
@@ -127,89 +165,85 @@
                         </div>
                     </div>
 
-                    <h3 class="font-serif font-bold text-lg text-[#0B2A43] group-hover:text-[#C9A24D] transition-colors leading-snug">
+                    <h3 class="font-serif font-bold text-base text-[#0B2A43] group-hover:text-[#C9A24D] transition-colors leading-snug line-clamp-2">
                         <a href="{{ route('admin.events.show', $event) }}">{{ $event->title }}</a>
                     </h3>
 
-                    <p class="text-xs text-slate-500 flex items-center gap-1.5 font-medium flex-wrap">
-                        <span>🏛️</span> <span>{{ $event->institution_name ?? 'Instansi Internal' }}</span>
+                    <p class="text-[11px] text-slate-500 flex items-center gap-1 font-medium truncate">
+                        <span>🏛️</span> <span class="truncate">{{ $event->institution_name ?? 'Instansi Internal' }}</span>
                         @if($event->regency || $event->province)
                             <span class="text-slate-300">•</span>
-                            <span>📍 {{ $event->regency ? $event->regency->formatted_name : '' }}{{ $event->province ? ', ' . $event->province->name : '' }}</span>
+                            <span class="truncate">📍 {{ $event->regency ? $event->regency->formatted_name : '' }}</span>
                         @endif
                     </p>
                 </div>
 
-                <!-- Event Details & Stats -->
-                <div class="p-5 bg-slate-50/50 space-y-3 text-xs">
-                    <div class="grid grid-cols-2 gap-2 text-center">
-                        <div class="bg-white p-3 rounded-2xl border border-slate-200/60 shadow-2xs">
-                            <span class="text-[10px] font-bold text-slate-400 block uppercase">Peserta</span>
-                            <strong class="text-base font-bold text-[#0B2A43]">{{ $event->participants_count }}</strong>
-                        </div>
-                        <div class="bg-white p-3 rounded-2xl border border-slate-200/60 shadow-2xs">
-                            <span class="text-[10px] font-bold text-slate-400 block uppercase">Submissions</span>
-                            <strong class="text-base font-bold text-emerald-600">{{ $event->submissions_count }}</strong>
-                        </div>
-                    </div>
-
-                    @if($event->quota)
-                        @php
-                            $quotaPct = min(100, round(($event->participants_count / $event->quota) * 100));
-                        @endphp
-                        <div class="pt-2 border-t border-slate-200/60 space-y-1">
-                            <div class="flex justify-between text-[10px] font-bold">
-                                <span class="text-slate-500">Kuota Terisi:</span>
-                                <span class="{{ $quotaPct >= 90 ? 'text-rose-600 font-extrabold' : 'text-slate-800' }}">{{ $event->participants_count }} / {{ $event->quota }} ({{ $quotaPct }}%)</span>
+                <!-- Event Details Body -->
+                <div class="p-5 bg-slate-50/50 space-y-3 text-xs flex-1 flex flex-col justify-between">
+                    <div>
+                        <div class="grid grid-cols-2 gap-2 text-center mb-3">
+                            <div class="bg-white p-2.5 rounded-2xl border border-slate-200/60 shadow-2xs">
+                                <span class="text-[9px] font-bold text-slate-400 block uppercase">Peserta</span>
+                                <strong class="text-base font-bold text-[#0B2A43]">{{ $event->participants_count }}</strong>
                             </div>
-                            <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                                <div class="h-full {{ $quotaPct >= 90 ? 'bg-rose-500' : ($quotaPct >= 75 ? 'bg-amber-500' : 'bg-emerald-500') }} rounded-full transition-all duration-500" style="width: {{ $quotaPct }}%"></div>
+                            <div class="bg-white p-2.5 rounded-2xl border border-slate-200/60 shadow-2xs">
+                                <span class="text-[9px] font-bold text-slate-400 block uppercase">Submissions</span>
+                                <strong class="text-base font-bold text-emerald-600">{{ $event->submissions_count }}</strong>
                             </div>
                         </div>
-                    @endif
 
-                    <div class="text-[11px] text-slate-500 space-y-1">
-                        <div class="flex justify-between">
-                            <span>Preset Kategori:</span>
-                            <strong class="text-slate-800">{{ $event->target_category ?? 'Bebas / Fleksibel' }}</strong>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Jadwal:</span>
-                            <strong class="text-slate-800">
-                                {{ $event->start_date ? $event->start_date->format('d M Y') : 'Kapan Saja' }}
-                            </strong>
-                        </div>
-                        @if($event->assessment_type === 'prepost')
-                            <div class="pt-1 text-[10px] border-t border-slate-200/60 space-y-0.5 text-slate-600">
-                                <div>📅 Pretest: <strong>{{ $event->pretest_start ? $event->pretest_start->format('d/m/Y') : '-' }} s/d {{ $event->pretest_end ? $event->pretest_end->format('d/m/Y') : '-' }}</strong></div>
-                                <div>📅 Posttest: <strong>{{ $event->posttest_start ? $event->posttest_start->format('d/m/Y') : '-' }} s/d {{ $event->posttest_end ? $event->posttest_end->format('d/m/Y') : '-' }}</strong></div>
-                            </div>
-                        @endif
-
-                        <!-- Display Dynamic Subcategory / Class Badges Box -->
-                        @if(!empty($event->custom_subcategories) && is_array($event->custom_subcategories))
-                            <div class="pt-2.5 border-t border-slate-200/60 space-y-1">
-                                <span class="text-[10px] font-bold text-slate-600 block">🏷️ {{ $event->group_label ?: 'Opsi Pilihan Peserta' }}:</span>
-                                <div class="flex flex-wrap gap-1">
-                                    @foreach(array_slice($event->custom_subcategories, 0, 5) as $subCat)
-                                        <span class="px-2 py-0.5 bg-blue-50 text-blue-800 border border-blue-200/80 rounded-md text-[10px] font-semibold">{{ $subCat }}</span>
-                                    @endforeach
-                                    @if(count($event->custom_subcategories) > 5)
-                                        <span class="px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded-md text-[10px] font-bold">+{{ count($event->custom_subcategories) - 5 }} opsi</span>
-                                    @endif
+                        @if($event->quota)
+                            @php
+                                $quotaPct = min(100, round(($event->participants_count / $event->quota) * 100));
+                            @endphp
+                            <div class="mb-3 space-y-1">
+                                <div class="flex justify-between text-[10px] font-bold">
+                                    <span class="text-slate-500">Kuota Terisi:</span>
+                                    <span class="{{ $quotaPct >= 90 ? 'text-rose-600 font-extrabold' : 'text-slate-800' }}">{{ $event->participants_count }} / {{ $event->quota }} ({{ $quotaPct }}%)</span>
+                                </div>
+                                <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                                    <div class="h-full {{ $quotaPct >= 90 ? 'bg-rose-500' : ($quotaPct >= 75 ? 'bg-amber-500' : 'bg-emerald-500') }} rounded-full transition-all duration-500" style="width: {{ $quotaPct }}%"></div>
                                 </div>
                             </div>
                         @endif
+
+                        <div class="text-[11px] text-slate-500 space-y-1">
+                            <div class="flex justify-between">
+                                <span>Preset Kategori:</span>
+                                <strong class="text-slate-800">{{ $event->target_category ?? 'Bebas / Fleksibel' }}</strong>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Jadwal:</span>
+                                <strong class="text-slate-800">
+                                    {{ $event->start_date ? $event->start_date->format('d M Y') : 'Kapan Saja' }}
+                                </strong>
+                            </div>
+                        </div>
                     </div>
+
+                    <!-- Clean Subcategory Badges (Max 3 Tags) -->
+                    @if(!empty($event->custom_subcategories) && is_array($event->custom_subcategories))
+                        <div class="pt-2 border-t border-slate-200/60 space-y-1">
+                            <span class="text-[10px] font-bold text-slate-600 block">🏷️ {{ $event->group_label ?: 'Opsi Pilihan' }}:</span>
+                            <div class="flex flex-wrap gap-1 items-center">
+                                @foreach(array_slice($event->custom_subcategories, 0, 3) as $subCat)
+                                    <span class="px-2 py-0.5 bg-blue-50 text-blue-800 border border-blue-200/80 rounded-md text-[10px] font-semibold">{{ $subCat }}</span>
+                                @endforeach
+                                @if(count($event->custom_subcategories) > 3)
+                                    <span title="{{ implode(', ', array_slice($event->custom_subcategories, 3)) }}" class="px-1.5 py-0.5 bg-slate-200 text-slate-700 rounded-md text-[10px] font-bold cursor-help">+{{ count($event->custom_subcategories) - 3 }} opsi</span>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
                 </div>
 
                 <!-- Action Footer -->
-                <div class="p-3.5 bg-white border-t border-slate-100 flex items-center justify-between gap-1.5 text-xs">
+                <div class="p-3 bg-white border-t border-slate-100 flex items-center justify-between gap-1 text-xs">
                     <a href="{{ route('admin.events.show', $event) }}" class="flex-1 py-2 bg-[#0B2A43] hover:bg-[#123B59] text-white font-bold text-center rounded-xl transition text-[11px]">
                         📊 Analytic
                     </a>
 
-                    <button @click="openEdit({{ json_encode($event) }}, '{{ route('admin.events.update', $event) }}')" type="button" title="Edit Event & Kelola Opsi Kelas" class="px-3 py-2 bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold rounded-xl transition cursor-pointer text-[11px] flex items-center gap-1">
+                    <button @click="openEdit({{ json_encode($event) }}, '{{ route('admin.events.update', $event) }}')" type="button" title="Edit Event" class="px-3 py-2 bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold rounded-xl transition cursor-pointer text-[11px] flex items-center gap-1">
                         <span>✏️ Edit</span>
                     </button>
 
@@ -237,6 +271,142 @@
                 <p class="text-xs text-slate-500 max-w-md mx-auto">Klik tombol "+ Buat Event / Kegiatan Baru" di atas untuk menambahkan acara uji ruhiologi resmi pertama Anda.</p>
             </div>
         @endforelse
+    </div>
+
+    <!-- VIEW MODE 2: HIGH DENSITY COMPACT TABLE VIEW -->
+    <div x-show="viewMode === 'table'" class="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+            <thead>
+                <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider text-[10px]">
+                    <th class="p-4">Kode & Nama Event</th>
+                    <th class="p-4">Instansi & Lokasi</th>
+                    <th class="p-4">Preset Kategori</th>
+                    <th class="p-4">Status & Waktu</th>
+                    <th class="p-4 text-center">Peserta / Submissions</th>
+                    <th class="p-4 text-center">Aksi Cepat</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 font-medium">
+                @forelse($events as $event)
+                    @php
+                        $timeStatus = 'ongoing';
+                        if ($event->start_date && $event->start_date->isFuture()) {
+                            $timeStatus = 'upcoming';
+                        } elseif ($event->end_date && $event->end_date->isPast()) {
+                            $timeStatus = 'finished';
+                        }
+                        $quotaPct = $event->quota ? min(100, round(($event->participants_count / $event->quota) * 100)) : 0;
+                    @endphp
+                    <tr class="hover:bg-slate-50/80 transition">
+                        <td class="p-4">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="font-mono text-[10px] font-extrabold text-[#C9A24D] bg-[#0B2A43] px-2 py-0.5 rounded uppercase">
+                                    {{ $event->event_code }}
+                                </span>
+                                @if($event->assessment_type === 'prepost')
+                                    <span class="px-1.5 py-0.5 bg-amber-50 text-amber-800 border border-amber-300 rounded text-[9px] font-bold">Pre & Post</span>
+                                @endif
+                            </div>
+                            <a href="{{ route('admin.events.show', $event) }}" class="font-serif font-bold text-[#0B2A43] hover:text-[#C9A24D] transition text-sm block">
+                                {{ $event->title }}
+                            </a>
+                        </td>
+                        <td class="p-4 text-slate-600">
+                            <div class="font-semibold text-slate-800 flex items-center gap-1">
+                                <span>🏛️</span> {{ $event->institution_name ?? 'Instansi Internal' }}
+                            </div>
+                            @if($event->regency || $event->province)
+                                <div class="text-[11px] text-slate-400 mt-0.5">
+                                    📍 {{ $event->regency ? $event->regency->formatted_name : '' }}{{ $event->province ? ', ' . $event->province->name : '' }}
+                                </div>
+                            @endif
+                        </td>
+                        <td class="p-4">
+                            <span class="px-2.5 py-0.5 bg-slate-100 text-slate-700 border border-slate-200 rounded-lg text-[11px] font-bold inline-block mb-1">
+                                🏷️ {{ $event->target_category ?? 'Bebas / Fleksibel' }}
+                            </span>
+                            @if(!empty($event->custom_subcategories) && is_array($event->custom_subcategories))
+                                <div class="text-[10px] text-slate-500">
+                                    {{ count($event->custom_subcategories) }} Opsi: <span class="font-semibold text-slate-700">{{ implode(', ', array_slice($event->custom_subcategories, 0, 2)) }}{{ count($event->custom_subcategories) > 2 ? '...' : '' }}</span>
+                                </div>
+                            @endif
+                        </td>
+                        <td class="p-4">
+                            <div class="flex items-center gap-1.5 mb-1">
+                                @if($timeStatus === 'upcoming')
+                                    <span class="px-2 py-0.5 bg-amber-100 text-amber-800 border border-amber-300 rounded-full text-[9px] font-extrabold">
+                                        🟡 Belum Dimulai
+                                    </span>
+                                @elseif($timeStatus === 'finished')
+                                    <span class="px-2 py-0.5 bg-rose-100 text-rose-800 border border-rose-300 rounded-full text-[9px] font-extrabold">
+                                        🔴 Selesai
+                                    </span>
+                                @else
+                                    <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-full text-[9px] font-extrabold animate-pulse">
+                                        🟢 Berlangsung
+                                    </span>
+                                @endif
+                                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase
+                                    {{ $event->status === 'active' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : '' }}
+                                    {{ $event->status === 'draft' ? 'bg-slate-100 text-slate-700 border border-slate-300' : '' }}
+                                    {{ $event->status === 'completed' ? 'bg-blue-100 text-blue-800 border border-blue-300' : '' }}
+                                    {{ $event->status === 'archived' ? 'bg-rose-100 text-rose-800 border border-rose-300' : '' }}">
+                                    {{ $event->status }}
+                                </span>
+                            </div>
+                            <div class="text-[10px] text-slate-400">
+                                📅 {{ $event->start_date ? $event->start_date->format('d/m/Y') : 'Kapan Saja' }}
+                            </div>
+                        </td>
+                        <td class="p-4 text-center">
+                            <div class="font-bold text-[#0B2A43] text-sm">
+                                {{ $event->participants_count }} <span class="text-xs text-slate-400 font-normal">peserta</span>
+                            </div>
+                            <div class="text-[10px] text-emerald-600 font-bold">
+                                {{ $event->submissions_count }} submissions
+                            </div>
+                            @if($event->quota)
+                                <div class="w-24 mx-auto mt-1">
+                                    <div class="w-full h-1 bg-slate-200 rounded-full overflow-hidden">
+                                        <div class="h-full {{ $quotaPct >= 90 ? 'bg-rose-500' : ($quotaPct >= 75 ? 'bg-amber-500' : 'bg-emerald-500') }} rounded-full" style="width: {{ $quotaPct }}%"></div>
+                                    </div>
+                                    <span class="text-[9px] text-slate-400 font-medium block mt-0.5">{{ $quotaPct }}% dari {{ $event->quota }}</span>
+                                </div>
+                            @endif
+                        </td>
+                        <td class="p-4 text-center">
+                            <div class="flex items-center justify-center gap-1">
+                                <a href="{{ route('admin.events.show', $event) }}" title="Analytic Event" class="p-2 bg-[#0B2A43] hover:bg-[#123B59] text-white font-bold rounded-xl transition text-xs">
+                                    📊
+                                </a>
+                                <button @click="openEdit({{ json_encode($event) }}, '{{ route('admin.events.update', $event) }}')" type="button" title="Edit Event" class="p-2 bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold rounded-xl transition text-xs">
+                                    ✏️
+                                </button>
+                                <button @click="activeQrUrl = '{{ $event->direct_access_url }}'; activeQrTitle = '{{ addslashes($event->title) }}'; activeInstitution = '{{ addslashes($event->institution_name ?? '') }}'; activeStartDate = '{{ $event->start_date ? $event->start_date->format('d M Y') : 'Kapan Saja' }}'; qrModal = true" type="button" title="QR & Broadcast WA" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition text-xs">
+                                    📱
+                                </button>
+                                <a href="{{ route('admin.reports.export_pdf', ['event_id' => $event->id]) }}" target="_blank" title="Export PDF" class="p-2 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-xl transition text-xs">
+                                    📄
+                                </a>
+                                <form action="{{ route('admin.events.destroy', $event) }}" method="POST" onsubmit="return confirm('Yakin menghapus event ini? Data peserta terkait tidak akan terhapus.')" class="inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" title="Hapus Event" class="p-2 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold rounded-xl transition text-xs">
+                                        🗑️
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="6" class="p-12 text-center text-slate-500 font-serif">
+                            Belum Ada Event / Kegiatan Asesmen Ditemukan.
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
     </div>
 
     <!-- PAGINATION -->
@@ -717,6 +887,7 @@
 <script>
 function adminEventsManager() {
     return {
+        viewMode: localStorage.getItem('admin_events_view') || 'grid',
         createModal: false,
         editModal: false,
         qrModal: false,
@@ -727,6 +898,11 @@ function adminEventsManager() {
         assessmentType: 'single',
         createTargetCategory: '',
         createCustomSubcategories: '',
+
+        toggleViewMode(mode) {
+            this.viewMode = mode;
+            localStorage.setItem('admin_events_view', mode);
+        },
 
         provincesList: @json($provinces ?? []),
         regenciesMap: @json($regenciesMap ?? []),
