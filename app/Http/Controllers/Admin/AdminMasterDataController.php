@@ -155,6 +155,48 @@ class AdminMasterDataController extends Controller
         return back()->with('success', 'Kategori Peserta "' . $name . '" berhasil dihapus.');
     }
 
+    public function storeParticipantSubCategory(Request $request)
+    {
+        $validated = $request->validate([
+            'category_id' => ['required', 'exists:participant_categories,id'],
+            'name' => ['required', 'string', 'max:255'],
+            'detail_label' => ['nullable', 'string', 'max:255'],
+            'order' => ['nullable', 'integer'],
+            'status' => ['required', 'in:active,inactive'],
+        ]);
+
+        $validated['code'] = Str::slug($validated['name']);
+        $validated['order'] = $validated['order'] ?? (\App\Models\ParticipantSubCategory::where('category_id', $validated['category_id'])->count() + 1);
+
+        \App\Models\ParticipantSubCategory::create($validated);
+
+        return back()->with('success', 'Sub-Kategori "' . $validated['name'] . '" berhasil ditambahkan.');
+    }
+
+    public function updateParticipantSubCategory(Request $request, \App\Models\ParticipantSubCategory $participantSubCategory)
+    {
+        $validated = $request->validate([
+            'category_id' => ['required', 'exists:participant_categories,id'],
+            'name' => ['required', 'string', 'max:255'],
+            'detail_label' => ['nullable', 'string', 'max:255'],
+            'order' => ['nullable', 'integer'],
+            'status' => ['required', 'in:active,inactive'],
+        ]);
+
+        $validated['code'] = Str::slug($validated['name']);
+        $participantSubCategory->update($validated);
+
+        return back()->with('success', 'Sub-Kategori "' . $participantSubCategory->name . '" berhasil diperbarui.');
+    }
+
+    public function destroyParticipantSubCategory(\App\Models\ParticipantSubCategory $participantSubCategory)
+    {
+        $name = $participantSubCategory->name;
+        $participantSubCategory->delete();
+
+        return back()->with('success', 'Sub-Kategori "' . $name . '" berhasil dihapus.');
+    }
+
     public function updatePendingStatus(Request $request, PendingInstitution $pending)
     {
         $validated = $request->validate([

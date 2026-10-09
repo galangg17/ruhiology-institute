@@ -37,12 +37,14 @@ window.rqAssessmentIndex = function rqAssessmentIndex() {
             gender: 'Laki-laki',
             phone: '',
             email: '',
-            category: 'Pelajar',
+            category: 'MURID',
+            sub_category_type: '',
+            detail_institution: '',
             sub_category: '',
             country_id: 1,
             province_id: null,
             regency_id: null,
-            school_level: 'SMA',
+            school_level: '',
             school_class: '',
             school_custom: '',
             university_id: null,
@@ -77,11 +79,55 @@ window.rqAssessmentIndex = function rqAssessmentIndex() {
         occupations: [],
 
         init() {
-            this.loadOccupations();
+            if (this.participantCategoriesList && this.participantCategoriesList.length > 0) {
+                const firstCat = this.participantCategoriesList[0];
+                if (firstCat && firstCat.name && !this.form.category) {
+                    this.form.category = firstCat.name;
+                }
+            }
+            const subs = this.getCurrentCategorySubCategories();
+            if (subs && subs.length > 0 && !this.form.sub_category_type) {
+                this.form.sub_category_type = subs[0].name;
+            }
             if (this.eventCode) {
                 this.inputEventCode = this.eventCode;
                 this.verifyEventCodeAsync(this.eventCode);
             }
+        },
+
+        getCurrentCategorySubCategories() {
+            if (!this.participantCategoriesList || this.participantCategoriesList.length === 0) return [];
+            const catObj = this.participantCategoriesList.find(c => (c.name || '').toUpperCase() === (this.form.category || '').toUpperCase());
+            if (!catObj) return [];
+            return catObj.sub_categories || catObj.sub_categories_list || catObj.subCategories || [];
+        },
+
+        getDetailLabel() {
+            const subs = this.getCurrentCategorySubCategories();
+            if (!subs || subs.length === 0) return 'Nama Instansi / Detail Tempat';
+            const sel = subs.find(s => s.name === this.form.sub_category_type);
+            return (sel && sel.detail_label) ? sel.detail_label : 'Nama Instansi / Detail Tempat';
+        },
+
+        getDetailPlaceholder() {
+            const lbl = this.getDetailLabel();
+            return 'Contoh: ' + (lbl || 'Nama Instansi / Unit Kerja Anda');
+        },
+
+        setCategory(catName) {
+            if (this.isCategoryLocked) return;
+            this.form.category = catName;
+            const subs = this.getCurrentCategorySubCategories();
+            if (subs && subs.length > 0) {
+                this.form.sub_category_type = subs[0].name;
+            } else {
+                this.form.sub_category_type = '';
+            }
+            this.form.detail_institution = '';
+        },
+
+        onSubCategoryTypeChange() {
+            this.form.detail_institution = '';
         },
 
         openRegistrationModal(track = 'PUBLIC_SELF') {
@@ -91,6 +137,8 @@ window.rqAssessmentIndex = function rqAssessmentIndex() {
                 this.eventInstitution = '';
                 this.form.event_code = '';
                 this.form.sub_category = '';
+                this.form.sub_category_type = '';
+                this.form.detail_institution = '';
                 this.eventGroupLabel = '';
                 this.eventSubcategories = [];
                 this.isCategoryLocked = false;
@@ -175,11 +223,6 @@ window.rqAssessmentIndex = function rqAssessmentIndex() {
             });
         },
 
-        setCategory(cat) {
-            if (this.isCategoryLocked) return;
-            this.form.category = cat;
-        },
-
         onProvinceChange() {
             this.form.regency_id = null;
             if (!this.form.province_id) {
@@ -233,26 +276,24 @@ window.rqAssessmentIndex = function rqAssessmentIndex() {
                 .catch(() => {});
         },
 
-        searchUniversities() {
-            fetch(`/api/master/universities?province_id=${this.form.province_id || ''}&q=${encodeURIComponent(this.universityQuery)}`)
-                .then(res => res.json())
-                .then(res => { this.filteredUniversities = res.data || []; });
-        },
-
-        selectUniversity(u) {
-            this.form.university_id = u.id;
-            this.universityQuery = u.name;
-            this.showUniversityDropdown = false;
-        },
-
-        loadOccupations() {
-            fetch(`/api/master/occupations`)
-                .then(res => res.json())
-                .then(res => { this.occupations = res.data || []; });
-        },
-
         submitRegistration() {
             this.isSubmitting = true;
+
+            if (this.form.sub_category_type) {
+                this.form.sub_category = this.form.sub_category_type + (this.form.detail_institution ? ' — ' + this.form.detail_institution : '');
+            } else {
+                this.form.sub_category = this.form.detail_institution || '';
+            }
+
+            const catUpper = (this.form.category || '').toUpperCase();
+            if (['MURID', 'PELAJAR', 'GURU'].includes(catUpper)) {
+                this.form.school_custom = this.form.detail_institution || '';
+                this.form.school_level = this.form.sub_category_type || '';
+            }
+            if (['MAHASISWA', 'DOSEN'].includes(catUpper)) {
+                this.form.university_custom = this.form.detail_institution || '';
+            }
+            this.form.occupation_custom = this.form.detail_institution || '';
 
             fetch('/assessment/register', {
                 method: 'POST',
@@ -582,13 +623,13 @@ document.addEventListener('alpine:init', () => {
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
-                            <!-- LEFT COLUMN: Identitas Diri, WA, Kategori & Wilayah -->
+                            <!-- LEFT COLUMN: Identitas Diri & Wilayah -->
                             <div class="space-y-3.5 bg-slate-50/80 p-4 sm:p-5 rounded-2xl border border-slate-200">
                                 <h4 class="font-serif font-bold text-xs text-[#0B2A43] border-b border-slate-200 pb-1.5 uppercase font-mono tracking-wider">Langkah 1: Identitas & Wilayah</h4>
 
                                 <div>
                                     <label class="block font-bold text-slate-700 mb-1">Nama Lengkap *</label>
-                                    <input type="text" x-model="form.name" required placeholder="Masukkan nama lengkap..." class="w-full p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
+                                    <input type="text" x-model="form.name" required placeholder="Masukkan nama lengkap Anda..." class="w-full p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
                                 </div>
 
                                 <div class="grid grid-cols-2 gap-2.5">
@@ -614,23 +655,6 @@ document.addEventListener('alpine:init', () => {
                                     </div>
                                 </div>
 
-                                <div>
-                                    <label class="block font-bold text-slate-700 mb-1">Kategori Peserta *</label>
-                                    <div class="grid grid-cols-3 gap-1.5">
-                                        <template x-for="cat in (participantCategoriesList && participantCategoriesList.length > 0 ? participantCategoriesList : [
-                                            { name: 'Pelajar', icon: '🏫' },
-                                            { name: 'Mahasiswa/i', icon: '🎓' },
-                                            { name: 'Umum', icon: '👤' }
-                                        ])" :key="cat.name">
-                                            <button type="button" @click="setCategory(cat.name)"
-                                                :class="form.category === cat.name ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'"
-                                                class="py-2 px-1.5 rounded-xl border text-[11px] transition-colors text-center truncate">
-                                                <span x-text="(cat.icon ? cat.icon + ' ' : '') + cat.name"></span>
-                                            </button>
-                                        </template>
-                                    </div>
-                                </div>
-
                                 <div class="grid grid-cols-2 gap-2.5">
                                     <div>
                                         <label class="block font-bold text-slate-700 text-xs mb-1">Provinsi *</label>
@@ -645,93 +669,82 @@ document.addEventListener('alpine:init', () => {
                                 </div>
                             </div>
 
-                            <!-- RIGHT COLUMN: Detail Profil Pendidikan / Pekerjaan -->
+                            <!-- RIGHT COLUMN: Profil & Kategori 3-Tingkat -->
                             <div class="space-y-3.5 bg-slate-50/80 p-4 sm:p-5 rounded-2xl border border-slate-200">
-                                <h4 class="font-serif font-bold text-xs text-[#0B2A43] border-b border-slate-200 pb-1.5 uppercase font-mono tracking-wider">Langkah 2: Profil Spesifik</h4>
+                                <h4 class="font-serif font-bold text-xs text-[#0B2A43] border-b border-slate-200 pb-1.5 uppercase font-mono tracking-wider">Langkah 2: Kategori & Instansi Peserta</h4>
 
-                                <!-- Pelajar Fields -->
-                                <template x-if="form.category === 'Pelajar'">
-                                    <div class="p-3.5 bg-amber-50/80 rounded-2xl border border-amber-200/90 space-y-3">
+                                <!-- Level 1: Kategori Utama Grid -->
+                                <div>
+                                    <label class="block font-bold text-slate-700 text-xs mb-1.5">1. Kategori Utama *</label>
+                                    <div class="grid grid-cols-3 gap-1.5">
+                                        <template x-for="cat in (participantCategoriesList && participantCategoriesList.length > 0 ? participantCategoriesList : [
+                                            { name: 'GURU', icon: '👨‍🏫' },
+                                            { name: 'DOSEN', icon: '🧑‍🏫' },
+                                            { name: 'MURID', icon: '🏫' },
+                                            { name: 'MAHASISWA', icon: '🎓' },
+                                            { name: 'APH', icon: '⚖️' },
+                                            { name: 'ASN', icon: '🏛️' },
+                                            { name: 'TENAGA KEPENDIDIKAN', icon: '💼' },
+                                            { name: 'WARGA BINAAN', icon: '🤝' },
+                                            { name: 'UMUM', icon: '👤' }
+                                        ])" :key="cat.name">
+                                            <button type="button" @click="setCategory(cat.name)"
+                                                :class="form.category === cat.name ? 'bg-[#0B2A43] text-[#C9A24D] font-extrabold border-[#0B2A43] shadow-xs' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100 font-semibold'"
+                                                class="py-2 px-1 rounded-xl border text-[10px] sm:text-[11px] transition-colors text-center truncate cursor-pointer flex items-center justify-center gap-1">
+                                                <span x-text="cat.icon || '📌'"></span>
+                                                <span x-text="cat.name"></span>
+                                            </button>
+                                        </template>
+                                    </div>
+                                </div>
+
+                                <!-- Level 2: Sub-Kategori / Jenis Dropdown -->
+                                <template x-if="getCurrentCategorySubCategories() && getCurrentCategorySubCategories().length > 0">
+                                    <div>
+                                        <label class="block font-bold text-slate-800 text-xs mb-1">
+                                            2. Sub-Kategori / Jenis (<span x-text="form.category"></span>) *
+                                        </label>
+                                        <select x-model="form.sub_category_type" @change="onSubCategoryTypeChange()" required class="w-full p-2.5 text-xs font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white text-slate-800">
+                                            <template x-for="sub in getCurrentCategorySubCategories()" :key="sub.id || sub.name">
+                                                <option :value="sub.name" x-text="sub.name"></option>
+                                            </template>
+                                        </select>
+                                    </div>
+                                </template>
+
+                                <!-- Level 3: Detail Tempat / Satuan / Instansi Input -->
+                                <div>
+                                    <label class="block font-bold text-slate-800 text-xs mb-1">
+                                        3. <span x-text="getDetailLabel()"></span> *
+                                    </label>
+                                    <input type="text" x-model="form.detail_institution" required :placeholder="getDetailPlaceholder()" class="w-full p-2.5 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white font-medium text-slate-900">
+                                </div>
+
+                                <!-- Secondary Optional Fields for Student/Mahasiswa -->
+                                <template x-if="form.category === 'MAHASISWA'">
+                                    <div class="grid grid-cols-2 gap-2.5 pt-1">
                                         <div>
-                                            <label class="block font-bold text-slate-800 text-xs mb-1">Nama Sekolah / Madrasah *</label>
-                                            <input type="text" name="school_custom" x-model="form.school_custom" required placeholder="Contoh: SMAN 1 Kota Jambi / SMA Titian Teras" class="w-full p-2.5 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white font-medium">
+                                            <label class="block font-bold text-slate-700 text-[11px] mb-1">Semester (Opsional)</label>
+                                            <select x-model="form.semester" class="w-full p-2 text-xs font-medium rounded-xl border border-slate-300 outline-none bg-white">
+                                                <template x-for="s in 12" :key="s">
+                                                    <option :value="s" x-text="'Semester ' + s"></option>
+                                                </template>
+                                            </select>
                                         </div>
-                                        <div class="grid grid-cols-2 gap-2.5">
-                                            <div>
-                                                <label class="block font-bold text-slate-800 text-xs mb-1">Jenjang Pendidikan *</label>
-                                                <select x-model="form.school_level" class="w-full p-2.5 text-xs font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
-                                                    <option value="SMA">SMA (Sekolah Menengah Atas)</option>
-                                                    <option value="SMK">SMK (Sekolah Menengah Kejuruan)</option>
-                                                    <option value="MA">MA (Madrasah Aliyah)</option>
-                                                    <option value="SMP">SMP / MTs (Sekolah Menengah Pertama)</option>
-                                                    <option value="SD">SD / MI (Sekolah Dasar)</option>
-                                                    <option value="Sederajat">Sederajat / Lainnya</option>
-                                                </select>
-                                            </div>
-                                            <div>
-                                                <label class="block font-bold text-slate-800 text-xs mb-1">Kelas / Rombel (Opsional)</label>
-                                                <input type="text" x-model="form.school_class" placeholder="Contoh: Kelas X IPA 1 / XI IPS 2" class="w-full p-2.5 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
-                                            </div>
+                                        <div>
+                                            <label class="block font-bold text-slate-700 text-[11px] mb-1">Angkatan (Opsional)</label>
+                                            <input type="text" x-model="form.entry_year" placeholder="2024" class="w-full p-2 text-xs rounded-xl border border-slate-300 outline-none bg-white">
                                         </div>
                                     </div>
                                 </template>
 
-                                <!-- Mahasiswa Fields -->
-                                <template x-if="form.category === 'Mahasiswa/i'">
-                                    <div class="p-3.5 bg-blue-50/70 rounded-2xl border border-blue-200/80 space-y-3">
-                                        <div>
-                                            <label class="block font-bold text-slate-800 text-xs mb-1">Perguruan Tinggi / Nama Kampus *</label>
-                                            <input type="text" name="university_custom" x-model="form.university_custom" required placeholder="Contoh: Universitas Jambi / UNJA / UI / UGM" class="w-full p-2.5 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white font-medium">
-                                        </div>
-                                        <div class="grid grid-cols-2 gap-2.5">
-                                            <div>
-                                                <label class="block font-bold text-slate-700 text-xs mb-1">Semester</label>
-                                                <select x-model="form.semester" class="w-full p-2.5 text-xs font-semibold rounded-xl border border-slate-300 outline-none bg-white">
-                                                    <template x-for="s in 12" :key="s">
-                                                        <option :value="s" x-text="'Semester ' + s"></option>
-                                                    </template>
-                                                </select>
-                                            </div>
-                                            <div>
-                                                <label class="block font-bold text-slate-700 text-xs mb-1">Angkatan</label>
-                                                <input type="text" x-model="form.entry_year" placeholder="2024" class="w-full p-2.5 text-xs rounded-xl border border-slate-300 outline-none bg-white">
-                                            </div>
-                                        </div>
+                                <template x-if="['MURID', 'GURU'].includes(form.category)">
+                                    <div class="pt-1">
+                                        <label class="block font-bold text-slate-700 text-[11px] mb-1">Kelas / Rombel / Jurusan (Opsional)</label>
+                                        <input type="text" x-model="form.school_class" placeholder="Contoh: Kelas X IPA 1 / XII IPS 2" class="w-full p-2 text-xs rounded-xl border border-slate-300 outline-none bg-white">
                                     </div>
                                 </template>
 
-                                <!-- Umum Fields -->
-                                <template x-if="form.category === 'Umum'">
-                                    <div class="p-3.5 bg-slate-100/70 rounded-2xl border border-slate-200/90 space-y-3">
-                                        <div class="grid grid-cols-2 gap-2.5">
-                                            <div>
-                                                <label class="block font-bold text-slate-700 text-xs mb-1">Pekerjaan *</label>
-                                                <select x-model="form.occupation_id" class="w-full p-2.5 text-xs font-semibold rounded-xl border border-slate-300 outline-none bg-white">
-                                                    <option value="">-- Pilih Pekerjaan --</option>
-                                                    <template x-for="occ in occupations" :key="occ.id">
-                                                        <option :value="occ.id" x-text="occ.name"></option>
-                                                    </template>
-                                                </select>
-                                            </div>
-                                            <div>
-                                                <label class="block font-bold text-slate-700 text-xs mb-1">Pendidikan Terakhir</label>
-                                                <select x-model="form.last_education" class="w-full p-2.5 text-xs font-semibold rounded-xl border border-slate-300 outline-none bg-white">
-                                                    <option value="S1/D4">S1 / D4 (Sarjana)</option>
-                                                    <option value="SMA/SMK">SMA / SMK / MA</option>
-                                                    <option value="D3">D3 / D1 / D2 (Diploma)</option>
-                                                    <option value="S2">S2 (Magister)</option>
-                                                    <option value="S3">S3 (Doktor)</option>
-                                                    <option value="SMP/SD">SMP / SD / Sederajat</option>
-                                                    <option value="Lainnya">Lainnya</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <label class="block font-bold text-slate-700 text-xs mb-1">Instansi / Perusahaan (Opsional)</label>
-                                            <input type="text" x-model="form.occupation_custom" placeholder="Nama instansi/perusahaan..." class="w-full p-2.5 text-xs rounded-xl border border-slate-300 outline-none bg-white">
-                                        </div>
-                                    </div>
-                                </template>
                             </div>
                         </div>
                     </div>

@@ -99,11 +99,14 @@ class PublicAssessmentController extends Controller
             $request->merge(['regency_id' => $defaultRegId]);
         }
 
-        if ($request->input('category') === 'Mahasiswa') {
-            $request->merge(['category' => 'Mahasiswa/i']);
+        if ($request->input('category') === 'Mahasiswa' || $request->input('category') === 'Mahasiswa/i') {
+            $request->merge(['category' => 'MAHASISWA']);
+        }
+        if ($request->input('category') === 'Pelajar') {
+            $request->merge(['category' => 'MURID']);
         }
         if ($request->input('category') === 'Mandiri') {
-            $request->merge(['category' => 'Umum']);
+            $request->merge(['category' => 'UMUM']);
         }
 
         $validated = $request->validate([
@@ -117,13 +120,17 @@ class PublicAssessmentController extends Controller
             'province_id' => ['required', 'exists:provinces,id'],
             'regency_id' => ['required', 'exists:regencies,id'],
             
-            // Pelajar fields
-            'school_level' => ['required_if:category,Pelajar', 'nullable', 'string'],
+            // Cascading subcategory fields
+            'sub_category_type' => ['nullable', 'string', 'max:255'],
+            'detail_institution' => ['nullable', 'string', 'max:255'],
+            'sub_category' => ['nullable', 'string', 'max:255'],
+
+            // Legacy & optional fields
+            'school_level' => ['nullable', 'string'],
             'school_class' => ['nullable', 'string', 'max:100'],
             'school_custom' => ['nullable', 'string', 'max:255'],
             'school_name' => ['nullable', 'string', 'max:255'],
             
-            // Mahasiswa/i fields
             'university_id' => ['nullable'],
             'university_custom' => ['nullable', 'string', 'max:255'],
             'university_name' => ['nullable', 'string', 'max:255'],
@@ -132,11 +139,9 @@ class PublicAssessmentController extends Controller
             'semester' => ['nullable', 'integer', 'min:1', 'max:14'],
             'entry_year' => ['nullable', 'string'],
 
-            // Umum fields
             'occupation_id' => ['nullable'],
             'occupation_custom' => ['nullable', 'string', 'max:255'],
             
-            'sub_category' => ['nullable', 'string', 'max:255'],
             'event_code' => ['nullable', 'string'],
             'period_code' => ['nullable', 'string'],
         ]);
@@ -203,6 +208,25 @@ class PublicAssessmentController extends Controller
 
         $countryId = $validated['country_id'] ?? 1;
 
+        // Process sub_category formatting (L2 — L3)
+        $subCategory = $validated['sub_category'] ?? null;
+        $subType = $request->input('sub_category_type');
+        $detailInst = $request->input('detail_institution');
+
+        if (empty($subCategory) && !empty($subType)) {
+            $subCategory = $subType . ($detailInst ? ' — ' . $detailInst : '');
+        }
+
+        $schoolCustom = $validated['school_custom'] ?? $validated['school_name'] ?? null;
+        $universityCustom = $validated['university_custom'] ?? $validated['university_name'] ?? null;
+
+        if (empty($schoolCustom) && !empty($detailInst) && in_array(strtoupper($validated['category']), ['MURID', 'PELAJAR', 'GURU'])) {
+            $schoolCustom = $detailInst;
+        }
+        if (empty($universityCustom) && !empty($detailInst) && in_array(strtoupper($validated['category']), ['MAHASISWA', 'DOSEN'])) {
+            $universityCustom = $detailInst;
+        }
+
         $participant = Participant::create([
             'event_id' => $eventId,
             'access_type' => $accessType,
@@ -214,23 +238,23 @@ class PublicAssessmentController extends Controller
             'gender' => $validated['gender'] ?? 'Laki-laki',
             'phone' => $validated['phone'] ?? null,
             'category' => $validated['category'],
-            'sub_category' => $validated['sub_category'] ?? null,
+            'sub_category' => $subCategory,
             'email' => $email,
             'country_id' => $countryId,
             'province_id' => $validated['province_id'],
             'regency_id' => $validated['regency_id'],
             'school_id' => null,
-            'school_custom' => $validated['school_custom'] ?? $validated['school_name'] ?? null,
+            'school_custom' => $schoolCustom,
             'university_id' => null,
-            'university_custom' => $validated['university_custom'] ?? $validated['university_name'] ?? null,
+            'university_custom' => $universityCustom,
             'faculty_id' => $validated['faculty_id'] ?? null,
             'study_program_id' => $validated['study_program_id'] ?? null,
-            'school_level' => $validated['school_level'] ?? null,
+            'school_level' => $validated['school_level'] ?? $subType ?? null,
             'school_class' => $validated['school_class'] ?? null,
             'semester' => $validated['semester'] ?? null,
             'entry_year' => $validated['entry_year'] ?? null,
             'occupation_id' => $validated['occupation_id'] ?? null,
-            'occupation_custom' => $validated['occupation_custom'] ?? null,
+            'occupation_custom' => $detailInst ?? $validated['occupation_custom'] ?? null,
             'status' => 'active',
         ]);
 

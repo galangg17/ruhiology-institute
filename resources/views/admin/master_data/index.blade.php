@@ -239,15 +239,15 @@
         </div>
     </div>
 
-    <!-- TAB CONTENT 5.5: KATEGORI PESERTA -->
-    <div x-show="currentTab === 'categories'" class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden" x-data="{ editCatModal: false, editCatData: {} }">
+    <!-- TAB CONTENT 5.5: KATEGORI & SUB-KATEGORI PESERTA -->
+    <div x-show="currentTab === 'categories'" class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden" x-data="{ editCatModal: false, editCatData: {}, addSubModal: false, addSubCatId: null, addSubCatName: '', editSubModal: false, editSubData: {} }">
         <div class="p-5 border-b border-slate-100 flex justify-between items-center">
             <div>
-                <h3 class="font-serif font-bold text-[#0B2A43] text-base">Kelola Kategori Peserta Asesmen</h3>
-                <p class="text-xs text-slate-500">Tambah, edit nama, ikon, deskripsi, dan status kategori peserta (misal: Pelajar, Mahasiswa, Umum, ASN, dll).</p>
+                <h3 class="font-serif font-bold text-[#0B2A43] text-base">Kelola Kategori & Sub-Kategori Peserta (Hirarki 3 Tingkat)</h3>
+                <p class="text-xs text-slate-500">Kelola Kategori Utama (L1) dan Sub-Kategori / Jenis (L2) untuk asesmen umum & event.</p>
             </div>
             <button @click="showAddModal = true" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5 cursor-pointer">
-                <span>🏷️</span> <span>+ Tambah Kategori Baru</span>
+                <span>🏷️</span> <span>+ Tambah Kategori Baru (L1)</span>
             </button>
         </div>
         <div class="overflow-x-auto">
@@ -255,9 +255,8 @@
                 <thead class="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider border-b border-slate-200">
                     <tr>
                         <th class="px-6 py-3.5">Urutan</th>
-                        <th class="px-6 py-3.5">Nama & Ikon Kategori</th>
-                        <th class="px-6 py-3.5">Kode Slug</th>
-                        <th class="px-6 py-3.5">Deskripsi</th>
+                        <th class="px-6 py-3.5">Kategori Utama (L1)</th>
+                        <th class="px-6 py-3.5">Sub-Kategori / Jenis (L2)</th>
                         <th class="px-6 py-3.5">Total Peserta</th>
                         <th class="px-6 py-3.5">Status</th>
                         <th class="px-6 py-3.5 text-center">Aksi</th>
@@ -265,22 +264,46 @@
                 </thead>
                 <tbody class="divide-y divide-slate-100 font-medium">
                     @foreach($participantCategories as $cat)
-                        <tr class="hover:bg-slate-50/80">
+                        <tr class="hover:bg-slate-50/80 align-top">
                             <td class="px-6 py-4 font-mono font-bold text-slate-500">#{{ $cat->order }}</td>
-                            <td class="px-6 py-4 font-bold text-slate-900 text-sm">
-                                <span class="mr-1 text-base">{{ $cat->icon ?? '🏷️' }}</span> {{ $cat->name }}
-                            </td>
-                            <td class="px-6 py-4 font-mono text-slate-500">{{ $cat->code }}</td>
-                            <td class="px-6 py-4 text-slate-600 max-w-xs truncate">{{ $cat->description ?? '-' }}</td>
-                            <td class="px-6 py-4 font-bold text-[#0B2A43]">{{ $cat->participants_count ?? 0 }} Peserta</td>
                             <td class="px-6 py-4">
+                                <div class="font-bold text-slate-900 text-sm flex items-center gap-1.5">
+                                    <span class="text-base">{{ $cat->icon ?? '🏷️' }}</span> {{ $cat->name }}
+                                </div>
+                                <span class="font-mono text-[10px] text-slate-400 block mt-0.5">{{ $cat->code }}</span>
+                                <p class="text-[11px] text-slate-500 mt-1 max-w-xs">{{ $cat->description ?? '-' }}</p>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex flex-wrap gap-1.5 max-w-md">
+                                    @forelse($cat->subCategories as $sub)
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 border border-slate-200 text-slate-800 rounded-lg text-[11px] font-semibold group">
+                                            <span>{{ $sub->name }}</span>
+                                            <button @click="editSubData = {
+                                                id: {{ $sub->id }},
+                                                category_id: {{ $cat->id }},
+                                                name: '{{ addslashes($sub->name) }}',
+                                                detail_label: '{{ addslashes($sub->detail_label ?? '') }}',
+                                                order: {{ $sub->order }},
+                                                status: '{{ $sub->status }}'
+                                            }; editSubModal = true" class="text-slate-400 hover:text-amber-600 transition" title="Edit Sub-Kategori Ini">✏️</button>
+                                        </span>
+                                    @empty
+                                        <span class="text-[11px] text-slate-400 italic">Belum ada sub-kategori</span>
+                                    @endforelse
+                                </div>
+                                <button @click="addSubCatId = {{ $cat->id }}; addSubCatName = '{{ addslashes($cat->name) }}'; addSubModal = true" class="mt-2 text-[10px] font-bold text-emerald-700 hover:text-emerald-900 underline inline-flex items-center gap-1 cursor-pointer">
+                                    <span>+ Tambah Sub-Kategori L2</span>
+                                </button>
+                            </td>
+                            <td class="px-6 py-4 font-bold text-[#0B2A43] whitespace-nowrap">{{ $cat->participants_count ?? 0 }} Peserta</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
                                 @if($cat->status === 'active')
                                     <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-full text-[10px] font-bold uppercase">🟢 Aktif</span>
                                 @else
                                     <span class="px-2.5 py-1 bg-slate-100 text-slate-600 rounded-full text-[10px] font-bold uppercase">⚪ Non-Aktif</span>
                                 @endif
                             </td>
-                            <td class="px-6 py-4 text-center">
+                            <td class="px-6 py-4 text-center whitespace-nowrap">
                                 <div class="flex items-center justify-center gap-1.5">
                                     <button @click="editCatData = {
                                         id: {{ $cat->id }},
@@ -290,7 +313,7 @@
                                         order: {{ $cat->order }},
                                         status: '{{ $cat->status }}'
                                     }; editCatModal = true" class="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-xs rounded-xl transition cursor-pointer">
-                                        ✏️ Edit
+                                        ✏️ Edit L1
                                     </button>
 
                                     <form action="{{ route('admin.master_data.participant_categories.destroy', $cat->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus kategori \'{{ addslashes($cat->name) }}\'?')" class="inline">
@@ -310,13 +333,13 @@
             {{ $participantCategories->appends(['tab' => 'categories'])->links() }}
         </div>
 
-        <!-- EDIT MODAL FOR PARTICIPANT CATEGORY -->
+        <!-- EDIT MODAL FOR PARTICIPANT CATEGORY L1 -->
         <div x-show="editCatModal" x-cloak class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/65 backdrop-blur-sm animate-fadeIn">
             <div @click.away="editCatModal = false" class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative border border-slate-100" @click.stop>
                 <button @click="editCatModal = false" class="absolute top-5 right-5 text-slate-400 hover:text-slate-700 font-bold">✕</button>
 
                 <div class="mb-5 pb-3 border-b border-slate-100">
-                    <span class="text-[10px] font-mono font-bold text-amber-600 uppercase tracking-widest block">EDIT KATEGORI PESERTA</span>
+                    <span class="text-[10px] font-mono font-bold text-amber-600 uppercase tracking-widest block">EDIT KATEGORI UTAMA (L1)</span>
                     <h3 class="text-lg font-serif font-bold text-[#0B2A43]">Edit Data Kategori</h3>
                 </div>
 
@@ -354,6 +377,100 @@
                 </form>
             </div>
         </div>
+
+        <!-- ADD MODAL FOR SUB-CATEGORY L2 -->
+        <div x-show="addSubModal" x-cloak class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/65 backdrop-blur-sm animate-fadeIn">
+            <div @click.away="addSubModal = false" class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative border border-slate-100" @click.stop>
+                <button @click="addSubModal = false" class="absolute top-5 right-5 text-slate-400 hover:text-slate-700 font-bold">✕</button>
+
+                <div class="mb-5 pb-3 border-b border-slate-100">
+                    <span class="text-[10px] font-mono font-bold text-emerald-600 uppercase tracking-widest block" x-text="'SUB-KATEGORI L2 FOR: ' + addSubCatName"></span>
+                    <h3 class="text-lg font-serif font-bold text-[#0B2A43]">Tambah Sub-Kategori Baru</h3>
+                </div>
+
+                <form action="{{ route('admin.master_data.participant_sub_categories.store') }}" method="POST" class="space-y-3.5 text-xs">
+                    @csrf
+                    <input type="hidden" name="category_id" :value="addSubCatId">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Nama Sub-Kategori / Jenis *</label>
+                        <input type="text" name="name" required placeholder="Contoh: POLRI / TNI / SMA / Kementerian" class="w-full p-3 rounded-xl border border-slate-300 font-bold">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Label Petunjuk Tingkat 3 (Detail Instansi/Tempat)</label>
+                        <input type="text" name="detail_label" placeholder="Contoh: Nama Polda / Polres / Satuan Kerja" class="w-full p-3 rounded-xl border border-slate-300">
+                        <p class="text-[10px] text-slate-400 mt-1">Petunjuk bagi peserta saat mengisi kolom nama tempat/satuan spesifik.</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Urutan</label>
+                            <input type="number" name="order" placeholder="1" class="w-full p-3 rounded-xl border border-slate-300 font-mono">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Status *</label>
+                            <select name="status" required class="w-full p-3 rounded-xl border border-slate-300 font-semibold">
+                                <option value="active">🟢 Aktif</option>
+                                <option value="inactive">⚪ Non-Aktif</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl shadow cursor-pointer">
+                        ➕ Simpan Sub-Kategori
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- EDIT MODAL FOR SUB-CATEGORY L2 -->
+        <div x-show="editSubModal" x-cloak class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/65 backdrop-blur-sm animate-fadeIn">
+            <div @click.away="editSubModal = false" class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative border border-slate-100" @click.stop>
+                <button @click="editSubModal = false" class="absolute top-5 right-5 text-slate-400 hover:text-slate-700 font-bold">✕</button>
+
+                <div class="mb-5 pb-3 border-b border-slate-100">
+                    <span class="text-[10px] font-mono font-bold text-amber-600 uppercase tracking-widest block">EDIT SUB-KATEGORI L2</span>
+                    <h3 class="text-lg font-serif font-bold text-[#0B2A43]">Edit Sub-Kategori</h3>
+                </div>
+
+                <form :action="'/admin/master-data/participant-sub-categories/' + editSubData.id" method="POST" class="space-y-3.5 text-xs">
+                    @csrf
+                    @method('PUT')
+                    <input type="hidden" name="category_id" x-model="editSubData.category_id">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Nama Sub-Kategori *</label>
+                        <input type="text" name="name" x-model="editSubData.name" required class="w-full p-3 rounded-xl border border-slate-300 font-bold">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Label Petunjuk Tingkat 3 (Detail Tempat)</label>
+                        <input type="text" name="detail_label" x-model="editSubData.detail_label" class="w-full p-3 rounded-xl border border-slate-300">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Urutan *</label>
+                            <input type="number" name="order" x-model="editSubData.order" required class="w-full p-3 rounded-xl border border-slate-300 font-mono">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Status *</label>
+                            <select name="status" x-model="editSubData.status" required class="w-full p-3 rounded-xl border border-slate-300 font-semibold">
+                                <option value="active">🟢 Aktif</option>
+                                <option value="inactive">⚪ Non-Aktif</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button type="submit" class="flex-1 py-3 bg-[#0B2A43] text-white font-bold rounded-xl shadow cursor-pointer">
+                            💾 Simpan Perubahan
+                        </button>
+                    </div>
+                </form>
+
+                <form :action="'/admin/master-data/participant-sub-categories/' + editSubData.id" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus sub-kategori ini?')" class="mt-2">
+                    @csrf @method('DELETE')
+                    <button type="submit" class="w-full py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-xl text-xs border border-rose-200 cursor-pointer">
+                        🗑️ Hapus Sub-Kategori Ini
+                    </button>
+                </form>
+            </div>
+        </div>
+
     </div>
 
     <!-- TAB CONTENT 6: USULAN BARU (PENDING VERIFICATION) -->

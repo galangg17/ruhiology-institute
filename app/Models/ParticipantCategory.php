@@ -18,6 +18,11 @@ class ParticipantCategory extends Model
         'status',
     ];
 
+    public function subCategories()
+    {
+        return $this->hasMany(ParticipantSubCategory::class, 'category_id')->where('status', 'active')->orderBy('order', 'asc');
+    }
+
     public function participants()
     {
         return $this->hasMany(Participant::class, 'category', 'name');
@@ -26,13 +31,12 @@ class ParticipantCategory extends Model
     public static function getAllActive()
     {
         try {
-            return static::where('status', 'active')->orderBy('order', 'asc')->get();
+            return static::where('status', 'active')
+                ->with(['subCategories'])
+                ->orderBy('order', 'asc')
+                ->get();
         } catch (\Throwable $e) {
-            return collect([
-                (object)['id' => 1, 'name' => 'Pelajar', 'icon' => '🏫'],
-                (object)['id' => 2, 'name' => 'Mahasiswa/i', 'icon' => '🎓'],
-                (object)['id' => 3, 'name' => 'Umum', 'icon' => '👤'],
-            ]);
+            return collect([]);
         }
     }
 }
