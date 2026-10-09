@@ -79,6 +79,11 @@ window.rqAssessmentIndex = function rqAssessmentIndex() {
         occupations: [],
 
         init() {
+            if (this.publicInstruments && this.publicInstruments.length > 0) {
+                if (!this.form.instrument_id) {
+                    this.form.instrument_id = this.publicInstruments[0].id;
+                }
+            }
             if (this.participantCategoriesList && this.participantCategoriesList.length > 0) {
                 const firstCat = this.participantCategoriesList[0];
                 if (firstCat && firstCat.name && !this.form.category) {
@@ -130,7 +135,7 @@ window.rqAssessmentIndex = function rqAssessmentIndex() {
             this.form.detail_institution = '';
         },
 
-        openRegistrationModal(track = 'PUBLIC_SELF') {
+        openRegistrationModal(track = 'PUBLIC_SELF', targetInstId = null) {
             if (track === 'PUBLIC_SELF') {
                 this.eventCode = '';
                 this.eventName = '';
@@ -142,6 +147,11 @@ window.rqAssessmentIndex = function rqAssessmentIndex() {
                 this.eventGroupLabel = '';
                 this.eventSubcategories = [];
                 this.isCategoryLocked = false;
+                if (targetInstId) {
+                    this.form.instrument_id = targetInstId;
+                } else if (this.publicInstruments && this.publicInstruments.length > 0 && !this.form.instrument_id) {
+                    this.form.instrument_id = this.publicInstruments[0].id;
+                }
             }
             this.showRegModal = true;
         },
@@ -621,6 +631,40 @@ document.addEventListener('alpine:init', () => {
                                 <span>🎯 Punya Kode Event Panitia?</span>
                             </button>
                         </div>
+
+                        <!-- Paket Soal / Instrumen Selector (jika > 1 instrumen publik aktif) -->
+                        <template x-if="publicInstruments && publicInstruments.length > 1">
+                            <div class="p-3.5 bg-amber-500/10 border border-amber-400/40 rounded-2xl space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <label class="block font-serif font-bold text-xs text-[#0B2A43] flex items-center gap-1.5">
+                                        <span>📋</span> <span>Pilih Paket Soal / Instrumen Asesmen *</span>
+                                    </label>
+                                    <span class="text-[10px] font-mono font-bold text-amber-800 bg-amber-100 border border-amber-300 px-2.5 py-0.5 rounded-full" x-text="publicInstruments.length + ' Paket Soal Publik'"></span>
+                                </div>
+                                <select x-model="form.instrument_id" required class="w-full p-2.5 text-xs font-bold rounded-xl border border-amber-400 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white text-slate-800 shadow-xs">
+                                    <template x-for="inst in publicInstruments" :key="inst.id">
+                                        <option :value="inst.id" x-text="inst.name + (inst.title ? ' — ' + inst.title : '') + (inst.questions_count ? ' (' + inst.questions_count + ' Soal)' : '')"></option>
+                                    </template>
+                                </select>
+                            </div>
+                        </template>
+
+                        <!-- Single Active Instrument Info Badge -->
+                        <template x-if="publicInstruments && publicInstruments.length === 1">
+                            <div class="p-3 bg-slate-100/90 border border-slate-200 rounded-2xl flex items-center justify-between text-xs">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-base">📝</span>
+                                    <div>
+                                        <span class="text-[9px] font-bold text-slate-400 uppercase font-mono tracking-wider block">PAKET SOAL ASESMEN</span>
+                                        <strong class="font-bold text-[#0B2A43]" x-text="publicInstruments[0].name"></strong>
+                                        <span class="text-slate-500 text-[11px]" x-text="publicInstruments[0].questions_count ? ' (' + publicInstruments[0].questions_count + ' Soal)' : ''"></span>
+                                    </div>
+                                </div>
+                                <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+                                    ✓ Aktif
+                                </span>
+                            </div>
+                        </template>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
                             <!-- LEFT COLUMN: Identitas Diri & Wilayah -->

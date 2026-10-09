@@ -142,6 +142,7 @@ class PublicAssessmentController extends Controller
             'occupation_id' => ['nullable'],
             'occupation_custom' => ['nullable', 'string', 'max:255'],
             
+            'instrument_id' => ['nullable', 'exists:instruments,id'],
             'event_code' => ['nullable', 'string'],
             'period_code' => ['nullable', 'string'],
         ]);
