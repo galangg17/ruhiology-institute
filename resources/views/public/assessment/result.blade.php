@@ -399,7 +399,7 @@
 
     </div>
 
-    <!-- INSTAGRAM / WHATSAPP STORY 9:16 SHARE MODAL (2-COLUMN SPLIT GRID) -->
+    <!-- INSTAGRAM / WHATSAPP CARD 4:5 SHARE MODAL (2-COLUMN SPLIT GRID) -->
     <div x-show="showStoryModal" x-cloak class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[9999] flex items-center justify-center p-4 sm:p-6 animate-fadeIn no-print">
         <div @click.away="showStoryModal = false" class="bg-slate-900 rounded-3xl max-w-3xl w-full p-6 sm:p-8 shadow-2xl border border-slate-800 space-y-6">
             
@@ -410,8 +410,8 @@
                         📱
                     </div>
                     <div>
-                        <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest block">INSTAGRAM & WHATSAPP STORY ENGINE</span>
-                        <h3 class="text-lg font-serif font-bold text-white">Kartu Visual Hasil Asesmen (Rasio 9:16)</h3>
+                        <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest block">INSTAGRAM FEED & STORY ENGINE</span>
+                        <h3 class="text-lg font-serif font-bold text-white">Kartu Visual Hasil Asesmen (Rasio 4:5 - Instagram)</h3>
                     </div>
                 </div>
                 <button @click="showStoryModal = false" type="button" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-slate-400 hover:text-white flex items-center justify-center transition cursor-pointer">✕</button>
@@ -422,16 +422,16 @@
                 
                 <!-- Left Column (5 Cols): Card Canvas Preview -->
                 <div class="md:col-span-5 bg-black/60 p-4 rounded-3xl border border-slate-800 flex justify-center items-center">
-                    <canvas id="storyCanvas" class="w-full max-w-[210px] sm:max-w-[230px] aspect-[9/16] rounded-2xl shadow-2xl border border-slate-700/80"></canvas>
+                    <canvas id="storyCanvas" class="w-full max-w-[260px] sm:max-w-[300px] aspect-[4/5] rounded-2xl shadow-2xl border border-slate-700/80"></canvas>
                 </div>
 
                 <!-- Right Column (7 Cols): Information & Actions -->
                 <div class="md:col-span-7 space-y-5 text-left text-xs">
                     
                     <div class="space-y-2">
-                        <h4 class="text-sm font-bold text-white">Siap Dibagikan ke Media Sosial</h4>
+                        <h4 class="text-sm font-bold text-white">Siap Dibagikan ke Instagram & WhatsApp</h4>
                         <p class="text-slate-300 leading-relaxed font-normal">
-                            Format visual 9:16 dirancang dengan estetika minimalis & elegan, memuat ringkasan profil kecerdasan batiniah Anda secara resmi dari Ruhiology Institute.
+                            Format visual 4:5 dirancang khusus sesuai rasio postingan Instagram & WhatsApp Story, menampilkan skor RQI-15, skrining WHO-5, dan refleksi batin Anda secara resmi.
                         </p>
                     </div>
 
@@ -439,22 +439,22 @@
                     <div class="p-4 bg-slate-800/60 rounded-2xl border border-slate-700/60 space-y-2.5">
                         <div class="flex items-center gap-2 text-slate-200">
                             <span class="text-[#C9A24D]">✨</span>
-                            <span>Resolusi HD Terstandar (1080 x 1920 px)</span>
+                            <span>Resolusi HD Instagram (1080 x 1350 px — Rasio 4:5)</span>
                         </div>
                         <div class="flex items-center gap-2 text-slate-200">
                             <span class="text-[#C9A24D]">📊</span>
-                            <span>Menampilkan Skor RQI-15 & Interpretasi Resmi</span>
+                            <span>Dual Metric: Skor RQI-15 & Skrining Kesejahteraan WHO-5</span>
                         </div>
                         <div class="flex items-center gap-2 text-slate-200">
                             <span class="text-[#C9A24D]">🏛️</span>
-                            <span>Dilengkapi Autentikasi Logo & Founder Ruhiologi</span>
+                            <span>Autentikasi Resmi Ruhiology Institute</span>
                         </div>
                     </div>
 
                     <!-- Action Buttons -->
                     <div class="pt-2 space-y-3">
                         <button type="button" @click="downloadStoryImage()" class="w-full py-4 bg-gradient-to-r from-[#C9A24D] to-[#B48A16] hover:from-[#B48A16] hover:to-[#96710E] text-[#0B2A43] font-extrabold text-xs uppercase tracking-wider rounded-2xl shadow-xl transition transform hover:-translate-y-0.5 cursor-pointer flex items-center justify-center gap-2">
-                            <span>📥 Unduh Gambar Story (PNG)</span>
+                            <span>📥 Unduh Kartu Instagram (PNG 4:5)</span>
                         </button>
 
                         <button type="button" @click="showStoryModal = false" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-2xl transition cursor-pointer">
@@ -556,183 +556,236 @@ function rqResultPage() {
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
 
+            // Set 4:5 Instagram Aspect Ratio (1080 x 1350 px)
             canvas.width = 1080;
-            canvas.height = 1920;
+            canvas.height = 1350;
 
             const logoImg = new Image();
 
+            const cleanText = (str) => {
+                if (!str) return '';
+                const txt = document.createElement('textarea');
+                txt.innerHTML = str;
+                return txt.value;
+            };
+
             const render = () => {
-                // Background - Deep Luxury Navy
-                const bgGrad = ctx.createLinearGradient(0, 0, 1080, 1920);
+                // Background - Deep Luxury Navy Gradient
+                const bgGrad = ctx.createLinearGradient(0, 0, 1080, 1350);
                 bgGrad.addColorStop(0, '#0B2A43');
                 bgGrad.addColorStop(0.5, '#123B59');
                 bgGrad.addColorStop(1, '#061726');
                 ctx.fillStyle = bgGrad;
-                ctx.fillRect(0, 0, 1080, 1920);
+                ctx.fillRect(0, 0, 1080, 1350);
 
                 // Gold Ambient Radial Glow
-                const glowGrad = ctx.createRadialGradient(540, 500, 60, 540, 500, 550);
-                glowGrad.addColorStop(0, 'rgba(201, 162, 77, 0.25)');
+                const glowGrad = ctx.createRadialGradient(540, 450, 40, 540, 450, 450);
+                glowGrad.addColorStop(0, 'rgba(201, 162, 77, 0.22)');
                 glowGrad.addColorStop(1, 'rgba(11, 42, 67, 0)');
                 ctx.fillStyle = glowGrad;
-                ctx.fillRect(0, 0, 1080, 1920);
+                ctx.fillRect(0, 0, 1080, 1350);
 
                 // Top Header Logo Image
                 if (logoImg.complete && logoImg.naturalWidth > 0) {
-                    const logoWidth = 130;
+                    const logoWidth = 100;
                     const logoHeight = (logoImg.naturalHeight / logoImg.naturalWidth) * logoWidth;
-                    ctx.drawImage(logoImg, 540 - (logoWidth / 2), 55, logoWidth, logoHeight);
+                    ctx.drawImage(logoImg, 540 - (logoWidth / 2), 40, logoWidth, logoHeight);
                 } else {
-                    // Fallback Gold Icon Badge
                     ctx.fillStyle = '#C9A24D';
-                    ctx.font = '48px "Outfit", sans-serif';
+                    ctx.font = '40px "Outfit", sans-serif';
                     ctx.textAlign = 'center';
-                    ctx.fillText('🕌', 540, 110);
+                    ctx.fillText('🕌', 540, 90);
                 }
 
-                // Header Logo & Branding Text
+                // Header Branding Title & Subtitle
                 ctx.fillStyle = '#C9A24D';
-                ctx.font = 'bold 34px "Outfit", sans-serif';
+                ctx.font = 'bold 32px "Outfit", sans-serif';
                 ctx.textAlign = 'center';
-                ctx.fillText('RUHIOLOGY INSTITUTE', 540, 220);
+                ctx.fillText('RUHIOLOGY INSTITUTE', 540, 170);
 
-                ctx.fillStyle = '#e2e8f0';
-                ctx.font = 'bold 20px monospace';
-                ctx.fillText('INDEKS KECERDASAN RUHIOLOGI (RQI-15)', 540, 260);
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = 'bold 16px monospace';
+                ctx.fillText('KARTU HASIL EVALUASI DIRI (RQI-15 & WHO-5)', 540, 200);
 
-                // Gold Line Accent
+                // Gold Line Separator Accent
                 ctx.strokeStyle = 'rgba(201, 162, 77, 0.4)';
-                ctx.lineWidth = 3;
+                ctx.lineWidth = 2;
                 ctx.beginPath();
-                ctx.moveTo(220, 290);
-                ctx.lineTo(860, 290);
+                ctx.moveTo(180, 220);
+                ctx.lineTo(900, 220);
                 ctx.stroke();
 
                 // Participant Name Glass Box
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.07)';
                 ctx.beginPath();
-                ctx.roundRect(140, 330, 800, 115, 24);
+                ctx.roundRect(75, 240, 930, 90, 20);
                 ctx.fill();
                 ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
                 ctx.lineWidth = 2;
                 ctx.stroke();
 
                 ctx.fillStyle = '#94a3b8';
-                ctx.font = 'bold 20px monospace';
-                ctx.fillText('PESERTA ASESMEN:', 540, 370);
+                ctx.font = 'bold 16px monospace';
+                ctx.fillText('PESERTA ASESMEN:', 540, 270);
 
                 ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 40px "Outfit", sans-serif';
-                ctx.fillText('{{ addslashes($submission->participant->name) }}', 540, 420);
+                ctx.font = 'bold 34px "Outfit", sans-serif';
+                const participantName = cleanText('{{ addslashes($submission->participant->name) }}');
+                ctx.fillText(participantName, 540, 312);
 
-                // Minimalist Central Score Circle
-                ctx.fillStyle = 'rgba(201, 162, 77, 0.1)';
+                // DUAL METRIC CARDS (SIDE BY SIDE: RQI-15 & WHO-5)
+                // Left Card: RQI-15
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
                 ctx.beginPath();
-                ctx.arc(540, 675, 170, 0, Math.PI * 2);
+                ctx.roundRect(75, 350, 450, 245, 24);
                 ctx.fill();
-                ctx.strokeStyle = '#C9A24D';
-                ctx.lineWidth = 6;
+                ctx.strokeStyle = 'rgba(201, 162, 77, 0.4)';
+                ctx.lineWidth = 2;
                 ctx.stroke();
 
                 ctx.fillStyle = '#C9A24D';
-                ctx.font = 'bold 24px monospace';
-                ctx.fillText('SKOR RQI-15', 540, 585);
+                ctx.font = 'bold 18px monospace';
+                ctx.fillText('SKOR RQI-15', 300, 385);
 
                 ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 110px "Outfit", sans-serif';
-                ctx.fillText('{{ $rqiScore }}', 540, 700);
+                ctx.font = 'bold 72px "Outfit", sans-serif';
+                ctx.fillText('{{ $rqiScore }}', 300, 460);
 
                 ctx.fillStyle = '#94a3b8';
-                ctx.font = '600 26px "Plus Jakarta Sans", sans-serif';
-                ctx.fillText('/ {{ $maxRqiScore }} POIN ({{ $scorePct }}%)', 540, 760);
+                ctx.font = '600 18px "Plus Jakarta Sans", sans-serif';
+                ctx.fillText('/ {{ $maxRqiScore }} POIN ({{ $scorePct }}%)', 300, 498);
 
-                // Category Level Badge
-                const categoryText = '✦ {{ addslashes($catName) }}';
+                // RQI Badge Pill
+                const rqiBadgeText = cleanText('✦ {{ addslashes($catName) }}');
                 ctx.fillStyle = '#C9A24D';
                 ctx.beginPath();
-                ctx.roundRect(120, 830, 840, 80, 40);
+                ctx.roundRect(95, 518, 410, 52, 26);
                 ctx.fill();
 
                 ctx.fillStyle = '#0B2A43';
-                let fontSize = 30;
-                if (categoryText.length > 35) {
-                    fontSize = 22;
-                } else if (categoryText.length > 25) {
-                    fontSize = 26;
-                }
-                ctx.font = `bold ${fontSize}px "Outfit", sans-serif`;
-                ctx.fillText(categoryText, 540, 880);
+                let rqiFontSize = 16;
+                if (rqiBadgeText.length > 35) rqiFontSize = 13;
+                else if (rqiBadgeText.length > 25) rqiFontSize = 14.5;
+                ctx.font = `bold ${rqiFontSize}px "Outfit", sans-serif`;
+                ctx.fillText(rqiBadgeText, 300, 550);
 
-                // WHO-5 Mental Well-Being Badge
+                // Right Card: WHO-5 Index
                 @php
-                    $who5PctCanvas = number_format($submission->result->who5_percentage ?? 0, 0);
-                    $who5NoteCanvas = addslashes($submission->result->who5_screening_note ?? (($submission->result->who5_percentage ?? 0) >= 50 ? 'Kesejahteraan Baik' : 'Indikasi Perlu Skrining'));
+                    $who5PctValCanvas = $submission->result->who5_percentage ?? 0;
+                    $who5RawValCanvas = $submission->result->who5_raw_score ?? 0;
+                    
+                    if ($who5RawValCanvas >= 20 || $who5PctValCanvas >= 80) {
+                        $who5BadgeTitle = 'Level 5: Thriving & Energetic';
+                        $who5BadgeBgHex = '#10b981'; // emerald
+                    } elseif ($who5RawValCanvas >= 16 || $who5PctValCanvas >= 64) {
+                        $who5BadgeTitle = 'Level 4: Good Vibe & Fresh';
+                        $who5BadgeBgHex = '#0284c7'; // sky
+                    } elseif ($who5RawValCanvas >= 11 || $who5PctValCanvas >= 44) {
+                        $who5BadgeTitle = 'Level 3: Moderate Well-Being';
+                        $who5BadgeBgHex = '#f59e0b'; // amber
+                    } elseif ($who5RawValCanvas >= 6 || $who5PctValCanvas >= 24) {
+                        $who5BadgeTitle = 'Level 2: Low Energy (Cemas)';
+                        $who5BadgeBgHex = '#ea580c'; // orange
+                    } else {
+                        $who5BadgeTitle = 'Level 1: Mental Exhausted';
+                        $who5BadgeBgHex = '#e11d48'; // rose
+                    }
+
+                    $who5NoteCanvasText = addslashes($submission->result->who5_screening_note ?? 'Pemetaan kesejahteraan emosional harian');
                 @endphp
-                ctx.fillStyle = 'rgba(16, 185, 129, 0.2)';
+
+                ctx.fillStyle = 'rgba(16, 185, 129, 0.08)';
                 ctx.beginPath();
-                ctx.roundRect(120, 930, 840, 65, 32);
+                ctx.roundRect(555, 350, 450, 245, 24);
                 ctx.fill();
-                ctx.strokeStyle = 'rgba(52, 211, 153, 0.5)';
+                ctx.strokeStyle = 'rgba(52, 211, 153, 0.4)';
                 ctx.lineWidth = 2;
                 ctx.stroke();
 
                 ctx.fillStyle = '#6ee7b7';
-                ctx.font = 'bold 22px "Plus Jakarta Sans", sans-serif';
-                ctx.fillText('🌱 WHO-5 MENTAL WELL-BEING: {{ $who5PctCanvas }}% ({{ $who5NoteCanvas }})', 540, 972);
+                ctx.font = 'bold 18px monospace';
+                ctx.fillText('🌿 INDEKS WHO-5', 780, 385);
 
-                // Minimalist Narrative Quote Box
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
-                ctx.beginPath();
-                ctx.roundRect(140, 1020, 800, 360, 24);
-                ctx.fill();
-                ctx.strokeStyle = 'rgba(201, 162, 77, 0.25)';
-                ctx.lineWidth = 2;
-                ctx.stroke();
-
-                ctx.fillStyle = '#f1f5f9';
-                ctx.font = 'italic 25px "Plus Jakarta Sans", sans-serif';
-                this.wrapText(ctx, '"{{ addslashes($submission->result->overall_interpretation) }}"', 540, 1100, 720, 42);
-
-                // Footer URL & Verification Code
-                ctx.fillStyle = '#C9A24D';
-                ctx.font = 'bold 26px monospace';
-                ctx.fillText('ruhiology.gmadhyaksa-litbang.my.id', 540, 1640);
+                ctx.fillStyle = '#6ee7b7';
+                ctx.font = 'bold 72px "Outfit", sans-serif';
+                ctx.fillText('{{ number_format($who5PctValCanvas, 0) }}%', 780, 460);
 
                 ctx.fillStyle = '#94a3b8';
-                ctx.font = '20px monospace';
-                ctx.fillText('Kode Evaluasi: {{ $submission->participant->assessment_code ?? $submission->participant->participant_code }}', 540, 1685);
+                ctx.font = '600 18px "Plus Jakarta Sans", sans-serif';
+                ctx.fillText('({{ $who5RawValCanvas }} / 25 POIN)', 780, 498);
 
-                // Gold Line Separator Footer
+                // WHO-5 Badge Pill
+                const who5BadgeText = cleanText('🌱 {{ addslashes($who5BadgeTitle) }}');
+                ctx.fillStyle = '{{ $who5BadgeBgHex }}';
+                ctx.beginPath();
+                ctx.roundRect(575, 518, 410, 52, 26);
+                ctx.fill();
+
+                ctx.fillStyle = '#ffffff';
+                let who5FontSize = 16;
+                if (who5BadgeText.length > 35) who5FontSize = 13;
+                else if (who5BadgeText.length > 25) who5FontSize = 14.5;
+                ctx.font = `bold ${who5FontSize}px "Outfit", sans-serif`;
+                ctx.fillText(who5BadgeText, 780, 550);
+
+                // Minimalist Profile & Narrative Quote Box
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+                ctx.beginPath();
+                ctx.roundRect(75, 615, 930, 400, 24);
+                ctx.fill();
                 ctx.strokeStyle = 'rgba(201, 162, 77, 0.3)';
                 ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.moveTo(300, 1725);
-                ctx.lineTo(780, 1725);
                 ctx.stroke();
 
-                // Founder Signature & Title Branding (Bottom)
-                const founderName = '{{ addslashes(\App\Models\Setting::get("founder_name", "Prof. Iskandar Nazari")) }}';
-                const founderTitle = '{{ addslashes(\App\Models\Setting::get("founder_title", "Founder Ruhiology Institute")) }}';
-                const founderText = `${founderName} - ${founderTitle}`;
-                const sigUrl = '{{ \App\Models\Setting::get("founder_signature") }}';
+                ctx.fillStyle = '#C9A24D';
+                ctx.font = 'bold 18px monospace';
+                ctx.fillText('✦ GAMBARAN PROFIL & REFLEKSI BATIN', 540, 655);
 
-                if (sigUrl) {
-                    const sigImg = new Image();
-                    sigImg.crossOrigin = 'anonymous';
-                    sigImg.onload = function() {
-                        const sigWidth = 160;
-                        const sigHeight = (sigImg.naturalHeight / sigImg.naturalWidth) * sigWidth;
-                        ctx.drawImage(sigImg, 540 - (sigWidth / 2), 1735 - sigHeight, sigWidth, sigHeight);
-                        ctx.fillStyle = '#ffffff';
-                        ctx.font = 'bold 24px "Outfit", sans-serif';
-                        ctx.fillText(founderText, 540, 1785);
-                    };
-                    sigImg.src = sigUrl;
-                } else {
-                    ctx.fillStyle = '#ffffff';
-                    ctx.font = 'bold 25px "Outfit", sans-serif';
-                    ctx.fillText(founderText, 540, 1775);
-                }
+                ctx.fillStyle = '#f1f5f9';
+                ctx.font = 'italic 22px "Plus Jakarta Sans", sans-serif';
+                const interpText = cleanText('"{{ addslashes($submission->result->overall_interpretation) }}"');
+                this.wrapText(ctx, interpText, 540, 705, 840, 36);
+
+                // Bottom WHO-5 Screening Note inside Quote Box
+                ctx.fillStyle = '#6ee7b7';
+                ctx.font = '15px "Plus Jakarta Sans", sans-serif';
+                const noteText = cleanText('🌿 WHO-5: {{ $who5NoteCanvasText }}');
+                ctx.fillText(noteText.length > 80 ? noteText.substring(0, 77) + '...' : noteText, 540, 985);
+
+                // Footer Section
+                ctx.strokeStyle = 'rgba(201, 162, 77, 0.4)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(200, 1035);
+                ctx.lineTo(880, 1035);
+                ctx.stroke();
+
+                ctx.fillStyle = '#C9A24D';
+                ctx.font = 'bold 24px monospace';
+                ctx.fillText('ruhiology-institute.site', 540, 1075);
+
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = '18px monospace';
+                ctx.fillText('Kode Evaluasi: {{ $submission->participant->assessment_code ?? $submission->participant->participant_code }}', 540, 1110);
+
+                // Founder Branding at Footer Bottom
+                ctx.strokeStyle = 'rgba(201, 162, 77, 0.25)';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(320, 1135);
+                ctx.lineTo(760, 1135);
+                ctx.stroke();
+
+                const founderName = cleanText('{{ addslashes(\App\Models\Setting::get("founder_name", "Prof. Dr. Iskandar Nazari")) }}');
+                const founderTitle = cleanText('{{ addslashes(\App\Models\Setting::get("founder_title", "Founder Ruhiology Institute")) }}');
+                
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 22px "Outfit", sans-serif';
+                ctx.fillText(founderName, 540, 1175);
+
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = '15px "Plus Jakarta Sans", sans-serif';
+                ctx.fillText(founderTitle, 540, 1205);
             };
 
             logoImg.onload = render;
@@ -755,7 +808,7 @@ function rqResultPage() {
                     ctx.fillText(line, x, currentY);
                     line = words[n] + ' ';
                     currentY += lineHeight;
-                    if (currentY > y + 250) break;
+                    if (currentY > y + 230) break;
                 } else {
                     line = testLine;
                 }
@@ -767,7 +820,7 @@ function rqResultPage() {
             const canvas = document.getElementById('storyCanvas');
             if (!canvas) return;
             const link = document.createElement('a');
-            link.download = 'ruhiology_story_{{ $submission->submission_code }}.png';
+            link.download = 'ruhiology_card_{{ $submission->submission_code }}.png';
             link.href = canvas.toDataURL('image/png');
             link.click();
         }

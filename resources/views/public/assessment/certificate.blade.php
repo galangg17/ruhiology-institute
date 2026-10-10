@@ -184,14 +184,14 @@
                     <!-- DUAL SCORE CARDS (SIDE-BY-SIDE: RQI SCORE + WHO-5 SCORE) -->
                     <div class="grid grid-cols-2 gap-4 max-w-xl mx-auto my-1">
                         
-                        <!-- CARD 1: SKOR RUHIOLOGI (RQI) -->
+                        <!-- CARD 1: SKOR RUHIOLOGI (RQI-15) -->
                         <div class="bg-gradient-to-br from-white to-amber-50/80 p-3 rounded-2xl border border-amber-300 shadow-2xs text-center space-y-1">
-                            <span class="text-[9px] uppercase font-mono font-bold text-amber-900 block tracking-wider">SKOR RQI (0-100)</span>
+                            <span class="text-[9px] uppercase font-mono font-bold text-amber-900 block tracking-wider">SKOR KECERDASAN RUHIOLOGI (RQI-15)</span>
                             <strong class="font-serif-gold text-2xl font-black text-[#0B2A43] block">
-                                {{ number_format($submission->result->rqi_score ?? $submission->result->total_score ?? 0, 1) }}
+                                {{ number_format($submission->result->rqi_score ?? $submission->result->total_score ?? 0, 0) }} <span class="text-xs font-semibold text-slate-500 font-sans">/ 75 Poin ({{ round((( $submission->result->rqi_score ?? 0 ) / ($submission->result->max_score ?: 75)) * 100) }}%)</span>
                             </strong>
                             <span class="text-[9px] font-serif italic font-bold text-amber-900 bg-amber-100/90 px-2.5 py-0.5 rounded-full border border-amber-300 inline-block truncate max-w-full">
-                                ✦ {{ $submission->result->category_name ?? $submission->result->overall_interpretation ?? 'Mindful Youth' }}
+                                ✦ {{ $submission->result->category_name ?? 'Mindful Youth' }}
                             </span>
                         </div>
 
@@ -199,7 +199,7 @@
                         <div class="bg-gradient-to-br from-white to-emerald-50/80 p-3 rounded-2xl border border-emerald-300 shadow-2xs text-center space-y-1">
                             <span class="text-[9px] uppercase font-mono font-bold text-emerald-900 block tracking-wider">INDEKS KESEJAHTERAAN MENTAL (WHO-5)</span>
                             <strong class="font-serif-gold text-2xl font-black text-emerald-700 block">
-                                {{ number_format($submission->result->who5_percentage ?? 0, 0) }}%
+                                {{ number_format($submission->result->who5_percentage ?? 0, 0) }}% <span class="text-xs font-semibold text-slate-500 font-sans">({{ $submission->result->who5_raw_score ?? 0 }} / 25 Poin)</span>
                             </strong>
                             @php
                                 $who5PctVal = $submission->result->who5_percentage ?? 0;

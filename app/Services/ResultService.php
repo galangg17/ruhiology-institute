@@ -117,21 +117,25 @@ class ResultService
             'dimension_scores' => $dimensionScores,
         ];
 
-        $result = AssessmentResult::create([
-            'submission_id' => $submission->id,
-            'total_score' => $totalScore,
-            'rqi_score' => $totalScore,
-            'category_name' => $rqiCat['name'],
-            'max_score' => $maxScore,
-            'percentage' => $overallPercentage,
-            'overall_interpretation' => $overallInterpretation,
-            'who5_raw_score' => $who5Data ? $who5Data['raw_score'] : null,
-            'who5_percentage' => $who5Data ? $who5Data['percentage'] : null,
-            'who5_screening_note' => $who5Data ? $who5Data['screening_note'] : null,
-            'pre_post_diff' => $prePostDiff,
-            'scoring_version' => $instrument->version ?? '1.0',
-            'snapshot_data' => $snapshot,
-        ]);
+        $result = AssessmentResult::updateOrCreate(
+            ['submission_id' => $submission->id],
+            [
+                'total_score' => $totalScore,
+                'rqi_score' => $totalScore,
+                'category_name' => $rqiCat['name'],
+                'max_score' => $maxScore,
+                'percentage' => $overallPercentage,
+                'overall_interpretation' => $overallInterpretation,
+                'who5_raw_score' => $who5Data ? $who5Data['raw_score'] : null,
+                'who5_percentage' => $who5Data ? $who5Data['percentage'] : null,
+                'who5_screening_note' => $who5Data ? $who5Data['screening_note'] : null,
+                'pre_post_diff' => $prePostDiff,
+                'scoring_version' => $instrument->version ?? '1.0',
+                'snapshot_data' => $snapshot,
+            ]
+        );
+
+        ResultDimension::where('result_id', $result->id)->delete();
 
         foreach ($dimensionScores as $dimData) {
             $dimPct = $dimData['max_score'] > 0 ? round(($dimData['score'] / $dimData['max_score']) * 100, 2) : 0;
