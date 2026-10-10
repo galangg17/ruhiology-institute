@@ -117,64 +117,92 @@
 
             // Dynamic Level Badge Styling for RQI-15 Levels 1..5
             if ($rqiScore >= 65) {
-                $badgeStyle = 'bg-emerald-500 text-white border-emerald-400';
+                $badgeGradient = 'from-emerald-500 to-teal-600 text-white border-emerald-400';
             } elseif ($rqiScore >= 54) {
-                $badgeStyle = 'bg-sky-600 text-white border-sky-400';
+                $badgeGradient = 'from-sky-600 to-indigo-600 text-white border-sky-400';
             } elseif ($rqiScore >= 41) {
-                $badgeStyle = 'bg-amber-500 text-slate-950 border-amber-300';
+                $badgeGradient = 'from-amber-500 to-amber-600 text-slate-950 border-amber-300';
             } elseif ($rqiScore >= 27) {
-                $badgeStyle = 'bg-orange-600 text-white border-orange-400';
+                $badgeGradient = 'from-orange-600 to-amber-700 text-white border-orange-400';
             } else {
-                $badgeStyle = 'bg-rose-600 text-white border-rose-400';
+                $badgeGradient = 'from-rose-600 to-red-700 text-white border-rose-400';
             }
         @endphp
 
-        <!-- Main RQI Score Card -->
-        <div class="bg-[#0B2A43] text-white p-6 sm:p-10 rounded-3xl shadow-xl border border-slate-800 grid grid-cols-1 md:grid-cols-12 gap-6 sm:gap-8 items-center relative overflow-hidden">
-            <div class="absolute -right-10 -bottom-10 w-72 h-72 bg-[#C9A24D]/15 rounded-full blur-3xl pointer-events-none"></div>
+        <!-- Main RQI Score Dashboard Card (Luxury Redesign) -->
+        <div class="bg-[#0B2A43] text-white p-6 sm:p-10 rounded-3xl shadow-2xl border border-[#C9A24D]/30 relative overflow-hidden space-y-6">
+            <!-- Background Radial Lighting Overlay -->
+            <div class="absolute -top-24 -right-24 w-96 h-96 bg-[#C9A24D]/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-            <!-- Score Number & Radial Visual Gauge (5 cols) -->
-            <div class="md:col-span-5 text-center md:text-left space-y-4 border-b md:border-b-0 md:border-r border-slate-700/80 pb-6 md:pb-0 md:pr-8 flex flex-col items-center md:items-start justify-center">
-                <span class="text-xs text-[#C9A24D] font-mono font-bold uppercase tracking-widest block">Skor Kecerdasan Ruhiologi (RQI-15)</span>
+            <!-- Card Header Badge -->
+            <div class="flex items-center justify-between border-b border-white/10 pb-4 relative z-10">
+                <span class="text-[10px] sm:text-xs font-mono font-bold text-[#C9A24D] uppercase tracking-widest bg-white/5 px-3 py-1 rounded-full border border-[#C9A24D]/30 inline-flex items-center gap-1.5">
+                    <span>✦</span> <span>HASIL EVALUASI KECERDASAN RUHIOLOGI (RQI-15)</span>
+                </span>
+                <span class="text-xs font-mono text-slate-400 font-semibold hidden sm:inline">SKALA STANDAR 15 – 75 POIN</span>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
                 
-                <div class="flex flex-col sm:flex-row items-center gap-4">
-                    <!-- SVG Circular Progress Gauge -->
-                    <div class="relative w-24 h-24 shrink-0 flex items-center justify-center">
-                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                            <path class="text-slate-800" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                            <path class="text-[#C9A24D]" stroke-dasharray="{{ min(100, $scorePct) }}, 100" stroke-width="3.5" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                        </svg>
-                        <span class="absolute font-mono font-bold text-sm text-[#C9A24D]">{{ $scorePct }}%</span>
+                <!-- Score Number & Radial Visual Gauge (5 cols) -->
+                <div class="lg:col-span-5 text-center lg:text-left border-b lg:border-b-0 lg:border-r border-slate-700/80 pb-6 lg:pb-0 lg:pr-8 flex flex-col items-center lg:items-start justify-center space-y-4">
+                    <div class="flex flex-col sm:flex-row items-center gap-6">
+                        <!-- SVG Circular Progress Gauge -->
+                        <div class="relative w-28 h-28 shrink-0 flex items-center justify-center">
+                            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                                <path class="text-slate-800/80" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <path class="text-[#C9A24D] filter drop-shadow-[0_0_8px_rgba(201,162,77,0.5)]" stroke-dasharray="{{ min(100, $scorePct) }}, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            </svg>
+                            <div class="absolute flex flex-col items-center justify-center text-center">
+                                <span class="font-mono font-black text-base text-[#C9A24D] leading-none">{{ $scorePct }}%</span>
+                                <span class="text-[8px] font-mono uppercase text-slate-400 mt-0.5">CAPAIAN</span>
+                            </div>
+                        </div>
+
+                        <div class="text-center sm:text-left space-y-1">
+                            <span class="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest block">SKOR TOTAL RQI</span>
+                            <div class="text-5xl sm:text-6xl font-black font-serif text-white tracking-tight flex items-baseline justify-center sm:justify-start gap-1">
+                                <span>{{ $rqiScore }}</span>
+                                <span class="text-base sm:text-lg text-slate-400 font-normal font-sans">/ {{ $maxRqiScore }} Poin</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="text-center sm:text-left">
-                        <div class="text-4xl sm:text-6xl font-extrabold font-serif text-white tracking-tight">
-                            {{ $rqiScore }}
-                            <span class="text-lg sm:text-xl text-slate-400 font-normal">/ {{ $maxRqiScore }}</span>
-                        </div>
-                        <div class="mt-2">
-                            <span class="inline-block px-3 py-1.5 sm:px-4 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-black uppercase tracking-wider font-mono border shadow-md {{ $badgeStyle }}">
-                                ✦ {{ $catName }}
-                            </span>
+                    <!-- Level Badge Pill -->
+                    <div class="w-full pt-1">
+                        <div class="px-4 py-2.5 rounded-2xl text-xs font-bold uppercase tracking-wider font-mono border shadow-lg bg-gradient-to-r {{ $badgeGradient }} text-center sm:text-left flex items-center justify-center sm:justify-start gap-2">
+                            <span>✦</span>
+                            <span class="truncate">{{ $catName }}</span>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Interpretation Narrative (7 cols) -->
-            <div class="md:col-span-7 space-y-3">
-                <h4 class="text-xs font-bold text-[#C9A24D] uppercase tracking-widest font-mono">✦ Gambaran Profil & Refleksi Batiniah</h4>
-                <p class="text-xs sm:text-base font-serif italic text-slate-100 leading-relaxed font-normal">
-                    "{{ $submission->result->overall_interpretation }}"
-                </p>
-                @if($submission->result->pre_post_diff !== null)
-                    <div class="pt-3 border-t border-slate-700/80 flex items-center gap-3 text-xs">
-                        <span class="text-slate-300 font-medium">Perkembangan Delta RQI (dibanding Pretest):</span>
-                        <span class="font-bold font-mono px-3 py-1 rounded-full text-xs {{ $submission->result->pre_post_diff >= 0 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30' : 'bg-rose-500/20 text-rose-300 border border-rose-400/30' }}">
-                            {{ $submission->result->pre_post_diff >= 0 ? '+' : '' }}{{ number_format($submission->result->pre_post_diff, 1) }} poin
-                        </span>
+                <!-- Interpretation Narrative (7 cols) -->
+                <div class="lg:col-span-7 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-xs font-bold text-[#C9A24D] uppercase tracking-widest font-mono flex items-center gap-1.5">
+                            <span>✦</span> <span>GAMBARAN PROFIL & REFLEKSI BATINIAH</span>
+                        </h4>
                     </div>
-                @endif
+
+                    <div class="bg-white/5 p-5 sm:p-6 rounded-2xl border border-white/10 backdrop-blur-md relative space-y-2">
+                        <span class="text-3xl text-[#C9A24D]/40 font-serif absolute -top-2 left-3 select-none">“</span>
+                        <p class="text-xs sm:text-base font-serif italic text-slate-100 leading-relaxed font-normal relative z-10 pt-2">
+                            "{{ $submission->result->overall_interpretation }}"
+                        </p>
+                    </div>
+
+                    @if($submission->result->pre_post_diff !== null)
+                        <div class="pt-2 flex items-center gap-3 text-xs">
+                            <span class="text-slate-300 font-medium">Perkembangan Delta RQI (dibanding Pretest):</span>
+                            <span class="font-bold font-mono px-3 py-1 rounded-full text-xs {{ $submission->result->pre_post_diff >= 0 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30' : 'bg-rose-500/20 text-rose-300 border border-rose-400/30' }}">
+                                {{ $submission->result->pre_post_diff >= 0 ? '+' : '' }}{{ number_format($submission->result->pre_post_diff, 1) }} poin
+                            </span>
+                        </div>
+                    @endif
+                </div>
+
             </div>
         </div>
 
@@ -216,48 +244,59 @@
             </div>
         @endif
 
-        <!-- WHO-5 WELL-BEING INDEX CARD -->
+        <!-- WHO-5 WELL-BEING INDEX CARD (LUXURY REDESIGN) -->
         @if($submission->result->who5_percentage !== null)
             @php
                 $who5Raw = $submission->result->who5_raw_score ?? 0;
                 $who5Pct = $submission->result->who5_percentage ?? 0;
                 
-                if ($who5Raw >= 20) {
+                if ($who5Raw >= 20 || $who5Pct >= 80) {
                     $who5LevelName = 'Level 5: Thriving & Energetic (Super Bahagia)';
-                    $who5BadgeStyle = 'bg-emerald-500 text-white border-emerald-400';
-                } elseif ($who5Raw >= 16) {
+                    $who5BadgeStyle = 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white border-emerald-400';
+                } elseif ($who5Raw >= 16 || $who5Pct >= 64) {
                     $who5LevelName = 'Level 4: Good Vibe & Fresh (Sejahtera)';
-                    $who5BadgeStyle = 'bg-sky-600 text-white border-sky-400';
-                } elseif ($who5Raw >= 11) {
+                    $who5BadgeStyle = 'bg-gradient-to-r from-sky-600 to-blue-600 text-white border-sky-400';
+                } elseif ($who5Raw >= 11 || $who5Pct >= 44) {
                     $who5LevelName = 'Level 3: Moderate Well-Being (Cukup Stabil)';
-                    $who5BadgeStyle = 'bg-amber-500 text-slate-950 border-amber-300';
-                } elseif ($who5Raw >= 6) {
+                    $who5BadgeStyle = 'bg-gradient-to-r from-amber-500 to-yellow-600 text-slate-950 border-amber-300';
+                } elseif ($who5Raw >= 6 || $who5Pct >= 24) {
                     $who5LevelName = 'Level 2: Low Energy (Sering Cemas)';
-                    $who5BadgeStyle = 'bg-orange-600 text-white border-orange-400';
+                    $who5BadgeStyle = 'bg-gradient-to-r from-orange-600 to-amber-700 text-white border-orange-400';
                 } else {
                     $who5LevelName = 'Level 1: Mental Exhausted (Burnout Parah)';
-                    $who5BadgeStyle = 'bg-rose-600 text-white border-rose-400';
+                    $who5BadgeStyle = 'bg-gradient-to-r from-rose-600 to-red-700 text-white border-rose-400';
                 }
             @endphp
-            <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-                <div class="md:col-span-5 space-y-3 border-b md:border-b-0 md:border-r border-slate-100 pb-4 md:pb-0 md:pr-4">
-                    <span class="text-[10px] font-mono font-bold text-emerald-700 uppercase tracking-widest block">🌿 SKRINING KESEJAHTERAAN (WHO-5)</span>
-                    <div class="flex items-baseline gap-2">
-                        <span class="text-3xl sm:text-4xl font-serif font-bold text-[#0B2A43]">{{ number_format($who5Pct, 0) }}%</span>
-                        <span class="text-xs text-slate-500 font-mono">({{ $who5Raw }} / 25 Poin)</span>
+            <div class="bg-gradient-to-br from-emerald-950/30 via-[#0B2A43] to-slate-900 p-6 sm:p-8 rounded-3xl border border-emerald-500/30 shadow-xl grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center relative overflow-hidden">
+                <div class="absolute -bottom-20 -right-20 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div class="lg:col-span-5 space-y-4 border-b lg:border-b-0 lg:border-r border-slate-700/80 pb-6 lg:pb-0 lg:pr-8 text-center lg:text-left">
+                    <span class="text-[10px] font-mono font-bold text-emerald-400 uppercase tracking-widest bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 inline-block">
+                        🌿 SKRINING KESEJAHTERAAN EMOSIONAL (WHO-5 INDEX)
+                    </span>
+                    
+                    <div class="space-y-1">
+                        <span class="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest block">INDEKS WELL-BEING</span>
+                        <div class="flex items-baseline justify-center lg:justify-start gap-2">
+                            <span class="text-4xl sm:text-5xl font-serif font-extrabold text-emerald-400 tracking-tight">{{ number_format($who5Pct, 0) }}%</span>
+                            <span class="text-xs text-slate-300 font-mono">({{ $who5Raw }} / 25 Poin)</span>
+                        </div>
                     </div>
+
                     <div>
-                        <span class="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider font-mono border shadow-sm {{ $who5BadgeStyle }}">
-                            ✦ {{ $who5LevelName }}
+                        <span class="inline-block px-4 py-2 rounded-2xl text-xs font-bold uppercase tracking-wider font-mono border shadow-md {{ $who5BadgeStyle }}">
+                            🌱 {{ $who5LevelName }}
                         </span>
                     </div>
                 </div>
 
-                <div class="md:col-span-7 space-y-2">
-                    <h4 class="text-xs font-bold text-[#0B2A43] uppercase tracking-wider font-mono">Deskripsi Interpretasi Kesejahteraan Mental</h4>
-                    <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-normal">
-                        "{{ $submission->result->who5_screening_note }}"
-                    </p>
+                <div class="lg:col-span-7 space-y-3">
+                    <h4 class="text-xs font-bold text-emerald-400 uppercase tracking-wider font-mono">Deskripsi Interpretasi Kesejahteraan Mental</h4>
+                    <div class="bg-white/5 p-4 sm:p-5 rounded-2xl border border-white/10">
+                        <p class="text-xs sm:text-sm text-slate-100 leading-relaxed font-normal">
+                            "{{ $submission->result->who5_screening_note }}"
+                        </p>
+                    </div>
                     <p class="text-[11px] text-slate-400 italic">
                         *Catatan: WHO-5 (Well-Being Index) digunakan untuk pemetaan kesejahteraan emosional harian gaya hidup Gen Z & generasi muda.
                     </p>
