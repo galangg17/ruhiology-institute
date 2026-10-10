@@ -74,7 +74,7 @@
                 <span>Kembali ke Halaman Hasil</span>
             </a>
             <span class="text-xs text-slate-300 border-l border-slate-700 pl-3 hidden md:inline">
-                Sertifikat Hasil Asesmen Ruhiology (RQI) & WHO-5 Mental Well-being
+                Sertifikat Resmi Hasil Asesmen Ruhiology (RQI) & WHO-5 Index
             </span>
         </div>
         <div class="flex items-center gap-2 mt-2 sm:mt-0">
@@ -106,7 +106,7 @@
              :style="'width: 1050px; height: 742px; transform: scale(' + scale + '); margin-bottom: -' + ((1 - scale) * 742) + 'px;'">
 
             <!-- Official Printable Certificate Container -->
-            <div class="cert-container w-[1050px] h-[742px] bg-[#F8F6F0] relative p-8 border-[12px] border-[#0B2A43] rounded-3xl shadow-2xl overflow-hidden flex flex-col justify-between"
+            <div class="cert-container w-[1050px] h-[742px] bg-[#FAF8F5] relative p-8 border-[12px] border-[#0B2A43] rounded-3xl shadow-2xl overflow-hidden flex flex-col justify-between"
                  @if(!empty($settings['certificate_bg'])) style="background-image: url('{{ $settings['certificate_bg'] }}'); background-size: cover; background-position: center;" @endif>
                 
                 <!-- Outer Gold Frame Overlay -->
@@ -185,7 +185,7 @@
                     <div class="grid grid-cols-2 gap-4 max-w-xl mx-auto my-1">
                         
                         <!-- CARD 1: SKOR RUHIOLOGI (RQI) -->
-                        <div class="bg-gradient-to-br from-white to-amber-50/80 p-2.5 rounded-2xl border border-amber-300 shadow-2xs text-center space-y-0.5">
+                        <div class="bg-gradient-to-br from-white to-amber-50/80 p-3 rounded-2xl border border-amber-300 shadow-2xs text-center space-y-1">
                             <span class="text-[9px] uppercase font-mono font-bold text-amber-900 block tracking-wider">SKOR RQI (0-100)</span>
                             <strong class="font-serif-gold text-2xl font-black text-[#0B2A43] block">
                                 {{ number_format($submission->result->rqi_score ?? $submission->result->total_score ?? 0, 1) }}
@@ -196,39 +196,65 @@
                         </div>
 
                         <!-- CARD 2: SKOR KESEJAHTERAAN MENTAL (WHO-5) -->
-                        <div class="bg-gradient-to-br from-white to-emerald-50/80 p-2.5 rounded-2xl border border-emerald-300 shadow-2xs text-center space-y-0.5">
+                        <div class="bg-gradient-to-br from-white to-emerald-50/80 p-3 rounded-2xl border border-emerald-300 shadow-2xs text-center space-y-1">
                             <span class="text-[9px] uppercase font-mono font-bold text-emerald-900 block tracking-wider">INDEKS KESEJAHTERAAN MENTAL (WHO-5)</span>
                             <strong class="font-serif-gold text-2xl font-black text-emerald-700 block">
                                 {{ number_format($submission->result->who5_percentage ?? 0, 0) }}%
                             </strong>
                             @php
-                                $who5Note = $submission->result->who5_screening_note ?? (($submission->result->who5_percentage ?? 0) >= 50 ? 'Kesejahteraan Baik' : 'Indikasi Perlu Skrining');
-                                $isGood = str_contains(strtolower($who5Note), 'baik') || str_contains(strtolower($who5Note), 'sehat');
+                                $who5PctVal = $submission->result->who5_percentage ?? 0;
+                                $who5RawVal = $submission->result->who5_raw_score ?? 0;
+                                
+                                if ($who5RawVal >= 20 || $who5PctVal >= 80) {
+                                    $who5Label = 'Level 5: Thriving & Energetic (Super Bahagia)';
+                                    $badgeStyle = 'text-emerald-900 bg-emerald-100/90 border-emerald-300';
+                                } elseif ($who5RawVal >= 16 || $who5PctVal >= 64) {
+                                    $who5Label = 'Level 4: Good Vibe & Fresh (Sejahtera)';
+                                    $badgeStyle = 'text-sky-900 bg-sky-100/90 border-sky-300';
+                                } elseif ($who5RawVal >= 11 || $who5PctVal >= 44) {
+                                    $who5Label = 'Level 3: Moderate Well-Being (Cukup Stabil)';
+                                    $badgeStyle = 'text-amber-900 bg-amber-100/90 border-amber-300';
+                                } elseif ($who5RawVal >= 6 || $who5PctVal >= 24) {
+                                    $who5Label = 'Level 2: Low Energy (Sering Cemas)';
+                                    $badgeStyle = 'text-orange-900 bg-orange-100/90 border-orange-300';
+                                } else {
+                                    $who5Label = 'Level 1: Mental Exhausted (Burnout Parah)';
+                                    $badgeStyle = 'text-rose-900 bg-rose-100/90 border-rose-300';
+                                }
                             @endphp
-                            <span class="text-[9px] font-serif italic font-bold {{ $isGood ? 'text-emerald-900 bg-emerald-100/90 border-emerald-300' : 'text-rose-900 bg-rose-100/90 border-rose-300' }} px-2.5 py-0.5 rounded-full border inline-block truncate max-w-full">
-                                {{ $isGood ? '🌱' : '⚠️' }} {{ $who5Note }}
+                            <span class="text-[9px] font-serif italic font-bold {{ $badgeStyle }} px-2.5 py-0.5 rounded-full border inline-block truncate max-w-full">
+                                🌱 {{ $who5Label }}
                             </span>
                         </div>
 
                     </div>
 
-                    <!-- 5-DIMENSION COMPETENCY MATRIX GRID -->
+                    <!-- 5-DIMENSION COMPETENCY MATRIX GRID (EXCLUSIVELY 5 RQI DIMENSIONS) -->
                     @if(isset($submission->result->dimensionResults) && count($submission->result->dimensionResults) > 0)
-                        <div class="max-w-xl mx-auto bg-white/90 p-2 rounded-2xl border border-amber-200/90 shadow-2xs space-y-0.5">
-                            <span class="text-[8px] font-mono font-bold uppercase tracking-wider text-slate-400 block text-center">Capaian 5 Dimensi Utama Ruhiologi</span>
-                            <div class="grid grid-cols-5 gap-1.5">
-                                @foreach($submission->result->dimensionResults as $dr)
-                                    <div class="bg-amber-50/80 p-1 rounded-xl border border-amber-200 text-center">
-                                        <span class="block text-[8px] font-bold text-slate-700 truncate" title="{{ $dr->dimension->name }}">
-                                            {{ Str::limit($dr->dimension->name, 12) }}
-                                        </span>
-                                        <span class="font-mono font-bold text-xs text-[#0B2A43]">
-                                            {{ round($dr->percentage) }}%
-                                        </span>
-                                    </div>
-                                @endforeach
+                        @php
+                            $rqiDimensions = $submission->result->dimensionResults->filter(function($dr) {
+                                $code = strtolower($dr->dimension->code ?? '');
+                                $name = strtolower($dr->dimension->name ?? '');
+                                return !str_contains($code, 'who') && !str_contains($name, 'who');
+                            })->take(5);
+                        @endphp
+                        @if($rqiDimensions->count() > 0)
+                            <div class="max-w-xl mx-auto bg-white/90 p-2.5 rounded-2xl border border-amber-200/90 shadow-2xs space-y-1">
+                                <span class="text-[8.5px] font-mono font-bold uppercase tracking-wider text-slate-500 block text-center">Capaian 5 Dimensi Utama Ruhiologi</span>
+                                <div class="grid grid-cols-5 gap-1.5">
+                                    @foreach($rqiDimensions as $dr)
+                                        <div class="bg-amber-50/80 p-1.5 rounded-xl border border-amber-200 text-center flex flex-col justify-between h-full">
+                                            <span class="block text-[8px] font-bold text-slate-700 leading-tight" title="{{ $dr->dimension->name }}">
+                                                {{ Str::limit($dr->dimension->name, 14) }}
+                                            </span>
+                                            <span class="font-mono font-bold text-xs text-[#0B2A43] block mt-0.5">
+                                                {{ round($dr->percentage) }}%
+                                            </span>
+                                        </div>
+                                    @endforeach
+                                </div>
                             </div>
-                        </div>
+                        @endif
                     @endif
 
                 </div>
@@ -238,7 +264,7 @@
                     
                     <!-- Ruhiology Philosophical Quote Line -->
                     <div class="text-center">
-                        <p class="text-[9px] font-serif italic text-slate-600 max-w-xl mx-auto">
+                        <p class="text-[9px] font-serif italic text-slate-600 max-w-xl mx-auto leading-normal">
                             "Ruh adalah pusat inteligensi tertinggi (Ruhiology Quotient) yang mengendalikan orientasi nilai, kebersihan batin, serta komitmen etis." — Prof. Dr. Iskandar Nazari
                         </p>
                     </div>

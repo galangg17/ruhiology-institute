@@ -43,7 +43,7 @@ class ResultService
             $dimCode = strtolower($question->dimension->code ?? '');
             $dimName = strtolower($question->dimension->name ?? '');
 
-            $isWho5Item = ($question->instrument_id != $instrument->id) || str_contains($dimCode, 'who') || str_contains($dimName, 'who');
+            $isWho5Item = str_contains($dimCode, 'who') || str_contains($dimName, 'who');
 
             if ($isWho5Item) {
                 $hasWho5 = true;
@@ -52,8 +52,9 @@ class ResultService
                     5 => 5,
                     4 => 4,
                     3 => 3,
-                    2 => 1,
-                    1 => 0,
+                    2 => 2,
+                    1 => 1,
+                    0 => 0,
                     default => max(0, min(5, $val)),
                 };
                 $who5RawScore += $who5ItemScore;
