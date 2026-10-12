@@ -158,11 +158,12 @@
                         <p class="text-[11px] text-slate-600 font-medium mt-1">
                             Kategori: <strong class="text-slate-800">{{ $submission->participant->category }}</strong>
                             @php
-                                $instName = $submission->participant->school_custom 
+                                $instName = $submission->participant->sub_category 
+                                    ?? $submission->participant->occupation_custom 
+                                    ?? $submission->participant->school_custom 
                                     ?? $submission->participant->university_custom 
-                                    ?? $submission->participant->school->name 
-                                    ?? $submission->participant->university->name 
-                                    ?? $submission->participant->occupation 
+                                    ?? $submission->participant->school?->name 
+                                    ?? $submission->participant->university?->name 
                                     ?? null;
                             @endphp
                             @if($instName)

@@ -9,6 +9,7 @@
     drawerOpen: false,
     drawerTab: 'profile',
     selectedParticipant: null,
+    participantsMap: @json($participants->getCollection()->keyBy('id')),
     regenciesMap: @json($regenciesMap ?? []),
     createProvinceId: '',
     createRegencyId: '',
@@ -33,12 +34,13 @@
         university_custom: '',
         status: 'active'
     },
-    openEdit(part) {
+    openEdit(partOrId) {
+        const part = (typeof partOrId === 'object' && partOrId !== null) ? partOrId : (this.participantsMap[partOrId] || {});
         this.editData = {
-            id: part.id,
-            participant_code: part.participant_code,
-            name: part.name,
-            email: part.email,
+            id: part.id || '',
+            participant_code: part.participant_code || '',
+            name: part.name || '',
+            email: part.email || '',
             phone: part.phone || '',
             batch: part.batch || 'Angkatan 2026',
             gender: part.gender || 'Laki-laki',
@@ -52,7 +54,8 @@
         };
         this.editModal = true;
     },
-    openDrawer(part, tab = 'profile') {
+    openDrawer(partOrId, tab = 'profile') {
+        const part = (typeof partOrId === 'object' && partOrId !== null) ? partOrId : (this.participantsMap[partOrId] || {});
         this.selectedParticipant = part;
         this.drawerTab = tab;
         this.drawerOpen = true;
@@ -299,7 +302,7 @@
                 </thead>
                 <tbody class="divide-y divide-slate-100 font-medium text-slate-800">
                     @forelse($participants as $part)
-                        <tr class="hover:bg-amber-50/50 transition cursor-pointer" @click="openDrawer({{ json_encode($part) }}, 'profile')">
+                        <tr class="hover:bg-amber-50/50 transition cursor-pointer" @click="openDrawer({{ $part->id }}, 'profile')">
                             
                             <!-- Participant Info & Avatar -->
                             <td class="p-4">
@@ -375,7 +378,7 @@
 
                             <!-- Test Submissions History -->
                             <td class="p-4 text-center" @click.stop>
-                                <button type="button" @click="openDrawer({{ json_encode($part) }}, 'submissions')" class="px-2.5 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-xs rounded-full border border-amber-300 transition inline-flex items-center gap-1 cursor-pointer">
+                                <button type="button" @click="openDrawer({{ $part->id }}, 'submissions')" class="px-2.5 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-xs rounded-full border border-amber-300 transition inline-flex items-center gap-1 cursor-pointer">
                                     <span>📝</span>
                                     <span>{{ $part->submissions_count }} Sesi</span>
                                 </button>
@@ -384,10 +387,10 @@
                             <!-- Actions -->
                             <td class="p-4 text-right" @click.stop>
                                 <div class="flex items-center justify-end gap-1.5">
-                                    <button type="button" @click="openDrawer({{ json_encode($part) }}, 'profile')" class="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition cursor-pointer" title="Buka Slide Drawer Detail & Tes">
+                                    <button type="button" @click="openDrawer({{ $part->id }}, 'profile')" class="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition cursor-pointer" title="Buka Slide Drawer Detail & Tes">
                                         👁️ Drawer
                                     </button>
-                                    <button type="button" @click="openEdit({{ json_encode($part) }})" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-900 rounded-lg text-xs font-bold transition cursor-pointer" title="Edit Peserta">
+                                    <button type="button" @click="openEdit({{ $part->id }})" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-900 rounded-lg text-xs font-bold transition cursor-pointer" title="Edit Peserta">
                                         ✏️ Edit
                                     </button>
                                     <form action="{{ route('admin.participants.destroy', $part->id) }}" method="POST" class="inline" onsubmit="return confirm('Hapus peserta ini secara permanen?')">

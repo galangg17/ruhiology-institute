@@ -68,44 +68,60 @@
         </div>
 
         <!-- Participant Info Metadata Header -->
-        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-sm grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 text-xs">
-            <div>
-                <span class="text-slate-400 uppercase font-bold text-[10px] block font-mono">Nama Peserta</span>
-                <span class="font-bold text-[#0B2A43] text-sm block mt-0.5">{{ $submission->participant->name }}</span>
-            </div>
-            <div>
-                <span class="text-slate-400 uppercase font-bold text-[10px] block font-mono">Kategori & Institusi</span>
-                <span class="font-bold text-[#0B2A43] text-xs block mt-0.5">
-                    {{ $submission->participant->category }}
-                    @php
-                        $instName = $submission->participant->school->name 
-                            ?? $submission->participant->university->name 
-                            ?? $submission->participant->occupationModel->name 
-                            ?? $submission->participant->occupation_custom 
-                            ?? null;
-                    @endphp
-                    @if($instName)
-                        &mdash; <span class="text-slate-600 font-semibold">{{ $instName }}</span>
-                    @endif
-                </span>
-            </div>
-            <div>
-                <div class="flex items-center justify-between">
-                    <span class="text-slate-400 uppercase font-bold text-[10px] block font-mono">Wilayah asal</span>
-                    <button type="button" @click="openEditRegionModal()" class="no-print text-[10px] text-amber-700 hover:text-amber-900 font-bold underline cursor-pointer inline-flex items-center gap-0.5">
-                        <span>✏️</span> <span>Ubah</span>
-                    </button>
+        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-sm text-xs">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 items-center">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-[#0B2A43] text-[#C9A24D] font-bold text-sm flex items-center justify-center font-mono shrink-0 shadow border border-[#C9A24D]/30">
+                        {{ strtoupper(substr($submission->participant->name, 0, 2)) }}
+                    </div>
+                    <div>
+                        <span class="text-slate-400 uppercase font-bold text-[9px] block font-mono">NAMA LENGKAP PESERTA</span>
+                        <strong class="font-bold text-[#0B2A43] text-sm block leading-snug">{{ $submission->participant->name }}</strong>
+                    </div>
                 </div>
-                <span class="font-bold text-[#0B2A43] text-xs block mt-0.5">
-                    {{ $submission->participant->regency->name ?? '' }}{{ isset($submission->participant->regency) && isset($submission->participant->province) ? ', ' : '' }}{{ $submission->participant->province->name ?? '-' }}
-                </span>
-            </div>
-            <div>
-                <span class="text-slate-400 uppercase font-bold text-[10px] block font-mono">Tanggal & Sesi Asesmen</span>
-                <span class="font-bold text-slate-700 text-xs block mt-0.5">
-                    {{ $submission->submitted_at ? $submission->submitted_at->format('d M Y, H:i') : '-' }} 
-                    <span class="uppercase text-amber-700 bg-amber-50 px-2 py-0.5 rounded text-[10px] font-mono border border-amber-200">({{ $submission->submission_type }})</span>
-                </span>
+
+                <div>
+                    <span class="text-slate-400 uppercase font-bold text-[9px] block font-mono">KATEGORI & ASAL INSTANSI</span>
+                    <span class="font-bold text-[#0B2A43] text-xs block mt-0.5 leading-snug">
+                        {{ $submission->participant->category }}
+                        @php
+                            $instName = $submission->participant->sub_category
+                                ?? $submission->participant->occupation_custom 
+                                ?? $submission->participant->school_custom 
+                                ?? $submission->participant->university_custom 
+                                ?? $submission->participant->school?->name 
+                                ?? $submission->participant->university?->name 
+                                ?? null;
+                        @endphp
+                        @if($instName)
+                            &mdash; <span class="text-slate-600 font-semibold">{{ $instName }}</span>
+                        @endif
+                    </span>
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-400 uppercase font-bold text-[9px] block font-mono">WILAYAH ASAL (DOMISILI)</span>
+                        <button type="button" @click="openEditRegionModal()" class="no-print text-[10px] text-amber-700 hover:text-amber-900 font-bold underline cursor-pointer inline-flex items-center gap-0.5">
+                            <span>✏️</span> <span>Ubah</span>
+                        </button>
+                    </div>
+                    <span class="font-bold text-[#0B2A43] text-xs block mt-0.5">
+                        📍 {{ $submission->participant->regency->name ?? '' }}{{ isset($submission->participant->regency) && isset($submission->participant->province) ? ', ' : '' }}{{ $submission->participant->province->name ?? 'Tidak diisi' }}
+                    </span>
+                </div>
+
+                <div>
+                    <span class="text-slate-400 uppercase font-bold text-[9px] block font-mono">TANGGAL & STATUS SESI</span>
+                    <div class="flex items-center gap-2 mt-0.5">
+                        <span class="font-bold text-slate-700 text-xs">
+                            {{ $submission->submitted_at ? $submission->submitted_at->format('d M Y, H:i') : '-' }}
+                        </span>
+                        <span class="uppercase text-amber-800 bg-amber-50 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold border border-amber-200">
+                            {{ $submission->submission_type }}
+                        </span>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -127,27 +143,50 @@
             } else {
                 $badgeGradient = 'from-rose-600 to-red-700 text-white border-rose-400';
             }
+
+            $hasWho5 = ($submission->result->who5_percentage !== null);
+            if ($hasWho5) {
+                $who5Raw = $submission->result->who5_raw_score ?? 0;
+                $who5Pct = $submission->result->who5_percentage ?? 0;
+                
+                if ($who5Raw >= 20 || $who5Pct >= 80) {
+                    $who5LevelName = 'Level 5: Thriving & Energetic (Super Bahagia)';
+                    $who5BadgeStyle = 'from-emerald-500 to-teal-600 text-white border-emerald-400';
+                } elseif ($who5Raw >= 16 || $who5Pct >= 64) {
+                    $who5LevelName = 'Level 4: Good Vibe & Fresh (Sejahtera)';
+                    $who5BadgeStyle = 'from-sky-600 to-blue-600 text-white border-sky-400';
+                } elseif ($who5Raw >= 11 || $who5Pct >= 44) {
+                    $who5LevelName = 'Level 3: Moderate Well-Being (Cukup Stabil)';
+                    $who5BadgeStyle = 'from-amber-500 to-yellow-600 text-slate-950 border-amber-300';
+                } elseif ($who5Raw >= 6 || $who5Pct >= 24) {
+                    $who5LevelName = 'Level 2: Low Energy (Sering Cemas)';
+                    $who5BadgeStyle = 'from-orange-600 to-amber-700 text-white border-orange-400';
+                } else {
+                    $who5LevelName = 'Level 1: Mental Exhausted (Burnout Parah)';
+                    $who5BadgeStyle = 'from-rose-600 to-red-700 text-white border-rose-400';
+                }
+            }
         @endphp
 
-        <!-- Main RQI Score Dashboard Card (Luxury Redesign) -->
-        <div class="bg-[#0B2A43] text-white p-6 sm:p-10 rounded-3xl shadow-2xl border border-[#C9A24D]/30 relative overflow-hidden space-y-6">
-            <!-- Background Radial Lighting Overlay -->
-            <div class="absolute -top-24 -right-24 w-96 h-96 bg-[#C9A24D]/20 rounded-full blur-3xl pointer-events-none"></div>
-            <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <!-- UNIFIED DUAL-PILLAR EXECUTIVE DASHBOARD (TWIN LUXURY CARDS) -->
+        <div class="grid grid-cols-1 {{ $hasWho5 ? 'lg:grid-cols-2' : '' }} gap-6 sm:gap-8 items-stretch">
+            
+            <!-- CARD 1: PILAR 1 - KECERDASAN RUHIOLOGI (RQI-15) -->
+            <div class="bg-[#0B2A43] text-white p-6 sm:p-8 rounded-3xl shadow-2xl border border-[#C9A24D]/35 relative overflow-hidden flex flex-col justify-between space-y-6">
+                <!-- Background Lighting -->
+                <div class="absolute -top-20 -right-20 w-80 h-80 bg-[#C9A24D]/20 rounded-full blur-3xl pointer-events-none"></div>
 
-            <!-- Card Header Badge -->
-            <div class="flex items-center justify-between border-b border-white/10 pb-4 relative z-10">
-                <span class="text-[10px] sm:text-xs font-mono font-bold text-[#C9A24D] uppercase tracking-widest bg-white/5 px-3 py-1 rounded-full border border-[#C9A24D]/30 inline-flex items-center gap-1.5">
-                    <span>✦</span> <span>HASIL EVALUASI KECERDASAN RUHIOLOGI (RQI-15)</span>
-                </span>
-                <span class="text-xs font-mono text-slate-400 font-semibold hidden sm:inline">SKALA STANDAR 15 – 75 POIN</span>
-            </div>
+                <div class="space-y-5 relative z-10">
+                    <!-- Pillar Header Badge -->
+                    <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                        <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest bg-white/5 px-3 py-1 rounded-full border border-[#C9A24D]/30 inline-flex items-center gap-1.5">
+                            <span>✦</span> <span>PILAR 1: KECERDASAN RUHIOLOGI (RQI-15)</span>
+                        </span>
+                        <span class="text-[10px] font-mono text-slate-400 font-semibold">SKALA 15 – 75 POIN</span>
+                    </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
-                
-                <!-- Score Number & Radial Visual Gauge (5 cols) -->
-                <div class="lg:col-span-5 text-center lg:text-left border-b lg:border-b-0 lg:border-r border-slate-700/80 pb-6 lg:pb-0 lg:pr-8 flex flex-col items-center lg:items-start justify-center space-y-4">
-                    <div class="flex flex-col sm:flex-row items-center gap-6">
+                    <!-- Gauge & Score Core Display -->
+                    <div class="flex flex-col sm:flex-row items-center gap-5 sm:gap-6 pt-1">
                         <!-- SVG Circular Progress Gauge -->
                         <div class="relative w-28 h-28 shrink-0 flex items-center justify-center">
                             <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
@@ -162,48 +201,105 @@
 
                         <div class="text-center sm:text-left space-y-1">
                             <span class="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest block">SKOR TOTAL RQI</span>
-                            <div class="text-5xl sm:text-6xl font-black font-serif text-white tracking-tight flex items-baseline justify-center sm:justify-start gap-1">
+                            <div class="text-4xl sm:text-5xl font-black font-serif text-white tracking-tight flex items-baseline justify-center sm:justify-start gap-1">
                                 <span>{{ $rqiScore }}</span>
-                                <span class="text-base sm:text-lg text-slate-400 font-normal font-sans">/ {{ $maxRqiScore }} Poin</span>
+                                <span class="text-sm text-slate-400 font-normal font-sans">/ {{ $maxRqiScore }} Poin</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Level Badge Pill -->
-                    <div class="w-full pt-1">
-                        <div class="px-4 py-2.5 rounded-2xl text-xs font-bold uppercase tracking-wider font-mono border shadow-lg bg-gradient-to-r {{ $badgeGradient }} text-center sm:text-left flex items-center justify-center sm:justify-start gap-2">
+                    <div>
+                        <div class="px-3.5 py-2 rounded-2xl text-[11px] font-bold uppercase tracking-wider font-mono border shadow-md bg-gradient-to-r {{ $badgeGradient }} text-center flex items-center justify-center gap-1.5">
                             <span>✦</span>
                             <span class="truncate">{{ $catName }}</span>
                         </div>
                     </div>
-                </div>
 
-                <!-- Interpretation Narrative (7 cols) -->
-                <div class="lg:col-span-7 space-y-4">
-                    <div class="flex items-center justify-between">
-                        <h4 class="text-xs font-bold text-[#C9A24D] uppercase tracking-widest font-mono flex items-center gap-1.5">
-                            <span>✦</span> <span>GAMBARAN PROFIL & REFLEKSI BATINIAH</span>
-                        </h4>
-                    </div>
-
-                    <div class="bg-white/5 p-5 sm:p-6 rounded-2xl border border-white/10 backdrop-blur-md relative space-y-2">
-                        <span class="text-3xl text-[#C9A24D]/40 font-serif absolute -top-2 left-3 select-none">“</span>
-                        <p class="text-xs sm:text-base font-serif italic text-slate-100 leading-relaxed font-normal relative z-10 pt-2">
-                            "{{ $submission->result->overall_interpretation }}"
-                        </p>
-                    </div>
-
-                    @if($submission->result->pre_post_diff !== null)
-                        <div class="pt-2 flex items-center gap-3 text-xs">
-                            <span class="text-slate-300 font-medium">Perkembangan Delta RQI (dibanding Pretest):</span>
-                            <span class="font-bold font-mono px-3 py-1 rounded-full text-xs {{ $submission->result->pre_post_diff >= 0 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30' : 'bg-rose-500/20 text-rose-300 border border-rose-400/30' }}">
-                                {{ $submission->result->pre_post_diff >= 0 ? '+' : '' }}{{ number_format($submission->result->pre_post_diff, 1) }} poin
-                            </span>
+                    <!-- Interpretation Narrative Box -->
+                    <div class="space-y-1.5 pt-1">
+                        <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-wider block">✦ GAMBARAN PROFIL & REFLEKSI BATINIAH</span>
+                        <div class="bg-white/5 p-4 rounded-2xl border border-white/10 backdrop-blur-md relative">
+                            <p class="text-xs font-serif italic text-slate-100 leading-relaxed font-normal">
+                                "{{ $submission->result->overall_interpretation }}"
+                            </p>
                         </div>
-                    @endif
+                    </div>
                 </div>
 
+                @if($submission->result->pre_post_diff !== null)
+                    <div class="pt-2 border-t border-white/10 flex items-center justify-between text-xs relative z-10">
+                        <span class="text-slate-300 font-medium">Perkembangan Delta RQI:</span>
+                        <span class="font-bold font-mono px-2.5 py-0.5 rounded-full text-xs {{ $submission->result->pre_post_diff >= 0 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30' : 'bg-rose-500/20 text-rose-300 border border-rose-400/30' }}">
+                            {{ $submission->result->pre_post_diff >= 0 ? '+' : '' }}{{ number_format($submission->result->pre_post_diff, 1) }} poin
+                        </span>
+                    </div>
+                @endif
             </div>
+
+            <!-- CARD 2: PILAR 2 - SKRINING KESEJAHTERAAN MENTAL (WHO-5) -->
+            @if($hasWho5)
+                <div class="bg-[#0B2A43] text-white p-6 sm:p-8 rounded-3xl shadow-2xl border border-emerald-500/35 relative overflow-hidden flex flex-col justify-between space-y-6">
+                    <!-- Background Lighting -->
+                    <div class="absolute -top-20 -right-20 w-80 h-80 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none"></div>
+
+                    <div class="space-y-5 relative z-10">
+                        <!-- Pillar Header Badge -->
+                        <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                            <span class="text-[10px] font-mono font-bold text-emerald-400 uppercase tracking-widest bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/30 inline-flex items-center gap-1.5">
+                                <span>🌿</span> <span>PILAR 2: KESEJAHTERAAN MENTAL (WHO-5)</span>
+                            </span>
+                            <span class="text-[10px] font-mono text-slate-400 font-semibold">SKALA 0 – 25 POIN</span>
+                        </div>
+
+                        <!-- Gauge & Score Core Display -->
+                        <div class="flex flex-col sm:flex-row items-center gap-5 sm:gap-6 pt-1">
+                            <!-- SVG Circular Progress Gauge -->
+                            <div class="relative w-28 h-28 shrink-0 flex items-center justify-center">
+                                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                                    <path class="text-slate-800/80" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                    <path class="text-emerald-400 filter drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]" stroke-dasharray="{{ min(100, $who5Pct) }}, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                </svg>
+                                <div class="absolute flex flex-col items-center justify-center text-center">
+                                    <span class="font-mono font-black text-base text-emerald-400 leading-none">{{ number_format($who5Pct, 0) }}%</span>
+                                    <span class="text-[8px] font-mono uppercase text-slate-400 mt-0.5">INDEKS</span>
+                                </div>
+                            </div>
+
+                            <div class="text-center sm:text-left space-y-1">
+                                <span class="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest block">SKOR MENTAH WHO-5</span>
+                                <div class="text-4xl sm:text-5xl font-black font-serif text-emerald-400 tracking-tight flex items-baseline justify-center sm:justify-start gap-1">
+                                    <span>{{ $who5Raw }}</span>
+                                    <span class="text-sm text-slate-300 font-normal font-sans">/ 25 Poin</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Level Badge Pill -->
+                        <div>
+                            <div class="px-3.5 py-2 rounded-2xl text-[11px] font-bold uppercase tracking-wider font-mono border shadow-md bg-gradient-to-r {{ $who5BadgeStyle }} text-center flex items-center justify-center gap-1.5">
+                                <span>🌱</span>
+                                <span class="truncate">{{ $who5LevelName }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Interpretation Narrative Box -->
+                        <div class="space-y-1.5 pt-1">
+                            <span class="text-[10px] font-mono font-bold text-emerald-400 uppercase tracking-wider block">🌿 DESKRIPSI KESEJAHTERAAN EMOSIONAL</span>
+                            <div class="bg-white/5 p-4 rounded-2xl border border-white/10 backdrop-blur-md relative">
+                                <p class="text-xs text-slate-100 leading-relaxed font-normal">
+                                    "{{ $submission->result->who5_screening_note }}"
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-2 border-t border-white/10 text-[10px] text-slate-400 italic leading-snug relative z-10">
+                        *World Health Organization-5 (WHO-5) Well-Being Index: instrumen psikometrik global untuk pemetaan kesehatan mental dan vitalitas emosional.
+                    </div>
+                </div>
+            @endif
+
         </div>
 
         <!-- PRE VS POST COMPARATIVE PROGRESS CARD -->
@@ -240,66 +336,6 @@
                         </div>
                         <span class="text-[11px] text-slate-600 font-medium">Perbandingan capaian awal dan evaluasi akhir</span>
                     </div>
-                </div>
-            </div>
-        @endif
-
-        <!-- WHO-5 WELL-BEING INDEX CARD (LUXURY REDESIGN) -->
-        @if($submission->result->who5_percentage !== null)
-            @php
-                $who5Raw = $submission->result->who5_raw_score ?? 0;
-                $who5Pct = $submission->result->who5_percentage ?? 0;
-                
-                if ($who5Raw >= 20 || $who5Pct >= 80) {
-                    $who5LevelName = 'Level 5: Thriving & Energetic (Super Bahagia)';
-                    $who5BadgeStyle = 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white border-emerald-400';
-                } elseif ($who5Raw >= 16 || $who5Pct >= 64) {
-                    $who5LevelName = 'Level 4: Good Vibe & Fresh (Sejahtera)';
-                    $who5BadgeStyle = 'bg-gradient-to-r from-sky-600 to-blue-600 text-white border-sky-400';
-                } elseif ($who5Raw >= 11 || $who5Pct >= 44) {
-                    $who5LevelName = 'Level 3: Moderate Well-Being (Cukup Stabil)';
-                    $who5BadgeStyle = 'bg-gradient-to-r from-amber-500 to-yellow-600 text-slate-950 border-amber-300';
-                } elseif ($who5Raw >= 6 || $who5Pct >= 24) {
-                    $who5LevelName = 'Level 2: Low Energy (Sering Cemas)';
-                    $who5BadgeStyle = 'bg-gradient-to-r from-orange-600 to-amber-700 text-white border-orange-400';
-                } else {
-                    $who5LevelName = 'Level 1: Mental Exhausted (Burnout Parah)';
-                    $who5BadgeStyle = 'bg-gradient-to-r from-rose-600 to-red-700 text-white border-rose-400';
-                }
-            @endphp
-            <div class="bg-gradient-to-br from-emerald-950/30 via-[#0B2A43] to-slate-900 p-6 sm:p-8 rounded-3xl border border-emerald-500/30 shadow-xl grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center relative overflow-hidden">
-                <div class="absolute -bottom-20 -right-20 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
-                <div class="lg:col-span-5 space-y-4 border-b lg:border-b-0 lg:border-r border-slate-700/80 pb-6 lg:pb-0 lg:pr-8 text-center lg:text-left">
-                    <span class="text-[10px] font-mono font-bold text-emerald-400 uppercase tracking-widest bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 inline-block">
-                        🌿 SKRINING KESEJAHTERAAN EMOSIONAL (WHO-5 INDEX)
-                    </span>
-                    
-                    <div class="space-y-1">
-                        <span class="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest block">INDEKS WELL-BEING</span>
-                        <div class="flex items-baseline justify-center lg:justify-start gap-2">
-                            <span class="text-4xl sm:text-5xl font-serif font-extrabold text-emerald-400 tracking-tight">{{ number_format($who5Pct, 0) }}%</span>
-                            <span class="text-xs text-slate-300 font-mono">({{ $who5Raw }} / 25 Poin)</span>
-                        </div>
-                    </div>
-
-                    <div>
-                        <span class="inline-block px-4 py-2 rounded-2xl text-xs font-bold uppercase tracking-wider font-mono border shadow-md {{ $who5BadgeStyle }}">
-                            🌱 {{ $who5LevelName }}
-                        </span>
-                    </div>
-                </div>
-
-                <div class="lg:col-span-7 space-y-3">
-                    <h4 class="text-xs font-bold text-emerald-400 uppercase tracking-wider font-mono">Deskripsi Interpretasi Kesejahteraan Mental</h4>
-                    <div class="bg-white/5 p-4 sm:p-5 rounded-2xl border border-white/10">
-                        <p class="text-xs sm:text-sm text-slate-100 leading-relaxed font-normal">
-                            "{{ $submission->result->who5_screening_note }}"
-                        </p>
-                    </div>
-                    <p class="text-[11px] text-slate-400 italic">
-                        *Catatan: WHO-5 (Well-Being Index) digunakan untuk pemetaan kesejahteraan emosional harian gaya hidup Gen Z & generasi muda.
-                    </p>
                 </div>
             </div>
         @endif

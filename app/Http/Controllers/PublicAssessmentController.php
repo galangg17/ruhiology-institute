@@ -28,12 +28,13 @@ class PublicAssessmentController extends Controller
         try {
             $publicInstruments = Instrument::where('status', 'active')
                 ->where('access_type', 'public')
+                ->has('questions')
                 ->withCount('questions')
                 ->get();
 
             $activePeriods = AssessmentPeriod::where('status', 'active')
                 ->whereHas('instrument', function ($q) {
-                    $q->where('access_type', 'public');
+                    $q->where('access_type', 'public')->where('status', 'active')->has('questions');
                 })
                 ->with(['program.institution', 'instrument'])
                 ->get();
@@ -95,8 +96,13 @@ class PublicAssessmentController extends Controller
             $request->merge(['province_id' => $defaultProvId]);
         }
         if (empty($request->input('regency_id'))) {
-            $defaultRegId = \App\Models\Regency::where('province_id', $request->input('province_id'))->first()?->id ?? 1;
-            $request->merge(['regency_id' => $defaultRegId]);
+            $defaultRegId = \App\Models\Regency::where('province_id', $request->input('province_id'))->first()?->id;
+            if (!$defaultRegId) {
+                $defaultRegId = \App\Models\Regency::first()?->id;
+            }
+            if ($defaultRegId) {
+                $request->merge(['regency_id' => $defaultRegId]);
+            }
         }
 
         if ($request->input('category') === 'Mahasiswa' || $request->input('category') === 'Mahasiswa/i') {
@@ -118,7 +124,7 @@ class PublicAssessmentController extends Controller
             'category' => ['required', 'string'],
             'country_id' => ['nullable', 'exists:countries,id'],
             'province_id' => ['required', 'exists:provinces,id'],
-            'regency_id' => ['required', 'exists:regencies,id'],
+            'regency_id' => ['nullable', 'exists:regencies,id'],
             
             // Cascading subcategory fields
             'sub_category_type' => ['nullable', 'string', 'max:255'],
@@ -173,9 +179,13 @@ class PublicAssessmentController extends Controller
             }
         } elseif (!empty($request->input('instrument_id'))) {
             $targetInstId = (int) $request->input('instrument_id');
+            $targetInst = Instrument::where('id', $targetInstId)->has('questions')->first();
+            if (!$targetInst) {
+                $targetInst = Instrument::where('status', 'active')->has('questions')->first();
+                $targetInstId = $targetInst ? $targetInst->id : 1;
+            }
             $period = AssessmentPeriod::where('instrument_id', $targetInstId)->where('status', 'active')->first();
             if (!$period) {
-                $targetInst = Instrument::find($targetInstId);
                 $period = AssessmentPeriod::create([
                     'program_id' => 1,
                     'instrument_id' => $targetInstId,

@@ -38,6 +38,7 @@ class AdminParticipantController extends Controller
             'school',
             'university',
             'submissions.period.instrument',
+            'submissions.instrument',
             'submissions.result'
         ]);
 
