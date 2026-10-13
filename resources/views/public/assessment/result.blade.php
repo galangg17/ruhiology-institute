@@ -70,11 +70,22 @@
     }
 
     $canvasPillars = $rqiOnlyDimensions->map(function($dr) {
-        $clean = preg_replace('/^\d+\.\s*/', '', trim($dr->dimension->name ?? 'Dimensi'));
-        $clean = preg_replace('/\s*\(.*?\)/', '', $clean);
+        $rawName = trim($dr->dimension->name ?? 'Dimensi');
+        $lower = strtolower($rawName);
+        if (str_contains($lower, 'god spot') || str_contains($lower, 'diri')) $cleanName = 'Kesadaran Diri & Ruh';
+        elseif (str_contains($lower, 'puncak')) $cleanName = 'Kesadaran Puncak Ilahi';
+        elseif (str_contains($lower, 'ketuhanan') || str_contains($lower, 'spiritual connection')) $cleanName = 'Kesadaran Ketuhanan';
+        elseif (str_contains($lower, 'ibadah') || str_contains($lower, 'ketaatan')) $cleanName = 'Ketaatan Spiritual & Ibadah';
+        elseif (str_contains($lower, 'tazkiyah') || str_contains($lower, 'purifikasi') || str_contains($lower, 'inner peace')) $cleanName = 'Purifikasi Batin (Tazkiyah)';
+        elseif (str_contains($lower, 'perilaku') || str_contains($lower, 'akhlak') || str_contains($lower, 'altruistic')) $cleanName = 'Akhlak & Kepedulian Sosial';
+        elseif (str_contains($lower, 'resiliensi') || str_contains($lower, 'ketangguhan')) $cleanName = 'Ketangguhan & Resiliensi';
+        else {
+            $cleanName = preg_replace('/^\d+\.\s*/', '', $rawName);
+            $cleanName = preg_replace('/\s*\(.*?\)/', '', $cleanName);
+        }
         return [
             'code' => $dr->dimension->code ?? 'D',
-            'name' => \Illuminate\Support\Str::limit($clean, 26),
+            'name' => $cleanName,
             'score' => $dr->score,
             'max' => $dr->max_score,
             'pct' => round($dr->percentage)
@@ -547,7 +558,7 @@
                     <span class="text-[10px] font-mono text-slate-400" x-text="cardRatio === '9:16' ? 'Resolusi: 1080 × 1920 px (Full Story 9:16)' : 'Resolusi: 1080 × 1350 px (Feed Portrait 4:5)'"></span>
                 </div>
 
-                <!-- Right Column (7 Cols): Format Selector & Actions -->
+                <!-- Right Column (7 Cols): Format & Theme Selector & Actions -->
                 <div class="md:col-span-7 space-y-4 text-left text-xs">
                     
                     <!-- Aspect Ratio Switcher -->
@@ -555,8 +566,8 @@
                         <label class="text-[11px] font-bold text-slate-300 uppercase tracking-wider font-mono block">1. Pilih Ukuran Kartu Sosmed:</label>
                         <div class="grid grid-cols-2 gap-2.5">
                             <button type="button" @click="setCardRatio('4:5')"
-                                    :class="cardRatio === '4:5' ? 'bg-[#C9A24D] text-[#0B2A43] font-extrabold border-[#C9A24D]' : 'bg-slate-800/80 text-slate-300 border-slate-700 hover:bg-slate-800'"
-                                    class="p-3 rounded-2xl border text-left transition cursor-pointer flex items-center gap-2.5">
+                                    :class="cardRatio === '4:5' ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 font-extrabold border-amber-400 shadow-md' : 'bg-slate-800/80 text-slate-300 border-slate-700 hover:bg-slate-800'"
+                                    class="p-2.5 rounded-2xl border text-left transition cursor-pointer flex items-center gap-2.5">
                                 <span class="text-lg">🖼️</span>
                                 <div>
                                     <span class="block text-xs font-bold leading-tight">Feed IG / WA (4:5)</span>
@@ -564,8 +575,8 @@
                                 </div>
                             </button>
                             <button type="button" @click="setCardRatio('9:16')"
-                                    :class="cardRatio === '9:16' ? 'bg-[#C9A24D] text-[#0B2A43] font-extrabold border-[#C9A24D]' : 'bg-slate-800/80 text-slate-300 border-slate-700 hover:bg-slate-800'"
-                                    class="p-3 rounded-2xl border text-left transition cursor-pointer flex items-center gap-2.5">
+                                    :class="cardRatio === '9:16' ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 font-extrabold border-amber-400 shadow-md' : 'bg-slate-800/80 text-slate-300 border-slate-700 hover:bg-slate-800'"
+                                    class="p-2.5 rounded-2xl border text-left transition cursor-pointer flex items-center gap-2.5">
                                 <span class="text-lg">📱</span>
                                 <div>
                                     <span class="block text-xs font-bold leading-tight">Story Full (9:16)</span>
@@ -575,26 +586,44 @@
                         </div>
                     </div>
 
+                    <!-- Card Theme Switcher -->
+                    <div class="space-y-1.5">
+                        <label class="text-[11px] font-bold text-slate-300 uppercase tracking-wider font-mono block">2. Pilih Tema Warna Kartu:</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button type="button" @click="setCardTheme('royal')"
+                                    :class="cardTheme === 'royal' ? 'bg-amber-400 text-slate-950 font-extrabold border-amber-300 shadow' : 'bg-slate-800/80 text-slate-300 border-slate-700 hover:bg-slate-800'"
+                                    class="py-2.5 px-3 rounded-xl border text-center transition cursor-pointer">
+                                <span class="block text-xs">👑 Royal Gold</span>
+                            </button>
+                            <button type="button" @click="setCardTheme('emerald')"
+                                    :class="cardTheme === 'emerald' ? 'bg-emerald-400 text-slate-950 font-extrabold border-emerald-300 shadow' : 'bg-slate-800/80 text-slate-300 border-slate-700 hover:bg-slate-800'"
+                                    class="py-2.5 px-3 rounded-xl border text-center transition cursor-pointer">
+                                <span class="block text-xs">🌿 Emerald Glow</span>
+                            </button>
+                            <button type="button" @click="setCardTheme('ivory')"
+                                    :class="cardTheme === 'ivory' ? 'bg-white text-slate-950 font-extrabold border-amber-400 shadow' : 'bg-slate-800/80 text-slate-300 border-slate-700 hover:bg-slate-800'"
+                                    class="py-2.5 px-3 rounded-xl border text-center transition cursor-pointer">
+                                <span class="block text-xs">☀️ Ivory Executive</span>
+                            </button>
+                        </div>
+                    </div>
+
                     <!-- Highlighted Content Info -->
-                    <div class="p-3.5 bg-slate-800/60 rounded-2xl border border-slate-700/60 space-y-2">
+                    <div class="p-3 bg-slate-800/60 rounded-2xl border border-slate-700/60 space-y-1.5">
                         <div class="flex items-center gap-2 text-slate-200">
-                            <span class="text-[#C9A24D]">🎓</span>
+                            <span class="text-amber-400">🎓</span>
                             <span>Menampilkan Identitas, Instansi/Kampus, & Domisili Anda</span>
                         </div>
                         <div class="flex items-center gap-2 text-slate-200">
-                            <span class="text-[#C9A24D]">📊</span>
+                            <span class="text-amber-400">📊</span>
                             <span>Dilengkapi Skor Dual-Pilar (RQI-15 & WHO-5) + <strong>5 Bar Dimensi RQI</strong></span>
-                        </div>
-                        <div class="flex items-center gap-2 text-slate-200">
-                            <span class="text-[#C9A24D]">🏛️</span>
-                            <span>Desain Eksklusif Resmi Ruhiology Institute (Kualitas Cetak HD)</span>
                         </div>
                     </div>
 
                     <!-- Action Buttons -->
                     <div class="pt-1 space-y-2.5">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                            <button type="button" @click="downloadStoryImage()" class="py-3.5 px-4 bg-gradient-to-r from-[#C9A24D] to-[#B48A16] hover:from-[#B48A16] hover:to-[#96710E] text-[#0B2A43] font-extrabold text-xs uppercase tracking-wider rounded-2xl shadow-xl transition transform hover:-translate-y-0.5 cursor-pointer flex items-center justify-center gap-2">
+                            <button type="button" @click="downloadStoryImage()" class="py-3.5 px-4 bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-600 hover:from-amber-500 hover:to-yellow-700 text-slate-950 font-extrabold text-xs uppercase tracking-wider rounded-2xl shadow-xl transition transform hover:-translate-y-0.5 cursor-pointer flex items-center justify-center gap-2">
                                 <span>📥</span> <span x-text="'Unduh PNG (' + cardRatio + ')'"></span>
                             </button>
 
@@ -668,6 +697,7 @@ function rqResultPage() {
         showStoryModal: false,
         showEditRegionModal: false,
         cardRatio: '4:5',
+        cardTheme: 'royal',
         captionCopied: false,
         editProvinceId: '{{ $submission->participant->province_id ?? '' }}',
         editRegencyId: '{{ $submission->participant->regency_id ?? '' }}',
@@ -709,12 +739,19 @@ function rqResultPage() {
             this.$nextTick(() => this.drawStoryCard());
         },
 
+        setCardTheme(theme) {
+            this.cardTheme = theme;
+            this.$nextTick(() => this.drawStoryCard());
+        },
+
         drawStoryCard() {
             const canvas = document.getElementById('storyCanvas');
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
 
             const isStory = (this.cardRatio === '9:16');
+            const isLight = (this.cardTheme === 'ivory');
+            const isEmerald = (this.cardTheme === 'emerald');
             const W = 1080;
             const H = isStory ? 1920 : 1350;
             canvas.width = W;
@@ -731,70 +768,80 @@ function rqResultPage() {
             logoImg.crossOrigin = 'anonymous';
 
             const render = () => {
-                // 1. Deep Luxury Navy Background
+                // 1. Vibrant Background Gradient according to Theme
                 const bgGrad = ctx.createLinearGradient(0, 0, W, H);
-                bgGrad.addColorStop(0, '#071A2B');
-                bgGrad.addColorStop(0.5, '#0F3350');
-                bgGrad.addColorStop(1, '#051320');
+                if (isLight) {
+                    bgGrad.addColorStop(0, '#FFFDF9');
+                    bgGrad.addColorStop(0.5, '#FEF9EC');
+                    bgGrad.addColorStop(1, '#FDF6E2');
+                } else if (isEmerald) {
+                    bgGrad.addColorStop(0, '#042F2E');
+                    bgGrad.addColorStop(0.5, '#065F46');
+                    bgGrad.addColorStop(1, '#022C22');
+                } else {
+                    bgGrad.addColorStop(0, '#061A2E');
+                    bgGrad.addColorStop(0.45, '#103B63');
+                    bgGrad.addColorStop(1, '#041220');
+                }
                 ctx.fillStyle = bgGrad;
                 ctx.fillRect(0, 0, W, H);
 
-                // Ambient Gold & Emerald Glows
-                const glowTop = ctx.createRadialGradient(W / 2, isStory ? 350 : 250, 20, W / 2, isStory ? 350 : 250, 520);
-                glowTop.addColorStop(0, 'rgba(201, 162, 77, 0.22)');
-                glowTop.addColorStop(1, 'rgba(11, 42, 67, 0)');
+                // Luminous Spotlight Glows
+                const glowTop = ctx.createRadialGradient(W / 2, isStory ? 340 : 240, 20, W / 2, isStory ? 340 : 240, 560);
+                glowTop.addColorStop(0, isLight ? 'rgba(245, 158, 11, 0.16)' : 'rgba(251, 191, 36, 0.28)');
+                glowTop.addColorStop(1, 'rgba(0, 0, 0, 0)');
                 ctx.fillStyle = glowTop;
                 ctx.fillRect(0, 0, W, H);
 
-                // Double Luxury Gold Border Frame
-                ctx.strokeStyle = 'rgba(201, 162, 77, 0.55)';
-                ctx.lineWidth = 3;
+                // Outer & Inner Vibrant Gold Frame
+                ctx.strokeStyle = isLight ? '#0B2A43' : '#F59E0B';
+                ctx.lineWidth = isLight ? 10 : 4;
                 ctx.beginPath();
-                ctx.roundRect(32, 32, W - 64, H - 64, 36);
+                ctx.roundRect(28, 28, W - 56, H - 56, 36);
                 ctx.stroke();
 
-                ctx.strokeStyle = 'rgba(201, 162, 77, 0.22)';
-                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = '#F59E0B';
+                ctx.lineWidth = 2;
                 ctx.beginPath();
-                ctx.roundRect(44, 44, W - 88, H - 88, 28);
+                ctx.roundRect(44, 44, W - 88, H - 88, 26);
                 ctx.stroke();
 
-                let curY = isStory ? 110 : 75;
+                let curY = isStory ? 105 : 72;
 
-                // 2. Top Logo & Institute Title
+                // 2. Top Logo & Institute Header Pill
                 if (logoImg.complete && logoImg.naturalWidth > 0) {
-                    const logoSize = isStory ? 96 : 78;
+                    const logoSize = isStory ? 92 : 76;
                     ctx.drawImage(logoImg, (W - logoSize) / 2, curY, logoSize, logoSize);
-                    curY += logoSize + (isStory ? 38 : 30);
+                    curY += logoSize + (isStory ? 36 : 28);
                 } else {
                     curY += 40;
                 }
 
                 ctx.textAlign = 'center';
-                ctx.fillStyle = '#C9A24D';
-                ctx.font = '800 30px "Poppins", sans-serif';
+                ctx.fillStyle = isLight ? '#0B2A43' : '#FBBF24';
+                ctx.font = '800 32px "Poppins", sans-serif';
                 ctx.fillText('RUHIOLOGY INSTITUTE', W / 2, curY);
 
-                curY += 30;
-                ctx.fillStyle = '#94a3b8';
+                curY += 28;
+                ctx.fillStyle = isLight ? '#B45309' : '#E2E8F0';
                 ctx.font = '700 15px "Plus Jakarta Sans", sans-serif';
-                ctx.fillText('OFFICIAL ASSESSMENT REPORT · RQI-15 & WHO-5 INDEX', W / 2, curY);
+                ctx.fillText('LAPORAN RESMI HASIL ASESMEN RQI-15 & WHO-5 INDEX', W / 2, curY);
 
-                curY += isStory ? 38 : 26;
+                curY += isStory ? 36 : 24;
 
-                // 3. Participant Identity Card
-                const pBoxH = isStory ? 155 : 132;
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
+                // 3. Participant Identity Card (High Contrast)
+                const pBoxH = isStory ? 158 : 134;
+                ctx.fillStyle = isLight ? '#FFFFFF' : 'rgba(255, 255, 255, 0.09)';
                 ctx.beginPath();
                 ctx.roundRect(72, curY, W - 144, pBoxH, 24);
                 ctx.fill();
-                ctx.strokeStyle = 'rgba(201, 162, 77, 0.35)';
-                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = isLight ? '#F59E0B' : 'rgba(251, 191, 36, 0.55)';
+                ctx.lineWidth = 2;
                 ctx.stroke();
 
                 const pName = cleanText('{{ addslashes($submission->participant->name) }}');
-                ctx.fillStyle = '#ffffff';
-                ctx.font = pName.length > 28 ? '700 28px "Poppins", sans-serif' : '700 34px "Poppins", sans-serif';
+                ctx.fillStyle = isLight ? '#0B2A43' : '#FFFFFF';
+                ctx.font = pName.length > 28 ? '800 28px "Poppins", sans-serif' : '800 34px "Poppins", sans-serif';
                 ctx.fillText(pName, W / 2, curY + (isStory ? 56 : 50));
 
                 const catStr = cleanText('{{ addslashes($submission->participant->category ?: "UMUM") }}');
@@ -802,107 +849,116 @@ function rqResultPage() {
                 const regStr = cleanText('{{ addslashes($regionText ?? "") }}');
                 const subLine1 = instStr ? `${catStr}  •  ${instStr}` : catStr;
 
-                ctx.fillStyle = '#C9A24D';
-                ctx.font = '600 18px "Plus Jakarta Sans", sans-serif';
+                ctx.fillStyle = isLight ? '#B45309' : '#FBBF24';
+                ctx.font = '700 18px "Plus Jakarta Sans", sans-serif';
                 ctx.fillText(subLine1.length > 54 ? subLine1.substring(0, 52) + '...' : subLine1, W / 2, curY + (isStory ? 95 : 84));
 
                 if (regStr) {
-                    ctx.fillStyle = '#cbd5e1';
-                    ctx.font = '500 15px "Plus Jakarta Sans", sans-serif';
+                    ctx.fillStyle = isLight ? '#475569' : '#E2E8F0';
+                    ctx.font = '600 15px "Plus Jakarta Sans", sans-serif';
                     ctx.fillText('📍 ' + regStr, W / 2, curY + (isStory ? 128 : 112));
                 }
 
-                curY += pBoxH + (isStory ? 32 : 22);
+                curY += pBoxH + (isStory ? 30 : 20);
 
-                // 4. Dual Metric Score Cards (RQI-15 & WHO-5)
+                // 4. Dual Metric Score Cards (SOLID VIBRANT ROYAL NAVY & EMERALD)
                 const cardH = isStory ? 255 : 220;
                 const cardW = 452;
 
-                // Left Card: RQI-15
-                ctx.fillStyle = 'rgba(201, 162, 77, 0.09)';
+                // Left Card: RQI-15 (Vibrant Navy & Gold)
+                const rqiCardGrad = ctx.createLinearGradient(72, curY, 72 + cardW, curY + cardH);
+                rqiCardGrad.addColorStop(0, '#0B2A43');
+                rqiCardGrad.addColorStop(1, '#15466E');
+                ctx.fillStyle = rqiCardGrad;
                 ctx.beginPath();
                 ctx.roundRect(72, curY, cardW, cardH, 24);
                 ctx.fill();
-                ctx.strokeStyle = 'rgba(201, 162, 77, 0.5)';
-                ctx.lineWidth = 2;
+                ctx.strokeStyle = '#FBBF24';
+                ctx.lineWidth = 3;
                 ctx.stroke();
 
-                ctx.fillStyle = '#C9A24D';
-                ctx.font = '700 16px "Poppins", sans-serif';
+                ctx.fillStyle = '#FDE047';
+                ctx.font = '800 16px "Poppins", sans-serif';
                 ctx.fillText('✦ SKOR RQI-15', 298, curY + 38);
 
-                ctx.fillStyle = '#ffffff';
-                ctx.font = isStory ? '800 72px "Poppins", sans-serif' : '800 62px "Poppins", sans-serif';
+                ctx.fillStyle = '#FBBF24';
+                ctx.font = isStory ? '800 74px "Poppins", sans-serif' : '800 64px "Poppins", sans-serif';
                 ctx.fillText('{{ $rqiScore }}', 298, curY + (isStory ? 116 : 102));
 
-                ctx.fillStyle = '#cbd5e1';
-                ctx.font = '600 17px "Plus Jakarta Sans", sans-serif';
+                ctx.fillStyle = '#F8FAFC';
+                ctx.font = '700 17px "Plus Jakarta Sans", sans-serif';
                 ctx.fillText('/ {{ $maxRqiScore }} Poin ({{ $scorePct }}%)', 298, curY + (isStory ? 150 : 132));
 
                 // RQI Badge Pill
                 const rqiBadgeText = cleanText('{{ addslashes($catName) }}');
-                ctx.fillStyle = '#C9A24D';
+                const pillGrad1 = ctx.createLinearGradient(92, 0, 92 + cardW - 40, 0);
+                pillGrad1.addColorStop(0, '#FDE047');
+                pillGrad1.addColorStop(1, '#F59E0B');
+                ctx.fillStyle = pillGrad1;
                 ctx.beginPath();
                 ctx.roundRect(92, curY + cardH - 64, cardW - 40, 44, 22);
                 ctx.fill();
 
                 ctx.fillStyle = '#071A2B';
-                ctx.font = rqiBadgeText.length > 30 ? '700 13px "Poppins", sans-serif' : '700 15px "Poppins", sans-serif';
+                ctx.font = rqiBadgeText.length > 30 ? '800 13px "Poppins", sans-serif' : '800 15px "Poppins", sans-serif';
                 ctx.fillText(rqiBadgeText.length > 38 ? rqiBadgeText.substring(0, 36) + '...' : rqiBadgeText, 298, curY + cardH - 36);
 
-                // Right Card: WHO-5
-                ctx.fillStyle = 'rgba(16, 185, 129, 0.09)';
+                // Right Card: WHO-5 (Vibrant Emerald Teal)
+                const whoCardGrad = ctx.createLinearGradient(556, curY, 556 + cardW, curY + cardH);
+                whoCardGrad.addColorStop(0, '#065F46');
+                whoCardGrad.addColorStop(1, '#047857');
+                ctx.fillStyle = whoCardGrad;
                 ctx.beginPath();
                 ctx.roundRect(556, curY, cardW, cardH, 24);
                 ctx.fill();
-                ctx.strokeStyle = 'rgba(52, 211, 153, 0.5)';
-                ctx.lineWidth = 2;
+                ctx.strokeStyle = '#34D399';
+                ctx.lineWidth = 3;
                 ctx.stroke();
 
-                ctx.fillStyle = '#6ee7b7';
-                ctx.font = '700 16px "Poppins", sans-serif';
+                ctx.fillStyle = '#A7F3D0';
+                ctx.font = '800 16px "Poppins", sans-serif';
                 ctx.fillText('🌿 INDEKS WHO-5', 782, curY + 38);
 
-                ctx.fillStyle = '#6ee7b7';
-                ctx.font = isStory ? '800 72px "Poppins", sans-serif' : '800 62px "Poppins", sans-serif';
+                ctx.fillStyle = '#FFFFFF';
+                ctx.font = isStory ? '800 74px "Poppins", sans-serif' : '800 64px "Poppins", sans-serif';
                 ctx.fillText('{{ number_format($who5Pct, 0) }}%', 782, curY + (isStory ? 116 : 102));
 
-                ctx.fillStyle = '#cbd5e1';
-                ctx.font = '600 17px "Plus Jakarta Sans", sans-serif';
+                ctx.fillStyle = '#D1FAE5';
+                ctx.font = '700 17px "Plus Jakarta Sans", sans-serif';
                 ctx.fillText('Skor Mentah: {{ $who5Raw }} / 25 Poin', 782, curY + (isStory ? 150 : 132));
 
                 // WHO-5 Badge Pill
                 const who5BadgeText = cleanText('{{ addslashes($who5BadgeTitleShort) }}');
-                ctx.fillStyle = '{{ $who5BadgeBgHex }}';
+                ctx.fillStyle = '#A7F3D0';
                 ctx.beginPath();
                 ctx.roundRect(576, curY + cardH - 64, cardW - 40, 44, 22);
                 ctx.fill();
 
-                ctx.fillStyle = '#ffffff';
-                ctx.font = '700 15px "Poppins", sans-serif';
+                ctx.fillStyle = '#064E3B';
+                ctx.font = '800 15px "Poppins", sans-serif';
                 ctx.fillText(who5BadgeText, 782, curY + cardH - 36);
 
-                curY += cardH + (isStory ? 34 : 22);
+                curY += cardH + (isStory ? 32 : 20);
 
                 // 5. 5-Pillar Competency Progress Bars Box
                 const pillars = this.pillarsData || [];
                 const pSectionH = isStory ? 360 : 285;
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+                ctx.fillStyle = isLight ? '#FFFFFF' : 'rgba(255, 255, 255, 0.08)';
                 ctx.beginPath();
                 ctx.roundRect(72, curY, W - 144, pSectionH, 24);
                 ctx.fill();
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.14)';
-                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = isLight ? '#F59E0B' : 'rgba(251, 191, 36, 0.4)';
+                ctx.lineWidth = 2;
                 ctx.stroke();
 
                 ctx.textAlign = 'left';
-                ctx.fillStyle = '#C9A24D';
-                ctx.font = '700 16px "Poppins", sans-serif';
+                ctx.fillStyle = isLight ? '#0B2A43' : '#FBBF24';
+                ctx.font = '800 16px "Poppins", sans-serif';
                 ctx.fillText('✦ PROFIL CAPAIAN 5 PILAR DIMENSI RQI-15', 105, curY + 38);
 
                 ctx.textAlign = 'right';
-                ctx.fillStyle = '#94a3b8';
-                ctx.font = '600 14px "Plus Jakarta Sans", sans-serif';
+                ctx.fillStyle = isLight ? '#B45309' : '#A7F3D0';
+                ctx.font = '700 14px "Plus Jakarta Sans", sans-serif';
                 ctx.fillText('SKALA 0–100%', W - 105, curY + 38);
 
                 const rowStart = curY + (isStory ? 74 : 64);
@@ -911,24 +967,25 @@ function rqResultPage() {
                 pillars.slice(0, 5).forEach((p, idx) => {
                     const y = rowStart + (idx * rowGap);
                     ctx.textAlign = 'left';
-                    ctx.fillStyle = '#f8fafc';
-                    ctx.font = '600 17px "Plus Jakarta Sans", sans-serif';
+                    ctx.fillStyle = isLight ? '#0B2A43' : '#FFFFFF';
+                    ctx.font = '700 17px "Plus Jakarta Sans", sans-serif';
                     ctx.fillText(`${idx + 1}. ${p.name}`, 105, y);
 
                     // Bar Track
                     const barX = 485;
                     const barW = 390;
-                    const barH = isStory ? 18 : 14;
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
+                    const barH = isStory ? 18 : 15;
+                    ctx.fillStyle = isLight ? '#E2E8F0' : 'rgba(255, 255, 255, 0.16)';
                     ctx.beginPath();
                     ctx.roundRect(barX, y - barH + 3, barW, barH, barH / 2);
                     ctx.fill();
 
-                    // Bar Fill
-                    const fillW = Math.max(20, Math.min(barW, (p.pct / 100) * barW));
+                    // Bar Fill (Vibrant Amber -> Emerald)
+                    const fillW = Math.max(22, Math.min(barW, (p.pct / 100) * barW));
                     const barGrad = ctx.createLinearGradient(barX, 0, barX + fillW, 0);
-                    barGrad.addColorStop(0, '#C9A24D');
-                    barGrad.addColorStop(1, '#34d399');
+                    barGrad.addColorStop(0, '#F59E0B');
+                    barGrad.addColorStop(0.5, '#FBBF24');
+                    barGrad.addColorStop(1, '#10B981');
                     ctx.fillStyle = barGrad;
                     ctx.beginPath();
                     ctx.roundRect(barX, y - barH + 3, fillW, barH, barH / 2);
@@ -936,55 +993,55 @@ function rqResultPage() {
 
                     // Pct Text
                     ctx.textAlign = 'right';
-                    ctx.fillStyle = '#C9A24D';
-                    ctx.font = '700 18px "Poppins", sans-serif';
+                    ctx.fillStyle = isLight ? '#0B2A43' : '#FDE047';
+                    ctx.font = '800 18px "Poppins", sans-serif';
                     ctx.fillText(`${p.pct}%`, W - 105, y + 1);
                 });
 
-                curY += pSectionH + (isStory ? 34 : 20);
+                curY += pSectionH + (isStory ? 32 : 18);
 
                 // 6. Interpretation / Philosophical Reflection Box
-                const quoteBoxH = isStory ? 260 : 165;
-                ctx.fillStyle = 'rgba(201, 162, 77, 0.07)';
+                const quoteBoxH = isStory ? 260 : 168;
+                ctx.fillStyle = isLight ? '#FEF3C7' : 'rgba(251, 191, 36, 0.1)';
                 ctx.beginPath();
                 ctx.roundRect(72, curY, W - 144, quoteBoxH, 24);
                 ctx.fill();
-                ctx.strokeStyle = 'rgba(201, 162, 77, 0.3)';
-                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = '#F59E0B';
+                ctx.lineWidth = 2;
                 ctx.stroke();
 
                 ctx.textAlign = 'center';
-                ctx.fillStyle = '#C9A24D';
-                ctx.font = '700 15px "Poppins", sans-serif';
+                ctx.fillStyle = isLight ? '#92400E' : '#FDE047';
+                ctx.font = '800 15px "Poppins", sans-serif';
                 ctx.fillText('✦ REFLEKSI PROFIL RUHIOLOGI', W / 2, curY + 34);
 
-                ctx.fillStyle = '#f1f5f9';
-                ctx.font = isStory ? 'italic 20px "Plus Jakarta Sans", sans-serif' : 'italic 17px "Plus Jakarta Sans", sans-serif';
+                ctx.fillStyle = isLight ? '#0B2A43' : '#FFFFFF';
+                ctx.font = isStory ? 'italic 600 20px "Plus Jakarta Sans", sans-serif' : 'italic 600 17px "Plus Jakarta Sans", sans-serif';
                 const interpText = cleanText('"{{ addslashes($submission->result->overall_interpretation) }}"');
                 this.wrapText(ctx, interpText, W / 2, curY + (isStory ? 74 : 66), 860, isStory ? 32 : 26, isStory ? 4 : 3);
 
-                curY += quoteBoxH + (isStory ? 42 : 24);
+                curY += quoteBoxH + (isStory ? 40 : 22);
 
                 // 7. Footer Branding & Verification
-                ctx.strokeStyle = 'rgba(201, 162, 77, 0.35)';
-                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = isLight ? '#D97706' : 'rgba(251, 191, 36, 0.45)';
+                ctx.lineWidth = 2;
                 ctx.beginPath();
                 ctx.moveTo(160, curY);
                 ctx.lineTo(W - 160, curY);
                 ctx.stroke();
 
                 const founderName = cleanText('{{ addslashes(\App\Models\Setting::get("founder_name", "Prof. Dr. Iskandar Nazari, S.Ag., M.Pd., M.S.I., M.H., Ph.D.")) }}');
-                ctx.fillStyle = '#ffffff';
-                ctx.font = '700 19px "Poppins", sans-serif';
+                ctx.fillStyle = isLight ? '#0B2A43' : '#FFFFFF';
+                ctx.font = '800 19px "Poppins", sans-serif';
                 ctx.fillText(founderName, W / 2, curY + (isStory ? 38 : 30));
 
-                ctx.fillStyle = '#C9A24D';
-                ctx.font = '600 15px "Plus Jakarta Sans", sans-serif';
+                ctx.fillStyle = isLight ? '#B45309' : '#FBBF24';
+                ctx.font = '700 15px "Plus Jakarta Sans", sans-serif';
                 ctx.fillText('Founder Ruhiology Institute  •  ruhiology-institute.site', W / 2, curY + (isStory ? 66 : 54));
 
-                ctx.fillStyle = '#94a3b8';
-                ctx.font = '600 14px monospace';
-                ctx.fillText('KODE VERIFIKASI RESMI: {{ $submission->submission_code }}', W / 2, curY + (isStory ? 96 : 78));
+                ctx.fillStyle = isLight ? '#047857' : '#A7F3D0';
+                ctx.font = '700 14px monospace';
+                ctx.fillText('✓ KODE VERIFIKASI RESMI: {{ $submission->submission_code }}', W / 2, curY + (isStory ? 96 : 78));
             };
 
             logoImg.onload = render;
@@ -1026,7 +1083,7 @@ function rqResultPage() {
             if (!canvas) return;
             const suffix = this.cardRatio === '9:16' ? 'story_9x16' : 'feed_4x5';
             const link = document.createElement('a');
-            link.download = `Kartu_RQI_{{ $submission->submission_code }}_${suffix}.png`;
+            link.download = `Kartu_RQI_{{ $submission->submission_code }}_${this.cardTheme}_${suffix}.png`;
             link.href = canvas.toDataURL('image/png', 1.0);
             link.click();
         },
