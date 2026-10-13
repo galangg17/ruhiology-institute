@@ -11,7 +11,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
@@ -33,8 +33,10 @@
                         amber: { 500: '#F59E0B', 600: '#D97706', 700: '#B45309' }
                     },
                     fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', '"Outfit"', 'sans-serif'],
-                        serif: ['"Outfit"', '"Plus Jakarta Sans"', 'sans-serif'],
+                        sans: ['"Plus Jakarta Sans"', '"Inter"', '"Poppins"', 'sans-serif'],
+                        serif: ['"Poppins"', '"Plus Jakarta Sans"', 'sans-serif'],
+                        display: ['"Poppins"', '"Plus Jakarta Sans"', 'sans-serif'],
+                        mono: ['"Poppins"', '"Inter"', 'sans-serif'],
                     }
                 }
             }
@@ -42,6 +44,13 @@
     </script>
     <style>
         [x-cloak] { display: none !important; }
+        h1, h2, h3, h4, h5, h6, button {
+            font-family: 'Poppins', 'Plus Jakarta Sans', sans-serif;
+            letter-spacing: -0.01em;
+        }
+        table, td, th, .font-mono {
+            font-variant-numeric: tabular-nums;
+        }
         @media print {
             body {
                 background: #ffffff !important;

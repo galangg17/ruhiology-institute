@@ -26,10 +26,10 @@
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
-    <!-- Google Fonts: Plus Jakarta Sans (Sans) & Outfit (Display) & DM Serif Display -->
+    <!-- Google Fonts: Poppins (Headings & UI) + Inter & Plus Jakarta Sans (Body & Tabular Data) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
 
     <!-- Chart.js for Assessment Engine -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -57,9 +57,10 @@
                         textmuted: '#687582',
                     },
                     fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', '"Outfit"', 'Inter', 'sans-serif'],
-                        serif: ['"Outfit"', '"Plus Jakarta Sans"', '"DM Serif Display"', 'sans-serif'],
-                        display: ['"Outfit"', '"Plus Jakarta Sans"', 'sans-serif'],
+                        sans: ['"Plus Jakarta Sans"', '"Inter"', '"Poppins"', 'sans-serif'],
+                        serif: ['"Poppins"', '"Plus Jakarta Sans"', 'sans-serif'],
+                        display: ['"Poppins"', '"Plus Jakarta Sans"', 'sans-serif'],
+                        mono: ['"Poppins"', '"Inter"', 'sans-serif'],
                     },
                     maxWidth: {
                         '7xl': '1280px',
@@ -68,6 +69,15 @@
             }
         }
     </script>
+    <style>
+        h1, h2, h3, h4, h5, h6, button, .btn {
+            font-family: 'Poppins', 'Plus Jakarta Sans', sans-serif;
+            letter-spacing: -0.01em;
+        }
+        table, td, th, .font-mono {
+            font-variant-numeric: tabular-nums;
+        }
+    </style>
 
     <style>
         [x-cloak] { display: none !important; }
