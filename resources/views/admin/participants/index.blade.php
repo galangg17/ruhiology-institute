@@ -530,24 +530,29 @@
                                     <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
                                         <div class="flex justify-between items-start border-b border-slate-100 pb-2">
                                             <div>
-                                                <strong class="text-slate-900 font-bold text-xs block" x-text="sub.instrument ? sub.instrument.title : 'Paket Soal'"></strong>
+                                                <strong class="text-slate-900 font-bold text-xs block" x-text="(sub.period && sub.period.instrument) ? sub.period.instrument.name : (sub.period ? sub.period.title : 'Paket Soal RQI')"></strong>
                                                 <span class="text-[10px] text-slate-400 font-mono" x-text="sub.created_at ? new Date(sub.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-'"></span>
                                             </div>
-                                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider" :class="sub.type === 'pretest' ? 'bg-sky-100 text-sky-800' : 'bg-emerald-100 text-emerald-800'" x-text="sub.type || 'evaluasi'"></span>
+                                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider" :class="(sub.submission_type || sub.type) === 'pretest' ? 'bg-sky-100 text-sky-800' : 'bg-emerald-100 text-emerald-800'" x-text="sub.submission_type || sub.type || 'evaluasi'"></span>
                                         </div>
 
                                         <div class="grid grid-cols-2 gap-2 text-center bg-slate-50 p-2.5 rounded-xl border border-slate-100">
                                             <div>
                                                 <span class="text-[10px] text-slate-400 font-mono block">SKOR TOTAL RQI</span>
-                                                <span class="text-lg font-black font-mono text-amber-800" x-text="sub.total_score || '0.0'"></span>
+                                                <span class="text-lg font-black font-mono text-amber-800" x-text="sub.result ? (sub.result.rqi_score || sub.result.total_score || '0') : (sub.total_score || '0')"></span>
                                             </div>
                                             <div>
                                                 <span class="text-[10px] text-slate-400 font-mono block">KATEGORI RUHIOLOGI</span>
-                                                <span class="text-xs font-bold text-emerald-700 block" x-text="sub.rq_category || 'Terhitung'"></span>
+                                                <span class="text-xs font-bold text-emerald-700 block" x-text="sub.result ? (sub.result.category_name || 'Terhitung') : (sub.rq_category || 'Terhitung')"></span>
                                             </div>
                                         </div>
 
-                                        <div class="pt-1 flex justify-end gap-2">
+                                        <div class="pt-1 flex flex-wrap justify-end gap-2">
+                                            <template x-if="sub.result && sub.result.id">
+                                                <a :href="'{{ url('admin/results') }}/' + sub.result.id" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-xl border border-slate-200">
+                                                    🔍 Audit Detail
+                                                </a>
+                                            </template>
                                             <a :href="'{{ url('assessment/result') }}/' + sub.submission_code" target="_blank" class="px-3 py-1.5 bg-[#0B2A43] text-white font-bold text-xs rounded-xl shadow-xs hover:bg-[#123B59]">
                                                 Lihat Laporan Hasil ➔
                                             </a>
