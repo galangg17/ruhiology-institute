@@ -260,21 +260,6 @@ class Realistic3900MandiriSeeder extends Seeder
             }
         }
 
-        // Also clean up any old fake admin@ruhiologyinstitute.com emails if present
-        $badEmails = DB::table('participants')
-            ->where('email', 'like', '%ruhiologyinstitute.com%')
-            ->orWhere('email', 'like', 'participant.%')
-            ->get(['id', 'name']);
-
-        foreach ($badEmails as $row) {
-            $cleanSlug = strtolower(preg_replace('/[^a-zA-Z]/', '', $row->name ?: 'peserta'));
-            if (strlen($cleanSlug) < 4) {
-                $cleanSlug = 'ahmadfauzi';
-            }
-            $realisticEmail = substr($cleanSlug, 0, 14) . rand(11, 99) . '@gmail.com';
-            DB::table('participants')->where('id', $row->id)->update(['email' => $realisticEmail]);
-        }
-
         $totalTarget = 3900;
         $batchSize = 150;
         $chunks = (int) ceil($totalTarget / $batchSize);
