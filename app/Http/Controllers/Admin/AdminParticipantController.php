@@ -136,8 +136,8 @@ class AdminParticipantController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'institution_id' => ['required', 'exists:institutions,id'],
-            'program_id' => ['required', 'exists:programs,id'],
+            'institution_id' => ['nullable', 'exists:institutions,id'],
+            'program_id' => ['nullable', 'exists:programs,id'],
             'province_id' => ['nullable', 'exists:provinces,id'],
             'regency_id' => ['nullable', 'exists:regencies,id'],
             'school_custom' => ['nullable', 'string', 'max:255'],
@@ -180,8 +180,8 @@ class AdminParticipantController extends Controller
     public function update(Request $request, Participant $participant)
     {
         $validated = $request->validate([
-            'institution_id' => ['required', 'exists:institutions,id'],
-            'program_id' => ['required', 'exists:programs,id'],
+            'institution_id' => ['nullable', 'exists:institutions,id'],
+            'program_id' => ['nullable', 'exists:programs,id'],
             'province_id' => ['nullable', 'exists:provinces,id'],
             'regency_id' => ['nullable', 'exists:regencies,id'],
             'school_custom' => ['nullable', 'string', 'max:255'],

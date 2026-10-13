@@ -1,66 +1,80 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="space-y-6" x-data="{ 
-    createModal: false, 
-    importModal: false,
-    importServerModal: false,
-    editModal: false,
-    drawerOpen: false,
-    drawerTab: 'profile',
-    selectedParticipant: null,
-    participantsMap: @json($participants->getCollection()->keyBy('id')),
-    regenciesMap: @json($regenciesMap ?? []),
-    createProvinceId: '',
-    createRegencyId: '',
-    getRegencies(provId) {
-        if (!provId) return [];
-        const pid = String(provId);
-        return this.regenciesMap[pid] || this.regenciesMap[Number(pid)] || [];
-    },
-    editData: {
-        id: '',
-        participant_code: '',
-        name: '',
-        email: '',
-        phone: '',
-        batch: '',
-        gender: 'Laki-laki',
-        institution_id: '',
-        program_id: '',
-        province_id: '',
-        regency_id: '',
-        school_custom: '',
-        university_custom: '',
-        status: 'active'
-    },
-    openEdit(partOrId) {
-        const part = (typeof partOrId === 'object' && partOrId !== null) ? partOrId : (this.participantsMap[partOrId] || {});
-        this.editData = {
-            id: part.id || '',
-            participant_code: part.participant_code || '',
-            name: part.name || '',
-            email: part.email || '',
-            phone: part.phone || '',
-            batch: part.batch || 'Angkatan 2026',
-            gender: part.gender || 'Laki-laki',
-            institution_id: part.institution_id || '',
-            program_id: part.program_id || '',
-            province_id: part.province_id || '',
-            regency_id: part.regency_id || '',
-            school_custom: part.school_custom || '',
-            university_custom: part.university_custom || '',
-            status: part.status || 'active'
+<script>
+    window.__participantsMap = @json($participants->getCollection()->keyBy('id'));
+    window.__regenciesMap = @json($regenciesMap ?? []);
+
+    function participantManager() {
+        return {
+            createModal: false,
+            importModal: false,
+            importServerModal: false,
+            editModal: false,
+            drawerOpen: false,
+            drawerTab: 'profile',
+            selectedParticipant: null,
+            participantsMap: window.__participantsMap || {},
+            regenciesMap: window.__regenciesMap || {},
+            createProvinceId: '',
+            createRegencyId: '',
+            getRegencies(provId) {
+                if (!provId) return [];
+                const pid = String(provId);
+                return this.regenciesMap[pid] || this.regenciesMap[Number(pid)] || [];
+            },
+            editData: {
+                id: '',
+                participant_code: '',
+                name: '',
+                email: '',
+                phone: '',
+                batch: '',
+                gender: 'Laki-laki',
+                institution_id: '',
+                program_id: '',
+                province_id: '',
+                regency_id: '',
+                school_custom: '',
+                university_custom: '',
+                status: 'active'
+            },
+            openEdit(partOrId) {
+                const part = (typeof partOrId === 'object' && partOrId !== null)
+                    ? partOrId
+                    : (this.participantsMap[partOrId] || this.participantsMap[String(partOrId)] || {});
+                this.editData = {
+                    id: part.id || '',
+                    participant_code: part.participant_code || '',
+                    name: part.name || '',
+                    email: part.email || '',
+                    phone: part.phone || '',
+                    batch: part.batch || 'Angkatan 2026',
+                    gender: part.gender || 'Laki-laki',
+                    institution_id: part.institution_id || '',
+                    program_id: part.program_id || '',
+                    province_id: part.province_id ? String(part.province_id) : '',
+                    regency_id: part.regency_id ? String(part.regency_id) : '',
+                    school_custom: part.school_custom || '',
+                    university_custom: part.university_custom || '',
+                    status: part.status || 'active'
+                };
+                this.editModal = true;
+            },
+            openDrawer(partOrId, tab = 'profile') {
+                const part = (typeof partOrId === 'object' && partOrId !== null)
+                    ? partOrId
+                    : (this.participantsMap[partOrId] || this.participantsMap[String(partOrId)] || null);
+                if (!part) return;
+                this.selectedParticipant = part;
+                this.drawerTab = tab;
+                this.drawerOpen = true;
+            }
         };
-        this.editModal = true;
-    },
-    openDrawer(partOrId, tab = 'profile') {
-        const part = (typeof partOrId === 'object' && partOrId !== null) ? partOrId : (this.participantsMap[partOrId] || {});
-        this.selectedParticipant = part;
-        this.drawerTab = tab;
-        this.drawerOpen = true;
     }
-}">
+</script>
+
+<div class="space-y-6" x-data="participantManager()">
 
     <!-- HUB NAV BAR (UNIFIED SWITCHER FOR PESERTA & HASIL EVALUASI) -->
     <div class="bg-white p-2 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-2 font-sans">
@@ -742,16 +756,18 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block font-bold text-slate-700 mb-1">Institusi Mitra *</label>
-                        <select name="institution_id" x-model="editData.institution_id" required class="w-full p-2.5 rounded-xl border border-slate-300">
+                        <label class="block font-bold text-slate-700 mb-1">Institusi Mitra</label>
+                        <select name="institution_id" x-model="editData.institution_id" class="w-full p-2.5 rounded-xl border border-slate-300">
+                            <option value="">-- Tanpa Institusi / Mandiri --</option>
                             @foreach($institutions as $inst)
                                 <option value="{{ $inst->id }}">{{ $inst->name }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div>
-                        <label class="block font-bold text-slate-700 mb-1">Program Asesmen *</label>
-                        <select name="program_id" x-model="editData.program_id" required class="w-full p-2.5 rounded-xl border border-slate-300">
+                        <label class="block font-bold text-slate-700 mb-1">Program Asesmen</label>
+                        <select name="program_id" x-model="editData.program_id" class="w-full p-2.5 rounded-xl border border-slate-300">
+                            <option value="">-- Tanpa Program --</option>
                             @foreach($programs as $p)
                                 <option value="{{ $p->id }}">{{ $p->name }}</option>
                             @endforeach
@@ -855,6 +871,8 @@
                 </div>
             </form>
         </div>
+    </div>
+
     <!-- MODAL IMPOR DATA SERVER ONLINE (.CSV) -->
     <div x-show="importServerModal" x-cloak class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
         <div class="bg-white max-w-xl w-full rounded-3xl p-6 border border-slate-200 shadow-2xl space-y-4">
