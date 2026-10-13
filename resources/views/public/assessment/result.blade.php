@@ -7,7 +7,7 @@
     $catName = $submission->result->category_name ?? 'Level 3: Developing Soul (Jiwa Berproses Stabil)';
     $scorePct = round(($rqiScore / $maxRqiScore) * 100, 1);
 
-    // Filter strictly 5 RQI-15 Dimensions (exclude any 6th WHO-5 row if present)
+    // Filter strictly 5 RQI-15 Dimensions
     $rqiOnlyDimensions = ($submission->result->dimensionResults ?? collect())->filter(function($dr) {
         $code = strtolower($dr->dimension->code ?? '');
         $name = strtolower($dr->dimension->name ?? '');
@@ -25,48 +25,25 @@
 
     $regionText = trim(($submission->participant->regency->name ?? '') . (isset($submission->participant->regency) && isset($submission->participant->province) ? ', ' : '') . ($submission->participant->province->name ?? ''));
 
-    // Dynamic Level Badge Styling for RQI-15 Levels 1..5
-    if ($rqiScore >= 65) {
-        $badgeGradient = 'from-emerald-500 to-teal-600 text-white border-emerald-400';
-    } elseif ($rqiScore >= 54) {
-        $badgeGradient = 'from-sky-600 to-indigo-600 text-white border-sky-400';
-    } elseif ($rqiScore >= 41) {
-        $badgeGradient = 'from-amber-500 to-amber-600 text-slate-950 border-amber-300';
-    } elseif ($rqiScore >= 27) {
-        $badgeGradient = 'from-orange-600 to-amber-700 text-white border-orange-400';
-    } else {
-        $badgeGradient = 'from-rose-600 to-red-700 text-white border-rose-400';
-    }
-
     $hasWho5 = ($submission->result->who5_percentage !== null);
     $who5Raw = $submission->result->who5_raw_score ?? 0;
     $who5Pct = $submission->result->who5_percentage ?? 0;
     
     if ($who5Raw >= 20 || $who5Pct >= 80) {
-        $who5LevelName = 'Level 5: Thriving & Energetic (Super Bahagia)';
-        $who5BadgeStyle = 'from-emerald-500 to-teal-600 text-white border-emerald-400';
+        $who5LevelName = 'Level 5: Thriving & Energetic (Sangat Sejahtera)';
         $who5BadgeTitleShort = 'Level 5: Thriving & Energetic';
-        $who5BadgeBgHex = '#10b981';
     } elseif ($who5Raw >= 16 || $who5Pct >= 64) {
         $who5LevelName = 'Level 4: Good Vibe & Fresh (Sejahtera)';
-        $who5BadgeStyle = 'from-sky-600 to-blue-600 text-white border-sky-400';
         $who5BadgeTitleShort = 'Level 4: Good Vibe & Fresh';
-        $who5BadgeBgHex = '#0284c7';
     } elseif ($who5Raw >= 11 || $who5Pct >= 44) {
         $who5LevelName = 'Level 3: Moderate Well-Being (Cukup Stabil)';
-        $who5BadgeStyle = 'from-amber-500 to-yellow-600 text-slate-950 border-amber-300';
         $who5BadgeTitleShort = 'Level 3: Moderate Well-Being';
-        $who5BadgeBgHex = '#f59e0b';
     } elseif ($who5Raw >= 6 || $who5Pct >= 24) {
-        $who5LevelName = 'Level 2: Low Energy (Sering Cemas)';
-        $who5BadgeStyle = 'from-orange-600 to-amber-700 text-white border-orange-400';
+        $who5LevelName = 'Level 2: Low Energy (Perlu Perhatian)';
         $who5BadgeTitleShort = 'Level 2: Low Energy';
-        $who5BadgeBgHex = '#ea580c';
     } else {
-        $who5LevelName = 'Level 1: Mental Exhausted (Burnout Parah)';
-        $who5BadgeStyle = 'from-rose-600 to-red-700 text-white border-rose-400';
+        $who5LevelName = 'Level 1: Mental Exhausted (Perlu Pendampingan)';
         $who5BadgeTitleShort = 'Level 1: Mental Exhausted';
-        $who5BadgeBgHex = '#e11d48';
     }
 
     $canvasPillars = $rqiOnlyDimensions->map(function($dr) {
@@ -125,104 +102,109 @@
 }
 </style>
 
-<!-- Hero Header Banner -->
-<div class="bg-[#0B2A43] text-white py-6 sm:py-10 border-b border-slate-800 no-print">
+<!-- Hero Header Banner (Calm Editorial Oxford Navy) -->
+<div class="bg-[#0F2537] text-white py-7 sm:py-10 border-b border-slate-800 no-print">
     <div class="max-w-[1280px] mx-auto px-4 sm:px-10">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-                <span class="text-[9px] sm:text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest bg-white/10 px-3 py-1 rounded-full border border-white/20 inline-block mb-2">
+                <span class="text-[10px] font-mono font-semibold text-[#C5A059] uppercase tracking-[0.18em] block mb-1.5">
                     LAPORAN HASIL INDIVIDUAL RQ ASSESSMENT
                 </span>
-                <h1 class="text-xl sm:text-3xl font-extrabold font-serif text-white tracking-tight">{{ $submission->period->title }}</h1>
-                <p class="text-xs text-slate-300 mt-1">
-                    Kode Assessment: <strong class="font-mono text-[#C9A24D] text-sm">{{ $submission->participant->assessment_code ?? $submission->participant->participant_code }}</strong>
-                    &bull; Kode Sesi: <strong class="font-mono text-white text-xs">{{ $submission->submission_code }}</strong>
-                    &bull; Sesi: <strong class="uppercase text-emerald-400 font-bold">{{ $submission->submission_type }}</strong>
+                <h1 class="text-xl sm:text-3xl font-bold font-serif text-white tracking-tight">{{ $submission->period->title }}</h1>
+                <p class="text-xs text-slate-300 mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
+                    <span>Kode Assessment: <strong class="font-mono text-white">{{ $submission->participant->assessment_code ?? $submission->participant->participant_code }}</strong></span>
+                    <span class="text-slate-600">|</span>
+                    <span>Kode Sesi: <strong class="font-mono text-[#C5A059]">{{ $submission->submission_code }}</strong></span>
+                    <span class="text-slate-600">|</span>
+                    <span>Tipe Sesi: <strong class="uppercase text-slate-200">{{ $submission->submission_type }}</strong></span>
                 </p>
             </div>
             <div class="flex flex-wrap gap-2.5 w-full md:w-auto">
-                <a href="{{ route('assessment.certificate', $submission->submission_code) }}" target="_blank" class="flex-1 md:flex-none justify-center px-4 py-3 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg transition cursor-pointer flex items-center gap-2 uppercase tracking-wider min-h-[44px]">
-                    <span>📜</span> <span>Sertifikat Resmi</span>
+                <a href="{{ route('assessment.certificate', $submission->submission_code) }}" target="_blank" class="flex-1 md:flex-none justify-center px-4 py-2.5 bg-[#B5945B] hover:bg-[#A3834B] text-white text-xs font-semibold rounded-xl shadow-xs transition cursor-pointer flex items-center gap-2 min-h-[42px]">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+                    <span>Sertifikat Resmi</span>
                 </a>
-                <button onclick="window.print()" class="flex-1 md:flex-none justify-center px-4 py-3 bg-[#C9A24D] hover:bg-[#B48A16] text-[#0B2A43] text-xs font-bold rounded-xl shadow-lg transition cursor-pointer flex items-center gap-2 uppercase tracking-wider min-h-[44px]">
-                    <span>🖨️</span> <span>Cetak Laporan</span>
+                <button @click="openStoryModal()" class="flex-1 md:flex-none justify-center px-4 py-2.5 bg-white/10 hover:bg-white/15 text-white border border-white/20 text-xs font-semibold rounded-xl transition cursor-pointer flex items-center gap-2 min-h-[42px]">
+                    <svg class="w-4 h-4 text-[#C5A059]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+                    <span>Kartu Sosmed (IG/WA)</span>
                 </button>
-                <button @click="openStoryModal()" class="flex-1 md:flex-none justify-center px-4 py-3 bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 hover:from-purple-700 hover:to-rose-700 text-white text-xs font-bold rounded-xl shadow-lg transition cursor-pointer flex items-center gap-2 uppercase tracking-wider min-h-[44px]">
-                    <span>📱</span> <span>Kartu Sosmed (IG/WA)</span>
+                <button onclick="window.print()" class="flex-1 md:flex-none justify-center px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold rounded-xl transition cursor-pointer flex items-center gap-2 min-h-[42px]">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                    <span>Cetak Laporan</span>
                 </button>
             </div>
         </div>
     </div>
 </div>
 
-<div class="py-6 sm:py-10 bg-[#F8F6F0] min-h-screen print-container">
+<div class="py-6 sm:py-10 bg-[#F8F7F4] min-h-screen print-container">
     <div class="max-w-[1280px] mx-auto px-4 sm:px-10 space-y-6 sm:space-y-8">
 
         @if(session('success'))
-            <div class="p-4 bg-emerald-50 text-emerald-900 text-xs font-bold rounded-2xl border border-emerald-200 shadow-sm flex items-center justify-between no-print">
-                <span>✨ {{ session('success') }}</span>
+            <div class="p-4 bg-emerald-50 text-emerald-900 text-xs font-semibold rounded-2xl border border-emerald-200 shadow-2xs flex items-center justify-between no-print">
+                <span>{{ session('success') }}</span>
             </div>
         @endif
         
         <!-- Official Printable Header (Visible only in PDF Print) -->
-        <div class="hidden print:block border-b-2 border-[#0B2A43] pb-4 mb-4">
+        <div class="hidden print:block border-b-2 border-[#0F2537] pb-4 mb-4">
             <div class="flex justify-between items-center">
                 <div class="flex items-center gap-3">
                     <img src="{{ asset('images/ruhiology-logo.png') }}" class="w-11 h-11 object-contain" alt="Logo">
                     <div>
-                        <h2 class="text-lg font-serif font-extrabold text-[#0B2A43] tracking-wide uppercase">RUHIOLOGY INSTITUTE</h2>
+                        <h2 class="text-lg font-serif font-bold text-[#0F2537] tracking-wide uppercase">RUHIOLOGY INSTITUTE</h2>
                         <p class="text-[11px] text-slate-600">Laporan Resmi Hasil Individu Asesmen Kesadaran Ruhiologi (RQI-15 & WHO-5 Index)</p>
                     </div>
                 </div>
                 <div class="text-right text-[11px] font-mono">
-                    <p class="font-bold text-[#0B2A43]">NO: {{ $submission->submission_code }}</p>
+                    <p class="font-bold text-[#0F2537]">NO: {{ $submission->submission_code }}</p>
                     <p class="text-slate-500">Tanggal: {{ optional($submission->submitted_at)->format('d/m/Y H:i') }}</p>
                 </div>
             </div>
         </div>
 
         <!-- Participant Info Metadata Header -->
-        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-sm text-xs print-avoid-break">
+        <div class="bg-white p-5 sm:p-6 rounded-2xl border border-[#E5E0D5] shadow-2xs text-xs print-avoid-break">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 items-center">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-[#0B2A43] text-[#C9A24D] font-bold text-sm flex items-center justify-center font-mono shrink-0 shadow border border-[#C9A24D]/30">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-10 h-10 rounded-xl bg-[#0F2537] text-[#C5A059] font-semibold text-sm flex items-center justify-center font-mono shrink-0">
                         {{ strtoupper(substr($submission->participant->name, 0, 2)) }}
                     </div>
                     <div>
-                        <span class="text-slate-400 uppercase font-bold text-[9px] block font-mono">NAMA LENGKAP PESERTA</span>
-                        <strong class="font-bold text-[#0B2A43] text-sm block leading-snug">{{ $submission->participant->name }}</strong>
+                        <span class="text-slate-400 uppercase font-semibold text-[9px] block font-mono tracking-wider">NAMA LENGKAP PESERTA</span>
+                        <strong class="font-bold text-[#0F2537] text-sm block leading-snug mt-0.5">{{ $submission->participant->name }}</strong>
                     </div>
                 </div>
 
                 <div>
-                    <span class="text-slate-400 uppercase font-bold text-[9px] block font-mono">KATEGORI & ASAL INSTANSI</span>
-                    <span class="font-bold text-[#0B2A43] text-xs block mt-0.5 leading-snug">
+                    <span class="text-slate-400 uppercase font-semibold text-[9px] block font-mono tracking-wider">KATEGORI & ASAL INSTANSI</span>
+                    <span class="font-semibold text-[#0F2537] text-xs block mt-0.5 leading-snug">
                         {{ $submission->participant->category ?: 'UMUM' }}
                         @if($instName)
-                            &mdash; <span class="text-slate-600 font-semibold">{{ $instName }}</span>
+                            &mdash; <span class="text-slate-600 font-normal">{{ $instName }}</span>
                         @endif
                     </span>
                 </div>
 
                 <div>
                     <div class="flex items-center justify-between">
-                        <span class="text-slate-400 uppercase font-bold text-[9px] block font-mono">WILAYAH ASAL (DOMISILI)</span>
-                        <button type="button" @click="openEditRegionModal()" class="no-print text-[10px] text-amber-700 hover:text-amber-900 font-bold underline cursor-pointer inline-flex items-center gap-0.5">
-                            <span>✏️</span> <span>Ubah</span>
+                        <span class="text-slate-400 uppercase font-semibold text-[9px] block font-mono tracking-wider">WILAYAH ASAL (DOMISILI)</span>
+                        <button type="button" @click="openEditRegionModal()" class="no-print text-[10px] text-[#8C703E] hover:text-[#0F2537] font-semibold underline cursor-pointer">
+                            Ubah
                         </button>
                     </div>
-                    <span class="font-bold text-[#0B2A43] text-xs block mt-0.5">
-                        📍 {{ $regionText ?: 'Tidak diisi' }}
+                    <span class="font-semibold text-[#0F2537] text-xs block mt-0.5">
+                        {{ $regionText ?: 'Tidak diisi' }}
                     </span>
                 </div>
 
                 <div>
-                    <span class="text-slate-400 uppercase font-bold text-[9px] block font-mono">TANGGAL & STATUS SESI</span>
+                    <span class="text-slate-400 uppercase font-semibold text-[9px] block font-mono tracking-wider">TANGGAL & STATUS SESI</span>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <span class="font-bold text-slate-700 text-xs">
+                        <span class="font-semibold text-slate-700 text-xs">
                             {{ $submission->submitted_at ? $submission->submitted_at->format('d M Y, H:i') : '-' }}
                         </span>
-                        <span class="uppercase text-amber-800 bg-amber-50 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold border border-amber-200">
+                        <span class="uppercase text-[#0F2537] bg-[#F4F1EA] px-2.5 py-0.5 rounded-md text-[10px] font-mono font-semibold border border-[#E5E0D5]">
                             {{ $submission->submission_type }}
                         </span>
                     </div>
@@ -230,53 +212,49 @@
             </div>
         </div>
 
-        <!-- UNIFIED DUAL-PILLAR EXECUTIVE DASHBOARD (TWIN LUXURY CARDS) -->
-        <div class="grid grid-cols-1 {{ $hasWho5 ? 'lg:grid-cols-2' : '' }} gap-6 sm:gap-8 items-stretch print-avoid-break">
+        <!-- UNIFIED DUAL-PILLAR EXECUTIVE DASHBOARD (CALM EDITORIAL CARDS) -->
+        <div class="grid grid-cols-1 {{ $hasWho5 ? 'lg:grid-cols-2' : '' }} gap-6 items-stretch print-avoid-break">
             
             <!-- CARD 1: PILAR 1 - KECERDASAN RUHIOLOGI (RQI-15) -->
-            <div class="bg-[#0B2A43] text-white p-6 sm:p-8 rounded-3xl shadow-2xl border border-[#C9A24D]/35 relative overflow-hidden flex flex-col justify-between space-y-6">
-                <div class="absolute -top-20 -right-20 w-80 h-80 bg-[#C9A24D]/20 rounded-full blur-3xl pointer-events-none no-print"></div>
-
-                <div class="space-y-5 relative z-10">
-                    <div class="flex items-center justify-between border-b border-white/10 pb-3">
-                        <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest bg-white/5 px-3 py-1 rounded-full border border-[#C9A24D]/30 inline-flex items-center gap-1.5">
-                            <span>✦</span> <span>PILAR 1: KECERDASAN RUHIOLOGI (RQI-15)</span>
+            <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-2xs border border-[#E5E0D5] border-t-4 border-t-[#0F2537] flex flex-col justify-between space-y-5">
+                <div class="space-y-5">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <span class="text-[10px] font-mono font-semibold text-[#8C703E] uppercase tracking-[0.14em]">
+                            PILAR 01 · KECERDASAN RUHIOLOGI (RQI-15)
                         </span>
-                        <span class="text-[10px] font-mono text-slate-400 font-semibold">SKALA 15 – 75 POIN</span>
+                        <span class="text-[10px] font-mono text-slate-400 font-medium">SKALA 15 – 75 POIN</span>
                     </div>
 
-                    <div class="flex flex-col sm:flex-row items-center gap-5 sm:gap-6 pt-1">
-                        <div class="relative w-28 h-28 shrink-0 flex items-center justify-center">
+                    <div class="flex flex-col sm:flex-row items-center gap-5 sm:gap-6">
+                        <div class="relative w-24 h-24 shrink-0 flex items-center justify-center">
                             <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                                <path class="text-slate-800/80" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                                <path class="text-[#C9A24D]" stroke-dasharray="{{ min(100, $scorePct) }}, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <path class="text-[#EFECE6]" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <path class="text-[#0F2537]" stroke-dasharray="{{ min(100, $scorePct) }}, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                             </svg>
                             <div class="absolute flex flex-col items-center justify-center text-center">
-                                <span class="font-mono font-black text-base text-[#C9A24D] leading-none">{{ $scorePct }}%</span>
+                                <span class="font-mono font-bold text-sm text-[#0F2537] leading-none">{{ $scorePct }}%</span>
                                 <span class="text-[8px] font-mono uppercase text-slate-400 mt-0.5">CAPAIAN</span>
                             </div>
                         </div>
 
-                        <div class="text-center sm:text-left space-y-1">
-                            <span class="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest block">SKOR TOTAL RQI</span>
-                            <div class="text-4xl sm:text-5xl font-black font-serif text-white tracking-tight flex items-baseline justify-center sm:justify-start gap-1">
+                        <div class="text-center sm:text-left space-y-1.5 flex-1">
+                            <span class="text-[10px] font-mono font-semibold text-slate-400 uppercase tracking-wider block">SKOR TOTAL RQI-15</span>
+                            <div class="text-3xl sm:text-4xl font-bold font-serif text-[#0F2537] tracking-tight flex items-baseline justify-center sm:justify-start gap-1.5">
                                 <span>{{ $rqiScore }}</span>
                                 <span class="text-sm text-slate-400 font-normal font-sans">/ {{ $maxRqiScore }} Poin</span>
+                            </div>
+                            <div class="pt-0.5">
+                                <span class="inline-block px-3 py-1 rounded-lg text-[11px] font-semibold bg-[#F4F1EA] text-[#0F2537] border border-[#DFD8C8]">
+                                    {{ $catName }}
+                                </span>
                             </div>
                         </div>
                     </div>
 
-                    <div>
-                        <div class="px-3.5 py-2 rounded-2xl text-[11px] font-bold uppercase tracking-wider font-mono border shadow-md bg-gradient-to-r {{ $badgeGradient }} text-center flex items-center justify-center gap-1.5">
-                            <span>✦</span>
-                            <span class="truncate">{{ $catName }}</span>
-                        </div>
-                    </div>
-
                     <div class="space-y-1.5 pt-1">
-                        <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-wider block">✦ GAMBARAN PROFIL & REFLEKSI BATINIAH</span>
-                        <div class="bg-white/5 p-4 rounded-2xl border border-white/10 backdrop-blur-md relative">
-                            <p class="text-xs italic text-slate-100 leading-relaxed font-normal">
+                        <span class="text-[10px] font-mono font-semibold text-slate-400 uppercase tracking-wider block">GAMBARAN PROFIL & REFLEKSI BATINIAH</span>
+                        <div class="bg-[#FAF9F6] p-4 rounded-xl border border-[#EFECE6]">
+                            <p class="text-xs italic text-slate-700 leading-relaxed font-normal">
                                 "{{ $submission->result->overall_interpretation }}"
                             </p>
                         </div>
@@ -284,9 +262,9 @@
                 </div>
 
                 @if($submission->result->pre_post_diff !== null)
-                    <div class="pt-2 border-t border-white/10 flex items-center justify-between text-xs relative z-10">
-                        <span class="text-slate-300 font-medium">Perkembangan Delta RQI:</span>
-                        <span class="font-bold font-mono px-2.5 py-0.5 rounded-full text-xs {{ $submission->result->pre_post_diff >= 0 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30' : 'bg-rose-500/20 text-rose-300 border border-rose-400/30' }}">
+                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                        <span class="text-slate-500 font-medium">Perkembangan Delta RQI:</span>
+                        <span class="font-semibold font-mono px-2.5 py-0.5 rounded-md text-xs bg-slate-100 text-[#0F2537]">
                             {{ $submission->result->pre_post_diff >= 0 ? '+' : '' }}{{ number_format($submission->result->pre_post_diff, 1) }} poin
                         </span>
                     </div>
@@ -295,57 +273,53 @@
 
             <!-- CARD 2: PILAR 2 - SKRINING KESEJAHTERAAN MENTAL (WHO-5) -->
             @if($hasWho5)
-                <div class="bg-[#0B2A43] text-white p-6 sm:p-8 rounded-3xl shadow-2xl border border-emerald-500/35 relative overflow-hidden flex flex-col justify-between space-y-6">
-                    <div class="absolute -top-20 -right-20 w-80 h-80 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none no-print"></div>
-
-                    <div class="space-y-5 relative z-10">
-                        <div class="flex items-center justify-between border-b border-white/10 pb-3">
-                            <span class="text-[10px] font-mono font-bold text-emerald-400 uppercase tracking-widest bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/30 inline-flex items-center gap-1.5">
-                                <span>🌿</span> <span>PILAR 2: KESEJAHTERAAN MENTAL (WHO-5)</span>
+                <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-2xs border border-[#E5E0D5] border-t-4 border-t-[#1E4E44] flex flex-col justify-between space-y-5">
+                    <div class="space-y-5">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                            <span class="text-[10px] font-mono font-semibold text-[#1E4E44] uppercase tracking-[0.14em]">
+                                PILAR 02 · KESEJAHTERAAN MENTAL (WHO-5)
                             </span>
-                            <span class="text-[10px] font-mono text-slate-400 font-semibold">SKALA 0 – 25 POIN</span>
+                            <span class="text-[10px] font-mono text-slate-400 font-medium">SKALA 0 – 25 POIN</span>
                         </div>
 
-                        <div class="flex flex-col sm:flex-row items-center gap-5 sm:gap-6 pt-1">
-                            <div class="relative w-28 h-28 shrink-0 flex items-center justify-center">
+                        <div class="flex flex-col sm:flex-row items-center gap-5 sm:gap-6">
+                            <div class="relative w-24 h-24 shrink-0 flex items-center justify-center">
                                 <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                                    <path class="text-slate-800/80" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                                    <path class="text-emerald-400" stroke-dasharray="{{ min(100, $who5Pct) }}, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                    <path class="text-[#EFECE6]" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                    <path class="text-[#1E4E44]" stroke-dasharray="{{ min(100, $who5Pct) }}, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                                 </svg>
                                 <div class="absolute flex flex-col items-center justify-center text-center">
-                                    <span class="font-mono font-black text-base text-emerald-400 leading-none">{{ number_format($who5Pct, 0) }}%</span>
+                                    <span class="font-mono font-bold text-sm text-[#1E4E44] leading-none">{{ number_format($who5Pct, 0) }}%</span>
                                     <span class="text-[8px] font-mono uppercase text-slate-400 mt-0.5">INDEKS</span>
                                 </div>
                             </div>
 
-                            <div class="text-center sm:text-left space-y-1">
-                                <span class="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest block">SKOR MENTAH WHO-5</span>
-                                <div class="text-4xl sm:text-5xl font-black font-serif text-emerald-400 tracking-tight flex items-baseline justify-center sm:justify-start gap-1">
+                            <div class="text-center sm:text-left space-y-1.5 flex-1">
+                                <span class="text-[10px] font-mono font-semibold text-slate-400 uppercase tracking-wider block">SKOR MENTAH WHO-5</span>
+                                <div class="text-3xl sm:text-4xl font-bold font-serif text-[#1E4E44] tracking-tight flex items-baseline justify-center sm:justify-start gap-1.5">
                                     <span>{{ $who5Raw }}</span>
-                                    <span class="text-sm text-slate-300 font-normal font-sans">/ 25 Poin</span>
+                                    <span class="text-sm text-slate-400 font-normal font-sans">/ 25 Poin ({{ number_format($who5Pct, 0) }}%)</span>
+                                </div>
+                                <div class="pt-0.5">
+                                    <span class="inline-block px-3 py-1 rounded-lg text-[11px] font-semibold bg-[#F0F5F3] text-[#1E4E44] border border-[#CFE0DA]">
+                                        {{ $who5LevelName }}
+                                    </span>
                                 </div>
                             </div>
                         </div>
 
-                        <div>
-                            <div class="px-3.5 py-2 rounded-2xl text-[11px] font-bold uppercase tracking-wider font-mono border shadow-md bg-gradient-to-r {{ $who5BadgeStyle }} text-center flex items-center justify-center gap-1.5">
-                                <span>🌱</span>
-                                <span class="truncate">{{ $who5LevelName }}</span>
-                            </div>
-                        </div>
-
                         <div class="space-y-1.5 pt-1">
-                            <span class="text-[10px] font-mono font-bold text-emerald-400 uppercase tracking-wider block">🌿 DESKRIPSI KESEJAHTERAAN EMOSIONAL</span>
-                            <div class="bg-white/5 p-4 rounded-2xl border border-white/10 backdrop-blur-md relative">
-                                <p class="text-xs text-slate-100 leading-relaxed font-normal">
+                            <span class="text-[10px] font-mono font-semibold text-slate-400 uppercase tracking-wider block">DESKRIPSI KESEJAHTERAAN EMOSIONAL</span>
+                            <div class="bg-[#FAF9F6] p-4 rounded-xl border border-[#EFECE6]">
+                                <p class="text-xs text-slate-700 leading-relaxed font-normal">
                                     "{{ $submission->result->who5_screening_note }}"
                                 </p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="pt-2 border-t border-white/10 text-[10px] text-slate-400 italic leading-snug relative z-10">
-                        *World Health Organization-5 (WHO-5) Well-Being Index: instrumen psikometrik global untuk pemetaan kesehatan mental dan vitalitas emosional.
+                    <div class="pt-3 border-t border-slate-100 text-[10px] text-slate-400 italic leading-snug">
+                        *World Health Organization-5 (WHO-5) Well-Being Index: instrumen psikometrik terstandar untuk pemetaan vitalitas emosional.
                     </div>
                 </div>
             @endif
@@ -354,72 +328,72 @@
 
         <!-- PRE VS POST COMPARATIVE PROGRESS CARD -->
         @if(isset($preSubmission) && isset($postSubmission))
-            <div class="bg-white p-6 sm:p-8 rounded-3xl border-2 border-emerald-200 shadow-md space-y-6 print-avoid-break">
+            <div class="bg-white p-6 sm:p-8 rounded-2xl border border-[#E5E0D5] shadow-2xs space-y-6 print-avoid-break">
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-slate-100 pb-4 gap-2">
                     <div>
-                        <span class="text-[10px] font-mono font-bold text-emerald-700 uppercase tracking-widest block">PERBANDINGAN SIKLUS PRE VS POST</span>
-                        <h3 class="text-lg sm:text-xl font-serif font-bold text-[#0B2A43]">Hasil Perkembangan & Evaluasi Diri</h3>
+                        <span class="text-[10px] font-mono font-semibold text-[#1E4E44] uppercase tracking-widest block">PERBANDINGAN SIKLUS PRE VS POST</span>
+                        <h3 class="text-lg sm:text-xl font-serif font-bold text-[#0F2537]">Hasil Perkembangan & Evaluasi Diri</h3>
                     </div>
-                    <span class="px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full border border-emerald-300">Matrik Evaluasi Longitudinal</span>
+                    <span class="px-3 py-1 bg-[#F0F5F3] text-[#1E4E44] text-xs font-semibold rounded-lg border border-[#CFE0DA]">Matrik Evaluasi Longitudinal</span>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-                    <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 text-center space-y-1">
-                        <span class="text-xs text-slate-500 font-bold uppercase tracking-wider block">PRETEST</span>
-                        <div class="text-3xl font-serif font-bold text-[#0B2A43]">{{ number_format($preSubmission->result->rqi_score ?? 0, 0) }} / 75</div>
-                        <span class="text-xs font-semibold text-slate-600 block">{{ $preSubmission->result->category_name ?? '' }}</span>
+                    <div class="p-5 bg-[#FAF9F6] rounded-xl border border-[#EFECE6] text-center space-y-1">
+                        <span class="text-xs text-slate-500 font-semibold uppercase tracking-wider block">PRETEST</span>
+                        <div class="text-3xl font-serif font-bold text-[#0F2537]">{{ number_format($preSubmission->result->rqi_score ?? 0, 0) }} / 75</div>
+                        <span class="text-xs font-medium text-slate-600 block">{{ $preSubmission->result->category_name ?? '' }}</span>
                     </div>
 
-                    <div class="p-5 bg-emerald-50 rounded-2xl border border-emerald-200 text-center space-y-1">
-                        <span class="text-xs text-emerald-800 font-bold uppercase tracking-wider block">POSTTEST</span>
-                        <div class="text-3xl font-serif font-bold text-emerald-900">{{ number_format($postSubmission->result->rqi_score ?? 0, 0) }} / 75</div>
-                        <span class="text-xs font-bold text-emerald-700 block">{{ $postSubmission->result->category_name ?? '' }}</span>
+                    <div class="p-5 bg-[#F0F5F3] rounded-xl border border-[#CFE0DA] text-center space-y-1">
+                        <span class="text-xs text-[#1E4E44] font-semibold uppercase tracking-wider block">POSTTEST</span>
+                        <div class="text-3xl font-serif font-bold text-[#1E4E44]">{{ number_format($postSubmission->result->rqi_score ?? 0, 0) }} / 75</div>
+                        <span class="text-xs font-semibold text-[#1E4E44] block">{{ $postSubmission->result->category_name ?? '' }}</span>
                     </div>
 
-                    <div class="p-5 bg-amber-50 rounded-2xl border border-amber-200 text-center space-y-1 flex flex-col justify-center">
-                        <span class="text-xs text-amber-900 font-bold uppercase tracking-wider block">PERUBAHAN SKOR</span>
+                    <div class="p-5 bg-[#F4F1EA] rounded-xl border border-[#DFD8C8] text-center space-y-1 flex flex-col justify-center">
+                        <span class="text-xs text-[#8C703E] font-semibold uppercase tracking-wider block">PERUBAHAN SKOR</span>
                         @php
                             $diff = ($postSubmission->result->rqi_score ?? 0) - ($preSubmission->result->rqi_score ?? 0);
                         @endphp
-                        <div class="text-3xl font-serif font-bold {{ $diff >= 0 ? 'text-emerald-700' : 'text-rose-700' }}">
+                        <div class="text-3xl font-serif font-bold text-[#0F2537]">
                             {{ $diff >= 0 ? '+' : '' }}{{ number_format($diff, 0) }} Poin
                         </div>
-                        <span class="text-[11px] text-slate-600 font-medium">Perbandingan capaian awal dan evaluasi akhir</span>
+                        <span class="text-[11px] text-slate-600">Perbandingan capaian awal dan evaluasi akhir</span>
                     </div>
                 </div>
             </div>
         @endif
 
         <!-- VISUAL RADAR CHART 5 DIMENSI RQI -->
-        <div class="bg-[#0B2A43] text-white p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-md grid grid-cols-1 lg:grid-cols-12 gap-6 items-center print-avoid-break">
-            <div class="lg:col-span-5 bg-white/10 p-5 rounded-2xl border border-white/15 backdrop-blur-md">
-                <h4 class="font-serif font-bold text-sm text-[#C9A24D] mb-1 flex items-center gap-2">
-                    <span>🕸️</span> <span>Grafik Keseimbangan 5 Dimensi RQ</span>
+        <div class="bg-[#0F2537] text-white p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-sm grid grid-cols-1 lg:grid-cols-12 gap-6 items-center print-avoid-break">
+            <div class="lg:col-span-5 bg-white/5 p-5 rounded-xl border border-white/10">
+                <h4 class="font-serif font-bold text-sm text-[#C5A059] mb-1">
+                    Grafik Keseimbangan 5 Dimensi RQ
                 </h4>
-                <p class="text-[11px] text-slate-300 mb-3">Keseimbangan indikator potensial ruhiologi individu.</p>
+                <p class="text-[11px] text-slate-300 mb-3">Pemetaan proporsional kelima pilar kesadaran ruhiologi.</p>
                 <div class="relative w-full aspect-square max-w-xs mx-auto">
                     <canvas id="resultRadarChart"></canvas>
                 </div>
             </div>
             <div class="lg:col-span-7 space-y-3">
-                <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest bg-white/10 px-3 py-1 rounded-full border border-white/20 inline-block">
+                <span class="text-[10px] font-mono font-semibold text-[#C5A059] uppercase tracking-[0.16em] block">
                     PROFIL METRIK 5 PILAR RQI-15
                 </span>
                 <h3 class="text-xl sm:text-2xl font-serif font-bold text-white leading-snug">
                     Pemetaan Keseimbangan Potensi Ruh Individual
                 </h3>
-                <p class="text-xs text-slate-200 leading-relaxed font-normal">
+                <p class="text-xs text-slate-300 leading-relaxed font-normal">
                     Setiap dimensi merepresentasikan bagian integral dari kesadaran batin manusia: dari hubungan vertikal dengan Sang Pencipta, regulasi emosi di bawah tekanan (Tazkiyah), hingga kontribusi altruistik bagi masyarakat.
                 </p>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2">
                     @foreach($rqiOnlyDimensions as $dRes)
-                        <div class="p-3 bg-white/10 rounded-xl border border-white/10 space-y-1.5">
+                        <div class="p-3 bg-white/5 rounded-xl border border-white/10 space-y-1.5">
                             <div class="flex justify-between items-center text-xs">
-                                <span class="font-bold text-slate-100 truncate">{{ $dRes->dimension->name }}</span>
-                                <span class="font-mono font-bold text-[#C9A24D] shrink-0 ml-2">{{ number_format($dRes->percentage, 0) }}%</span>
+                                <span class="font-semibold text-slate-100 truncate">{{ $dRes->dimension->name }}</span>
+                                <span class="font-mono font-bold text-[#C5A059] shrink-0 ml-2">{{ number_format($dRes->percentage, 0) }}%</span>
                             </div>
                             <div class="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
-                                <div class="h-full bg-[#C9A24D] rounded-full" style="width: {{ min(100, $dRes->percentage) }}%"></div>
+                                <div class="h-full bg-[#C5A059] rounded-full" style="width: {{ min(100, $dRes->percentage) }}%"></div>
                             </div>
                         </div>
                     @endforeach
@@ -427,40 +401,40 @@
             </div>
         </div>
 
-        <!-- 5 DIMENSIONS BREAKDOWN TABLE (DESKTOP: TABLE, MOBILE: RESPONSIVE CARDS) -->
-        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden print-avoid-break">
+        <!-- 5 DIMENSIONS BREAKDOWN TABLE -->
+        <div class="bg-white rounded-2xl border border-[#E5E0D5] shadow-2xs overflow-hidden print-avoid-break">
             <div class="p-5 sm:p-6 border-b border-slate-100 flex justify-between items-center">
-                <h3 class="font-serif font-bold text-[#0B2A43] text-base sm:text-lg">Rincian Perolehan 5 Dimensi Utama RQI-15</h3>
-                <span class="text-[10px] sm:text-xs font-mono font-bold text-[#C9A24D] uppercase bg-[#0B2A43] px-3 py-1 rounded-full">5 Pilar RQI-15</span>
+                <h3 class="font-serif font-bold text-[#0F2537] text-base sm:text-lg">Rincian Perolehan 5 Dimensi Utama RQI-15</h3>
+                <span class="text-[10px] sm:text-xs font-mono font-semibold text-[#8C703E] uppercase bg-[#F4F1EA] px-3 py-1 rounded-md border border-[#DFD8C8]">5 Pilar RQI-15</span>
             </div>
 
             <!-- Desktop View: Table -->
             <div class="hidden md:block overflow-x-auto">
                 <table class="w-full text-left text-xs">
-                    <thead class="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider border-b border-slate-200">
+                    <thead class="bg-[#FAF9F6] text-slate-500 font-semibold uppercase tracking-wider border-b border-[#EFECE6]">
                         <tr>
-                            <th class="px-6 py-4">Kode</th>
-                            <th class="px-6 py-4">Dimensi Kecerdasan Ruhiologi</th>
-                            <th class="px-6 py-4">Skor Mentah</th>
-                            <th class="px-6 py-4">Capaian (%)</th>
-                            <th class="px-6 py-4">Interpretasi Kualitatif</th>
+                            <th class="px-6 py-3.5">Kode</th>
+                            <th class="px-6 py-3.5">Dimensi Kecerdasan Ruhiologi</th>
+                            <th class="px-6 py-3.5">Skor Mentah</th>
+                            <th class="px-6 py-3.5">Capaian (%)</th>
+                            <th class="px-6 py-3.5">Interpretasi Kualitatif</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100 font-medium">
                         @foreach($rqiOnlyDimensions as $dimRes)
-                            <tr class="hover:bg-slate-50/80">
-                                <td class="px-6 py-4 font-mono font-bold text-[#C9A24D]">{{ $dimRes->dimension->code }}</td>
-                                <td class="px-6 py-4 text-[#0B2A43] font-bold text-sm">{{ $dimRes->dimension->name }}</td>
-                                <td class="px-6 py-4 text-slate-600 font-mono font-bold">{{ $dimRes->score }} / {{ $dimRes->max_score }}</td>
+                            <tr class="hover:bg-[#FAF9F6]">
+                                <td class="px-6 py-4 font-mono font-semibold text-[#8C703E]">{{ $dimRes->dimension->code }}</td>
+                                <td class="px-6 py-4 text-[#0F2537] font-semibold text-xs">{{ $dimRes->dimension->name }}</td>
+                                <td class="px-6 py-4 text-slate-600 font-mono font-semibold">{{ $dimRes->score }} / {{ $dimRes->max_score }}</td>
                                 <td class="px-6 py-4">
-                                    <div class="flex items-center gap-2">
-                                        <span class="font-bold text-[#0B2A43] font-mono">{{ number_format($dimRes->percentage, 1) }}%</span>
-                                        <div class="w-20 bg-slate-200 h-2 rounded-full overflow-hidden">
-                                            <div class="bg-[#C9A24D] h-2 rounded-full" style="width: {{ min(100, $dimRes->percentage) }}%"></div>
+                                    <div class="flex items-center gap-2.5">
+                                        <span class="font-bold text-[#0F2537] font-mono w-10">{{ number_format($dimRes->percentage, 0) }}%</span>
+                                        <div class="w-20 bg-[#EFECE6] h-1.5 rounded-full overflow-hidden">
+                                            <div class="bg-[#0F2537] h-1.5 rounded-full" style="width: {{ min(100, $dimRes->percentage) }}%"></div>
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 text-slate-700 leading-relaxed font-normal">{{ $dimRes->interpretation }}</td>
+                                <td class="px-6 py-4 text-slate-600 leading-relaxed font-normal">{{ $dimRes->interpretation }}</td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -470,20 +444,20 @@
             <!-- Mobile View: Vertical Responsive Cards -->
             <div class="block md:hidden p-4 space-y-3">
                 @foreach($rqiOnlyDimensions as $dimRes)
-                    <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+                    <div class="p-4 bg-[#FAF9F6] rounded-xl border border-[#EFECE6] space-y-2">
                         <div class="flex justify-between items-center border-b border-slate-200/60 pb-2">
-                            <span class="font-mono font-bold text-xs text-[#C9A24D] bg-[#0B2A43] px-2 py-0.5 rounded">{{ $dimRes->dimension->code }}</span>
-                            <span class="font-bold text-xs text-[#0B2A43] font-mono">{{ $dimRes->score }} / {{ $dimRes->max_score }} Poin</span>
+                            <span class="font-mono font-semibold text-xs text-[#8C703E]">{{ $dimRes->dimension->code }}</span>
+                            <span class="font-semibold text-xs text-[#0F2537] font-mono">{{ $dimRes->score }} / {{ $dimRes->max_score }} Poin</span>
                         </div>
-                        <h4 class="font-bold text-sm text-[#0B2A43]">{{ $dimRes->dimension->name }}</h4>
+                        <h4 class="font-semibold text-sm text-[#0F2537]">{{ $dimRes->dimension->name }}</h4>
                         
                         <div class="space-y-1 pt-1">
-                            <div class="flex justify-between text-xs font-bold">
+                            <div class="flex justify-between text-xs font-semibold">
                                 <span class="text-slate-500">Capaian:</span>
-                                <span class="text-[#0B2A43]">{{ number_format($dimRes->percentage, 1) }}%</span>
+                                <span class="text-[#0F2537]">{{ number_format($dimRes->percentage, 0) }}%</span>
                             </div>
-                            <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-                                <div class="bg-[#C9A24D] h-2 rounded-full" style="width: {{ min(100, $dimRes->percentage) }}%"></div>
+                            <div class="w-full bg-[#EFECE6] h-1.5 rounded-full overflow-hidden">
+                                <div class="bg-[#0F2537] h-1.5 rounded-full" style="width: {{ min(100, $dimRes->percentage) }}%"></div>
                             </div>
                         </div>
 
@@ -496,10 +470,10 @@
         </div>
 
         <!-- PERSONAL REFLECTION & TEKAD PERUBAHAN BATIN FORM -->
-        <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-4 no-print">
+        <div class="bg-white p-6 sm:p-8 rounded-2xl border border-[#E5E0D5] shadow-2xs space-y-4 no-print">
             <div>
-                <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest block">✦ KOMITMEN REFLEKSI BATIN</span>
-                <h3 class="text-base sm:text-lg font-serif font-bold text-[#0B2A43]">Tekad Perubahan Batin Anda</h3>
+                <span class="text-[10px] font-mono font-semibold text-[#8C703E] uppercase tracking-widest block">KOMITMEN REFLEKSI BATIN</span>
+                <h3 class="text-base sm:text-lg font-serif font-bold text-[#0F2537]">Tekad Perubahan Batin Anda</h3>
                 <p class="text-xs text-slate-600 font-normal mt-1">
                     "Tuliskan satu tekad perubahan batin yang paling ingin Anda wujudkan agar studi, karier, dan hidup Anda terasa lebih bermakna dan damai."
                 </p>
@@ -507,9 +481,9 @@
 
             <form action="{{ route('assessment.reflection', ['submission_code' => $submission->submission_code]) }}" method="POST" class="space-y-3">
                 @csrf
-                <textarea name="reflection_text" rows="3" required placeholder="Tuliskan tekad perubahan batin Anda di sini..." class="w-full p-4 rounded-2xl border border-slate-300 text-xs font-medium focus:ring-2 focus:ring-[#0B2A43] focus:border-[#0B2A43] outline-none transition">{{ old('reflection_text', $submission->result->reflection_text ?? '') }}</textarea>
+                <textarea name="reflection_text" rows="3" required placeholder="Tuliskan tekad perubahan batin Anda di sini..." class="w-full p-4 rounded-xl border border-slate-300 text-xs font-medium focus:ring-2 focus:ring-[#0F2537] focus:border-[#0F2537] outline-none transition">{{ old('reflection_text', $submission->result->reflection_text ?? '') }}</textarea>
                 <div class="flex justify-end">
-                    <button type="submit" class="w-full sm:w-auto py-3.5 px-6 bg-[#0B2A43] hover:bg-[#123B59] text-white font-bold text-xs rounded-xl shadow transition-colors cursor-pointer min-h-[44px]">
+                    <button type="submit" class="w-full sm:w-auto py-3 px-6 bg-[#0F2537] hover:bg-[#183650] text-white font-semibold text-xs rounded-xl transition-colors cursor-pointer min-h-[42px]">
                         Simpan Tekad Perubahan Batin →
                     </button>
                 </div>
@@ -517,45 +491,40 @@
         </div>
 
         <!-- CONSULTATION CTA FOOTER -->
-        <div class="bg-gradient-to-r from-[#0B2A43] via-[#123B59] to-[#0B2A43] p-6 sm:p-8 rounded-3xl text-white shadow-xl flex flex-col sm:flex-row justify-between items-center gap-6 no-print text-center sm:text-left">
+        <div class="bg-[#0F2537] p-6 sm:p-8 rounded-2xl text-white border border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-6 no-print text-center sm:text-left">
             <div class="space-y-1">
                 <h3 class="text-lg sm:text-xl font-serif font-bold text-white">Ingin Diskusi / Pendampingan Lebih Lanjut?</h3>
                 <p class="text-xs text-slate-300 font-normal">Konsultasikan hasil profil RQ Anda bersama para pakar & konselor berpengalaman Ruhiology Institute.</p>
             </div>
-            <a href="{{ route('consultation.index') }}" class="w-full sm:w-auto px-8 py-4 bg-[#C9A24D] hover:bg-[#B48A16] text-[#0B2A43] font-bold rounded-2xl text-xs uppercase tracking-wider shadow-lg transition-transform hover:scale-105 whitespace-nowrap inline-block text-center min-h-[44px]">
+            <a href="{{ route('consultation.index') }}" class="w-full sm:w-auto px-7 py-3.5 bg-[#B5945B] hover:bg-[#A3834B] text-white font-semibold rounded-xl text-xs uppercase tracking-wider transition whitespace-nowrap inline-block text-center min-h-[42px]">
                 Konsultasi Dengan Pakar →
             </a>
         </div>
 
     </div>
 
-    <!-- INSTAGRAM / WHATSAPP CARD SHARE MODAL (SUPPORTS 4:5 FEED & 9:16 STORY) -->
-    <div x-show="showStoryModal" x-cloak class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-[9999] flex items-center justify-center p-3 sm:p-6 animate-fadeIn no-print overflow-y-auto">
-        <div @click.away="showStoryModal = false" class="bg-slate-900 rounded-3xl max-w-4xl w-full p-5 sm:p-8 shadow-2xl border border-slate-800 space-y-5 my-auto">
+    <!-- INSTAGRAM / WHATSAPP CARD SHARE MODAL (CLEAN EDITORIAL 60-30-10 DESIGN) -->
+    <div x-show="showStoryModal" x-cloak class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-3 sm:p-6 animate-fadeIn no-print overflow-y-auto">
+        <div @click.away="showStoryModal = false" class="bg-slate-900 rounded-2xl max-w-4xl w-full p-5 sm:p-7 shadow-2xl border border-slate-800 space-y-5 my-auto">
             
             <!-- Modal Header -->
-            <div class="flex flex-wrap items-center justify-between border-b border-slate-800 pb-4 gap-3">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-[#C9A24D]/15 border border-[#C9A24D]/35 flex items-center justify-center text-xl text-[#C9A24D]">
-                        📱
-                    </div>
-                    <div>
-                        <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest block">SOCIAL MEDIA SHARE CARD GENERATOR</span>
-                        <h3 class="text-base sm:text-lg font-serif font-bold text-white">Kartu Visual Hasil Asesmen (Instagram & WhatsApp)</h3>
-                    </div>
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                <div>
+                    <span class="text-[10px] font-mono font-semibold text-[#C5A059] uppercase tracking-widest block">SOCIAL MEDIA SHARE CARD</span>
+                    <h3 class="text-base sm:text-lg font-serif font-bold text-white">Kartu Visual Hasil Asesmen (Instagram & WhatsApp)</h3>
                 </div>
-                <button @click="showStoryModal = false" type="button" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-slate-400 hover:text-white flex items-center justify-center transition cursor-pointer">✕</button>
+                <button @click="showStoryModal = false" type="button" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition cursor-pointer">✕</button>
             </div>
 
             <!-- 2-Column Split Body Grid -->
             <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
                 
                 <!-- Left Column (5 Cols): Card Canvas Preview -->
-                <div class="md:col-span-5 bg-slate-950/80 p-4 rounded-3xl border border-slate-800 flex flex-col items-center justify-center space-y-3">
+                <div class="md:col-span-5 bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col items-center justify-center space-y-2.5">
                     <canvas id="storyCanvas"
-                            :class="cardRatio === '9:16' ? 'aspect-[9/16] max-w-[235px]' : 'aspect-[4/5] max-w-[280px]'"
-                            class="w-full rounded-2xl shadow-2xl border border-[#C9A24D]/30 transition-all duration-200"></canvas>
-                    <span class="text-[10px] font-mono text-slate-400" x-text="cardRatio === '9:16' ? 'Resolusi: 1080 × 1920 px (Full Story 9:16)' : 'Resolusi: 1080 × 1350 px (Feed Portrait 4:5)'"></span>
+                            :class="cardRatio === '9:16' ? 'aspect-[9/16] max-w-[230px]' : 'aspect-[4/5] max-w-[275px]'"
+                            class="w-full rounded-xl shadow-xl border border-slate-800 transition-all duration-200"></canvas>
+                    <span class="text-[10px] font-mono text-slate-400" x-text="cardRatio === '9:16' ? '1080 × 1920 px (Story 9:16)' : '1080 × 1350 px (Feed 4:5)'"></span>
                 </div>
 
                 <!-- Right Column (7 Cols): Format & Theme Selector & Actions -->
@@ -563,77 +532,58 @@
                     
                     <!-- Aspect Ratio Switcher -->
                     <div class="space-y-1.5">
-                        <label class="text-[11px] font-bold text-slate-300 uppercase tracking-wider font-mono block">1. Pilih Ukuran Kartu Sosmed:</label>
+                        <label class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider font-mono block">1. Ukuran Rasio Kartu</label>
                         <div class="grid grid-cols-2 gap-2.5">
                             <button type="button" @click="setCardRatio('4:5')"
-                                    :class="cardRatio === '4:5' ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 font-extrabold border-amber-400 shadow-md' : 'bg-slate-800/80 text-slate-300 border-slate-700 hover:bg-slate-800'"
-                                    class="p-2.5 rounded-2xl border text-left transition cursor-pointer flex items-center gap-2.5">
-                                <span class="text-lg">🖼️</span>
-                                <div>
-                                    <span class="block text-xs font-bold leading-tight">Feed IG / WA (4:5)</span>
-                                    <span class="block text-[10px] opacity-80">1080 × 1350 px</span>
-                                </div>
+                                    :class="cardRatio === '4:5' ? 'bg-white text-slate-900 font-semibold border-white' : 'bg-slate-800/70 text-slate-300 border-slate-700 hover:bg-slate-800'"
+                                    class="p-2.5 rounded-xl border text-left transition cursor-pointer">
+                                <span class="block text-xs font-semibold">Feed Portrait (4:5)</span>
+                                <span class="block text-[10px] opacity-75">1080 × 1350 px · Postingan IG</span>
                             </button>
                             <button type="button" @click="setCardRatio('9:16')"
-                                    :class="cardRatio === '9:16' ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 font-extrabold border-amber-400 shadow-md' : 'bg-slate-800/80 text-slate-300 border-slate-700 hover:bg-slate-800'"
-                                    class="p-2.5 rounded-2xl border text-left transition cursor-pointer flex items-center gap-2.5">
-                                <span class="text-lg">📱</span>
-                                <div>
-                                    <span class="block text-xs font-bold leading-tight">Story Full (9:16)</span>
-                                    <span class="block text-[10px] opacity-80">1080 × 1920 px</span>
-                                </div>
+                                    :class="cardRatio === '9:16' ? 'bg-white text-slate-900 font-semibold border-white' : 'bg-slate-800/70 text-slate-300 border-slate-700 hover:bg-slate-800'"
+                                    class="p-2.5 rounded-xl border text-left transition cursor-pointer">
+                                <span class="block text-xs font-semibold">Story Fullscreen (9:16)</span>
+                                <span class="block text-[10px] opacity-75">1080 × 1920 px · IG Story / WA Status</span>
                             </button>
                         </div>
                     </div>
 
-                    <!-- Card Theme Switcher -->
+                    <!-- Card Theme Switcher (Clean Editorial Light & Dark) -->
                     <div class="space-y-1.5">
-                        <label class="text-[11px] font-bold text-slate-300 uppercase tracking-wider font-mono block">2. Pilih Tema Warna Kartu:</label>
-                        <div class="grid grid-cols-3 gap-2">
-                            <button type="button" @click="setCardTheme('royal')"
-                                    :class="cardTheme === 'royal' ? 'bg-amber-400 text-slate-950 font-extrabold border-amber-300 shadow' : 'bg-slate-800/80 text-slate-300 border-slate-700 hover:bg-slate-800'"
-                                    class="py-2.5 px-3 rounded-xl border text-center transition cursor-pointer">
-                                <span class="block text-xs">👑 Royal Gold</span>
-                            </button>
-                            <button type="button" @click="setCardTheme('emerald')"
-                                    :class="cardTheme === 'emerald' ? 'bg-emerald-400 text-slate-950 font-extrabold border-emerald-300 shadow' : 'bg-slate-800/80 text-slate-300 border-slate-700 hover:bg-slate-800'"
-                                    class="py-2.5 px-3 rounded-xl border text-center transition cursor-pointer">
-                                <span class="block text-xs">🌿 Emerald Glow</span>
-                            </button>
+                        <label class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider font-mono block">2. Tema Warna Editorial</label>
+                        <div class="grid grid-cols-2 gap-2.5">
                             <button type="button" @click="setCardTheme('ivory')"
-                                    :class="cardTheme === 'ivory' ? 'bg-white text-slate-950 font-extrabold border-amber-400 shadow' : 'bg-slate-800/80 text-slate-300 border-slate-700 hover:bg-slate-800'"
-                                    class="py-2.5 px-3 rounded-xl border text-center transition cursor-pointer">
-                                <span class="block text-xs">☀️ Ivory Executive</span>
+                                    :class="cardTheme === 'ivory' ? 'bg-[#FCFBF9] text-[#0F2537] font-semibold border-[#B5945B]' : 'bg-slate-800/70 text-slate-300 border-slate-700 hover:bg-slate-800'"
+                                    class="py-2.5 px-3 rounded-xl border text-left transition cursor-pointer">
+                                <span class="block text-xs font-semibold">Classic Ivory (Terang)</span>
+                                <span class="block text-[10px] opacity-75">Kertas Alabaster & Oxford Navy</span>
                             </button>
-                        </div>
-                    </div>
-
-                    <!-- Highlighted Content Info -->
-                    <div class="p-3 bg-slate-800/60 rounded-2xl border border-slate-700/60 space-y-1.5">
-                        <div class="flex items-center gap-2 text-slate-200">
-                            <span class="text-amber-400">🎓</span>
-                            <span>Menampilkan Identitas, Instansi/Kampus, & Domisili Anda</span>
-                        </div>
-                        <div class="flex items-center gap-2 text-slate-200">
-                            <span class="text-amber-400">📊</span>
-                            <span>Dilengkapi Skor Dual-Pilar (RQI-15 & WHO-5) + <strong>5 Bar Dimensi RQI</strong></span>
+                            <button type="button" @click="setCardTheme('navy')"
+                                    :class="cardTheme === 'navy' ? 'bg-[#13293D] text-white font-semibold border-[#B5945B]' : 'bg-slate-800/70 text-slate-300 border-slate-700 hover:bg-slate-800'"
+                                    class="py-2.5 px-3 rounded-xl border text-left transition cursor-pointer">
+                                <span class="block text-xs font-semibold">Oxford Navy (Gelap)</span>
+                                <span class="block text-[10px] opacity-75">Deep Slate & Champagne Gold</span>
+                            </button>
                         </div>
                     </div>
 
                     <!-- Action Buttons -->
-                    <div class="pt-1 space-y-2.5">
+                    <div class="pt-2 space-y-2.5">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                            <button type="button" @click="downloadStoryImage()" class="py-3.5 px-4 bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-600 hover:from-amber-500 hover:to-yellow-700 text-slate-950 font-extrabold text-xs uppercase tracking-wider rounded-2xl shadow-xl transition transform hover:-translate-y-0.5 cursor-pointer flex items-center justify-center gap-2">
-                                <span>📥</span> <span x-text="'Unduh PNG (' + cardRatio + ')'"></span>
+                            <button type="button" @click="downloadStoryImage()" class="py-3 px-4 bg-[#B5945B] hover:bg-[#A3834B] text-white font-semibold text-xs rounded-xl transition cursor-pointer flex items-center justify-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                <span x-text="'Unduh PNG (' + cardRatio + ')'"></span>
                             </button>
 
-                            <button type="button" @click="shareStoryCard()" class="py-3.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs uppercase tracking-wider rounded-2xl shadow-xl transition transform hover:-translate-y-0.5 cursor-pointer flex items-center justify-center gap-2">
-                                <span>📲</span> <span>Bagikan ke IG / WA</span>
+                            <button type="button" @click="shareStoryCard()" class="py-3 px-4 bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 font-semibold text-xs rounded-xl transition cursor-pointer flex items-center justify-center gap-2">
+                                <svg class="w-4 h-4 text-[#C5A059]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+                                <span>Bagikan ke IG / WA</span>
                             </button>
                         </div>
 
-                        <button type="button" @click="copySocialCaption()" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 font-bold text-xs rounded-2xl transition cursor-pointer flex items-center justify-center gap-2">
-                            <span x-text="captionCopied ? '✅ Caption Berhasil Disalin ke Clipboard!' : '📋 Salin Teks Caption Siap Pakai'"></span>
+                        <button type="button" @click="copySocialCaption()" class="w-full py-2.5 bg-slate-950 hover:bg-slate-800 text-slate-300 border border-slate-800 font-medium text-xs rounded-xl transition cursor-pointer flex items-center justify-center gap-2">
+                            <span x-text="captionCopied ? '✓ Teks Caption Berhasil Disalin' : 'Salin Teks Caption Pendamping'"></span>
                         </button>
                     </div>
 
@@ -646,10 +596,10 @@
 
     <!-- MODAL UBAH WILAYAH ASAL PESERTA -->
     <div x-show="showEditRegionModal" x-cloak class="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm no-print">
-        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-100">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-100">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                <h3 class="font-bold font-serif text-[#0B2A43] text-base flex items-center gap-2">
-                    <span>📍</span> <span>Perbarui Wilayah Asal Peserta</span>
+                <h3 class="font-bold font-serif text-[#0F2537] text-base">
+                    Perbarui Wilayah Asal Peserta
                 </h3>
                 <button @click="showEditRegionModal = false" class="text-slate-400 hover:text-slate-600 text-lg font-bold">✕</button>
             </div>
@@ -657,8 +607,8 @@
             <form action="{{ route('assessment.update_region', $submission->submission_code) }}" method="POST" class="space-y-4 text-xs">
                 @csrf
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1">Provinsi *</label>
-                    <select name="province_id" x-model="editProvinceId" @change="onEditProvinceChange()" required class="w-full p-2.5 rounded-xl border border-slate-300 font-bold bg-white text-slate-800 focus:ring-2 focus:ring-[#0B2A43] outline-none">
+                    <label class="block font-semibold text-slate-700 mb-1">Provinsi *</label>
+                    <select name="province_id" x-model="editProvinceId" @change="onEditProvinceChange()" required class="w-full p-2.5 rounded-xl border border-slate-300 font-medium bg-white text-slate-800 focus:ring-2 focus:ring-[#0F2537] outline-none">
                         <option value="">-- Pilih Provinsi --</option>
                         <template x-for="p in provincesList" :key="p.id">
                             <option :value="p.id" x-text="p.name" :selected="String(p.id) === String(editProvinceId)"></option>
@@ -667,8 +617,8 @@
                 </div>
 
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1">Kabupaten / Kota *</label>
-                    <select name="regency_id" x-model="editRegencyId" :disabled="!editProvinceId" required class="w-full p-2.5 rounded-xl border border-slate-300 font-bold bg-white text-slate-800 disabled:bg-slate-100 disabled:text-slate-400 focus:ring-2 focus:ring-[#0B2A43] outline-none">
+                    <label class="block font-semibold text-slate-700 mb-1">Kabupaten / Kota *</label>
+                    <select name="regency_id" x-model="editRegencyId" :disabled="!editProvinceId" required class="w-full p-2.5 rounded-xl border border-slate-300 font-medium bg-white text-slate-800 disabled:bg-slate-100 disabled:text-slate-400 focus:ring-2 focus:ring-[#0F2537] outline-none">
                         <option value="" x-text="editProvinceId ? '-- Pilih Kab/Kota --' : 'Pilih Provinsi Dahulu'"></option>
                         <template x-for="r in filteredEditRegencies" :key="r.id">
                             <option :value="r.id" x-text="r.formatted_name || ((r.name.startsWith('Kota') || r.name.startsWith('Kabupaten') || !r.type) ? r.name : (r.type + ' ' + r.name))" :selected="String(r.id) === String(editRegencyId)"></option>
@@ -677,10 +627,10 @@
                 </div>
 
                 <div class="flex gap-2 pt-2">
-                    <button type="button" @click="showEditRegionModal = false" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition cursor-pointer">
+                    <button type="button" @click="showEditRegionModal = false" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl transition cursor-pointer">
                         Batal
                     </button>
-                    <button type="submit" class="flex-1 py-3 bg-[#0B2A43] hover:bg-[#123B59] text-[#C9A24D] font-extrabold rounded-xl transition shadow cursor-pointer">
+                    <button type="submit" class="flex-1 py-2.5 bg-[#0F2537] hover:bg-[#183650] text-white font-semibold rounded-xl transition cursor-pointer">
                         Simpan Perubahan
                     </button>
                 </div>
@@ -697,7 +647,7 @@ function rqResultPage() {
         showStoryModal: false,
         showEditRegionModal: false,
         cardRatio: '4:5',
-        cardTheme: 'royal',
+        cardTheme: 'ivory',
         captionCopied: false,
         editProvinceId: '{{ $submission->participant->province_id ?? '' }}',
         editRegencyId: '{{ $submission->participant->regency_id ?? '' }}',
@@ -751,11 +701,45 @@ function rqResultPage() {
 
             const isStory = (this.cardRatio === '9:16');
             const isLight = (this.cardTheme === 'ivory');
-            const isEmerald = (this.cardTheme === 'emerald');
             const W = 1080;
             const H = isStory ? 1920 : 1350;
             canvas.width = W;
             canvas.height = H;
+
+            /*
+             * Strict 60-30-10 Editorial Palette
+             */
+            const palette = isLight ? {
+                bg: '#FCFBF9',
+                cardBg: '#FFFFFF',
+                cardBorder: '#E5E0D5',
+                outerBorder: '#0F2537',
+                innerBorder: '#C5A870',
+                primaryInk: '#0F2537',
+                secondaryInk: '#475569',
+                mutedInk: '#94A3B8',
+                goldAccent: '#8C703E',
+                goldLine: '#B5945B',
+                sageAccent: '#1E4E44',
+                trackBg: '#EFECE6',
+                barFill: '#0F2537',
+                quoteBg: '#F6F4EE'
+            } : {
+                bg: '#0D1F30',
+                cardBg: '#13293D',
+                cardBorder: '#26435E',
+                outerBorder: '#1B354D',
+                innerBorder: 'rgba(181, 148, 91, 0.5)',
+                primaryInk: '#F8FAFC',
+                secondaryInk: '#CBD5E1',
+                mutedInk: '#94A3B8',
+                goldAccent: '#D5BC8A',
+                goldLine: '#B5945B',
+                sageAccent: '#7CC4B5',
+                trackBg: '#091622',
+                barFill: '#C5A059',
+                quoteBg: '#102336'
+            };
 
             const cleanText = (str) => {
                 if (!str) return '';
@@ -768,280 +752,263 @@ function rqResultPage() {
             logoImg.crossOrigin = 'anonymous';
 
             const render = () => {
-                // 1. Vibrant Background Gradient according to Theme
-                const bgGrad = ctx.createLinearGradient(0, 0, W, H);
-                if (isLight) {
-                    bgGrad.addColorStop(0, '#FFFDF9');
-                    bgGrad.addColorStop(0.5, '#FEF9EC');
-                    bgGrad.addColorStop(1, '#FDF6E2');
-                } else if (isEmerald) {
-                    bgGrad.addColorStop(0, '#042F2E');
-                    bgGrad.addColorStop(0.5, '#065F46');
-                    bgGrad.addColorStop(1, '#022C22');
-                } else {
-                    bgGrad.addColorStop(0, '#061A2E');
-                    bgGrad.addColorStop(0.45, '#103B63');
-                    bgGrad.addColorStop(1, '#041220');
-                }
-                ctx.fillStyle = bgGrad;
+                // 1. Calm Matte Editorial Canvas
+                ctx.fillStyle = palette.bg;
                 ctx.fillRect(0, 0, W, H);
 
-                // Luminous Spotlight Glows
-                const glowTop = ctx.createRadialGradient(W / 2, isStory ? 340 : 240, 20, W / 2, isStory ? 340 : 240, 560);
-                glowTop.addColorStop(0, isLight ? 'rgba(245, 158, 11, 0.16)' : 'rgba(251, 191, 36, 0.28)');
-                glowTop.addColorStop(1, 'rgba(0, 0, 0, 0)');
-                ctx.fillStyle = glowTop;
-                ctx.fillRect(0, 0, W, H);
+                // Architectural Frame
+                ctx.strokeStyle = palette.outerBorder;
+                ctx.lineWidth = 12;
+                ctx.strokeRect(18, 18, W - 36, H - 36);
 
-                // Outer & Inner Vibrant Gold Frame
-                ctx.strokeStyle = isLight ? '#0B2A43' : '#F59E0B';
-                ctx.lineWidth = isLight ? 10 : 4;
-                ctx.beginPath();
-                ctx.roundRect(28, 28, W - 56, H - 56, 36);
-                ctx.stroke();
+                ctx.strokeStyle = palette.innerBorder;
+                ctx.lineWidth = 1.5;
+                ctx.strokeRect(36, 36, W - 72, H - 72);
 
-                ctx.strokeStyle = '#F59E0B';
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.roundRect(44, 44, W - 88, H - 88, 26);
-                ctx.stroke();
+                let curY = isStory ? 115 : 80;
 
-                let curY = isStory ? 105 : 72;
-
-                // 2. Top Logo & Institute Header Pill
+                // 2. Top Emblem & Institute Header
                 if (logoImg.complete && logoImg.naturalWidth > 0) {
-                    const logoSize = isStory ? 92 : 76;
+                    const logoSize = isStory ? 84 : 68;
                     ctx.drawImage(logoImg, (W - logoSize) / 2, curY, logoSize, logoSize);
                     curY += logoSize + (isStory ? 36 : 28);
                 } else {
-                    curY += 40;
+                    curY += 36;
                 }
 
                 ctx.textAlign = 'center';
-                ctx.fillStyle = isLight ? '#0B2A43' : '#FBBF24';
-                ctx.font = '800 32px "Poppins", sans-serif';
+                ctx.fillStyle = palette.primaryInk;
+                ctx.font = '700 26px "Poppins", sans-serif';
                 ctx.fillText('RUHIOLOGY INSTITUTE', W / 2, curY);
 
-                curY += 28;
-                ctx.fillStyle = isLight ? '#B45309' : '#E2E8F0';
-                ctx.font = '700 15px "Plus Jakarta Sans", sans-serif';
-                ctx.fillText('LAPORAN RESMI HASIL ASESMEN RQI-15 & WHO-5 INDEX', W / 2, curY);
+                curY += 26;
+                ctx.fillStyle = palette.goldAccent;
+                ctx.font = '600 14px "Plus Jakarta Sans", sans-serif';
+                ctx.fillText('EXECUTIVE ASSESSMENT SUMMARY  ·  RQI-15 & WHO-5', W / 2, curY);
 
-                curY += isStory ? 36 : 24;
+                curY += isStory ? 38 : 24;
 
-                // 3. Participant Identity Card (High Contrast)
-                const pBoxH = isStory ? 158 : 134;
-                ctx.fillStyle = isLight ? '#FFFFFF' : 'rgba(255, 255, 255, 0.09)';
+                // 3. Participant Identity Card
+                const pBoxH = isStory ? 152 : 128;
+                ctx.fillStyle = palette.cardBg;
                 ctx.beginPath();
-                ctx.roundRect(72, curY, W - 144, pBoxH, 24);
+                ctx.roundRect(72, curY, W - 144, pBoxH, 16);
                 ctx.fill();
-                ctx.strokeStyle = isLight ? '#F59E0B' : 'rgba(251, 191, 36, 0.55)';
-                ctx.lineWidth = 2;
+                ctx.strokeStyle = palette.cardBorder;
+                ctx.lineWidth = 1.5;
                 ctx.stroke();
 
                 const pName = cleanText('{{ addslashes($submission->participant->name) }}');
-                ctx.fillStyle = isLight ? '#0B2A43' : '#FFFFFF';
-                ctx.font = pName.length > 28 ? '800 28px "Poppins", sans-serif' : '800 34px "Poppins", sans-serif';
-                ctx.fillText(pName, W / 2, curY + (isStory ? 56 : 50));
+                ctx.fillStyle = palette.primaryInk;
+                ctx.font = pName.length > 28 ? '700 28px "Poppins", sans-serif' : '700 32px "Poppins", sans-serif';
+                ctx.fillText(pName, W / 2, curY + (isStory ? 54 : 48));
 
-                const catStr = cleanText('{{ addslashes($submission->participant->category ?: "UMUM") }}');
+                const catStr = cleanText('{{ addslashes(ucwords(strtolower($submission->participant->category ?: "Umum"))) }}');
                 const instStr = cleanText('{{ addslashes($instName ?? "") }}');
                 const regStr = cleanText('{{ addslashes($regionText ?? "") }}');
-                const subLine1 = instStr ? `${catStr}  •  ${instStr}` : catStr;
+                const subLine1 = instStr ? `${catStr}  |  ${instStr}` : `Kategori: ${catStr}`;
 
-                ctx.fillStyle = isLight ? '#B45309' : '#FBBF24';
-                ctx.font = '700 18px "Plus Jakarta Sans", sans-serif';
-                ctx.fillText(subLine1.length > 54 ? subLine1.substring(0, 52) + '...' : subLine1, W / 2, curY + (isStory ? 95 : 84));
+                ctx.fillStyle = palette.goldAccent;
+                ctx.font = '600 17px "Plus Jakarta Sans", sans-serif';
+                ctx.fillText(subLine1.length > 56 ? subLine1.substring(0, 54) + '...' : subLine1, W / 2, curY + (isStory ? 92 : 82));
 
                 if (regStr) {
-                    ctx.fillStyle = isLight ? '#475569' : '#E2E8F0';
-                    ctx.font = '600 15px "Plus Jakarta Sans", sans-serif';
-                    ctx.fillText('📍 ' + regStr, W / 2, curY + (isStory ? 128 : 112));
+                    ctx.fillStyle = palette.secondaryInk;
+                    ctx.font = '500 15px "Plus Jakarta Sans", sans-serif';
+                    ctx.fillText(regStr, W / 2, curY + (isStory ? 124 : 108));
                 }
 
-                curY += pBoxH + (isStory ? 30 : 20);
+                curY += pBoxH + (isStory ? 28 : 18);
 
-                // 4. Dual Metric Score Cards (SOLID VIBRANT ROYAL NAVY & EMERALD)
-                const cardH = isStory ? 255 : 220;
-                const cardW = 452;
+                // 4. Dual Metric Score Cards (Unified Surface + Left Accent Bar)
+                const cardH = isStory ? 235 : 200;
+                const cardW = 454;
 
-                // Left Card: RQI-15 (Vibrant Navy & Gold)
-                const rqiCardGrad = ctx.createLinearGradient(72, curY, 72 + cardW, curY + cardH);
-                rqiCardGrad.addColorStop(0, '#0B2A43');
-                rqiCardGrad.addColorStop(1, '#15466E');
-                ctx.fillStyle = rqiCardGrad;
+                // Left Card: RQI-15
+                ctx.fillStyle = palette.cardBg;
                 ctx.beginPath();
-                ctx.roundRect(72, curY, cardW, cardH, 24);
+                ctx.roundRect(72, curY, cardW, cardH, 16);
                 ctx.fill();
-                ctx.strokeStyle = '#FBBF24';
-                ctx.lineWidth = 3;
+                ctx.strokeStyle = palette.cardBorder;
+                ctx.lineWidth = 1.5;
                 ctx.stroke();
 
-                ctx.fillStyle = '#FDE047';
-                ctx.font = '800 16px "Poppins", sans-serif';
-                ctx.fillText('✦ SKOR RQI-15', 298, curY + 38);
+                // Left Accent Strip on RQI Card
+                ctx.fillStyle = palette.goldLine;
+                ctx.beginPath();
+                ctx.roundRect(72, curY, 8, cardH, [16, 0, 0, 16]);
+                ctx.fill();
 
-                ctx.fillStyle = '#FBBF24';
-                ctx.font = isStory ? '800 74px "Poppins", sans-serif' : '800 64px "Poppins", sans-serif';
-                ctx.fillText('{{ $rqiScore }}', 298, curY + (isStory ? 116 : 102));
+                ctx.textAlign = 'left';
+                ctx.fillStyle = palette.goldAccent;
+                ctx.font = '600 14px "Poppins", sans-serif';
+                ctx.fillText('PILAR 01 · INDEKS RQI-15', 104, curY + 38);
 
-                ctx.fillStyle = '#F8FAFC';
-                ctx.font = '700 17px "Plus Jakarta Sans", sans-serif';
-                ctx.fillText('/ {{ $maxRqiScore }} Poin ({{ $scorePct }}%)', 298, curY + (isStory ? 150 : 132));
+                ctx.fillStyle = palette.primaryInk;
+                ctx.font = isStory ? '700 62px "Poppins", sans-serif' : '700 54px "Poppins", sans-serif';
+                ctx.fillText('{{ $rqiScore }}', 104, curY + (isStory ? 108 : 96));
 
-                // RQI Badge Pill
+                ctx.fillStyle = palette.mutedInk;
+                ctx.font = '500 17px "Plus Jakarta Sans", sans-serif';
+                ctx.fillText('/ {{ $maxRqiScore }} Poin ({{ $scorePct }}%)', 200, curY + (isStory ? 104 : 92));
+
+                // Progress bar inside RQI card
+                ctx.fillStyle = palette.trackBg;
+                ctx.beginPath();
+                ctx.roundRect(104, curY + (isStory ? 132 : 118), cardW - 60, 8, 4);
+                ctx.fill();
+
+                ctx.fillStyle = palette.goldLine;
+                ctx.beginPath();
+                ctx.roundRect(104, curY + (isStory ? 132 : 118), Math.max(16, ((cardW - 60) * {{ min(100, $scorePct) }}) / 100), 8, 4);
+                ctx.fill();
+
                 const rqiBadgeText = cleanText('{{ addslashes($catName) }}');
-                const pillGrad1 = ctx.createLinearGradient(92, 0, 92 + cardW - 40, 0);
-                pillGrad1.addColorStop(0, '#FDE047');
-                pillGrad1.addColorStop(1, '#F59E0B');
-                ctx.fillStyle = pillGrad1;
-                ctx.beginPath();
-                ctx.roundRect(92, curY + cardH - 64, cardW - 40, 44, 22);
-                ctx.fill();
+                ctx.fillStyle = palette.secondaryInk;
+                ctx.font = '600 15px "Plus Jakarta Sans", sans-serif';
+                ctx.fillText(rqiBadgeText.length > 36 ? rqiBadgeText.substring(0, 34) + '...' : rqiBadgeText, 104, curY + cardH - 28);
 
-                ctx.fillStyle = '#071A2B';
-                ctx.font = rqiBadgeText.length > 30 ? '800 13px "Poppins", sans-serif' : '800 15px "Poppins", sans-serif';
-                ctx.fillText(rqiBadgeText.length > 38 ? rqiBadgeText.substring(0, 36) + '...' : rqiBadgeText, 298, curY + cardH - 36);
-
-                // Right Card: WHO-5 (Vibrant Emerald Teal)
-                const whoCardGrad = ctx.createLinearGradient(556, curY, 556 + cardW, curY + cardH);
-                whoCardGrad.addColorStop(0, '#065F46');
-                whoCardGrad.addColorStop(1, '#047857');
-                ctx.fillStyle = whoCardGrad;
+                // Right Card: WHO-5
+                ctx.fillStyle = palette.cardBg;
                 ctx.beginPath();
-                ctx.roundRect(556, curY, cardW, cardH, 24);
+                ctx.roundRect(554, curY, cardW, cardH, 16);
                 ctx.fill();
-                ctx.strokeStyle = '#34D399';
-                ctx.lineWidth = 3;
+                ctx.strokeStyle = palette.cardBorder;
+                ctx.lineWidth = 1.5;
                 ctx.stroke();
 
-                ctx.fillStyle = '#A7F3D0';
-                ctx.font = '800 16px "Poppins", sans-serif';
-                ctx.fillText('🌿 INDEKS WHO-5', 782, curY + 38);
-
-                ctx.fillStyle = '#FFFFFF';
-                ctx.font = isStory ? '800 74px "Poppins", sans-serif' : '800 64px "Poppins", sans-serif';
-                ctx.fillText('{{ number_format($who5Pct, 0) }}%', 782, curY + (isStory ? 116 : 102));
-
-                ctx.fillStyle = '#D1FAE5';
-                ctx.font = '700 17px "Plus Jakarta Sans", sans-serif';
-                ctx.fillText('Skor Mentah: {{ $who5Raw }} / 25 Poin', 782, curY + (isStory ? 150 : 132));
-
-                // WHO-5 Badge Pill
-                const who5BadgeText = cleanText('{{ addslashes($who5BadgeTitleShort) }}');
-                ctx.fillStyle = '#A7F3D0';
+                // Left Accent Strip on WHO-5 Card
+                ctx.fillStyle = palette.sageAccent;
                 ctx.beginPath();
-                ctx.roundRect(576, curY + cardH - 64, cardW - 40, 44, 22);
+                ctx.roundRect(554, curY, 8, cardH, [16, 0, 0, 16]);
                 ctx.fill();
 
-                ctx.fillStyle = '#064E3B';
-                ctx.font = '800 15px "Poppins", sans-serif';
-                ctx.fillText(who5BadgeText, 782, curY + cardH - 36);
+                ctx.fillStyle = palette.sageAccent;
+                ctx.font = '600 14px "Poppins", sans-serif';
+                ctx.fillText('PILAR 02 · INDEKS WHO-5', 586, curY + 38);
 
-                curY += cardH + (isStory ? 32 : 20);
+                ctx.fillStyle = palette.primaryInk;
+                ctx.font = isStory ? '700 62px "Poppins", sans-serif' : '700 54px "Poppins", sans-serif';
+                ctx.fillText('{{ number_format($who5Pct, 0) }}%', 586, curY + (isStory ? 108 : 96));
+
+                ctx.fillStyle = palette.mutedInk;
+                ctx.font = '500 17px "Plus Jakarta Sans", sans-serif';
+                ctx.fillText('({{ $who5Raw }}/25 Poin)', 745, curY + (isStory ? 104 : 92));
+
+                // Progress bar inside WHO-5 card
+                ctx.fillStyle = palette.trackBg;
+                ctx.beginPath();
+                ctx.roundRect(586, curY + (isStory ? 132 : 118), cardW - 60, 8, 4);
+                ctx.fill();
+
+                ctx.fillStyle = palette.sageAccent;
+                ctx.beginPath();
+                ctx.roundRect(586, curY + (isStory ? 132 : 118), Math.max(16, ((cardW - 60) * {{ min(100, $who5Pct) }}) / 100), 8, 4);
+                ctx.fill();
+
+                const who5BadgeText = cleanText('{{ addslashes($who5BadgeTitleShort) }}');
+                ctx.fillStyle = palette.secondaryInk;
+                ctx.font = '600 15px "Plus Jakarta Sans", sans-serif';
+                ctx.fillText(who5BadgeText, 586, curY + cardH - 28);
+
+                curY += cardH + (isStory ? 28 : 18);
 
                 // 5. 5-Pillar Competency Progress Bars Box
                 const pillars = this.pillarsData || [];
-                const pSectionH = isStory ? 360 : 285;
-                ctx.fillStyle = isLight ? '#FFFFFF' : 'rgba(255, 255, 255, 0.08)';
+                const pSectionH = isStory ? 355 : 280;
+                ctx.fillStyle = palette.cardBg;
                 ctx.beginPath();
-                ctx.roundRect(72, curY, W - 144, pSectionH, 24);
+                ctx.roundRect(72, curY, W - 144, pSectionH, 16);
                 ctx.fill();
-                ctx.strokeStyle = isLight ? '#F59E0B' : 'rgba(251, 191, 36, 0.4)';
-                ctx.lineWidth = 2;
+                ctx.strokeStyle = palette.cardBorder;
+                ctx.lineWidth = 1.5;
                 ctx.stroke();
 
                 ctx.textAlign = 'left';
-                ctx.fillStyle = isLight ? '#0B2A43' : '#FBBF24';
-                ctx.font = '800 16px "Poppins", sans-serif';
-                ctx.fillText('✦ PROFIL CAPAIAN 5 PILAR DIMENSI RQI-15', 105, curY + 38);
+                ctx.fillStyle = palette.goldAccent;
+                ctx.font = '600 14px "Poppins", sans-serif';
+                ctx.fillText('CAPAIAN 5 PILAR DIMENSI RQI-15', 104, curY + 36);
 
                 ctx.textAlign = 'right';
-                ctx.fillStyle = isLight ? '#B45309' : '#A7F3D0';
-                ctx.font = '700 14px "Plus Jakarta Sans", sans-serif';
-                ctx.fillText('SKALA 0–100%', W - 105, curY + 38);
+                ctx.fillStyle = palette.mutedInk;
+                ctx.font = '500 13px "Plus Jakarta Sans", sans-serif';
+                ctx.fillText('PROPORSIONAL 0–100%', W - 104, curY + 36);
 
                 const rowStart = curY + (isStory ? 74 : 64);
-                const rowGap = isStory ? 56 : 43;
+                const rowGap = isStory ? 55 : 42;
 
                 pillars.slice(0, 5).forEach((p, idx) => {
                     const y = rowStart + (idx * rowGap);
                     ctx.textAlign = 'left';
-                    ctx.fillStyle = isLight ? '#0B2A43' : '#FFFFFF';
-                    ctx.font = '700 17px "Plus Jakarta Sans", sans-serif';
-                    ctx.fillText(`${idx + 1}. ${p.name}`, 105, y);
+                    ctx.fillStyle = palette.primaryInk;
+                    ctx.font = '600 16px "Plus Jakarta Sans", sans-serif';
+                    ctx.fillText(`0${idx + 1}.  ${p.name}`, 104, y);
 
-                    // Bar Track
+                    // Clean Single-Tone Track & Bar
                     const barX = 485;
                     const barW = 390;
-                    const barH = isStory ? 18 : 15;
-                    ctx.fillStyle = isLight ? '#E2E8F0' : 'rgba(255, 255, 255, 0.16)';
+                    const barH = isStory ? 12 : 10;
+                    ctx.fillStyle = palette.trackBg;
                     ctx.beginPath();
-                    ctx.roundRect(barX, y - barH + 3, barW, barH, barH / 2);
+                    ctx.roundRect(barX, y - barH + 1, barW, barH, barH / 2);
                     ctx.fill();
 
-                    // Bar Fill (Vibrant Amber -> Emerald)
-                    const fillW = Math.max(22, Math.min(barW, (p.pct / 100) * barW));
-                    const barGrad = ctx.createLinearGradient(barX, 0, barX + fillW, 0);
-                    barGrad.addColorStop(0, '#F59E0B');
-                    barGrad.addColorStop(0.5, '#FBBF24');
-                    barGrad.addColorStop(1, '#10B981');
-                    ctx.fillStyle = barGrad;
+                    const fillW = Math.max(16, Math.min(barW, (p.pct / 100) * barW));
+                    ctx.fillStyle = palette.barFill;
                     ctx.beginPath();
-                    ctx.roundRect(barX, y - barH + 3, fillW, barH, barH / 2);
+                    ctx.roundRect(barX, y - barH + 1, fillW, barH, barH / 2);
                     ctx.fill();
 
-                    // Pct Text
                     ctx.textAlign = 'right';
-                    ctx.fillStyle = isLight ? '#0B2A43' : '#FDE047';
-                    ctx.font = '800 18px "Poppins", sans-serif';
-                    ctx.fillText(`${p.pct}%`, W - 105, y + 1);
+                    ctx.fillStyle = palette.primaryInk;
+                    ctx.font = '700 16px "Poppins", sans-serif';
+                    ctx.fillText(`${p.pct}%`, W - 104, y + 1);
                 });
 
-                curY += pSectionH + (isStory ? 32 : 18);
+                curY += pSectionH + (isStory ? 28 : 18);
 
-                // 6. Interpretation / Philosophical Reflection Box
-                const quoteBoxH = isStory ? 260 : 168;
-                ctx.fillStyle = isLight ? '#FEF3C7' : 'rgba(251, 191, 36, 0.1)';
+                // 6. Editorial Reflection Box
+                const quoteBoxH = isStory ? 255 : 165;
+                ctx.fillStyle = palette.quoteBg;
                 ctx.beginPath();
-                ctx.roundRect(72, curY, W - 144, quoteBoxH, 24);
+                ctx.roundRect(72, curY, W - 144, quoteBoxH, 16);
                 ctx.fill();
-                ctx.strokeStyle = '#F59E0B';
-                ctx.lineWidth = 2;
+                ctx.strokeStyle = palette.cardBorder;
+                ctx.lineWidth = 1.5;
                 ctx.stroke();
 
                 ctx.textAlign = 'center';
-                ctx.fillStyle = isLight ? '#92400E' : '#FDE047';
-                ctx.font = '800 15px "Poppins", sans-serif';
-                ctx.fillText('✦ REFLEKSI PROFIL RUHIOLOGI', W / 2, curY + 34);
+                ctx.fillStyle = palette.goldAccent;
+                ctx.font = '600 13px "Poppins", sans-serif';
+                ctx.fillText('INTERPRETASI PROFIL RUHIOLOGI', W / 2, curY + 32);
 
-                ctx.fillStyle = isLight ? '#0B2A43' : '#FFFFFF';
-                ctx.font = isStory ? 'italic 600 20px "Plus Jakarta Sans", sans-serif' : 'italic 600 17px "Plus Jakarta Sans", sans-serif';
+                ctx.fillStyle = palette.secondaryInk;
+                ctx.font = isStory ? 'italic 500 19px "Plus Jakarta Sans", sans-serif' : 'italic 500 16px "Plus Jakarta Sans", sans-serif';
                 const interpText = cleanText('"{{ addslashes($submission->result->overall_interpretation) }}"');
-                this.wrapText(ctx, interpText, W / 2, curY + (isStory ? 74 : 66), 860, isStory ? 32 : 26, isStory ? 4 : 3);
+                this.wrapText(ctx, interpText, W / 2, curY + (isStory ? 72 : 62), 860, isStory ? 31 : 25, isStory ? 4 : 3);
 
-                curY += quoteBoxH + (isStory ? 40 : 22);
+                curY += quoteBoxH + (isStory ? 42 : 24);
 
                 // 7. Footer Branding & Verification
-                ctx.strokeStyle = isLight ? '#D97706' : 'rgba(251, 191, 36, 0.45)';
-                ctx.lineWidth = 2;
+                ctx.strokeStyle = palette.cardBorder;
+                ctx.lineWidth = 1.5;
                 ctx.beginPath();
-                ctx.moveTo(160, curY);
-                ctx.lineTo(W - 160, curY);
+                ctx.moveTo(140, curY);
+                ctx.lineTo(W - 140, curY);
                 ctx.stroke();
 
                 const founderName = cleanText('{{ addslashes(\App\Models\Setting::get("founder_name", "Prof. Dr. Iskandar Nazari, S.Ag., M.Pd., M.S.I., M.H., Ph.D.")) }}');
-                ctx.fillStyle = isLight ? '#0B2A43' : '#FFFFFF';
-                ctx.font = '800 19px "Poppins", sans-serif';
+                ctx.fillStyle = palette.primaryInk;
+                ctx.font = '700 18px "Poppins", sans-serif';
                 ctx.fillText(founderName, W / 2, curY + (isStory ? 38 : 30));
 
-                ctx.fillStyle = isLight ? '#B45309' : '#FBBF24';
-                ctx.font = '700 15px "Plus Jakarta Sans", sans-serif';
-                ctx.fillText('Founder Ruhiology Institute  •  ruhiology-institute.site', W / 2, curY + (isStory ? 66 : 54));
+                ctx.fillStyle = palette.goldAccent;
+                ctx.font = '500 14px "Plus Jakarta Sans", sans-serif';
+                ctx.fillText('Founder Ruhiology Institute  ·  ruhiology-institute.site', W / 2, curY + (isStory ? 64 : 52));
 
-                ctx.fillStyle = isLight ? '#047857' : '#A7F3D0';
-                ctx.font = '700 14px monospace';
-                ctx.fillText('✓ KODE VERIFIKASI RESMI: {{ $submission->submission_code }}', W / 2, curY + (isStory ? 96 : 78));
+                ctx.fillStyle = palette.mutedInk;
+                ctx.font = '500 13px monospace';
+                ctx.fillText('DOC ID: {{ $submission->submission_code }}', W / 2, curY + (isStory ? 92 : 76));
             };
 
             logoImg.onload = render;
@@ -1091,7 +1058,7 @@ function rqResultPage() {
         async shareStoryCard() {
             const canvas = document.getElementById('storyCanvas');
             if (!canvas) return;
-            const caption = `Alhamdulillah, saya telah menyelesaikan Asesmen Kesadaran Ruhiologi (RQI-15 & WHO-5) di Ruhiology Institute!\n\n✦ Skor RQI-15: {{ $rqiScore }} / {{ $maxRqiScore }} Poin ({{ $catName }})\n🌿 Indeks Kesejahteraan WHO-5: {{ number_format($who5Pct, 0) }}%\n🔑 Kode Verifikasi: {{ $submission->submission_code }}\n\nYuk kenali profil kesadaran batin & potensi ruh Anda di: {{ url('/assessment') }}`;
+            const caption = `Saya telah menyelesaikan Asesmen Kesadaran Ruhiologi (RQI-15 & WHO-5) di Ruhiology Institute.\n\nSkor RQI-15: {{ $rqiScore }} / {{ $maxRqiScore }} Poin ({{ $catName }})\nIndeks Kesejahteraan WHO-5: {{ number_format($who5Pct, 0) }}%\nKode Verifikasi: {{ $submission->submission_code }}\n\nPortal Asesmen: {{ url('/assessment') }}`;
 
             if (navigator.canShare && canvas.toBlob) {
                 canvas.toBlob(async (blob) => {
@@ -1109,7 +1076,7 @@ function rqResultPage() {
                             });
                             return;
                         } catch (e) {
-                            // User cancelled or share failed
+                            // User cancelled
                         }
                     }
                     this.downloadStoryImage();
@@ -1120,7 +1087,7 @@ function rqResultPage() {
         },
 
         copySocialCaption() {
-            const caption = `Alhamdulillah, saya telah menyelesaikan Asesmen Kesadaran Ruhiologi (RQI-15 & WHO-5) di Ruhiology Institute! ✨\n\n📊 Skor RQI-15: {{ $rqiScore }} / {{ $maxRqiScore }} Poin ({{ $catName }})\n🌿 Indeks Kesejahteraan WHO-5: {{ number_format($who5Pct, 0) }}%\n🔑 Kode Verifikasi: {{ $submission->submission_code }}\n\nYuk kenali profil kesadaran batin & potensi ruh Anda di: {{ url('/assessment') }}`;
+            const caption = `Saya telah menyelesaikan Asesmen Kesadaran Ruhiologi (RQI-15 & WHO-5) di Ruhiology Institute.\n\nSkor RQI-15: {{ $rqiScore }} / {{ $maxRqiScore }} Poin ({{ $catName }})\nIndeks Kesejahteraan WHO-5: {{ number_format($who5Pct, 0) }}%\nKode Verifikasi: {{ $submission->submission_code }}\n\nPortal Asesmen: {{ url('/assessment') }}`;
             navigator.clipboard.writeText(caption).then(() => {
                 this.captionCopied = true;
                 setTimeout(() => { this.captionCopied = false; }, 2500);
@@ -1148,12 +1115,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 datasets: [{
                     label: 'Skor Dimensi (%)',
                     data: {!! json_encode($dimValues) !!},
-                    backgroundColor: 'rgba(201, 162, 77, 0.3)',
-                    borderColor: '#C9A24D',
-                    borderWidth: 2.5,
-                    pointBackgroundColor: '#C9A24D',
+                    backgroundColor: 'rgba(181, 148, 91, 0.25)',
+                    borderColor: '#C5A059',
+                    borderWidth: 2,
+                    pointBackgroundColor: '#C5A059',
                     pointBorderColor: '#fff',
-                    pointRadius: 4
+                    pointRadius: 3.5
                 }]
             },
             options: {
@@ -1161,10 +1128,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 maintainAspectRatio: true,
                 scales: {
                     r: {
-                        angleLines: { color: 'rgba(255, 255, 255, 0.2)' },
-                        grid: { color: 'rgba(255, 255, 255, 0.2)' },
+                        angleLines: { color: 'rgba(255, 255, 255, 0.15)' },
+                        grid: { color: 'rgba(255, 255, 255, 0.15)' },
                         pointLabels: {
-                            color: '#f8fafc',
+                            color: '#e2e8f0',
                             font: { size: 10, family: 'Poppins', weight: '600' }
                         },
                         ticks: { display: false, beginAtZero: true, max: 100 }
