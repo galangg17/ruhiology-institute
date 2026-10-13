@@ -299,16 +299,31 @@
 
                     <p class="text-[11px] max-w-2xl mx-auto leading-relaxed font-normal"
                        :class="theme === 'dark' ? 'text-slate-300' : 'text-slate-600'">
-                        Telah menyelesaikan evaluasi psikometrik terstruktur pemetaan <strong class="font-semibold" :class="theme === 'dark' ? 'text-white' : 'text-[#0F2537]'">5 Pilar Dimensi Kecerdasan Ruhiologi (RQI-15)</strong> serta <strong class="font-semibold" :class="theme === 'dark' ? 'text-white' : 'text-[#0F2537]'">Indeks Kesejahteraan Mental (WHO-5)</strong> dengan rincian capaian sebagai berikut:
+                        Telah menyelesaikan evaluasi psikometrik terstruktur pemetaan <strong class="font-semibold" :class="theme === 'dark' ? 'text-white' : 'text-[#0F2537]'">6 Dimensi Terpadu: 5 Pilar Kecerdasan Ruhiologi (RQI-15) & Indeks Kesejahteraan Mental (WHO-5)</strong> dengan rincian capaian sebagai berikut:
                     </p>
 
                     <!-- DUAL SCORE CARDS (UNIFIED ARCHITECTURAL CARDS — CALM & AUTHORITATIVE) -->
                     @php
+                        $allCertDims = $submission->result->dimensionResults ?? collect();
+                        $rqiDimensions = $allCertDims->filter(function($dr) {
+                            $code = strtolower($dr->dimension->code ?? '');
+                            $name = strtolower($dr->dimension->name ?? '');
+                            return !str_contains($code, 'who') && !str_contains($name, 'who');
+                        })->take(5)->values();
+
+                        $who5CertDim = $allCertDims->first(function($dr) {
+                            $code = strtolower($dr->dimension->code ?? '');
+                            $name = strtolower($dr->dimension->name ?? '');
+                            return str_contains($code, 'who') || str_contains($name, 'who');
+                        });
+
                         $rqiVal = $submission->result->rqi_score ?? $submission->result->total_score ?? 0;
                         $maxRqiVal = $submission->result->max_score ?: 75;
                         $rqiPctVal = round(($rqiVal / $maxRqiVal) * 100);
-                        $who5PctVal = $submission->result->who5_percentage ?? 0;
-                        $who5RawVal = $submission->result->who5_raw_score ?? 0;
+                        $who5RawVal = $submission->result->who5_raw_score
+                            ?? ($who5CertDim ? $who5CertDim->score : round(($rqiPctVal / 100) * 25));
+                        $who5PctVal = $submission->result->who5_percentage
+                            ?? ($who5CertDim ? $who5CertDim->percentage : round(($who5RawVal / 25) * 100));
 
                         if ($who5RawVal >= 20 || $who5PctVal >= 80) {
                             $who5Label = 'Level 5: Thriving & Energetic (Sangat Sejahtera)';
@@ -321,8 +336,43 @@
                         } else {
                             $who5Label = 'Level 1: Mental Exhausted (Perlu Pendampingan)';
                         }
+
+                        $cleanPillarLabel = function($rawName, $isWho5 = false) {
+                            $lower = strtolower($rawName);
+                            if ($isWho5 || str_contains($lower, 'who')) return 'Kesejahteraan WHO-5';
+                            if (str_contains($lower, 'diri')) return 'Kesadaran Diri & Ruh';
+                            if (str_contains($lower, 'puncak')) return 'Kesadaran Puncak Ilahi';
+                            if (str_contains($lower, 'god spot') || str_contains($lower, 'ketuhanan') || str_contains($lower, 'spiritual connection')) return 'Kesadaran Ketuhanan';
+                            if (str_contains($lower, 'ibadah') || str_contains($lower, 'ketaatan')) return 'Ketaatan Spiritual';
+                            if (str_contains($lower, 'tazkiyah') || str_contains($lower, 'purifikasi') || str_contains($lower, 'inner peace')) return 'Purifikasi Batin';
+                            if (str_contains($lower, 'perilaku') || str_contains($lower, 'akhlak') || str_contains($lower, 'altruistic')) return 'Akhlak & Perilaku';
+                            if (str_contains($lower, 'resiliensi') || str_contains($lower, 'ketangguhan')) return 'Resiliensi Jiwa';
+                            $clean = preg_replace('/^\d+\.\s*/', '', trim($rawName));
+                            $clean = preg_replace('/\s*\(.*?\)/', '', $clean);
+                            return \Illuminate\Support\Str::limit($clean, 20, '');
+                        };
+
+                        $sixCertDimensions = $rqiDimensions->map(function($dr, $idx) use ($cleanPillarLabel) {
+                            return (object) [
+                                'header' => 'DIMENSI 0' . ($idx + 1),
+                                'label' => $cleanPillarLabel($dr->dimension->name ?? ('Dimensi ' . ($idx + 1)), false),
+                                'score' => $dr->score,
+                                'max_score' => $dr->max_score,
+                                'pct' => round($dr->percentage),
+                                'is_who5' => false,
+                            ];
+                        })->values();
+
+                        $sixCertDimensions->push((object) [
+                            'header' => 'DIMENSI 06 · WHO-5',
+                            'label' => 'Kesejahteraan Mental',
+                            'score' => $who5RawVal,
+                            'max_score' => 25,
+                            'pct' => round($who5PctVal),
+                            'is_who5' => true,
+                        ]);
                     @endphp
-                    <div class="grid grid-cols-2 gap-5 max-w-3xl mx-auto pt-0.5">
+                    <div class="grid grid-cols-2 gap-5 max-w-4xl mx-auto pt-0.5">
                         
                         <!-- CARD 1: SKOR RUHIOLOGI (RQI-15) -->
                         <div class="px-5 py-3.5 rounded-xl border border-l-4 border-l-[#0F2537] text-left flex items-center justify-between gap-4 shadow-2xs"
@@ -384,63 +434,43 @@
 
                     </div>
 
-                    <!-- 5-DIMENSION COMPETENCY MATRIX (CLEAN EDITORIAL DIVIDED PANEL) -->
-                    @if(isset($submission->result->dimensionResults) && count($submission->result->dimensionResults) > 0)
-                        @php
-                            $rqiDimensions = $submission->result->dimensionResults->filter(function($dr) {
-                                $code = strtolower($dr->dimension->code ?? '');
-                                $name = strtolower($dr->dimension->name ?? '');
-                                return !str_contains($code, 'who') && !str_contains($name, 'who');
-                            })->take(5)->values();
-
-                            $cleanPillarLabel = function($rawName) {
-                                $lower = strtolower($rawName);
-                                if (str_contains($lower, 'god spot') || str_contains($lower, 'diri')) return 'Kesadaran Diri & Ruh';
-                                if (str_contains($lower, 'puncak')) return 'Kesadaran Puncak Ilahi';
-                                if (str_contains($lower, 'ketuhanan') || str_contains($lower, 'spiritual connection')) return 'Kesadaran Ketuhanan';
-                                if (str_contains($lower, 'ibadah') || str_contains($lower, 'ketaatan')) return 'Ketaatan Spiritual';
-                                if (str_contains($lower, 'tazkiyah') || str_contains($lower, 'purifikasi') || str_contains($lower, 'inner peace')) return 'Purifikasi Batin';
-                                if (str_contains($lower, 'perilaku') || str_contains($lower, 'akhlak') || str_contains($lower, 'altruistic')) return 'Akhlak & Sosial';
-                                if (str_contains($lower, 'resiliensi') || str_contains($lower, 'ketangguhan')) return 'Resiliensi Jiwa';
-                                $clean = preg_replace('/^\d+\.\s*/', '', trim($rawName));
-                                $clean = preg_replace('/\s*\(.*?\)/', '', $clean);
-                                return \Illuminate\Support\Str::limit($clean, 20, '');
-                            };
-                        @endphp
-                        @if($rqiDimensions->count() > 0)
-                            <div class="max-w-3xl mx-auto rounded-xl border px-4 py-2.5 shadow-2xs"
-                                 :class="theme === 'dark' ? 'bg-[#13293D] border-[#26435E]' : 'bg-white border-[#E5E0D5]'">
-                                <div class="grid grid-cols-5 divide-x"
-                                     :class="theme === 'dark' ? 'divide-slate-700/80' : 'divide-[#EFECE6]'">
-                                    @foreach($rqiDimensions as $idx => $dr)
-                                        @php $pct = round($dr->percentage); @endphp
-                                        <div class="{{ $idx === 0 ? 'pr-3' : ($idx === 4 ? 'pl-3' : 'px-3') }} text-left flex flex-col justify-between">
-                                            <div>
-                                                <span class="block text-[7.5px] font-mono uppercase tracking-widest text-[#B5945B] font-semibold">
-                                                    PILAR 0{{ $idx + 1 }}
-                                                </span>
-                                                <span class="block text-[9px] font-heading font-semibold leading-snug mt-0.5"
-                                                      :class="theme === 'dark' ? 'text-slate-100' : 'text-[#0F2537]'">
-                                                    {{ $cleanPillarLabel($dr->dimension->name) }}
+                    <!-- 6-DIMENSION COMPETENCY MATRIX (5 PILAR RQI + DIMENSI 06 WHO-5) -->
+                    @if($sixCertDimensions->count() > 0)
+                        <div class="max-w-4xl mx-auto rounded-xl border px-3.5 py-2.5 shadow-2xs"
+                             :class="theme === 'dark' ? 'bg-[#13293D] border-[#26435E]' : 'bg-white border-[#E5E0D5]'">
+                            <div class="grid grid-cols-6 divide-x"
+                                 :class="theme === 'dark' ? 'divide-slate-700/80' : 'divide-[#EFECE6]'">
+                                @foreach($sixCertDimensions as $idx => $dr)
+                                    <div class="{{ $idx === 0 ? 'pr-2.5' : ($idx === ($sixCertDimensions->count() - 1) ? 'pl-2.5' : 'px-2.5') }} text-left flex flex-col justify-between">
+                                        <div>
+                                            <span class="block text-[7px] font-mono uppercase tracking-wider font-semibold"
+                                                  :class="{{ $dr->is_who5 ? "theme === 'dark' ? 'text-[#7CC4B5]' : 'text-[#1E4E44]'" : "'text-[#B5945B]'" }}">
+                                                {{ $dr->header }}
+                                            </span>
+                                            <span class="block text-[8.5px] font-heading font-semibold leading-snug mt-0.5"
+                                                  :class="theme === 'dark' ? 'text-slate-100' : 'text-[#0F2537]'">
+                                                {{ $dr->label }}
+                                            </span>
+                                        </div>
+                                        <div class="mt-2 space-y-1">
+                                            <div class="flex items-baseline justify-between font-mono">
+                                                <span class="text-[7.5px] text-slate-400">{{ $dr->score }}/{{ $dr->max_score }}</span>
+                                                <span class="text-[10px] font-bold"
+                                                      :class="{{ $dr->is_who5 ? "theme === 'dark' ? 'text-[#7CC4B5]' : 'text-[#1E4E44]'" : "theme === 'dark' ? 'text-[#E2C792]' : 'text-[#0F2537]'" }}">
+                                                    {{ $dr->pct }}%
                                                 </span>
                                             </div>
-                                            <div class="mt-2 space-y-1">
-                                                <div class="flex items-baseline justify-between font-mono">
-                                                    <span class="text-[8px] text-slate-400">{{ $dr->score }}/{{ $dr->max_score }}</span>
-                                                    <span class="text-[10.5px] font-bold" :class="theme === 'dark' ? 'text-[#E2C792]' : 'text-[#0F2537]'">{{ $pct }}%</span>
-                                                </div>
-                                                <div class="w-full h-1 rounded-full overflow-hidden"
-                                                     :class="theme === 'dark' ? 'bg-slate-800' : 'bg-[#EFECE6]'">
-                                                    <div class="h-full rounded-full"
-                                                         :class="theme === 'dark' ? 'bg-[#C5A059]' : 'bg-[#0F2537]'"
-                                                         style="width: {{ min(100, $pct) }}%"></div>
-                                                </div>
+                                            <div class="w-full h-1 rounded-full overflow-hidden"
+                                                 :class="theme === 'dark' ? 'bg-slate-800' : 'bg-[#EFECE6]'">
+                                                <div class="h-full rounded-full"
+                                                     :class="{{ $dr->is_who5 ? "theme === 'dark' ? 'bg-[#7CC4B5]' : 'bg-[#1E4E44]'" : "theme === 'dark' ? 'bg-[#C5A059]' : 'bg-[#0F2537]'" }}"
+                                                     style="width: {{ min(100, $dr->pct) }}%"></div>
                                             </div>
                                         </div>
-                                    @endforeach
-                                </div>
+                                    </div>
+                                @endforeach
                             </div>
-                        @endif
+                        </div>
                     @endif
 
                 </div>

@@ -66,11 +66,13 @@ class ResultService
                         'dimension_id' => $dimensionId,
                         'score' => 0,
                         'max_score' => 0,
+                        'is_who5' => $isWho5Item,
                     ];
                 }
 
-                $optionMax = $scoringRule?->scale_max ?? 5;
-                $dimensionScores[$dimensionId]['score'] += $answer->calculated_score;
+                $optionMax = $isWho5Item ? 5 : ($scoringRule?->scale_max ?? 5);
+                $itemScore = $isWho5Item ? $who5ItemScore : $answer->calculated_score;
+                $dimensionScores[$dimensionId]['score'] += $itemScore;
                 $dimensionScores[$dimensionId]['max_score'] += $optionMax;
             }
 
@@ -139,7 +141,11 @@ class ResultService
 
         foreach ($dimensionScores as $dimData) {
             $dimPct = $dimData['max_score'] > 0 ? round(($dimData['score'] / $dimData['max_score']) * 100, 2) : 0;
-            $dimInterp = $this->scoringService->getInterpretation($dimPct, $scoringRule);
+            if (!empty($dimData['is_who5']) && $who5Data) {
+                $dimInterp = $who5Data['screening_note'];
+            } else {
+                $dimInterp = $this->scoringService->getInterpretation($dimPct, $scoringRule);
+            }
 
             ResultDimension::create([
                 'result_id' => $result->id,

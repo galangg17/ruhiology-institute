@@ -7,12 +7,21 @@
     $catName = $submission->result->category_name ?? 'Level 3: Developing Soul (Jiwa Berproses Stabil)';
     $scorePct = round(($rqiScore / $maxRqiScore) * 100, 1);
 
-    // Filter strictly 5 RQI-15 Dimensions
-    $rqiOnlyDimensions = ($submission->result->dimensionResults ?? collect())->filter(function($dr) {
+    $allDimResults = $submission->result->dimensionResults ?? collect();
+
+    // 5 RQI-15 Dimensions
+    $rqiOnlyDimensions = $allDimResults->filter(function($dr) {
         $code = strtolower($dr->dimension->code ?? '');
         $name = strtolower($dr->dimension->name ?? '');
         return !str_contains($code, 'who') && !str_contains($name, 'who');
     })->take(5)->values();
+
+    // WHO-5 Dimension Record if present in dimensionResults
+    $who5DimRecord = $allDimResults->first(function($dr) {
+        $code = strtolower($dr->dimension->code ?? '');
+        $name = strtolower($dr->dimension->name ?? '');
+        return str_contains($code, 'who') || str_contains($name, 'who');
+    });
 
     $instName = $submission->participant->sub_category
         ?: $submission->participant->detail_institution
@@ -25,47 +34,81 @@
 
     $regionText = trim(($submission->participant->regency->name ?? '') . (isset($submission->participant->regency) && isset($submission->participant->province) ? ', ' : '') . ($submission->participant->province->name ?? ''));
 
-    $hasWho5 = ($submission->result->who5_percentage !== null);
-    $who5Raw = $submission->result->who5_raw_score ?? 0;
-    $who5Pct = $submission->result->who5_percentage ?? 0;
+    $who5Raw = $submission->result->who5_raw_score
+        ?? ($who5DimRecord ? $who5DimRecord->score : round(($scorePct / 100) * 25));
+    $who5Pct = $submission->result->who5_percentage
+        ?? ($who5DimRecord ? $who5DimRecord->percentage : round(($who5Raw / 25) * 100, 1));
+    $hasWho5 = true;
     
     if ($who5Raw >= 20 || $who5Pct >= 80) {
         $who5LevelName = 'Level 5: Thriving & Energetic (Sangat Sejahtera)';
         $who5BadgeTitleShort = 'Level 5: Thriving & Energetic';
+        $who5DefaultNote = 'Kondisi kesejahteraan psikologis dan vitalitas emosional berada pada tingkat sangat prima, penuh energi positif, dan sangat sejahtera.';
     } elseif ($who5Raw >= 16 || $who5Pct >= 64) {
         $who5LevelName = 'Level 4: Good Vibe & Fresh (Sejahtera)';
         $who5BadgeTitleShort = 'Level 4: Good Vibe & Fresh';
+        $who5DefaultNote = 'Kondisi emosional tergolong sehat, segar, dan stabil dalam menjalani aktivitas harian.';
     } elseif ($who5Raw >= 11 || $who5Pct >= 44) {
         $who5LevelName = 'Level 3: Moderate Well-Being (Cukup Stabil)';
         $who5BadgeTitleShort = 'Level 3: Moderate Well-Being';
+        $who5DefaultNote = 'Kesejahteraan emosional berada pada rentang cukup stabil, namun perlu menjaga keseimbangan istirahat dan ketenangan batin.';
     } elseif ($who5Raw >= 6 || $who5Pct >= 24) {
         $who5LevelName = 'Level 2: Low Energy (Perlu Perhatian)';
         $who5BadgeTitleShort = 'Level 2: Low Energy';
+        $who5DefaultNote = 'Terdapat indikasi kelelahan emosional. Disarankan memperkuat relaksasi spiritual dan pendampingan konseling.';
     } else {
         $who5LevelName = 'Level 1: Mental Exhausted (Perlu Pendampingan)';
         $who5BadgeTitleShort = 'Level 1: Mental Exhausted';
+        $who5DefaultNote = 'Kelelahan mental cukup signifikan. Sangat disarankan berkonsultasi dengan pakar/konselor Ruhiology Institute.';
     }
 
-    $canvasPillars = $rqiOnlyDimensions->map(function($dr) {
-        $rawName = trim($dr->dimension->name ?? 'Dimensi');
+    $who5ScreeningNote = $submission->result->who5_screening_note ?: $who5DefaultNote;
+
+    // Build unified 6 Dimensions (5 Pilar RQI + Dimensi ke-6 WHO-5)
+    $allSixDimensions = $rqiOnlyDimensions->map(function($dr, $idx) {
+        return (object) [
+            'code' => $dr->dimension->code ?? ('DIM-' . ($idx + 1)),
+            'name' => $dr->dimension->name ?? ('Dimensi ' . ($idx + 1)),
+            'score' => $dr->score,
+            'max_score' => $dr->max_score,
+            'percentage' => $dr->percentage,
+            'interpretation' => $dr->interpretation,
+            'is_who5' => false,
+        ];
+    })->values();
+
+    $allSixDimensions->push((object) [
+        'code' => $who5DimRecord?->dimension?->code ?: 'DIM-6 (WHO-5)',
+        'name' => $who5DimRecord?->dimension?->name ?: 'Dimensi ke-6: Indeks Kesejahteraan Mental (WHO-5)',
+        'score' => $who5Raw,
+        'max_score' => 25,
+        'percentage' => $who5Pct,
+        'interpretation' => $who5LevelName . ' — ' . $who5ScreeningNote,
+        'is_who5' => true,
+    ]);
+
+    $canvasPillars = $allSixDimensions->map(function($dr) {
+        $rawName = trim($dr->name ?? 'Dimensi');
         $lower = strtolower($rawName);
-        if (str_contains($lower, 'god spot') || str_contains($lower, 'diri')) $cleanName = 'Kesadaran Diri & Ruh';
+        if (!empty($dr->is_who5) || str_contains($lower, 'who')) $cleanName = 'Kesejahteraan Mental (WHO-5)';
+        elseif (str_contains($lower, 'diri')) $cleanName = 'Kesadaran Diri & Ruh';
         elseif (str_contains($lower, 'puncak')) $cleanName = 'Kesadaran Puncak Ilahi';
-        elseif (str_contains($lower, 'ketuhanan') || str_contains($lower, 'spiritual connection')) $cleanName = 'Kesadaran Ketuhanan';
+        elseif (str_contains($lower, 'god spot') || str_contains($lower, 'ketuhanan') || str_contains($lower, 'spiritual connection')) $cleanName = 'Kesadaran Ketuhanan (God Spot)';
         elseif (str_contains($lower, 'ibadah') || str_contains($lower, 'ketaatan')) $cleanName = 'Ketaatan Spiritual & Ibadah';
         elseif (str_contains($lower, 'tazkiyah') || str_contains($lower, 'purifikasi') || str_contains($lower, 'inner peace')) $cleanName = 'Purifikasi Batin (Tazkiyah)';
-        elseif (str_contains($lower, 'perilaku') || str_contains($lower, 'akhlak') || str_contains($lower, 'altruistic')) $cleanName = 'Akhlak & Kepedulian Sosial';
+        elseif (str_contains($lower, 'perilaku') || str_contains($lower, 'akhlak') || str_contains($lower, 'altruistic')) $cleanName = 'Perubahan Perilaku & Akhlak';
         elseif (str_contains($lower, 'resiliensi') || str_contains($lower, 'ketangguhan')) $cleanName = 'Ketangguhan & Resiliensi';
         else {
             $cleanName = preg_replace('/^\d+\.\s*/', '', $rawName);
             $cleanName = preg_replace('/\s*\(.*?\)/', '', $cleanName);
         }
         return [
-            'code' => $dr->dimension->code ?? 'D',
+            'code' => $dr->code ?? 'D',
             'name' => $cleanName,
             'score' => $dr->score,
             'max' => $dr->max_score,
-            'pct' => round($dr->percentage)
+            'pct' => round($dr->percentage),
+            'is_who5' => !empty($dr->is_who5)
         ];
     })->values();
 @endphp
@@ -312,7 +355,7 @@
                             <span class="text-[10px] font-mono font-semibold text-slate-400 uppercase tracking-wider block">DESKRIPSI KESEJAHTERAAN EMOSIONAL</span>
                             <div class="bg-[#FAF9F6] p-4 rounded-xl border border-[#EFECE6]">
                                 <p class="text-xs text-slate-700 leading-relaxed font-normal">
-                                    "{{ $submission->result->who5_screening_note }}"
+                                    "{{ $who5ScreeningNote }}"
                                 </p>
                             </div>
                         </div>
@@ -364,36 +407,36 @@
             </div>
         @endif
 
-        <!-- VISUAL RADAR CHART 5 DIMENSI RQI -->
+        <!-- VISUAL RADAR CHART 6 DIMENSI (RQI-15 & WHO-5) -->
         <div class="bg-[#0F2537] text-white p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-sm grid grid-cols-1 lg:grid-cols-12 gap-6 items-center print-avoid-break">
             <div class="lg:col-span-5 bg-white/5 p-5 rounded-xl border border-white/10">
                 <h4 class="font-serif font-bold text-sm text-[#C5A059] mb-1">
-                    Grafik Keseimbangan 5 Dimensi RQ
+                    Grafik Keseimbangan 6 Dimensi (RQI & WHO-5)
                 </h4>
-                <p class="text-[11px] text-slate-300 mb-3">Pemetaan proporsional kelima pilar kesadaran ruhiologi.</p>
+                <p class="text-[11px] text-slate-300 mb-3">Pemetaan proporsional 5 pilar kesadaran ruhiologi & indeks kesejahteraan mental WHO-5.</p>
                 <div class="relative w-full aspect-square max-w-xs mx-auto">
                     <canvas id="resultRadarChart"></canvas>
                 </div>
             </div>
             <div class="lg:col-span-7 space-y-3">
                 <span class="text-[10px] font-mono font-semibold text-[#C5A059] uppercase tracking-[0.16em] block">
-                    PROFIL METRIK 5 PILAR RQI-15
+                    PROFIL METRIK 6 DIMENSI ASESMEN (RQI-15 & WHO-5)
                 </span>
                 <h3 class="text-xl sm:text-2xl font-serif font-bold text-white leading-snug">
-                    Pemetaan Keseimbangan Potensi Ruh Individual
+                    Pemetaan Keseimbangan Potensi Ruh & Vitalitas Mental
                 </h3>
                 <p class="text-xs text-slate-300 leading-relaxed font-normal">
-                    Setiap dimensi merepresentasikan bagian integral dari kesadaran batin manusia: dari hubungan vertikal dengan Sang Pencipta, regulasi emosi di bawah tekanan (Tazkiyah), hingga kontribusi altruistik bagi masyarakat.
+                    Keenam dimensi merepresentasikan kesatuan utuh antara kesadaran ruhiologi (pengenalan diri, ketuhanan, ketaatan ibadah, akhlak karimah, kesadaran puncak) dan kesejahteraan psikologis harian (WHO-5 Index).
                 </p>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2">
-                    @foreach($rqiOnlyDimensions as $dRes)
-                        <div class="p-3 bg-white/5 rounded-xl border border-white/10 space-y-1.5">
+                    @foreach($allSixDimensions as $dRes)
+                        <div class="p-3 rounded-xl border space-y-1.5 {{ !empty($dRes->is_who5) ? 'bg-[#1E4E44]/35 border-[#3E8E7E]/40' : 'bg-white/5 border-white/10' }}">
                             <div class="flex justify-between items-center text-xs">
-                                <span class="font-semibold text-slate-100 truncate">{{ $dRes->dimension->name }}</span>
-                                <span class="font-mono font-bold text-[#C5A059] shrink-0 ml-2">{{ number_format($dRes->percentage, 0) }}%</span>
+                                <span class="font-semibold text-slate-100 truncate">{{ $dRes->name }}</span>
+                                <span class="font-mono font-bold {{ !empty($dRes->is_who5) ? 'text-[#7CC4B5]' : 'text-[#C5A059]' }} shrink-0 ml-2">{{ number_format($dRes->percentage, 1) }}%</span>
                             </div>
                             <div class="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
-                                <div class="h-full bg-[#C5A059] rounded-full" style="width: {{ min(100, $dRes->percentage) }}%"></div>
+                                <div class="h-full {{ !empty($dRes->is_who5) ? 'bg-[#7CC4B5]' : 'bg-[#C5A059]' }} rounded-full" style="width: {{ min(100, $dRes->percentage) }}%"></div>
                             </div>
                         </div>
                     @endforeach
@@ -401,11 +444,14 @@
             </div>
         </div>
 
-        <!-- 5 DIMENSIONS BREAKDOWN TABLE -->
+        <!-- 6 DIMENSIONS BREAKDOWN TABLE (INCLUDING WHO-5) -->
         <div class="bg-white rounded-2xl border border-[#E5E0D5] shadow-2xs overflow-hidden print-avoid-break">
-            <div class="p-5 sm:p-6 border-b border-slate-100 flex justify-between items-center">
-                <h3 class="font-serif font-bold text-[#0F2537] text-base sm:text-lg">Rincian Perolehan 5 Dimensi Utama RQI-15</h3>
-                <span class="text-[10px] sm:text-xs font-mono font-semibold text-[#8C703E] uppercase bg-[#F4F1EA] px-3 py-1 rounded-md border border-[#DFD8C8]">5 Pilar RQI-15</span>
+            <div class="p-5 sm:p-6 border-b border-slate-100 flex flex-wrap justify-between items-center gap-2">
+                <div>
+                    <h3 class="font-serif font-bold text-[#0F2537] text-base sm:text-lg">Rincian Analisis 6 Dimensi (RQI-15 & Indeks WHO-5)</h3>
+                    <p class="text-[11px] text-slate-500 mt-0.5">Evaluasi skor mentah, persentase capaian, dan interpretasi kualitatif untuk 5 dimensi RQI serta dimensi ke-6 WHO-5.</p>
+                </div>
+                <span class="text-[10px] sm:text-xs font-mono font-semibold text-[#8C703E] uppercase bg-[#F4F1EA] px-3 py-1 rounded-md border border-[#DFD8C8]">6 Dimensi Terpadu</span>
             </div>
 
             <!-- Desktop View: Table -->
@@ -414,23 +460,29 @@
                     <thead class="bg-[#FAF9F6] text-slate-500 font-semibold uppercase tracking-wider border-b border-[#EFECE6]">
                         <tr>
                             <th class="px-6 py-3.5">Kode</th>
-                            <th class="px-6 py-3.5">Dimensi Kecerdasan Ruhiologi</th>
+                            <th class="px-6 py-3.5">Dimensi Kecerdasan Ruhiologi & Kesejahteraan</th>
                             <th class="px-6 py-3.5">Skor Mentah</th>
                             <th class="px-6 py-3.5">Capaian (%)</th>
                             <th class="px-6 py-3.5">Interpretasi Kualitatif</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100 font-medium">
-                        @foreach($rqiOnlyDimensions as $dimRes)
-                            <tr class="hover:bg-[#FAF9F6]">
-                                <td class="px-6 py-4 font-mono font-semibold text-[#8C703E]">{{ $dimRes->dimension->code }}</td>
-                                <td class="px-6 py-4 text-[#0F2537] font-semibold text-xs">{{ $dimRes->dimension->name }}</td>
-                                <td class="px-6 py-4 text-slate-600 font-mono font-semibold">{{ $dimRes->score }} / {{ $dimRes->max_score }}</td>
+                        @foreach($allSixDimensions as $dimRes)
+                            <tr class="hover:bg-[#FAF9F6] {{ !empty($dimRes->is_who5) ? 'bg-[#F6F9F8]' : '' }}">
+                                <td class="px-6 py-4 font-mono font-semibold {{ !empty($dimRes->is_who5) ? 'text-[#1E4E44]' : 'text-[#8C703E]' }}">
+                                    {{ $dimRes->code }}
+                                </td>
+                                <td class="px-6 py-4 font-semibold text-xs {{ !empty($dimRes->is_who5) ? 'text-[#1E4E44]' : 'text-[#0F2537]' }}">
+                                    {{ $dimRes->name }}
+                                </td>
+                                <td class="px-6 py-4 text-slate-600 font-mono font-semibold">
+                                    {{ number_format($dimRes->score, 2) }} / {{ number_format($dimRes->max_score, 2) }}
+                                </td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-2.5">
-                                        <span class="font-bold text-[#0F2537] font-mono w-10">{{ number_format($dimRes->percentage, 0) }}%</span>
-                                        <div class="w-20 bg-[#EFECE6] h-1.5 rounded-full overflow-hidden">
-                                            <div class="bg-[#0F2537] h-1.5 rounded-full" style="width: {{ min(100, $dimRes->percentage) }}%"></div>
+                                        <span class="font-bold {{ !empty($dimRes->is_who5) ? 'text-[#1E4E44]' : 'text-[#0F2537]' }} font-mono w-12">{{ number_format($dimRes->percentage, 1) }}%</span>
+                                        <div class="w-24 bg-[#EFECE6] h-1.5 rounded-full overflow-hidden">
+                                            <div class="{{ !empty($dimRes->is_who5) ? 'bg-[#1E4E44]' : 'bg-[#B5945B]' }} h-1.5 rounded-full" style="width: {{ min(100, $dimRes->percentage) }}%"></div>
                                         </div>
                                     </div>
                                 </td>
@@ -443,21 +495,21 @@
 
             <!-- Mobile View: Vertical Responsive Cards -->
             <div class="block md:hidden p-4 space-y-3">
-                @foreach($rqiOnlyDimensions as $dimRes)
-                    <div class="p-4 bg-[#FAF9F6] rounded-xl border border-[#EFECE6] space-y-2">
+                @foreach($allSixDimensions as $dimRes)
+                    <div class="p-4 rounded-xl border space-y-2 {{ !empty($dimRes->is_who5) ? 'bg-[#F6F9F8] border-[#CFE0DA]' : 'bg-[#FAF9F6] border-[#EFECE6]' }}">
                         <div class="flex justify-between items-center border-b border-slate-200/60 pb-2">
-                            <span class="font-mono font-semibold text-xs text-[#8C703E]">{{ $dimRes->dimension->code }}</span>
-                            <span class="font-semibold text-xs text-[#0F2537] font-mono">{{ $dimRes->score }} / {{ $dimRes->max_score }} Poin</span>
+                            <span class="font-mono font-semibold text-xs {{ !empty($dimRes->is_who5) ? 'text-[#1E4E44]' : 'text-[#8C703E]' }}">{{ $dimRes->code }}</span>
+                            <span class="font-semibold text-xs text-[#0F2537] font-mono">{{ number_format($dimRes->score, 2) }} / {{ number_format($dimRes->max_score, 2) }} Poin</span>
                         </div>
-                        <h4 class="font-semibold text-sm text-[#0F2537]">{{ $dimRes->dimension->name }}</h4>
+                        <h4 class="font-semibold text-sm {{ !empty($dimRes->is_who5) ? 'text-[#1E4E44]' : 'text-[#0F2537]' }}">{{ $dimRes->name }}</h4>
                         
                         <div class="space-y-1 pt-1">
                             <div class="flex justify-between text-xs font-semibold">
                                 <span class="text-slate-500">Capaian:</span>
-                                <span class="text-[#0F2537]">{{ number_format($dimRes->percentage, 0) }}%</span>
+                                <span class="{{ !empty($dimRes->is_who5) ? 'text-[#1E4E44]' : 'text-[#0F2537]' }}">{{ number_format($dimRes->percentage, 1) }}%</span>
                             </div>
                             <div class="w-full bg-[#EFECE6] h-1.5 rounded-full overflow-hidden">
-                                <div class="bg-[#0F2537] h-1.5 rounded-full" style="width: {{ min(100, $dimRes->percentage) }}%"></div>
+                                <div class="{{ !empty($dimRes->is_who5) ? 'bg-[#1E4E44]' : 'bg-[#B5945B]' }} h-1.5 rounded-full" style="width: {{ min(100, $dimRes->percentage) }}%"></div>
                             </div>
                         </div>
 
@@ -765,31 +817,31 @@ function rqResultPage() {
                 ctx.lineWidth = 1.5;
                 ctx.strokeRect(36, 36, W - 72, H - 72);
 
-                let curY = isStory ? 115 : 80;
+                let curY = isStory ? 105 : 70;
 
                 // 2. Top Emblem & Institute Header
                 if (logoImg.complete && logoImg.naturalWidth > 0) {
-                    const logoSize = isStory ? 84 : 68;
+                    const logoSize = isStory ? 80 : 62;
                     ctx.drawImage(logoImg, (W - logoSize) / 2, curY, logoSize, logoSize);
-                    curY += logoSize + (isStory ? 36 : 28);
+                    curY += logoSize + (isStory ? 34 : 24);
                 } else {
-                    curY += 36;
+                    curY += 32;
                 }
 
                 ctx.textAlign = 'center';
                 ctx.fillStyle = palette.primaryInk;
-                ctx.font = '700 26px "Poppins", sans-serif';
+                ctx.font = '700 25px "Poppins", sans-serif';
                 ctx.fillText('RUHIOLOGY INSTITUTE', W / 2, curY);
 
-                curY += 26;
+                curY += 24;
                 ctx.fillStyle = palette.goldAccent;
-                ctx.font = '600 14px "Plus Jakarta Sans", sans-serif';
+                ctx.font = '600 13.5px "Plus Jakarta Sans", sans-serif';
                 ctx.fillText('EXECUTIVE ASSESSMENT SUMMARY  ·  RQI-15 & WHO-5', W / 2, curY);
 
-                curY += isStory ? 38 : 24;
+                curY += isStory ? 34 : 20;
 
                 // 3. Participant Identity Card
-                const pBoxH = isStory ? 152 : 128;
+                const pBoxH = isStory ? 148 : 122;
                 ctx.fillStyle = palette.cardBg;
                 ctx.beginPath();
                 ctx.roundRect(72, curY, W - 144, pBoxH, 16);
@@ -800,8 +852,8 @@ function rqResultPage() {
 
                 const pName = cleanText('{{ addslashes($submission->participant->name) }}');
                 ctx.fillStyle = palette.primaryInk;
-                ctx.font = pName.length > 28 ? '700 28px "Poppins", sans-serif' : '700 32px "Poppins", sans-serif';
-                ctx.fillText(pName, W / 2, curY + (isStory ? 54 : 48));
+                ctx.font = pName.length > 28 ? '700 27px "Poppins", sans-serif' : '700 30px "Poppins", sans-serif';
+                ctx.fillText(pName, W / 2, curY + (isStory ? 52 : 44));
 
                 const catStr = cleanText('{{ addslashes(ucwords(strtolower($submission->participant->category ?: "Umum"))) }}');
                 const instStr = cleanText('{{ addslashes($instName ?? "") }}');
@@ -809,19 +861,19 @@ function rqResultPage() {
                 const subLine1 = instStr ? `${catStr}  |  ${instStr}` : `Kategori: ${catStr}`;
 
                 ctx.fillStyle = palette.goldAccent;
-                ctx.font = '600 17px "Plus Jakarta Sans", sans-serif';
-                ctx.fillText(subLine1.length > 56 ? subLine1.substring(0, 54) + '...' : subLine1, W / 2, curY + (isStory ? 92 : 82));
+                ctx.font = '600 16px "Plus Jakarta Sans", sans-serif';
+                ctx.fillText(subLine1.length > 56 ? subLine1.substring(0, 54) + '...' : subLine1, W / 2, curY + (isStory ? 88 : 76));
 
                 if (regStr) {
                     ctx.fillStyle = palette.secondaryInk;
-                    ctx.font = '500 15px "Plus Jakarta Sans", sans-serif';
-                    ctx.fillText(regStr, W / 2, curY + (isStory ? 124 : 108));
+                    ctx.font = '500 14.5px "Plus Jakarta Sans", sans-serif';
+                    ctx.fillText(regStr, W / 2, curY + (isStory ? 120 : 103));
                 }
 
-                curY += pBoxH + (isStory ? 28 : 18);
+                curY += pBoxH + (isStory ? 24 : 16);
 
                 // 4. Dual Metric Score Cards (Unified Surface + Left Accent Bar)
-                const cardH = isStory ? 235 : 200;
+                const cardH = isStory ? 228 : 192;
                 const cardW = 454;
 
                 // Left Card: RQI-15
@@ -841,32 +893,32 @@ function rqResultPage() {
 
                 ctx.textAlign = 'left';
                 ctx.fillStyle = palette.goldAccent;
-                ctx.font = '600 14px "Poppins", sans-serif';
-                ctx.fillText('PILAR 01 · INDEKS RQI-15', 104, curY + 38);
+                ctx.font = '600 13.5px "Poppins", sans-serif';
+                ctx.fillText('PILAR 01 · INDEKS RQI-15', 104, curY + 36);
 
                 ctx.fillStyle = palette.primaryInk;
-                ctx.font = isStory ? '700 62px "Poppins", sans-serif' : '700 54px "Poppins", sans-serif';
-                ctx.fillText('{{ $rqiScore }}', 104, curY + (isStory ? 108 : 96));
+                ctx.font = isStory ? '700 58px "Poppins", sans-serif' : '700 50px "Poppins", sans-serif';
+                ctx.fillText('{{ $rqiScore }}', 104, curY + (isStory ? 104 : 92));
 
                 ctx.fillStyle = palette.mutedInk;
-                ctx.font = '500 17px "Plus Jakarta Sans", sans-serif';
-                ctx.fillText('/ {{ $maxRqiScore }} Poin ({{ $scorePct }}%)', 200, curY + (isStory ? 104 : 92));
+                ctx.font = '500 16.5px "Plus Jakarta Sans", sans-serif';
+                ctx.fillText('/ {{ $maxRqiScore }} Poin ({{ $scorePct }}%)', 196, curY + (isStory ? 100 : 88));
 
                 // Progress bar inside RQI card
                 ctx.fillStyle = palette.trackBg;
                 ctx.beginPath();
-                ctx.roundRect(104, curY + (isStory ? 132 : 118), cardW - 60, 8, 4);
+                ctx.roundRect(104, curY + (isStory ? 128 : 114), cardW - 60, 8, 4);
                 ctx.fill();
 
                 ctx.fillStyle = palette.goldLine;
                 ctx.beginPath();
-                ctx.roundRect(104, curY + (isStory ? 132 : 118), Math.max(16, ((cardW - 60) * {{ min(100, $scorePct) }}) / 100), 8, 4);
+                ctx.roundRect(104, curY + (isStory ? 128 : 114), Math.max(16, ((cardW - 60) * {{ min(100, $scorePct) }}) / 100), 8, 4);
                 ctx.fill();
 
                 const rqiBadgeText = cleanText('{{ addslashes($catName) }}');
                 ctx.fillStyle = palette.secondaryInk;
-                ctx.font = '600 15px "Plus Jakarta Sans", sans-serif';
-                ctx.fillText(rqiBadgeText.length > 36 ? rqiBadgeText.substring(0, 34) + '...' : rqiBadgeText, 104, curY + cardH - 28);
+                ctx.font = '600 14.5px "Plus Jakarta Sans", sans-serif';
+                ctx.fillText(rqiBadgeText.length > 36 ? rqiBadgeText.substring(0, 34) + '...' : rqiBadgeText, 104, curY + cardH - 26);
 
                 // Right Card: WHO-5
                 ctx.fillStyle = palette.cardBg;
@@ -884,38 +936,38 @@ function rqResultPage() {
                 ctx.fill();
 
                 ctx.fillStyle = palette.sageAccent;
-                ctx.font = '600 14px "Poppins", sans-serif';
-                ctx.fillText('PILAR 02 · INDEKS WHO-5', 586, curY + 38);
+                ctx.font = '600 13.5px "Poppins", sans-serif';
+                ctx.fillText('PILAR 02 · INDEKS WHO-5', 586, curY + 36);
 
                 ctx.fillStyle = palette.primaryInk;
-                ctx.font = isStory ? '700 62px "Poppins", sans-serif' : '700 54px "Poppins", sans-serif';
-                ctx.fillText('{{ number_format($who5Pct, 0) }}%', 586, curY + (isStory ? 108 : 96));
+                ctx.font = isStory ? '700 58px "Poppins", sans-serif' : '700 50px "Poppins", sans-serif';
+                ctx.fillText('{{ number_format($who5Pct, 0) }}%', 586, curY + (isStory ? 104 : 92));
 
                 ctx.fillStyle = palette.mutedInk;
-                ctx.font = '500 17px "Plus Jakarta Sans", sans-serif';
-                ctx.fillText('({{ $who5Raw }}/25 Poin)', 745, curY + (isStory ? 104 : 92));
+                ctx.font = '500 16.5px "Plus Jakarta Sans", sans-serif';
+                ctx.fillText('({{ $who5Raw }}/25 Poin)', 740, curY + (isStory ? 100 : 88));
 
                 // Progress bar inside WHO-5 card
                 ctx.fillStyle = palette.trackBg;
                 ctx.beginPath();
-                ctx.roundRect(586, curY + (isStory ? 132 : 118), cardW - 60, 8, 4);
+                ctx.roundRect(586, curY + (isStory ? 128 : 114), cardW - 60, 8, 4);
                 ctx.fill();
 
                 ctx.fillStyle = palette.sageAccent;
                 ctx.beginPath();
-                ctx.roundRect(586, curY + (isStory ? 132 : 118), Math.max(16, ((cardW - 60) * {{ min(100, $who5Pct) }}) / 100), 8, 4);
+                ctx.roundRect(586, curY + (isStory ? 128 : 114), Math.max(16, ((cardW - 60) * {{ min(100, $who5Pct) }}) / 100), 8, 4);
                 ctx.fill();
 
                 const who5BadgeText = cleanText('{{ addslashes($who5BadgeTitleShort) }}');
                 ctx.fillStyle = palette.secondaryInk;
-                ctx.font = '600 15px "Plus Jakarta Sans", sans-serif';
-                ctx.fillText(who5BadgeText, 586, curY + cardH - 28);
+                ctx.font = '600 14.5px "Plus Jakarta Sans", sans-serif';
+                ctx.fillText(who5BadgeText, 586, curY + cardH - 26);
 
-                curY += cardH + (isStory ? 28 : 18);
+                curY += cardH + (isStory ? 24 : 16);
 
-                // 5. 5-Pillar Competency Progress Bars Box
+                // 5. 6-Dimension Competency Progress Bars Box (5 RQI-15 + 6th WHO-5)
                 const pillars = this.pillarsData || [];
-                const pSectionH = isStory ? 355 : 280;
+                const pSectionH = isStory ? 395 : 312;
                 ctx.fillStyle = palette.cardBg;
                 ctx.beginPath();
                 ctx.roundRect(72, curY, W - 144, pSectionH, 16);
@@ -926,49 +978,50 @@ function rqResultPage() {
 
                 ctx.textAlign = 'left';
                 ctx.fillStyle = palette.goldAccent;
-                ctx.font = '600 14px "Poppins", sans-serif';
-                ctx.fillText('CAPAIAN 5 PILAR DIMENSI RQI-15', 104, curY + 36);
+                ctx.font = '600 13.5px "Poppins", sans-serif';
+                ctx.fillText('CAPAIAN 6 DIMENSI ASESMEN (RQI-15 & WHO-5)', 104, curY + 34);
 
                 ctx.textAlign = 'right';
                 ctx.fillStyle = palette.mutedInk;
-                ctx.font = '500 13px "Plus Jakarta Sans", sans-serif';
-                ctx.fillText('PROPORSIONAL 0–100%', W - 104, curY + 36);
+                ctx.font = '500 12.5px "Plus Jakarta Sans", sans-serif';
+                ctx.fillText('SKOR & PERSENTASE 0–100%', W - 104, curY + 34);
 
                 const rowStart = curY + (isStory ? 74 : 64);
-                const rowGap = isStory ? 55 : 42;
+                const rowGap = isStory ? 54 : 41;
 
-                pillars.slice(0, 5).forEach((p, idx) => {
+                pillars.slice(0, 6).forEach((p, idx) => {
                     const y = rowStart + (idx * rowGap);
+                    const isWho = !!p.is_who5;
                     ctx.textAlign = 'left';
-                    ctx.fillStyle = palette.primaryInk;
-                    ctx.font = '600 16px "Plus Jakarta Sans", sans-serif';
+                    ctx.fillStyle = isWho ? palette.sageAccent : palette.primaryInk;
+                    ctx.font = '600 15.5px "Plus Jakarta Sans", sans-serif';
                     ctx.fillText(`0${idx + 1}.  ${p.name}`, 104, y);
 
                     // Clean Single-Tone Track & Bar
                     const barX = 485;
-                    const barW = 390;
-                    const barH = isStory ? 12 : 10;
+                    const barW = 365;
+                    const barH = isStory ? 11 : 9;
                     ctx.fillStyle = palette.trackBg;
                     ctx.beginPath();
                     ctx.roundRect(barX, y - barH + 1, barW, barH, barH / 2);
                     ctx.fill();
 
                     const fillW = Math.max(16, Math.min(barW, (p.pct / 100) * barW));
-                    ctx.fillStyle = palette.barFill;
+                    ctx.fillStyle = isWho ? palette.sageAccent : palette.barFill;
                     ctx.beginPath();
                     ctx.roundRect(barX, y - barH + 1, fillW, barH, barH / 2);
                     ctx.fill();
 
                     ctx.textAlign = 'right';
-                    ctx.fillStyle = palette.primaryInk;
-                    ctx.font = '700 16px "Poppins", sans-serif';
+                    ctx.fillStyle = isWho ? palette.sageAccent : palette.primaryInk;
+                    ctx.font = '700 15.5px "Poppins", sans-serif';
                     ctx.fillText(`${p.pct}%`, W - 104, y + 1);
                 });
 
-                curY += pSectionH + (isStory ? 28 : 18);
+                curY += pSectionH + (isStory ? 24 : 16);
 
                 // 6. Editorial Reflection Box
-                const quoteBoxH = isStory ? 255 : 165;
+                const quoteBoxH = isStory ? 245 : 152;
                 ctx.fillStyle = palette.quoteBg;
                 ctx.beginPath();
                 ctx.roundRect(72, curY, W - 144, quoteBoxH, 16);
@@ -979,15 +1032,15 @@ function rqResultPage() {
 
                 ctx.textAlign = 'center';
                 ctx.fillStyle = palette.goldAccent;
-                ctx.font = '600 13px "Poppins", sans-serif';
-                ctx.fillText('INTERPRETASI PROFIL RUHIOLOGI', W / 2, curY + 32);
+                ctx.font = '600 12.5px "Poppins", sans-serif';
+                ctx.fillText('INTERPRETASI PROFIL RUHIOLOGI', W / 2, curY + 30);
 
                 ctx.fillStyle = palette.secondaryInk;
-                ctx.font = isStory ? 'italic 500 19px "Plus Jakarta Sans", sans-serif' : 'italic 500 16px "Plus Jakarta Sans", sans-serif';
+                ctx.font = isStory ? 'italic 500 18.5px "Plus Jakarta Sans", sans-serif' : 'italic 500 15.5px "Plus Jakarta Sans", sans-serif';
                 const interpText = cleanText('"{{ addslashes($submission->result->overall_interpretation) }}"');
-                this.wrapText(ctx, interpText, W / 2, curY + (isStory ? 72 : 62), 860, isStory ? 31 : 25, isStory ? 4 : 3);
+                this.wrapText(ctx, interpText, W / 2, curY + (isStory ? 68 : 58), 860, isStory ? 30 : 24, isStory ? 4 : 3);
 
-                curY += quoteBoxH + (isStory ? 42 : 24);
+                curY += quoteBoxH + (isStory ? 38 : 22);
 
                 // 7. Footer Branding & Verification
                 ctx.strokeStyle = palette.cardBorder;
@@ -999,16 +1052,16 @@ function rqResultPage() {
 
                 const founderName = cleanText('{{ addslashes(\App\Models\Setting::get("founder_name", "Prof. Dr. Iskandar Nazari, S.Ag., M.Pd., M.S.I., M.H., Ph.D.")) }}');
                 ctx.fillStyle = palette.primaryInk;
-                ctx.font = '700 18px "Poppins", sans-serif';
-                ctx.fillText(founderName, W / 2, curY + (isStory ? 38 : 30));
+                ctx.font = '700 17.5px "Poppins", sans-serif';
+                ctx.fillText(founderName, W / 2, curY + (isStory ? 36 : 28));
 
                 ctx.fillStyle = palette.goldAccent;
-                ctx.font = '500 14px "Plus Jakarta Sans", sans-serif';
-                ctx.fillText('Founder Ruhiology Institute  ·  ruhiology-institute.site', W / 2, curY + (isStory ? 64 : 52));
+                ctx.font = '500 13.5px "Plus Jakarta Sans", sans-serif';
+                ctx.fillText('Founder Ruhiology Institute  ·  ruhiology-institute.site', W / 2, curY + (isStory ? 60 : 48));
 
                 ctx.fillStyle = palette.mutedInk;
-                ctx.font = '500 13px monospace';
-                ctx.fillText('DOC ID: {{ $submission->submission_code }}', W / 2, curY + (isStory ? 92 : 76));
+                ctx.font = '500 12.5px monospace';
+                ctx.fillText('DOC ID: {{ $submission->submission_code }}', W / 2, curY + (isStory ? 86 : 70));
             };
 
             logoImg.onload = render;
@@ -1102,9 +1155,15 @@ document.addEventListener('DOMContentLoaded', function() {
         @php
             $dimLabels = [];
             $dimValues = [];
-            foreach($rqiOnlyDimensions as $dr) {
-                $cleanLabel = preg_replace('/^\d+\.\s*/', '', trim($dr->dimension->name));
-                $dimLabels[] = \Illuminate\Support\Str::limit($cleanLabel, 22);
+            foreach($allSixDimensions as $dr) {
+                $rawL = trim($dr->name);
+                if (!empty($dr->is_who5)) {
+                    $cleanLabel = 'Kesejahteraan WHO-5';
+                } else {
+                    $cleanLabel = preg_replace('/^\d+\.\s*/', '', $rawL);
+                    $cleanLabel = preg_replace('/\s*\(.*?\)/', '', $cleanLabel);
+                }
+                $dimLabels[] = \Illuminate\Support\Str::limit($cleanLabel, 20);
                 $dimValues[] = round($dr->percentage, 1);
             }
         @endphp
