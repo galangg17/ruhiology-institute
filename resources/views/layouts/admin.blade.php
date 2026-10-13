@@ -93,71 +93,83 @@
                 $pendingOrderCount = \App\Models\Order::where('payment_status', 'pending')->count();
             @endphp
 
-            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all {{ request()->routeIs('admin.dashboard') ? 'bg-[#C9A24D] text-[#0B2A43] font-bold shadow-md' : 'hover:bg-slate-900 text-slate-300 hover:text-white' }}">
-                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all {{ request()->routeIs('admin.dashboard') ? 'bg-[#123B59] text-white font-bold border-l-4 border-[#D4AF37] shadow-sm' : 'hover:bg-white/5 text-slate-300 hover:text-white' }}">
+                <svg class="w-4 h-4 shrink-0 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
                 <span>Dashboard</span>
             </a>
 
             <!-- Group 1: Modul RQ Assessment -->
-            <div class="pt-4 pb-1 px-3.5 text-[10px] font-extrabold text-[#C9A24D] uppercase tracking-widest font-mono">Modul RQ Assessment</div>
+            <div class="pt-4 pb-1 px-3.5 text-[10px] font-extrabold text-[#D4AF37] uppercase tracking-widest font-mono">Modul RQ Assessment</div>
             
-            <a href="{{ route('admin.events.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl transition-all {{ request()->routeIs('admin.events.*') ? 'bg-slate-800 text-[#C9A24D] font-bold border-l-4 border-[#C9A24D]' : 'hover:bg-slate-900 text-slate-300 hover:text-white' }}">
-                <span>🎯</span> <span>Manajemen Event / Acara</span>
+            <a href="{{ route('admin.events.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl transition-all {{ request()->routeIs('admin.events.*') ? 'bg-[#123B59] text-white font-bold border-l-4 border-[#D4AF37] shadow-sm' : 'hover:bg-white/5 text-slate-300 hover:text-white' }}">
+                <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                <span>Manajemen Event / Acara</span>
             </a>
-            <a href="{{ route('admin.participants.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl transition-all {{ request()->routeIs('admin.participants.*') || request()->routeIs('admin.results.*') ? 'bg-slate-800 text-[#C9A24D] font-bold border-l-4 border-[#C9A24D]' : 'hover:bg-slate-900 text-slate-300 hover:text-white' }}">
-                <span>📊</span> <span>Data Peserta & Hasil Evaluasi</span>
+            <a href="{{ route('admin.participants.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl transition-all {{ request()->routeIs('admin.participants.*') || request()->routeIs('admin.results.*') ? 'bg-[#123B59] text-white font-bold border-l-4 border-[#D4AF37] shadow-sm' : 'hover:bg-white/5 text-slate-300 hover:text-white' }}">
+                <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                <span>Data Peserta & Hasil Evaluasi</span>
             </a>
-            <a href="{{ route('admin.master_data.index') }}" class="flex items-center justify-between px-3.5 py-2 rounded-xl transition-all {{ request()->routeIs('admin.master_data.*') ? 'bg-slate-800 text-[#C9A24D] font-bold border-l-4 border-[#C9A24D]' : 'hover:bg-slate-900 text-slate-300 hover:text-white' }}">
+            <a href="{{ route('admin.master_data.index') }}" class="flex items-center justify-between px-3.5 py-2 rounded-xl transition-all {{ request()->routeIs('admin.master_data.*') ? 'bg-[#123B59] text-white font-bold border-l-4 border-[#D4AF37] shadow-sm' : 'hover:bg-white/5 text-slate-300 hover:text-white' }}">
                 <div class="flex items-center gap-3">
-                    <span>🗺️</span> <span>Master Data & Importer</span>
+                    <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span>Master Data & Importer</span>
                 </div>
                 @if($pendingInstCount > 0)
-                    <span class="bg-amber-500 text-slate-950 font-bold px-2 py-0.5 rounded-full text-[10px] shadow" title="{{ $pendingInstCount }} Usulan Kampus Baru">{{ $pendingInstCount }}</span>
+                    <span class="bg-[#8C703E] text-white font-bold px-2 py-0.5 rounded-full text-[10px] shadow" title="{{ $pendingInstCount }} Usulan Kampus Baru">{{ $pendingInstCount }}</span>
                 @endif
             </a>
-            <a href="{{ route('admin.instruments.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl transition-all {{ request()->routeIs('admin.instruments.*') ? 'bg-slate-800 text-[#C9A24D] font-bold border-l-4 border-[#C9A24D]' : 'hover:bg-slate-900 text-slate-300 hover:text-white' }}">
-                <span>📦</span> <span>Paket Soal & Bank Soal</span>
+            <a href="{{ route('admin.instruments.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl transition-all {{ request()->routeIs('admin.instruments.*') ? 'bg-[#123B59] text-white font-bold border-l-4 border-[#D4AF37] shadow-sm' : 'hover:bg-white/5 text-slate-300 hover:text-white' }}">
+                <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <span>Paket Soal & Bank Soal</span>
             </a>
 
             <!-- Group 2: Layanan & Program -->
             <div class="pt-4 pb-1 px-3.5 text-[10px] font-extrabold text-slate-400 uppercase tracking-widest font-mono">Layanan & Institusi</div>
 
-            <a href="{{ route('admin.institutions.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl transition-all {{ request()->routeIs('admin.institutions.*') ? 'bg-slate-800 text-[#C9A24D] font-bold border-l-4 border-[#C9A24D]' : 'hover:bg-slate-900 text-slate-300 hover:text-white' }}">
-                <span>🏛️</span> <span>Institusi Mitra</span>
+            <a href="{{ route('admin.institutions.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl transition-all {{ request()->routeIs('admin.institutions.*') ? 'bg-[#123B59] text-white font-bold border-l-4 border-[#D4AF37] shadow-sm' : 'hover:bg-white/5 text-slate-300 hover:text-white' }}">
+                <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                <span>Institusi Mitra</span>
             </a>
-            <a href="{{ route('admin.training.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl transition-all {{ request()->routeIs('admin.training.*') ? 'bg-slate-800 text-[#C9A24D] font-bold border-l-4 border-[#C9A24D]' : 'hover:bg-slate-900 text-slate-300 hover:text-white' }}">
-                <span>🎯</span> <span>Training Programs</span>
+            <a href="{{ route('admin.training.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl transition-all {{ request()->routeIs('admin.training.*') ? 'bg-[#123B59] text-white font-bold border-l-4 border-[#D4AF37] shadow-sm' : 'hover:bg-white/5 text-slate-300 hover:text-white' }}">
+                <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                <span>Training Programs</span>
             </a>
-            <a href="{{ route('admin.consultations.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl transition-all {{ request()->routeIs('admin.consultations.*') ? 'bg-slate-800 text-[#C9A24D] font-bold border-l-4 border-[#C9A24D]' : 'hover:bg-slate-900 text-slate-300 hover:text-white' }}">
-                <span>💬</span> <span>Konsultasi</span>
+            <a href="{{ route('admin.consultations.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl transition-all {{ request()->routeIs('admin.consultations.*') ? 'bg-[#123B59] text-white font-bold border-l-4 border-[#D4AF37] shadow-sm' : 'hover:bg-white/5 text-slate-300 hover:text-white' }}">
+                <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                <span>Konsultasi</span>
             </a>
 
             <!-- Group 3: Buku Press & Konten Website -->
             <div class="pt-4 pb-1 px-3.5 text-[10px] font-extrabold text-slate-400 uppercase tracking-widest font-mono">Buku Press & Konten</div>
 
-            <a href="{{ route('admin.products.index') }}" class="flex items-center justify-between px-3.5 py-2 rounded-xl transition-all {{ request()->routeIs('admin.products.*') || request()->routeIs('admin.orders.*') ? 'bg-slate-800 text-[#C9A24D] font-bold border-l-4 border-[#C9A24D]' : 'hover:bg-slate-900 text-slate-300 hover:text-white' }}">
+            <a href="{{ route('admin.products.index') }}" class="flex items-center justify-between px-3.5 py-2 rounded-xl transition-all {{ request()->routeIs('admin.products.*') || request()->routeIs('admin.orders.*') ? 'bg-[#123B59] text-white font-bold border-l-4 border-[#D4AF37] shadow-sm' : 'hover:bg-white/5 text-slate-300 hover:text-white' }}">
                 <div class="flex items-center gap-3">
-                    <span>📚</span> <span>Katalog Buku & Pesanan</span>
+                    <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                    <span>Katalog Buku & Pesanan</span>
                 </div>
                 @if($pendingOrderCount > 0)
                     <span class="bg-rose-500 text-white font-bold px-2 py-0.5 rounded-full text-[10px] shadow" title="{{ $pendingOrderCount }} Pesanan Pending">{{ $pendingOrderCount }}</span>
                 @endif
             </a>
-            <a href="{{ route('admin.articles.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl transition-all {{ request()->routeIs('admin.articles.*') || request()->routeIs('admin.quotes.*') || request()->routeIs('admin.media.*') ? 'bg-slate-800 text-[#C9A24D] font-bold border-l-4 border-[#C9A24D]' : 'hover:bg-slate-900 text-slate-300 hover:text-white' }}">
-                <span>📰</span> <span>Artikel, Quotes & Media</span>
+            <a href="{{ route('admin.articles.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl transition-all {{ request()->routeIs('admin.articles.*') || request()->routeIs('admin.quotes.*') || request()->routeIs('admin.media.*') ? 'bg-[#123B59] text-white font-bold border-l-4 border-[#D4AF37] shadow-sm' : 'hover:bg-white/5 text-slate-300 hover:text-white' }}">
+                <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+                <span>Artikel, Quotes & Media</span>
             </a>
 
             <!-- Group 4: Sistem & Pengaturan -->
             <div class="pt-4 pb-1 px-3.5 text-[10px] font-extrabold text-slate-400 uppercase tracking-widest font-mono">Pengaturan Sistem</div>
 
-            <a href="{{ route('admin.settings.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl transition-all {{ request()->routeIs('admin.settings.*') ? 'bg-slate-800 text-[#C9A24D] font-bold border-l-4 border-[#C9A24D]' : 'hover:bg-slate-900 text-slate-300 hover:text-white' }}">
-                <span>⚙️</span> <span>Pengaturan Landing & CMS</span>
+            <a href="{{ route('admin.settings.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl transition-all {{ request()->routeIs('admin.settings.*') ? 'bg-[#123B59] text-white font-bold border-l-4 border-[#D4AF37] shadow-sm' : 'hover:bg-white/5 text-slate-300 hover:text-white' }}">
+                <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                <span>Pengaturan Landing & CMS</span>
             </a>
-            <a href="{{ route('admin.settings.index') }}#founder" class="flex items-center gap-3 px-3.5 py-2 rounded-xl transition-all text-amber-300/90 hover:bg-slate-900 hover:text-white">
-                <span>👨‍🏫</span> <span>Profil Founder (Prof. Iskandar)</span>
+            <a href="{{ route('admin.settings.index') }}#founder" class="flex items-center gap-3 px-3.5 py-2 rounded-xl transition-all text-[#D4AF37]/90 hover:bg-white/5 hover:text-white">
+                <svg class="w-4 h-4 shrink-0 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                <span>Profil Founder (Prof. Iskandar)</span>
             </a>
-            <a href="{{ route('admin.users.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl transition-all {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.audit_logs.*') ? 'bg-slate-800 text-[#C9A24D] font-bold border-l-4 border-[#C9A24D]' : 'hover:bg-slate-900 text-slate-300 hover:text-white' }}">
-                <span>🔑</span> <span>Manajemen User & Audit Log</span>
+            <a href="{{ route('admin.users.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl transition-all {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.audit_logs.*') ? 'bg-[#123B59] text-white font-bold border-l-4 border-[#D4AF37] shadow-sm' : 'hover:bg-white/5 text-slate-300 hover:text-white' }}">
+                <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                <span>Manajemen User & Audit Log</span>
             </a>
         </nav>
 
@@ -180,28 +192,28 @@
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
                 </button>
                 <div class="hidden sm:block">
-                    <span class="text-[10px] font-bold text-amber-700 uppercase tracking-widest block">ADMINISTRATIVE SYSTEM</span>
-                    <h1 class="text-base sm:text-lg font-bold font-serif text-slate-900 tracking-tight">{{ $title ?? 'Dashboard Overview' }}</h1>
+                    <span class="text-[10px] font-mono font-bold text-[#8C703E] uppercase tracking-widest block">ADMINISTRATIVE SYSTEM</span>
+                    <h1 class="text-base sm:text-lg font-bold font-serif text-[#0F2537] tracking-tight">{{ $title ?? 'Dashboard Overview' }}</h1>
                 </div>
             </div>
 
             <!-- Global Quick Search Bar -->
             <div class="flex-1 max-w-md mx-4">
                 <form action="{{ route('admin.results.index') }}" method="GET" class="relative">
-                    <input type="text" name="q" placeholder="Cari nama peserta, kode submission, pesanan..." class="w-full pl-9 pr-4 py-2 bg-slate-100 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-[#0B2A43]/20 focus:border-[#0B2A43] focus:bg-white transition">
+                    <input type="text" name="q" placeholder="Cari nama peserta, kode submission, pesanan..." class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:ring-1 focus:ring-[#0F2537] focus:border-[#0F2537] focus:bg-white transition outline-none">
                     <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 </form>
             </div>
 
             <!-- User Menu & Quick Role Badge -->
             <div class="flex items-center gap-4" x-data="{ userMenu: false }">
-                <span class="hidden sm:inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300/80">
+                <span class="hidden sm:inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-[#F4F1EA] text-[#8C703E] border border-[#DFD8C8]">
                     {{ auth()->user()->role_display_name }}
                 </span>
 
                 <div class="relative">
-                    <button @click="userMenu = !userMenu" class="flex items-center gap-3 text-xs font-bold text-slate-700 hover:text-slate-900 focus:outline-none bg-slate-100 p-1.5 rounded-xl border border-slate-200">
-                        <div class="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center font-bold text-xs shadow">
+                    <button @click="userMenu = !userMenu" class="flex items-center gap-3 text-xs font-bold text-slate-700 hover:text-slate-900 focus:outline-none bg-slate-50 p-1.5 rounded-xl border border-slate-200 cursor-pointer">
+                        <div class="w-8 h-8 rounded-lg bg-[#0F2537] text-[#D4AF37] flex items-center justify-center font-bold text-xs shadow-sm">
                             {{ substr(auth()->user()->name, 0, 1) }}
                         </div>
                         <span class="hidden md:inline pr-1">{{ auth()->user()->name }}</span>
@@ -216,7 +228,7 @@
                         <a href="{{ route('home') }}" class="block px-4 py-2 text-slate-700 hover:bg-slate-50">Kunjungi Situs Publik</a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <button type="submit" class="w-full text-left px-4 py-2 text-rose-600 hover:bg-rose-50 font-bold">Keluar Sesi</button>
+                            <button type="submit" class="w-full text-left px-4 py-2 text-rose-600 hover:bg-rose-50 font-bold cursor-pointer">Keluar Sesi</button>
                         </form>
                     </div>
                 </div>
@@ -225,13 +237,23 @@
 
         <!-- FLASH NOTIFICATIONS -->
         @if(session('success'))
-            <div class="print:hidden bg-emerald-600 text-white text-xs font-semibold px-6 py-3 shadow-md flex justify-between items-center">
-                <span>✅ {{ session('success') }}</span>
+            <div class="print:hidden bg-emerald-700 text-white text-xs font-semibold px-6 py-3 shadow-md flex justify-between items-center">
+                <span class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-emerald-200 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    {{ session('success') }}
+                </span>
             </div>
         @endif
         @if(session('error'))
-            <div class="print:hidden bg-rose-600 text-white text-xs font-semibold px-6 py-3 shadow-md flex justify-between items-center">
-                <span>⚠️ {{ session('error') }}</span>
+            <div class="print:hidden bg-rose-700 text-white text-xs font-semibold px-6 py-3 shadow-md flex justify-between items-center">
+                <span class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-rose-200 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                    {{ session('error') }}
+                </span>
             </div>
         @endif
 

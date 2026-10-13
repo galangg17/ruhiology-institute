@@ -77,23 +77,29 @@
 <div class="space-y-6" x-data="participantManager()">
 
     <!-- HUB NAV BAR (UNIFIED SWITCHER FOR PESERTA & HASIL EVALUASI) -->
-    <div class="bg-white p-2 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-2 font-sans">
+    <div class="bg-white p-2 rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-2 font-sans">
         <div class="flex items-center gap-2">
             <a href="{{ route('admin.participants.index') }}" 
-               class="px-5 py-2.5 rounded-xl font-bold text-xs transition flex items-center gap-2 {{ request()->routeIs('admin.participants.*') ? 'bg-[#0B2A43] text-white shadow-md' : 'text-slate-600 hover:bg-slate-100' }}">
-                <span>👥</span>
-                <span>Tab 1: Data Peserta & Demografi</span>
+               class="px-5 py-2.5 rounded-xl font-bold text-xs transition flex items-center gap-2 {{ request()->routeIs('admin.participants.*') ? 'bg-[#0F2537] text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100' }}">
+                <svg class="w-4 h-4 {{ request()->routeIs('admin.participants.*') ? 'text-[#D4AF37]' : 'text-slate-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                </svg>
+                <span>Data Peserta & Demografi</span>
             </a>
 
             <a href="{{ route('admin.results.index') }}" 
-               class="px-5 py-2.5 rounded-xl font-bold text-xs transition flex items-center gap-2 {{ request()->routeIs('admin.results.*') ? 'bg-[#0B2A43] text-white shadow-md' : 'text-slate-600 hover:bg-slate-100' }}">
-                <span>📈</span>
-                <span>Tab 2: Lembar Sesi & Hasil Evaluasi</span>
+               class="px-5 py-2.5 rounded-xl font-bold text-xs transition flex items-center gap-2 {{ request()->routeIs('admin.results.*') ? 'bg-[#0F2537] text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100' }}">
+                <svg class="w-4 h-4 {{ request()->routeIs('admin.results.*') ? 'text-[#D4AF37]' : 'text-slate-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+                <span>Lembar Sesi & Hasil Evaluasi</span>
             </a>
         </div>
 
-        <a href="{{ route('admin.reports.export_pdf') }}" target="_blank" class="px-4 py-2 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-bold text-xs rounded-xl transition flex items-center gap-1.5">
-            <span>📄</span>
+        <a href="{{ route('admin.reports.export_pdf') }}" target="_blank" class="px-4 py-2 bg-slate-50 hover:bg-slate-100 text-[#0F2537] border border-slate-200 font-bold text-xs rounded-xl transition flex items-center gap-2">
+            <svg class="w-4 h-4 text-[#8C703E]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
             <span>Laporan PDF Agregat</span>
         </a>
     </div>
@@ -101,55 +107,67 @@
     <!-- Page Title & Top Actions -->
     <div class="flex flex-wrap justify-between items-center gap-4">
         <div>
-            <h2 class="text-xl sm:text-2xl font-bold font-serif text-slate-900 tracking-tight">Manajemen Data Peserta & Demografi Terpadu</h2>
+            <h2 class="text-xl sm:text-2xl font-bold font-serif text-[#0F2537] tracking-tight">Manajemen Data Peserta & Demografi</h2>
             <p class="text-xs text-slate-500 mt-0.5">Kelola registrasi peserta, demografi wilayah 38 provinsi, riwayat asesmen RQI & WHO-5, serta impor/ekspor data.</p>
         </div>
         <div class="flex flex-wrap items-center gap-2.5">
-            <a href="{{ route('admin.participants.export', request()->all()) }}" class="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer">
-                <span>📊</span> <span>Export CSV</span>
+            <a href="{{ route('admin.participants.export', request()->all()) }}" class="px-3.5 py-2 bg-[#8C703E] hover:bg-[#72592F] text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer">
+                <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                </svg>
+                <span>Export CSV</span>
             </a>
-            <button @click="importServerModal = true" class="px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer">
-                <span>📥</span> <span>Impor Data Server (.csv)</span>
+            <button @click="importServerModal = true" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer">
+                <svg class="w-4 h-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/>
+                </svg>
+                <span>Impor Data Server</span>
             </button>
-            <button @click="importModal = true" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer">
-                <span>📥</span> <span>Import Template Peserta</span>
+            <button @click="importModal = true" class="px-3.5 py-2 bg-slate-700 hover:bg-slate-600 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer">
+                <svg class="w-4 h-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                </svg>
+                <span>Import Template</span>
             </button>
-            <button @click="createModal = true" class="px-4 py-2 bg-[#0B2A43] hover:bg-[#123B59] text-white font-bold text-xs rounded-xl shadow-md border border-[#C9A24D]/30 transition flex items-center gap-1.5 cursor-pointer">
-                <span>+</span> <span>Tambah Peserta Baru</span>
+            <button @click="createModal = true" class="px-4 py-2 bg-[#0F2537] hover:bg-[#1E3E5B] text-white font-bold text-xs rounded-xl shadow-sm transition flex items-center gap-1.5 cursor-pointer">
+                <svg class="w-4 h-4 text-[#D4AF37]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                <span>Tambah Peserta Baru</span>
             </button>
         </div>
     </div>
 
     <!-- Sub-Tab Switcher Bar (Semua vs Peserta Mandiri/Publik vs Peserta Event/Institusi) -->
-    <div class="flex items-center justify-between border-b border-slate-200 pb-1">
+    <div class="flex items-center justify-between border-b border-slate-200 pb-2">
         <div class="flex items-center gap-2">
             <a href="{{ route('admin.participants.index', array_merge(request()->except('access_type'), ['access_type' => ''])) }}" 
-               class="px-4 py-2 rounded-xl font-bold text-xs transition flex items-center gap-2 {{ empty(request('access_type')) ? 'bg-[#0B2A43] text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">
-                <span>👥 Semua Peserta</span>
-                <span class="px-2 py-0.5 rounded-full text-[10px] font-mono {{ empty(request('access_type')) ? 'bg-amber-400 text-slate-950 font-black' : 'bg-slate-200 text-slate-700' }}">
+               class="px-4 py-2 rounded-xl font-bold text-xs transition flex items-center gap-2 {{ empty(request('access_type')) ? 'bg-[#0F2537] text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">
+                <span>Semua Peserta</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-mono {{ empty(request('access_type')) ? 'bg-[#D4AF37] text-[#0F2537] font-black' : 'bg-slate-200 text-slate-700' }}">
                     {{ number_format($stats['total_participants'] ?? 0) }}
                 </span>
             </a>
 
             <a href="{{ route('admin.participants.index', array_merge(request()->except('access_type'), ['access_type' => 'public'])) }}" 
-               class="px-4 py-2 rounded-xl font-bold text-xs transition flex items-center gap-2 {{ request('access_type') === 'public' ? 'bg-[#0B2A43] text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">
-                <span>🌐 Peserta Mandiri (Publik)</span>
+               class="px-4 py-2 rounded-xl font-bold text-xs transition flex items-center gap-2 {{ request('access_type') === 'public' ? 'bg-[#0F2537] text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">
+                <span>Peserta Mandiri (Publik)</span>
                 <span class="px-2 py-0.5 rounded-full text-[10px] font-mono {{ request('access_type') === 'public' ? 'bg-emerald-400 text-slate-950 font-black' : 'bg-slate-200 text-slate-700' }}">
                     {{ number_format($stats['public_participants'] ?? 0) }}
                 </span>
             </a>
 
             <a href="{{ route('admin.participants.index', array_merge(request()->except('access_type'), ['access_type' => 'event_only'])) }}" 
-               class="px-4 py-2 rounded-xl font-bold text-xs transition flex items-center gap-2 {{ request('access_type') === 'event_only' ? 'bg-[#0B2A43] text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">
-                <span>🔒 Peserta Event / Institusi</span>
-                <span class="px-2 py-0.5 rounded-full text-[10px] font-mono {{ request('access_type') === 'event_only' ? 'bg-amber-400 text-slate-950 font-black' : 'bg-slate-200 text-slate-700' }}">
+               class="px-4 py-2 rounded-xl font-bold text-xs transition flex items-center gap-2 {{ request('access_type') === 'event_only' ? 'bg-[#0F2537] text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">
+                <span>Peserta Event / Institusi</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-mono {{ request('access_type') === 'event_only' ? 'bg-[#D4AF37] text-[#0F2537] font-black' : 'bg-slate-200 text-slate-700' }}">
                     {{ number_format($stats['event_participants'] ?? 0) }}
                 </span>
             </a>
         </div>
 
         <span class="hidden md:inline-block text-[11px] font-mono text-slate-400">
-            Klik baris peserta untuk membuka Drawer Detail (Opsi A)
+            Klik baris peserta untuk membuka panel rincian
         </span>
     </div>
 
