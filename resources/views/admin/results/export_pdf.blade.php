@@ -338,24 +338,29 @@
                 </div>
             </div>
 
-            <!-- Blok Tanda Tangan Resmi -->
-            <div class="text-center w-56 text-slate-800 space-y-1">
-                <div class="text-[10px]">Divalidasi di Jambi, {{ date('d F Y') }}</div>
+            <!-- Blok Tanda Tangan Resmi (Prof. Dr. Iskandar Nazari & QR Verifikasi) -->
+            <div class="text-center w-64 text-slate-800 space-y-1">
+                <div class="text-[10px] text-slate-600">Divalidasi di Jambi, {{ date('d F Y') }}</div>
                 <div class="text-[10px] font-bold uppercase tracking-wider text-slate-900">
-                    Dewan Penilai Ruhiologi
+                    DEWAN PENILAI RUHIOLOGI
                 </div>
                 
-                <div class="h-12 flex items-center justify-center">
-                    <div class="px-3 py-1 bg-slate-50 border border-slate-300 rounded text-[9px] font-mono-num text-slate-600 font-bold">
-                        [TERVALIDASI DIGITAL]
+                <!-- QR Code Validasi Resmi -->
+                <div class="h-16 flex items-center justify-center my-1">
+                    <div class="p-1 bg-white border border-slate-200 rounded-lg shadow-2xs">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&color=0F2537&data={{ urlencode(request()->fullUrl()) }}" 
+                             crossorigin="anonymous"
+                             alt="QR Verifikasi Dokumen" 
+                             class="w-14 h-14 object-contain">
                     </div>
                 </div>
                 
-                <div class="text-[10px] font-bold text-slate-900 border-t border-slate-300 pt-0.5">
-                    Tim Fasilitator & Penilai
+                <!-- Nama & Gelar Resmi Prof. Iskandar Nazari -->
+                <div class="text-[10.5px] font-bold text-slate-900 border-t border-slate-300 pt-1 leading-tight">
+                    {{ \App\Models\Setting::get('founder_name', 'Prof. Dr. Iskandar Nazari, S.Ag., M.Pd., M.S.I., M.H., Ph.D.') }}
                 </div>
-                <div class="text-[8px] font-mono-num text-slate-400">
-                    Ruhiology Institute
+                <div class="text-[8.5px] font-medium text-[#8C703E]">
+                    {{ \App\Models\Setting::get('founder_title', 'Founder & Guru Besar Ruhiology Institute') }}
                 </div>
             </div>
         </footer>
