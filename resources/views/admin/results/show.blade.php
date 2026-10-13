@@ -1,10 +1,38 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="space-y-6">
+<style>
+    @media print {
+        @page {
+            size: A4 portrait;
+            margin: 12mm;
+        }
+        .print-avoid-break {
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+    }
+</style>
 
-    <!-- Top Action Toolbar -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+<div class="space-y-6 print:space-y-4">
+
+    <!-- Official Print-Only Header (Kop Laporan) -->
+    <div class="hidden print:flex items-center justify-between border-b-2 border-[#0B2A43] pb-4 mb-4">
+        <div class="flex items-center gap-3">
+            <img src="{{ asset('images/ruhiology-logo.png') }}" alt="Ruhiology Institute" class="h-12 w-auto object-contain">
+            <div>
+                <span class="text-[10px] font-mono font-bold text-amber-700 uppercase tracking-widest block">RUHIOLOGY INSTITUTE — EXECUTIVE AUDIT REPORT</span>
+                <h1 class="text-lg font-bold font-serif text-[#0B2A43]">Laporan Detail Hasil Individual Assessment</h1>
+            </div>
+        </div>
+        <div class="text-right font-mono text-[10px] text-slate-600">
+            <div>Kode Sesi: <strong class="text-slate-900">{{ $submission->submission_code }}</strong></div>
+            <div>Dicetak: {{ now()->format('d M Y, H:i') }} WIB</div>
+        </div>
+    </div>
+
+    <!-- Top Action Toolbar (Hidden when printing) -->
+    <div class="no-print print:hidden flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
         <div>
             <div class="flex items-center gap-2 mb-1">
                 <a href="{{ route('admin.results.index') }}" class="text-xs font-bold text-slate-500 hover:text-slate-800 flex items-center gap-1 transition">
@@ -32,7 +60,7 @@
     </div>
 
     <!-- Participant Demographic & Identity Profile Box -->
-    <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-5">
+    <div class="print-avoid-break bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-5">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 border-b border-slate-100 gap-3">
             <div class="flex items-center gap-3.5">
                 <div class="w-12 h-12 rounded-2xl bg-[#0B2A43] text-[#C9A24D] font-bold text-base flex items-center justify-center font-mono shrink-0 shadow border border-[#C9A24D]/30">
@@ -118,7 +146,7 @@
     </div>
 
     <!-- Dual Metric Score Summary Banner -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+    <div class="print-avoid-break grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
         
         <!-- Score Card 1: RQI-15 -->
         @php
@@ -194,7 +222,7 @@
 
     <!-- Personal Commitment / Tekad Perubahan Batin if present -->
     @if(!empty($submission->result->reflection_text))
-        <div class="bg-amber-50 p-6 rounded-3xl border border-amber-200 shadow-xs space-y-2">
+        <div class="print-avoid-break bg-amber-50 p-6 rounded-3xl border border-amber-200 shadow-xs space-y-2">
             <div class="flex items-center gap-2">
                 <span class="text-base">✨</span>
                 <h4 class="font-bold font-serif text-amber-950 text-sm uppercase font-mono tracking-wider">Tekad Perubahan Batin Peserta</h4>
@@ -207,7 +235,7 @@
 
     <!-- Pretest vs Posttest Delta Comparison Banner if available -->
     @if(isset($pretestSubmission) && isset($posttestSubmission) && $pretestSubmission && $posttestSubmission && $pretestSubmission->result && $posttestSubmission->result)
-        <div class="bg-gradient-to-r from-[#0B2A43] to-[#123B59] text-white p-6 rounded-3xl border border-[#C9A24D]/30 shadow-xl space-y-4 font-sans">
+        <div class="print-avoid-break bg-gradient-to-r from-[#0B2A43] to-[#123B59] text-white p-6 rounded-3xl border border-[#C9A24D]/30 shadow-xl space-y-4 font-sans">
             <div class="flex justify-between items-center border-b border-white/10 pb-3">
                 <h3 class="text-[#C9A24D] font-bold text-xs uppercase tracking-wider font-serif flex items-center gap-2">
                     <span>🔄</span> <span>Komparasi Longitudinal: Pretest vs Posttest</span>
@@ -241,7 +269,7 @@
     @endif
 
     <!-- Visual Radar Chart & Dimensions Breakdown Table Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+    <div class="print-avoid-break grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         <!-- Radar Chart Column (5 cols) -->
         <div class="lg:col-span-5 bg-[#0B2A43] text-white p-6 rounded-3xl border border-slate-800 shadow-md space-y-4">

@@ -42,14 +42,30 @@
     </script>
     <style>
         [x-cloak] { display: none !important; }
+        @media print {
+            body {
+                background: #ffffff !important;
+                display: block !important;
+                min-height: auto !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            aside, header, .no-print {
+                display: none !important;
+            }
+            main {
+                padding: 0 !important;
+                overflow: visible !important;
+            }
+        }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-800 font-sans antialiased min-h-screen flex" x-data="{ sidebarOpen: false }">
+<body class="bg-slate-100 text-slate-800 font-sans antialiased min-h-screen flex print:block print:bg-white" x-data="{ sidebarOpen: false }">
 
     <!-- SIDEBAR NAV -->
     <aside 
         :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
-        class="fixed inset-y-0 left-0 z-40 w-64 bg-navy-950 text-slate-300 transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-auto flex flex-col border-r border-slate-800/80 shadow-2xl shrink-0"
+        class="print:hidden fixed inset-y-0 left-0 z-40 w-64 bg-navy-950 text-slate-300 transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-auto flex flex-col border-r border-slate-800/80 shadow-2xl shrink-0"
     >
         <!-- Sidebar Header -->
         <div class="h-20 flex items-center justify-between px-6 bg-navy-950 border-b border-slate-800">
@@ -146,10 +162,10 @@
     </aside>
 
     <!-- MAIN BODY CONTENT AREA -->
-    <div class="flex-1 flex flex-col min-w-0">
+    <div class="flex-1 flex flex-col min-w-0 print:block">
         
         <!-- ADMIN TOPBAR HEADER -->
-        <header class="h-20 bg-white border-b border-slate-200/80 px-4 sm:px-8 flex items-center justify-between shadow-sm sticky top-0 z-30">
+        <header class="print:hidden h-20 bg-white border-b border-slate-200/80 px-4 sm:px-8 flex items-center justify-between shadow-sm sticky top-0 z-30">
             <div class="flex items-center gap-4">
                 <button @click="sidebarOpen = !sidebarOpen" class="lg:hidden text-slate-600 hover:text-slate-900">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
@@ -200,18 +216,18 @@
 
         <!-- FLASH NOTIFICATIONS -->
         @if(session('success'))
-            <div class="bg-emerald-600 text-white text-xs font-semibold px-6 py-3 shadow-md flex justify-between items-center">
+            <div class="print:hidden bg-emerald-600 text-white text-xs font-semibold px-6 py-3 shadow-md flex justify-between items-center">
                 <span>✅ {{ session('success') }}</span>
             </div>
         @endif
         @if(session('error'))
-            <div class="bg-rose-600 text-white text-xs font-semibold px-6 py-3 shadow-md flex justify-between items-center">
+            <div class="print:hidden bg-rose-600 text-white text-xs font-semibold px-6 py-3 shadow-md flex justify-between items-center">
                 <span>⚠️ {{ session('error') }}</span>
             </div>
         @endif
 
         <!-- MAIN CONTAINER -->
-        <main class="flex-1 p-4 sm:p-8 overflow-y-auto">
+        <main class="flex-1 p-4 sm:p-8 overflow-y-auto print:p-0 print:overflow-visible">
             @yield('content')
         </main>
     </div>
