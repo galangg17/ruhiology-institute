@@ -100,6 +100,10 @@ window.rqAssessmentIndex = function rqAssessmentIndex() {
             }
             if (window.location.hash === '#cek-hasil') {
                 this.showCheckScoreModal = true;
+            } else if (window.location.hash === '#mulai-mandiri') {
+                this.openRegistrationModal('PUBLIC_SELF');
+            } else if (window.location.hash === '#pilih-event') {
+                this.openEventSelectorModal();
             }
         },
 

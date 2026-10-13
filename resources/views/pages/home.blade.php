@@ -135,7 +135,7 @@
                                     <span class="text-[11px] block font-medium" :class="total >= 9 ? 'text-emerald-300' : 'text-amber-300'" x-text="total >= 9 ? '🟢 Prediksi WHO-5: Kesejahteraan Mental Baik' : '⚠️ Prediksi WHO-5: Indikasi Perlu Skrining Stres'"></span>
                                 </div>
 
-                                <a href="#assessment" class="w-full mt-2 py-3 bg-[#C9A24D] hover:bg-[#B48A16] text-[#0B2A43] font-black text-xs rounded-xl shadow-lg transition transform hover:scale-[1.02] flex items-center justify-center gap-2 cursor-pointer">
+                                <a href="{{ route('assessment.index') }}#mulai-mandiri" class="w-full mt-2 py-3 bg-[#C9A24D] hover:bg-[#B48A16] text-[#0B2A43] font-black text-xs rounded-xl shadow-lg transition transform hover:scale-[1.02] flex items-center justify-center gap-2 cursor-pointer">
                                     <span>🚀 Mulai Asesmen Terstruktur (20 Soal)</span>
                                     <span>→</span>
                                 </a>
@@ -776,26 +776,26 @@
                                 </span>
                             </div>
                             <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
-                                <div class="bg-white p-2.5 rounded-xl border border-slate-200 text-center space-y-0.5 shadow-2xs">
-                                    <span class="text-sm">🌌</span>
+                                <a href="#dimensi-rqi" class="bg-white hover:bg-amber-50/70 p-2.5 rounded-xl border border-slate-200 hover:border-[#C9A24D] text-center space-y-0.5 shadow-2xs transition group">
+                                    <span class="text-sm inline-block group-hover:scale-110 transition-transform">🌌</span>
                                     <div class="text-[10px] font-bold text-[#0B2A43]">Kesadaran Ilahi (God Spot)</div>
-                                </div>
-                                <div class="bg-white p-2.5 rounded-xl border border-slate-200 text-center space-y-0.5 shadow-2xs">
-                                    <span class="text-sm">🕌</span>
+                                </a>
+                                <a href="#dimensi-rqi" class="bg-white hover:bg-amber-50/70 p-2.5 rounded-xl border border-slate-200 hover:border-[#C9A24D] text-center space-y-0.5 shadow-2xs transition group">
+                                    <span class="text-sm inline-block group-hover:scale-110 transition-transform">🕌</span>
                                     <div class="text-[10px] font-bold text-[#0B2A43]">Ketaatan Spiritual</div>
-                                </div>
-                                <div class="bg-white p-2.5 rounded-xl border border-slate-200 text-center space-y-0.5 shadow-2xs">
-                                    <span class="text-sm">🌿</span>
+                                </a>
+                                <a href="#dimensi-rqi" class="bg-white hover:bg-amber-50/70 p-2.5 rounded-xl border border-slate-200 hover:border-[#C9A24D] text-center space-y-0.5 shadow-2xs transition group">
+                                    <span class="text-sm inline-block group-hover:scale-110 transition-transform">🌿</span>
                                     <div class="text-[10px] font-bold text-[#0B2A43]">Purifikasi Batin (Tazkiyah)</div>
-                                </div>
-                                <div class="bg-white p-2.5 rounded-xl border border-slate-200 text-center space-y-0.5 shadow-2xs">
-                                    <span class="text-sm">🤝</span>
+                                </a>
+                                <a href="#dimensi-rqi" class="bg-white hover:bg-amber-50/70 p-2.5 rounded-xl border border-slate-200 hover:border-[#C9A24D] text-center space-y-0.5 shadow-2xs transition group">
+                                    <span class="text-sm inline-block group-hover:scale-110 transition-transform">🤝</span>
                                     <div class="text-[10px] font-bold text-[#0B2A43]">Akhlak & Kepedulian Sosial</div>
-                                </div>
-                                <div class="bg-white p-2.5 rounded-xl border border-slate-200 text-center space-y-0.5 shadow-2xs col-span-2 sm:col-span-1">
-                                    <span class="text-sm">🛡️</span>
+                                </a>
+                                <a href="#dimensi-rqi" class="bg-white hover:bg-amber-50/70 p-2.5 rounded-xl border border-slate-200 hover:border-[#C9A24D] text-center space-y-0.5 shadow-2xs col-span-2 sm:col-span-1 transition group">
+                                    <span class="text-sm inline-block group-hover:scale-110 transition-transform">🛡️</span>
                                     <div class="text-[10px] font-bold text-[#0B2A43]">Ketangguhan & Resiliensi</div>
-                                </div>
+                                </a>
                             </div>
                         </div>
 
@@ -820,79 +820,83 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 relative">
                 
                 <!-- Step 1 -->
-                <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-sm relative z-10 flex flex-col justify-between hover:shadow-md transition">
+                <a href="{{ route('assessment.index') }}#mulai-mandiri" class="group bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 hover:border-[#C9A24D] shadow-sm relative z-10 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer">
                     <div class="space-y-3 sm:space-y-4">
                         <div class="flex items-center justify-between">
-                            <span class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-[#0B2A43] text-white font-mono font-bold text-base sm:text-lg flex items-center justify-center shadow-sm">01</span>
-                            <span class="text-xl sm:text-2xl">📝</span>
+                            <span class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-[#0B2A43] group-hover:bg-[#C9A24D] group-hover:text-[#0B2A43] text-white font-mono font-bold text-base sm:text-lg flex items-center justify-center shadow-sm transition-colors">01</span>
+                            <span class="text-xl sm:text-2xl group-hover:scale-110 transition-transform">📝</span>
                         </div>
-                        <h3 class="font-serif font-bold text-base text-[#0B2A43]">Intake Data & Kode</h3>
+                        <h3 class="font-serif font-bold text-base text-[#0B2A43] group-hover:text-[#B48A16] transition-colors">Intake Data & Kode</h3>
                         <p class="text-xs text-slate-600 leading-relaxed">
                             Pilih jalur Asesmen Mandiri atau masukkan Kode Akses Event dari kampus/sekolah/instansi Anda.
                         </p>
                     </div>
-                    <div class="mt-4 pt-3 border-t border-slate-100 flex items-center text-[11px] font-bold text-[#C9A24D]">
-                        <span>Akses Instan ➔</span>
+                    <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-[#C9A24D] group-hover:text-[#0B2A43] transition-colors">
+                        <span>Akses Instan</span>
+                        <span class="transform group-hover:translate-x-1 transition-transform">➔</span>
                     </div>
-                </div>
+                </a>
 
                 <!-- Step 2 -->
-                <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-sm relative z-10 flex flex-col justify-between hover:shadow-md transition">
+                <a href="{{ route('assessment.index') }}" class="group bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 hover:border-[#C9A24D] shadow-sm relative z-10 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer">
                     <div class="space-y-3 sm:space-y-4">
                         <div class="flex items-center justify-between">
-                            <span class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-[#0B2A43] text-white font-mono font-bold text-base sm:text-lg flex items-center justify-center shadow-sm">02</span>
-                            <span class="text-xl sm:text-2xl">⏱️</span>
+                            <span class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-[#0B2A43] group-hover:bg-[#C9A24D] group-hover:text-[#0B2A43] text-white font-mono font-bold text-base sm:text-lg flex items-center justify-center shadow-sm transition-colors">02</span>
+                            <span class="text-xl sm:text-2xl group-hover:scale-110 transition-transform">⏱️</span>
                         </div>
-                        <h3 class="font-serif font-bold text-base text-[#0B2A43]">Pengerjaan 10-15 Menit</h3>
+                        <h3 class="font-serif font-bold text-base text-[#0B2A43] group-hover:text-[#B48A16] transition-colors">Pengerjaan 10-15 Menit</h3>
                         <p class="text-xs text-slate-600 leading-relaxed">
                             Isikan 20 pernyataan terstruktur (15 butir RQI & 5 butir WHO-5) dengan fitur auto-save otomatis.
                         </p>
                     </div>
-                    <div class="mt-4 pt-3 border-t border-slate-100 flex items-center text-[11px] font-bold text-[#C9A24D]">
-                        <span>20 Pertanyaan ➔</span>
+                    <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-[#C9A24D] group-hover:text-[#0B2A43] transition-colors">
+                        <span>20 Pertanyaan</span>
+                        <span class="transform group-hover:translate-x-1 transition-transform">➔</span>
                     </div>
-                </div>
+                </a>
 
                 <!-- Step 3 -->
-                <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-sm relative z-10 flex flex-col justify-between hover:shadow-md transition">
+                <a href="#dimensi-rqi" class="group bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 hover:border-[#C9A24D] shadow-sm relative z-10 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer">
                     <div class="space-y-3 sm:space-y-4">
                         <div class="flex items-center justify-between">
-                            <span class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-[#0B2A43] text-white font-mono font-bold text-base sm:text-lg flex items-center justify-center shadow-sm">03</span>
-                            <span class="text-xl sm:text-2xl">📊</span>
+                            <span class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-[#0B2A43] group-hover:bg-[#C9A24D] group-hover:text-[#0B2A43] text-white font-mono font-bold text-base sm:text-lg flex items-center justify-center shadow-sm transition-colors">03</span>
+                            <span class="text-xl sm:text-2xl group-hover:scale-110 transition-transform">📊</span>
                         </div>
-                        <h3 class="font-serif font-bold text-base text-[#0B2A43]">Kalkulasi Dual-Pilar</h3>
+                        <h3 class="font-serif font-bold text-base text-[#0B2A43] group-hover:text-[#B48A16] transition-colors">Kalkulasi Dual-Pilar</h3>
                         <p class="text-xs text-slate-600 leading-relaxed">
                             Sistem secara instan menghitung skor RQI-15 (15–75 Poin), Indeks WHO-5 (0–100%), dan Grafik Radar 5 Dimensi.
                         </p>
                     </div>
-                    <div class="mt-4 pt-3 border-t border-slate-100 flex items-center text-[11px] font-bold text-[#C9A24D]">
-                        <span>Kalkulasi Instan ➔</span>
+                    <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-[#C9A24D] group-hover:text-[#0B2A43] transition-colors">
+                        <span>Kalkulasi Instan</span>
+                        <span class="transform group-hover:translate-x-1 transition-transform">➔</span>
                     </div>
-                </div>
+                </a>
 
                 <!-- Step 4 -->
-                <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-sm relative z-10 flex flex-col justify-between hover:shadow-md transition">
+                <a href="{{ route('assessment.index') }}#cek-hasil" class="group bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 hover:border-emerald-500 shadow-sm relative z-10 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer">
                     <div class="space-y-3 sm:space-y-4">
                         <div class="flex items-center justify-between">
-                            <span class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-emerald-600 text-white font-mono font-bold text-base sm:text-lg flex items-center justify-center shadow-sm">04</span>
-                            <span class="text-xl sm:text-2xl">📄</span>
+                            <span class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-emerald-600 group-hover:bg-emerald-500 text-white font-mono font-bold text-base sm:text-lg flex items-center justify-center shadow-sm transition-colors">04</span>
+                            <span class="text-xl sm:text-2xl group-hover:scale-110 transition-transform">📄</span>
                         </div>
-                        <h3 class="font-serif font-bold text-base text-[#0B2A43]">Laporan & Sertifikat</h3>
+                        <h3 class="font-serif font-bold text-base text-[#0B2A43] group-hover:text-emerald-700 transition-colors">Laporan & Sertifikat</h3>
                         <p class="text-xs text-slate-600 leading-relaxed">
                             Unduh Sertifikat Resmi A4, Laporan PDF Eksekutif, serta Kartu Shareable 4:5 untuk Instagram/WhatsApp.
                         </p>
                     </div>
-                    <div class="mt-4 pt-3 border-t border-slate-100 flex items-center text-[11px] font-bold text-emerald-600">
-                        <span>Unduh Sertifikat & Kartu ➔</span>
+                    <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-emerald-600 group-hover:text-emerald-800 transition-colors">
+                        <span>Unduh Sertifikat & Kartu</span>
+                        <span class="transform group-hover:translate-x-1 transition-transform">➔</span>
                     </div>
-                </div>
+                </a>
 
             </div>
         </div>
     </section>
 
     <!-- SECTION 4: 5 PILAR DIMENSI RUHIOLOGI -->
-    <section class="py-14 sm:py-20 bg-[#0B2A43] text-white">
+    <section id="dimensi-rqi" class="py-14 sm:py-20 bg-[#0B2A43] text-white scroll-mt-20">
         <div class="max-w-[1280px] mx-auto px-4 sm:px-10">
             <div class="text-center max-w-2xl mx-auto mb-10 sm:mb-12">
                 <span class="text-xs font-bold text-[#C9A24D] uppercase tracking-widest block mb-2 font-mono">✦ Dimensi & Kerangka Teori</span>
