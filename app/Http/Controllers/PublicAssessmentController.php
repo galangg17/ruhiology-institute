@@ -242,6 +242,12 @@ class PublicAssessmentController extends Controller
             $universityCustom = $detailInst;
         }
 
+        $rawSchoolLevel = $validated['school_level'] ?? (in_array(strtoupper($validated['category']), ['MURID', 'PELAJAR', 'GURU']) ? $subType : null);
+        $safeSchoolLevel = $rawSchoolLevel ? mb_substr(trim((string) $rawSchoolLevel), 0, 20) : null;
+        $safeSchoolClass = !empty($validated['school_class']) ? mb_substr(trim((string) $validated['school_class']), 0, 20) : null;
+        $safeEntryYear = !empty($validated['entry_year']) ? mb_substr(trim((string) $validated['entry_year']), 0, 10) : null;
+        $safeSubCategory = !empty($subCategory) ? mb_substr(trim((string) $subCategory), 0, 250) : null;
+
         $participant = Participant::create([
             'event_id' => $eventId,
             'access_type' => $accessType,
@@ -253,23 +259,23 @@ class PublicAssessmentController extends Controller
             'gender' => $validated['gender'] ?? 'Laki-laki',
             'phone' => $validated['phone'] ?? null,
             'category' => $validated['category'],
-            'sub_category' => $subCategory,
+            'sub_category' => $safeSubCategory,
             'email' => $email,
             'country_id' => $countryId,
             'province_id' => $validated['province_id'],
             'regency_id' => $validated['regency_id'],
             'school_id' => null,
-            'school_custom' => $schoolCustom,
+            'school_custom' => $schoolCustom ? mb_substr(trim((string) $schoolCustom), 0, 250) : null,
             'university_id' => null,
-            'university_custom' => $universityCustom,
+            'university_custom' => $universityCustom ? mb_substr(trim((string) $universityCustom), 0, 250) : null,
             'faculty_id' => $validated['faculty_id'] ?? null,
             'study_program_id' => $validated['study_program_id'] ?? null,
-            'school_level' => $validated['school_level'] ?? $subType ?? null,
-            'school_class' => $validated['school_class'] ?? null,
+            'school_level' => $safeSchoolLevel,
+            'school_class' => $safeSchoolClass,
             'semester' => $validated['semester'] ?? null,
-            'entry_year' => $validated['entry_year'] ?? null,
+            'entry_year' => $safeEntryYear,
             'occupation_id' => $validated['occupation_id'] ?? null,
-            'occupation_custom' => $detailInst ?? $validated['occupation_custom'] ?? null,
+            'occupation_custom' => !empty($detailInst) ? mb_substr(trim((string) $detailInst), 0, 250) : ($validated['occupation_custom'] ?? null),
             'status' => 'active',
         ]);
 

@@ -302,10 +302,15 @@ window.rqAssessmentIndex = function rqAssessmentIndex() {
             const catUpper = (this.form.category || '').toUpperCase();
             if (['MURID', 'PELAJAR', 'GURU'].includes(catUpper)) {
                 this.form.school_custom = this.form.detail_institution || '';
-                this.form.school_level = this.form.sub_category_type || '';
+                this.form.school_level = (this.form.sub_category_type || '').substring(0, 20);
+            } else {
+                this.form.school_custom = '';
+                this.form.school_level = '';
             }
             if (['MAHASISWA', 'DOSEN'].includes(catUpper)) {
                 this.form.university_custom = this.form.detail_institution || '';
+            } else {
+                this.form.university_custom = '';
             }
             this.form.occupation_custom = this.form.detail_institution || '';
 
