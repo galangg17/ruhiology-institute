@@ -559,22 +559,45 @@ class PublicAssessmentController extends Controller
     }
 
     /**
-     * Verification & Score Lookup via Assessment Code + Birth Date.
+     * Flexible Verification & Score Lookup via Code (RQI/SUB/PAR), Phone, Email, or Name.
      */
     public function checkScore(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'assessment_code' => ['required', 'string'],
-            'birth_date' => ['required', 'date'],
+            'birth_date' => ['nullable', 'date'],
         ]);
 
-        $code = trim($validated['assessment_code']);
-        $participant = Participant::where('assessment_code', $code)
-            ->whereDate('birth_date', $validated['birth_date'])
-            ->first();
+        $queryStr = trim($request->input('assessment_code'));
+        $upperCode = strtoupper($queryStr);
+        $birthDate = $request->input('birth_date');
+
+        // 1. Direct match on Submission Code (SUB-...)
+        if (str_starts_with($upperCode, 'SUB-')) {
+            $sub = AssessmentSubmission::where('submission_code', $upperCode)->first();
+            if ($sub) {
+                return redirect()->route('assessment.result', ['submission_code' => $sub->submission_code]);
+            }
+        }
+
+        // 2. Match Participant by assessment_code, participant_code, phone, email, or exact name
+        $participantQuery = Participant::where(function ($q) use ($queryStr, $upperCode) {
+            $q->where('assessment_code', $upperCode)
+              ->orWhere('participant_code', $upperCode)
+              ->orWhere('email', strtolower($queryStr))
+              ->orWhere('phone', $queryStr)
+              ->orWhere('name', 'like', $queryStr);
+        });
+
+        if (!empty($birthDate)) {
+            $participantWithDob = (clone $participantQuery)->whereDate('birth_date', $birthDate)->latest()->first();
+            $participant = $participantWithDob ?? $participantQuery->latest()->first();
+        } else {
+            $participant = $participantQuery->latest()->first();
+        }
 
         if (!$participant) {
-            return back()->with('error', 'Kode Assessment dan Tanggal Lahir tidak cocok atau tidak ditemukan.')->withInput();
+            return back()->with('error', 'Data peserta tidak ditemukan. Pastikan Kode Assessment / Kode Sesi / No. WhatsApp / Nama sudah benar.')->withInput();
         }
 
         $latestSubmission = AssessmentSubmission::where('participant_id', $participant->id)
@@ -583,7 +606,7 @@ class PublicAssessmentController extends Controller
             ->first();
 
         if (!$latestSubmission) {
-            return back()->with('error', 'Peserta belum menyelesaikan tes asesmen.');
+            return back()->with('error', 'Peserta ditemukan (' . $participant->name . '), namun belum menyelesaikan sesi pengerjaan soal.')->withInput();
         }
 
         return redirect()->route('assessment.result', [

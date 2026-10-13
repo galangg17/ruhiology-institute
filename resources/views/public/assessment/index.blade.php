@@ -98,6 +98,9 @@ window.rqAssessmentIndex = function rqAssessmentIndex() {
                 this.inputEventCode = this.eventCode;
                 this.verifyEventCodeAsync(this.eventCode);
             }
+            if (window.location.hash === '#cek-hasil') {
+                this.showCheckScoreModal = true;
+            }
         },
 
         getCurrentCategorySubCategories() {
@@ -848,28 +851,28 @@ document.addEventListener('alpine:init', () => {
     <!-- CHECK SCORE MODAL -->
     <div x-show="showCheckScoreModal" x-cloak class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/65 backdrop-blur-sm animate-fadeIn">
         <div @click.away="showCheckScoreModal = false" class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative border border-slate-100" @click.stop>
-            <button @click="showCheckScoreModal = false" class="absolute top-5 right-5 text-slate-400 hover:text-slate-700">✕</button>
+            <button @click="showCheckScoreModal = false" class="absolute top-5 right-5 text-slate-400 hover:text-slate-700 cursor-pointer">✕</button>
             
             <div class="mb-5 pb-3 border-b border-slate-100">
-                <span class="text-[10px] font-extrabold text-[#C9A24D] uppercase tracking-widest block font-mono">VERIFIKASI KEAMANAN</span>
-                <h3 class="text-xl font-serif font-bold text-[#0B2A43]">Cek Skor Assessment</h3>
-                <p class="text-xs text-slate-500 mt-1">Masukkan Kode Assessment dan Tanggal Lahir untuk memverifikasi identitas Anda.</p>
+                <span class="text-[10px] font-extrabold text-[#C9A24D] uppercase tracking-widest block font-mono">CEK HASIL & SERTIFIKAT RESMI</span>
+                <h3 class="text-xl font-serif font-bold text-[#0B2A43]">Cek Skor & Unduh Sertifikat</h3>
+                <p class="text-xs text-slate-500 mt-1">Masukkan Kode Assessment (`RQI-...`), Kode Sesi (`SUB-...`), Nomor WhatsApp, atau Nama Lengkap Anda.</p>
             </div>
 
             <form action="{{ route('assessment.check_score') }}" method="POST" class="space-y-4 text-xs font-sans">
                 @csrf
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1">Kode Assessment *</label>
-                    <input type="text" name="assessment_code" required placeholder="Contoh: RQI-7F82K9" class="w-full p-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none font-mono uppercase font-bold text-sm">
+                    <label class="block font-bold text-slate-700 mb-1">Kode Assessment / No. WhatsApp / Nama Lengkap *</label>
+                    <input type="text" name="assessment_code" required placeholder="Contoh: RQI-7F82K9 atau 081234567890 atau Nama..." class="w-full p-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none font-bold text-sm">
                 </div>
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1">Tanggal Lahir *</label>
-                    <input type="date" name="birth_date" required class="w-full p-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none font-medium">
+                    <label class="block font-bold text-slate-700 mb-1">Tanggal Lahir <span class="text-slate-400 font-normal">(Opsional, untuk verifikasi tambahan)</span></label>
+                    <input type="date" name="birth_date" class="w-full p-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none font-medium">
                 </div>
 
                 <div class="pt-2">
-                    <button type="submit" class="w-full py-3.5 bg-[#0B2A43] hover:bg-[#123B59] text-white font-bold rounded-xl text-xs uppercase tracking-wider shadow-md transition-colors cursor-pointer">
-                        Verifikasi & Lihat Hasil →
+                    <button type="submit" class="w-full py-3.5 bg-[#0B2A43] hover:bg-[#123B59] text-[#C9A24D] font-bold rounded-xl text-xs uppercase tracking-wider shadow-md transition-colors cursor-pointer">
+                         Cari Laporan Hasil & Sertifikat →
                     </button>
                 </div>
             </form>

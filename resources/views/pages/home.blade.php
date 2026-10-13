@@ -457,15 +457,15 @@
                         <li class="flex items-start gap-2.5">
                             <span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold shrink-0 mt-0.5 text-[10px]">✓</span>
                             <div>
-                                <strong class="text-white block font-bold">Uji Validitas pada 1.250+ Responden</strong>
-                                <span class="text-slate-300 text-[11px]">Meliputi mahasiswa, pendidik, dan praktisi di berbagai institusi.</span>
+                                <strong class="text-white block font-bold">Uji Validitas pada {{ number_format($stats['total_participants'] ?? 14000) }}+ Responden</strong>
+                                <span class="text-slate-300 text-[11px]">Meliputi mahasiswa, pelajar, ASN, pendidik, dan praktisi di 38 provinsi.</span>
                             </div>
                         </li>
                         <li class="flex items-start gap-2.5">
                             <span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold shrink-0 mt-0.5 text-[10px]">✓</span>
                             <div>
                                 <strong class="text-white block font-bold">Mitra Konsorsium PT & Sekolah</strong>
-                                <span class="text-slate-300 text-[11px]">Kerja sama riset pengukuran dengan perguruan tinggi mitra.</span>
+                                <span class="text-slate-300 text-[11px]">Kerja sama riset pengukuran dengan {{ number_format($stats['total_institutions'] ?? 80) }}+ perguruan tinggi & sekolah.</span>
                             </div>
                         </li>
                         <li class="flex items-start gap-2.5">
@@ -496,12 +496,12 @@
             .animate-marquee-left {
                 display: flex;
                 width: max-content;
-                animation: marqueeLeft 450s linear infinite;
+                animation: marqueeLeft 95s linear infinite;
             }
             .animate-marquee-right {
                 display: flex;
                 width: max-content;
-                animation: marqueeRight 450s linear infinite;
+                animation: marqueeRight 95s linear infinite;
             }
             .marquee-group:hover .animate-marquee-left,
             .marquee-group:hover .animate-marquee-right {
@@ -682,12 +682,15 @@
                                 <div class="grid grid-cols-2 gap-2 text-[11px]">
                                     <div>Nama Peserta: <strong class="text-white block" x-text="verifResult.participant_name"></strong></div>
                                     <div>Instansi / Event: <strong class="text-white block" x-text="verifResult.event_title || 'Mandiri Publik'"></strong></div>
-                                    <div>Skor RQI: <strong class="text-[#C9A24D] block font-bold text-sm" x-text="verifResult.rqi_score + ' / 100'"></strong></div>
-                                    <div>Status WHO-5: <strong class="text-emerald-300 block font-bold" x-text="verifResult.who5_percentage + '% (' + (verifResult.who5_percentage >= 50 ? 'Sehat' : 'Skrining') + ')'"></strong></div>
+                                    <div>Skor RQI-15: <strong class="text-[#C9A24D] block font-bold text-sm" x-text="verifResult.rqi_score + ' / 75 Poin (' + Math.round((verifResult.rqi_score / 75) * 100) + '%)'"></strong></div>
+                                    <div>Indeks WHO-5: <strong class="text-emerald-300 block font-bold" x-text="verifResult.who5_percentage + '% (' + (verifResult.who5_percentage >= 50 ? 'Kesejahteraan Terpenuhi' : 'Perlu Skrining') + ')'"></strong></div>
                                 </div>
-                                <div class="pt-1 border-t border-emerald-500/30 text-right">
+                                <div class="pt-1 border-t border-emerald-500/30 flex items-center justify-between">
+                                    <a :href="'/assessment/result/' + verifResult.submission_code + '/certificate'" target="_blank" class="text-xs font-bold text-emerald-300 hover:underline flex items-center gap-1">
+                                        <span>📜 Buka Sertifikat →</span>
+                                    </a>
                                     <a :href="'/assessment/result/' + verifResult.submission_code" target="_blank" class="text-xs font-bold text-[#C9A24D] hover:underline flex items-center justify-end gap-1">
-                                        <span>Buka Laporan Hasil Lengkap →</span>
+                                        <span>Buka Laporan Lengkap →</span>
                                     </a>
                                 </div>
                             </div>
@@ -720,11 +723,14 @@
                                     Kenali Profil Ruhiologi Anda
                                 </h2>
                                 <p class="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
-                                    RQ Assessment dirancang sebagai instrumen untuk mengeksplorasi dan memetakan dimensi Ruhiologi berdasarkan instrumen yang digunakan oleh Ruhiology Institute.
+                                    RQ Assessment dirancang sebagai instrumen ilmiah terstruktur untuk memetakan 5 Pilar Dimensi Ruhiologi (RQI-15) dan Indeks Kesejahteraan Mental (WHO-5).
                                 </p>
-                                <div class="pt-2">
+                                <div class="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-3">
                                     <a href="{{ route('assessment.index') }}" class="px-7 py-3.5 bg-[#0B2A43] hover:bg-[#123B59] text-white rounded-full text-xs font-bold uppercase tracking-wider shadow-md transition-transform hover:scale-105 inline-flex items-center gap-2 min-h-[44px]">
                                         <span>Mulai Assessment</span> <span>→</span>
+                                    </a>
+                                    <a href="{{ route('assessment.index') }}#cek-hasil" class="px-5 py-3.5 bg-white hover:bg-slate-50 text-[#0B2A43] border border-slate-300 rounded-full text-xs font-bold tracking-wider shadow-2xs transition inline-flex items-center gap-2 min-h-[44px]">
+                                        <span>🔍 Cek Hasil / Sertifikat Saya</span>
                                     </a>
                                 </div>
                             </div>
@@ -736,7 +742,7 @@
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                     </div>
                                     <div>
-                                        <strong class="text-[#0B2A43] block font-bold">Instrumen Terstruktur</strong>
+                                        <strong class="text-[#0B2A43] block font-bold">Instrumen Terstruktur (20 Soal)</strong>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-3 text-xs sm:text-sm">
@@ -744,7 +750,7 @@
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                                     </div>
                                     <div>
-                                        <strong class="text-[#0B2A43] block font-bold">Hasil Assessment</strong>
+                                        <strong class="text-[#0B2A43] block font-bold">Laporan Dual-Pilar & Radar</strong>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-3 text-xs sm:text-sm">
@@ -752,39 +758,43 @@
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                                     </div>
                                     <div>
-                                        <strong class="text-[#0B2A43] block font-bold">Profil Ruhiologi</strong>
+                                        <strong class="text-[#0B2A43] block font-bold">Sertifikat Resmi & Kartu Story</strong>
                                     </div>
                                 </div>
                             </div>
 
                         </div>
 
-                        <!-- 4 Dimensi Pengukuran RQ Grid -->
+                        <!-- 5 Dimensi Pengukuran RQ Grid -->
                         <div class="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-slate-300/80">
                             <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                                 <span class="text-xs font-bold text-[#0B2A43] uppercase tracking-wider font-mono flex items-center gap-1.5">
-                                    <span>✨</span> <span>5 Tahap Pengukuran RQI</span>
+                                    <span>✨</span> <span>5 Pilar Pengukuran RQI-15 + WHO-5</span>
                                 </span>
                                 <span class="text-[10px] sm:text-[11px] font-mono font-bold text-emerald-800 bg-emerald-100/80 px-2.5 py-0.5 rounded-full border border-emerald-300">
-                                    📊 1.250+ Peserta Terukur
+                                    📊 {{ number_format($stats['total_participants'] ?? 14000) }}+ Peserta Terukur
                                 </span>
                             </div>
-                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
-                                <div class="bg-white p-2.5 sm:p-3 rounded-xl border border-slate-200 text-center space-y-0.5 shadow-2xs">
-                                    <span class="text-sm sm:text-base">🌌</span>
-                                    <div class="text-[10px] sm:text-[11px] font-bold text-[#0B2A43]">Pengenalan Diri Hakiki</div>
+                            <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+                                <div class="bg-white p-2.5 rounded-xl border border-slate-200 text-center space-y-0.5 shadow-2xs">
+                                    <span class="text-sm">🌌</span>
+                                    <div class="text-[10px] font-bold text-[#0B2A43]">Kesadaran Ilahi (God Spot)</div>
                                 </div>
-                                <div class="bg-white p-2.5 sm:p-3 rounded-xl border border-slate-200 text-center space-y-0.5 shadow-2xs">
-                                    <span class="text-sm sm:text-base">🌿</span>
-                                    <div class="text-[10px] sm:text-[11px] font-bold text-[#0B2A43]">Purifikasi & Regulasi Diri</div>
+                                <div class="bg-white p-2.5 rounded-xl border border-slate-200 text-center space-y-0.5 shadow-2xs">
+                                    <span class="text-sm">🕌</span>
+                                    <div class="text-[10px] font-bold text-[#0B2A43]">Ketaatan Spiritual</div>
                                 </div>
-                                <div class="bg-white p-2.5 sm:p-3 rounded-xl border border-slate-200 text-center space-y-0.5 shadow-2xs">
-                                    <span class="text-sm sm:text-base">🎯</span>
-                                    <div class="text-[10px] sm:text-[11px] font-bold text-[#0B2A43]">Pembentukan Karakter</div>
+                                <div class="bg-white p-2.5 rounded-xl border border-slate-200 text-center space-y-0.5 shadow-2xs">
+                                    <span class="text-sm">🌿</span>
+                                    <div class="text-[10px] font-bold text-[#0B2A43]">Purifikasi Batin (Tazkiyah)</div>
                                 </div>
-                                <div class="bg-white p-2.5 sm:p-3 rounded-xl border border-slate-200 text-center space-y-0.5 shadow-2xs">
-                                    <span class="text-sm sm:text-base">🛡️</span>
-                                    <div class="text-[10px] sm:text-[11px] font-bold text-[#0B2A43]">Keberfungsian Sosial</div>
+                                <div class="bg-white p-2.5 rounded-xl border border-slate-200 text-center space-y-0.5 shadow-2xs">
+                                    <span class="text-sm">🤝</span>
+                                    <div class="text-[10px] font-bold text-[#0B2A43]">Akhlak & Kepedulian Sosial</div>
+                                </div>
+                                <div class="bg-white p-2.5 rounded-xl border border-slate-200 text-center space-y-0.5 shadow-2xs col-span-2 sm:col-span-1">
+                                    <span class="text-sm">🛡️</span>
+                                    <div class="text-[10px] font-bold text-[#0B2A43]">Ketangguhan & Resiliensi</div>
                                 </div>
                             </div>
                         </div>
@@ -818,7 +828,7 @@
                         </div>
                         <h3 class="font-serif font-bold text-base text-[#0B2A43]">Intake Data & Kode</h3>
                         <p class="text-xs text-slate-600 leading-relaxed">
-                            Masukkan data profil atau Kode Unik Peserta dari kampus/sekolah Anda untuk memulai sesi asesmen.
+                            Pilih jalur Asesmen Mandiri atau masukkan Kode Akses Event dari kampus/sekolah/instansi Anda.
                         </p>
                     </div>
                     <div class="mt-4 pt-3 border-t border-slate-100 flex items-center text-[11px] font-bold text-[#C9A24D]">
@@ -833,9 +843,9 @@
                             <span class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-[#0B2A43] text-white font-mono font-bold text-base sm:text-lg flex items-center justify-center shadow-sm">02</span>
                             <span class="text-xl sm:text-2xl">⏱️</span>
                         </div>
-                        <h3 class="font-serif font-bold text-base text-[#0B2A43]">Pengerjaan 15-20 Menit</h3>
+                        <h3 class="font-serif font-bold text-base text-[#0B2A43]">Pengerjaan 10-15 Menit</h3>
                         <p class="text-xs text-slate-600 leading-relaxed">
-                            Isikan 20 pernyataan terstruktur (RQI-15 & WHO-5 Index) dengan tenang sesuai kondisi batin Anda.
+                            Isikan 20 pernyataan terstruktur (15 butir RQI & 5 butir WHO-5) dengan fitur auto-save otomatis.
                         </p>
                     </div>
                     <div class="mt-4 pt-3 border-t border-slate-100 flex items-center text-[11px] font-bold text-[#C9A24D]">
@@ -850,9 +860,9 @@
                             <span class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-[#0B2A43] text-white font-mono font-bold text-base sm:text-lg flex items-center justify-center shadow-sm">03</span>
                             <span class="text-xl sm:text-2xl">📊</span>
                         </div>
-                        <h3 class="font-serif font-bold text-base text-[#0B2A43]">Kalkulasi Real-time</h3>
+                        <h3 class="font-serif font-bold text-base text-[#0B2A43]">Kalkulasi Dual-Pilar</h3>
                         <p class="text-xs text-slate-600 leading-relaxed">
-                            Sistem secara instan menghitung skor total RQI-15 dan menyajikan hasil 5 Dimensi Ruhiologi secara visual.
+                            Sistem secara instan menghitung skor RQI-15 (15–75 Poin), Indeks WHO-5 (0–100%), dan Grafik Radar 5 Dimensi.
                         </p>
                     </div>
                     <div class="mt-4 pt-3 border-t border-slate-100 flex items-center text-[11px] font-bold text-[#C9A24D]">
@@ -867,13 +877,13 @@
                             <span class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-emerald-600 text-white font-mono font-bold text-base sm:text-lg flex items-center justify-center shadow-sm">04</span>
                             <span class="text-xl sm:text-2xl">📄</span>
                         </div>
-                        <h3 class="font-serif font-bold text-base text-[#0B2A43]">Laporan & Rekomendasi</h3>
+                        <h3 class="font-serif font-bold text-base text-[#0B2A43]">Laporan & Sertifikat</h3>
                         <p class="text-xs text-slate-600 leading-relaxed">
-                            Dapatkan interpretasi tingkat kedalaman RQ Gen Z beserta saran refleksi & intervensi pengembangan potensi batin.
+                            Unduh Sertifikat Resmi A4, Laporan PDF Eksekutif, serta Kartu Shareable 4:5 untuk Instagram/WhatsApp.
                         </p>
                     </div>
                     <div class="mt-4 pt-3 border-t border-slate-100 flex items-center text-[11px] font-bold text-emerald-600">
-                        <span>Unduh Hasil & Refleksi ➔</span>
+                        <span>Unduh Sertifikat & Kartu ➔</span>
                     </div>
                 </div>
 
@@ -881,69 +891,82 @@
         </div>
     </section>
 
-    <!-- SECTION 4: 4 PILAR DIMENSI RUHIOLOGI -->
+    <!-- SECTION 4: 5 PILAR DIMENSI RUHIOLOGI -->
     <section class="py-14 sm:py-20 bg-[#0B2A43] text-white">
         <div class="max-w-[1280px] mx-auto px-4 sm:px-10">
             <div class="text-center max-w-2xl mx-auto mb-10 sm:mb-12">
                 <span class="text-xs font-bold text-[#C9A24D] uppercase tracking-widest block mb-2 font-mono">✦ Dimensi & Kerangka Teori</span>
                 <h2 class="font-serif text-2xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight">
-                    Empat Dimensi Utama Kecerdasan Ruhiologi (RQ)
+                    Lima Pilar Dimensi Kecerdasan Ruhiologi (RQI-15)
                 </h2>
                 <p class="text-slate-200 text-xs sm:text-sm mt-3 font-normal leading-relaxed">
-                    Empat pilar utama yang dirumuskan oleh Prof. Dr. Iskandar Nazari sebagai pusat inteligensi dan potensi kemanusiaan.
+                    Lima pilar utama yang dirumuskan oleh Prof. Dr. Iskandar Nazari sebagai pusat inteligensi dan keseimbangan potensi kemanusiaan.
                 </p>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-5">
                 
                 <!-- Pilar 1 -->
-                <div class="bg-white/10 p-6 sm:p-7 rounded-3xl border border-white/15 backdrop-blur-md flex flex-col justify-between hover:bg-white/15 transition duration-300">
+                <div class="bg-white/10 p-5 sm:p-6 rounded-3xl border border-white/15 backdrop-blur-md flex flex-col justify-between hover:bg-white/15 transition duration-300">
                     <div>
-                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-[#C9A24D]/20 text-[#C9A24D] flex items-center justify-center font-bold text-lg sm:text-xl mb-4 sm:mb-5 border border-[#C9A24D]/30">
+                        <div class="w-10 h-10 rounded-2xl bg-[#C9A24D]/20 text-[#C9A24D] flex items-center justify-center font-bold text-lg mb-4 border border-[#C9A24D]/30">
                             ✦
                         </div>
-                        <h3 class="font-serif font-bold text-base sm:text-xl text-white mb-2 tracking-tight">1. Spiritualitas Transendental</h3>
-                        <p class="text-xs sm:text-sm text-slate-200 leading-relaxed font-normal">
-                            Kesadaran mendalam akan hubungan vertikal dengan Sang Pencipta, ketenangan batiniah, dan zikir.
+                        <h3 class="font-serif font-bold text-base text-white mb-2 tracking-tight">1. Kesadaran Ketuhanan (God Spot)</h3>
+                        <p class="text-xs text-slate-200 leading-relaxed font-normal">
+                            Kesadaran mendalam akan kehadiran Sang Pencipta, keikhlasan niat, dan orientasi hidup transendental.
                         </p>
                     </div>
                 </div>
 
                 <!-- Pilar 2 -->
-                <div class="bg-white/10 p-6 sm:p-7 rounded-3xl border border-white/15 backdrop-blur-md flex flex-col justify-between hover:bg-white/15 transition duration-300">
+                <div class="bg-white/10 p-5 sm:p-6 rounded-3xl border border-white/15 backdrop-blur-md flex flex-col justify-between hover:bg-white/15 transition duration-300">
                     <div>
-                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold text-lg sm:text-xl mb-4 sm:mb-5 border border-emerald-400/30">
-                            ✨
+                        <div class="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-300 flex items-center justify-center font-bold text-lg mb-4 border border-amber-400/30">
+                            🕌
                         </div>
-                        <h3 class="font-serif font-bold text-base sm:text-xl text-white mb-2 tracking-tight">2. Purifikasi Mental (Tazkiyah)</h3>
-                        <p class="text-xs sm:text-sm text-slate-200 leading-relaxed font-normal">
-                            Kebersihan hati dari penyakit iri, keangkuhan intelektual, dan ketahanan terhadap amarah.
+                        <h3 class="font-serif font-bold text-base text-white mb-2 tracking-tight">2. Ketaatan Spiritual & Ibadah</h3>
+                        <p class="text-xs text-slate-200 leading-relaxed font-normal">
+                            Kedisiplinan ibadah ritual, penghayatan doa/zikir, dan konsistensi menjaga hubungan vertikal.
                         </p>
                     </div>
                 </div>
 
                 <!-- Pilar 3 -->
-                <div class="bg-white/10 p-6 sm:p-7 rounded-3xl border border-white/15 backdrop-blur-md flex flex-col justify-between hover:bg-white/15 transition duration-300">
+                <div class="bg-white/10 p-5 sm:p-6 rounded-3xl border border-white/15 backdrop-blur-md flex flex-col justify-between hover:bg-white/15 transition duration-300">
                     <div>
-                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-amber-500/20 text-amber-300 flex items-center justify-center font-bold text-lg sm:text-xl mb-4 sm:mb-5 border border-amber-400/30">
-                            🎯
+                        <div class="w-10 h-10 rounded-2xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold text-lg mb-4 border border-emerald-400/30">
+                            ✨
                         </div>
-                        <h3 class="font-serif font-bold text-base sm:text-xl text-white mb-2 tracking-tight">3. Orientasi Intensional</h3>
-                        <p class="text-xs sm:text-sm text-slate-200 leading-relaxed font-normal">
-                            Penyelarasan setiap niat bekerja, belajar, dan memimpin semata-mata demi keridhaan Ilahi.
+                        <h3 class="font-serif font-bold text-base text-white mb-2 tracking-tight">3. Purifikasi Batin (Tazkiyah)</h3>
+                        <p class="text-xs text-slate-200 leading-relaxed font-normal">
+                            Kebersihan hati dari penyakit iri, dengki, keangkuhan intelektual, serta kejujuran nurani.
                         </p>
                     </div>
                 </div>
 
                 <!-- Pilar 4 -->
-                <div class="bg-white/10 p-6 sm:p-7 rounded-3xl border border-white/15 backdrop-blur-md flex flex-col justify-between hover:bg-white/15 transition duration-300">
+                <div class="bg-white/10 p-5 sm:p-6 rounded-3xl border border-white/15 backdrop-blur-md flex flex-col justify-between hover:bg-white/15 transition duration-300">
                     <div>
-                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-blue-500/20 text-blue-300 flex items-center justify-center font-bold text-lg sm:text-xl mb-4 sm:mb-5 border border-blue-400/30">
-                            🌱
+                        <div class="w-10 h-10 rounded-2xl bg-sky-500/20 text-sky-300 flex items-center justify-center font-bold text-lg mb-4 border border-sky-400/30">
+                            🤝
                         </div>
-                        <h3 class="font-serif font-bold text-base sm:text-xl text-white mb-2 tracking-tight">4. Altruisme & Resiliensi</h3>
-                        <p class="text-xs sm:text-sm text-slate-200 leading-relaxed font-normal">
-                            Kekuatan sabar menghadapi ujian dan komitmen aksi melayani masyarakat secara tulus.
+                        <h3 class="font-serif font-bold text-base text-white mb-2 tracking-tight">4. Akhlak & Kepedulian Sosial</h3>
+                        <p class="text-xs text-slate-200 leading-relaxed font-normal">
+                            Adab pergaulan, empati tulus, dan keberfungsian sosial yang membawa manfaat nyata bagi sesama.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Pilar 5 -->
+                <div class="bg-white/10 p-5 sm:p-6 rounded-3xl border border-white/15 backdrop-blur-md flex flex-col justify-between hover:bg-white/15 transition duration-300 sm:col-span-2 lg:col-span-1">
+                    <div>
+                        <div class="w-10 h-10 rounded-2xl bg-purple-500/20 text-purple-300 flex items-center justify-center font-bold text-lg mb-4 border border-purple-400/30">
+                            🛡️
+                        </div>
+                        <h3 class="font-serif font-bold text-base text-white mb-2 tracking-tight">5. Ketangguhan & Resiliensi Jiwa</h3>
+                        <p class="text-xs text-slate-200 leading-relaxed font-normal">
+                            Ketenangan batin, kesabaran menghadapi tekanan/ujian hidup, dan optimisme bangkit dari kesulitan.
                         </p>
                     </div>
                 </div>
@@ -963,30 +986,30 @@
                 </div>
                 <div class="lg:col-span-7 space-y-4">
                     <div class="inline-flex items-center space-x-2 bg-[#C9A24D]/20 text-[#C9A24D] text-xs font-mono font-bold px-3.5 py-1.5 rounded-full border border-[#C9A24D]/30 uppercase tracking-widest">
-                        <span>✦ PEMETAAN INTEGRIF</span>
+                        <span>✦ PEMETAAN INTEGRATIF</span>
                     </div>
                     <h3 class="font-serif font-bold text-xl sm:text-3xl text-white leading-snug">
                         Keseimbangan Integratif Antara Batin, Pikiran, & Aksi Real
                     </h3>
                     <p class="text-xs sm:text-sm text-slate-200 leading-relaxed font-normal">
-                        Kecerdasan Ruhiologi (RQ) mengukur integrasi harmonis antara kebersihan niat, regulasi emosi di bawah tekanan, serta keberfungsian sosial yang nyata dalam masyarakat.
+                        Kecerdasan Ruhiologi (RQ) mengukur integrasi harmonis antara kesadaran ketuhanan, ketaatan spiritual, kebersihan batin, akhlak sosial, dan ketangguhan mental (WHO-5).
                     </p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                         <div class="p-3.5 bg-white/10 rounded-2xl border border-white/10">
-                            <strong class="text-xs text-[#C9A24D] block font-bold">1. Spiritualitas Transendental</strong>
-                            <span class="text-[11px] text-slate-300">Kesadaran Ilahi & ketenangan batin.</span>
+                            <strong class="text-xs text-[#C9A24D] block font-bold">1. Kesadaran Ketuhanan & Spiritual</strong>
+                            <span class="text-[11px] text-slate-300">Koneksi vertikal (God Spot) & kualitas ibadah.</span>
                         </div>
                         <div class="p-3.5 bg-white/10 rounded-2xl border border-white/10">
-                            <strong class="text-xs text-[#C9A24D] block font-bold">2. Purifikasi Mental (Tazkiyah)</strong>
-                            <span class="text-[11px] text-slate-300">Regulasi amarah & pembersihan batin.</span>
+                            <strong class="text-xs text-[#C9A24D] block font-bold">2. Purifikasi Batin (Tazkiyah)</strong>
+                            <span class="text-[11px] text-slate-300">Regulasi amarah & kejujuran nurani.</span>
                         </div>
                         <div class="p-3.5 bg-white/10 rounded-2xl border border-white/10">
-                            <strong class="text-xs text-[#C9A24D] block font-bold">3. Orientasi Intensional</strong>
-                            <span class="text-[11px] text-slate-300">Penyelarasan niat ikhlas dalam bekerja.</span>
+                            <strong class="text-xs text-[#C9A24D] block font-bold">3. Akhlak & Kepedulian Sosial</strong>
+                            <span class="text-[11px] text-slate-300">Adab, empati, & kontribusi bagi sesama.</span>
                         </div>
                         <div class="p-3.5 bg-white/10 rounded-2xl border border-white/10">
-                            <strong class="text-xs text-[#C9A24D] block font-bold">4. Altruisme & Resiliensi</strong>
-                            <span class="text-[11px] text-slate-300">Kesabaran & aksi melayani sesama.</span>
+                            <strong class="text-xs text-emerald-300 block font-bold">4. Resiliensi & Skrining WHO-5</strong>
+                            <span class="text-[11px] text-slate-300">Ketangguhan menghadapi stres & kesejahteraan mental.</span>
                         </div>
                     </div>
                 </div>

@@ -240,9 +240,24 @@ function rqTakeAssessment() {
 
         openSubmitModal() {
             if (this.answeredCount < this.totalCount) {
-                if (!confirm(`Perhatian: Anda baru menjawab ${this.answeredCount} dari ${this.totalCount} pertanyaan. Apakah Anda tetap ingin mengirimkan?`)) {
-                    return;
+                // Find the first question card without a checked radio
+                const questionCards = document.querySelectorAll('form .bg-white.rounded-2xl.border');
+                for (const card of questionCards) {
+                    const radios = card.querySelectorAll('input[type="radio"]');
+                    if (radios.length > 0) {
+                        const isAnswered = Array.from(radios).some(r => r.checked);
+                        if (!isAnswered) {
+                            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            card.classList.add('ring-4', 'ring-rose-500/50', 'border-rose-500');
+                            setTimeout(() => {
+                                card.classList.remove('ring-4', 'ring-rose-500/50', 'border-rose-500');
+                            }, 3000);
+                            break;
+                        }
+                    }
                 }
+                alert(`Masih ada ${this.totalCount - this.answeredCount} pertanyaan yang belum dijawab. Halaman telah diarahkan ke pertanyaan yang belum terisi.`);
+                return;
             }
             this.showConfirmModal = true;
         },

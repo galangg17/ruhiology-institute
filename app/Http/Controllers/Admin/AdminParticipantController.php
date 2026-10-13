@@ -62,10 +62,20 @@ class AdminParticipantController extends Controller
                   ->orWhere('email', 'like', "%{$q}%")
                   ->orWhere('phone', 'like', "%{$q}%")
                   ->orWhere('school_custom', 'like', "%{$q}%")
-                  ->orWhere('university_custom', 'like', "%{$q}%");
+                  ->orWhere('university_custom', 'like', "%{$q}%")
+                  ->orWhere('occupation_custom', 'like', "%{$q}%")
+                  ->orWhere('detail_institution', 'like', "%{$q}%");
             });
         }
 
+        if ($request->filled('category')) {
+            $cat = strtoupper(trim($request->category));
+            if (in_array($cat, ['MURID', 'PELAJAR'])) {
+                $query->whereIn('category', ['MURID', 'PELAJAR']);
+            } else {
+                $query->where('category', $cat);
+            }
+        }
         if ($request->filled('institution_id')) {
             $query->where('institution_id', $request->institution_id);
         }
@@ -74,6 +84,9 @@ class AdminParticipantController extends Controller
         }
         if ($request->filled('province_id')) {
             $query->where('province_id', $request->province_id);
+        }
+        if ($request->filled('regency_id')) {
+            $query->where('regency_id', $request->regency_id);
         }
         if ($request->filled('gender')) {
             $query->where('gender', $request->gender);
@@ -239,9 +252,22 @@ class AdminParticipantController extends Controller
             $query->where(function ($w) use ($q) {
                 $w->where('name', 'like', "%{$q}%")
                   ->orWhere('participant_code', 'like', "%{$q}%")
+                  ->orWhere('assessment_code', 'like', "%{$q}%")
                   ->orWhere('email', 'like', "%{$q}%")
-                  ->orWhere('phone', 'like', "%{$q}%");
+                  ->orWhere('phone', 'like', "%{$q}%")
+                  ->orWhere('school_custom', 'like', "%{$q}%")
+                  ->orWhere('university_custom', 'like', "%{$q}%")
+                  ->orWhere('occupation_custom', 'like', "%{$q}%")
+                  ->orWhere('detail_institution', 'like', "%{$q}%");
             });
+        }
+        if ($request->filled('category')) {
+            $cat = strtoupper(trim($request->category));
+            if (in_array($cat, ['MURID', 'PELAJAR'])) {
+                $query->whereIn('category', ['MURID', 'PELAJAR']);
+            } else {
+                $query->where('category', $cat);
+            }
         }
         if ($request->filled('institution_id')) {
             $query->where('institution_id', $request->institution_id);
@@ -251,6 +277,12 @@ class AdminParticipantController extends Controller
         }
         if ($request->filled('province_id')) {
             $query->where('province_id', $request->province_id);
+        }
+        if ($request->filled('regency_id')) {
+            $query->where('regency_id', $request->regency_id);
+        }
+        if ($request->filled('gender')) {
+            $query->where('gender', $request->gender);
         }
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -281,7 +313,7 @@ class AdminParticipantController extends Controller
                 'Jenis Kelamin',
                 'Provinsi',
                 'Kabupaten / Kota',
-                'Sekolah / Kampus',
+                'Sekolah / Kampus / Instansi',
                 'Institusi',
                 'Program',
                 'Angkatan / Batch',
@@ -291,7 +323,7 @@ class AdminParticipantController extends Controller
             ]);
 
             foreach ($participants as $p) {
-                $schoolOrUni = $p->school_custom ?: ($p->university_custom ?: ($p->school?->name ?: ($p->university?->name ?: '-')));
+                $schoolOrUni = $p->school_custom ?: ($p->university_custom ?: ($p->detail_institution ?: ($p->occupation_custom ?: ($p->school?->name ?: ($p->university?->name ?: '-')))));
                 fputcsv($file, [
                     $p->participant_code,
                     $p->assessment_code ?? '-',

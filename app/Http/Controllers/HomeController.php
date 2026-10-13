@@ -123,11 +123,11 @@ class HomeController extends Controller
             ['name' => 'PENGGUNA MANDIRI 38+ PROVINSI', 'icon' => '👤', 'type' => 'Nasional'],
         ];
 
-        $dbUnivs = \App\Models\University::pluck('name')->toArray();
-        $dbSchools = \App\Models\School::pluck('name')->toArray();
-        $dbInsts = \App\Models\Institution::pluck('name')->toArray();
-        $customUnivs = \App\Models\Participant::whereNotNull('university_custom')->where('university_custom', '!=', '')->pluck('university_custom')->toArray();
-        $customSchools = \App\Models\Participant::whereNotNull('school_custom')->where('school_custom', '!=', '')->pluck('school_custom')->toArray();
+        $dbUnivs = \App\Models\University::distinct()->pluck('name')->toArray();
+        $dbSchools = \App\Models\School::distinct()->pluck('name')->toArray();
+        $dbInsts = \App\Models\Institution::distinct()->pluck('name')->toArray();
+        $customUnivs = \App\Models\Participant::whereNotNull('university_custom')->where('university_custom', '!=', '')->distinct()->pluck('university_custom')->toArray();
+        $customSchools = \App\Models\Participant::whereNotNull('school_custom')->where('school_custom', '!=', '')->distinct()->pluck('school_custom')->toArray();
 
         $allDbNames = array_merge($dbUnivs, $dbSchools, $dbInsts, $customUnivs, $customSchools);
         

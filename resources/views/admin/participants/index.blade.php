@@ -243,7 +243,17 @@
             </div>
 
             <!-- Secondary Filters row -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 pt-1">
+                <div>
+                    <select name="category" onchange="this.form.submit()" class="w-full p-2 rounded-xl border border-slate-300 text-xs bg-white font-medium">
+                        <option value="">Semua Kategori Peserta</option>
+                        <option value="MAHASISWA" {{ strtoupper((string) request('category')) == 'MAHASISWA' ? 'selected' : '' }}>🎓 Mahasiswa</option>
+                        <option value="MURID" {{ in_array(strtoupper((string) request('category')), ['MURID', 'PELAJAR']) ? 'selected' : '' }}>🏫 Pelajar / Siswa</option>
+                        <option value="ASN" {{ strtoupper((string) request('category')) == 'ASN' ? 'selected' : '' }}>🏛️ ASN / Birokrat</option>
+                        <option value="UMUM" {{ strtoupper((string) request('category')) == 'UMUM' ? 'selected' : '' }}>💼 Profesional / Umum</option>
+                    </select>
+                </div>
+
                 <div>
                     <select name="province_id" onchange="this.form.submit()" class="w-full p-2 rounded-xl border border-slate-300 text-xs bg-white font-medium">
                         <option value="">Semua Provinsi (Demografi)</option>
@@ -282,7 +292,7 @@
                     <button type="submit" class="w-full py-2 bg-[#0B2A43] hover:bg-[#123B59] text-white font-bold text-xs rounded-xl transition shadow-sm cursor-pointer">
                         Filter Data
                     </button>
-                    @if(request()->anyFilled(['q', 'institution_id', 'program_id', 'province_id', 'gender', 'status']))
+                    @if(request()->anyFilled(['q', 'category', 'institution_id', 'program_id', 'province_id', 'regency_id', 'gender', 'status']))
                         <a href="{{ route('admin.participants.index', request()->only('access_type')) }}" class="px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs rounded-xl transition cursor-pointer" title="Reset Filter">
                             ✕
                         </a>
