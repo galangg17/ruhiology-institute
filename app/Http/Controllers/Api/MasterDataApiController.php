@@ -51,6 +51,10 @@ class MasterDataApiController extends Controller
             return response()->json(['status' => 'success', 'data' => []]);
         }
 
+        if (Regency::count() < 200) {
+            app(\Database\Seeders\IndonesiaRegenciesSeeder::class)->run();
+        }
+
         $query = Regency::where('province_id', $provinceId)
             ->where('status', 'active');
 

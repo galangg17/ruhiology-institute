@@ -88,6 +88,10 @@ class AdminParticipantController extends Controller
 
         $participants = $query->withCount('submissions')->latest()->paginate(15)->withQueryString();
 
+        if (Regency::count() < 200) {
+            app(\Database\Seeders\IndonesiaRegenciesSeeder::class)->run();
+        }
+
         $institutions = Institution::all();
         $programs = Program::all();
         $provinces = Province::orderBy('name')->get();

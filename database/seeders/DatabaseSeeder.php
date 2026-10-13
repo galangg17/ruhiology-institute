@@ -11,6 +11,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
             MasterDataSeeder::class,
+            IndonesiaRegenciesSeeder::class,
             InstitutionAndProgramSeeder::class,
             InstrumentSeeder::class,
             EventSeeder::class,

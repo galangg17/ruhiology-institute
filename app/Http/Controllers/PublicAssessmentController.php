@@ -44,6 +44,10 @@ class PublicAssessmentController extends Controller
                 ->orderBy('title', 'asc')
                 ->get();
 
+            if (\App\Models\Regency::count() < 200) {
+                app(\Database\Seeders\IndonesiaRegenciesSeeder::class)->run();
+            }
+
             $provinces = \App\Models\Province::where('status', 'active')
                 ->orderBy('name', 'asc')
                 ->get(['id', 'code', 'name']);

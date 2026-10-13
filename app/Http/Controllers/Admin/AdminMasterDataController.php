@@ -28,6 +28,10 @@ class AdminMasterDataController extends Controller
 
     public function index(Request $request)
     {
+        if (Regency::count() < 200) {
+            app(\Database\Seeders\IndonesiaRegenciesSeeder::class)->run();
+        }
+
         $tab = $request->query('tab', 'provinces');
 
         $provinces = Province::withCount(['regencies', 'schools', 'universities'])->orderBy('name', 'asc')->paginate(15, ['*'], 'prov_page');
