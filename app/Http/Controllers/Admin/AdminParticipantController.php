@@ -4,19 +4,22 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AssessmentSubmission;
+use App\Models\Event;
 use App\Models\Institution;
 use App\Models\Participant;
+use App\Models\ParticipantCategory;
 use App\Models\Program;
 use App\Models\Province;
 use App\Models\Regency;
 use App\Services\AuditLogService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AdminParticipantController extends Controller
 {
     public function index(Request $request)
     {
-        // Global Statistics Bar
+        // Global Statistics & Demographic Summaries
         $stats = [
             'total_participants' => Participant::count(),
             'public_participants' => Participant::where(function($w) {
@@ -26,11 +29,35 @@ class AdminParticipantController extends Controller
                 $w->whereIn('access_type', ['event_only', 'EVENT_PROGRAM'])->orWhereNotNull('event_id');
             })->count(),
             'active_participants' => Participant::whereIn('status', ['active', 'ACTIVE'])->count(),
+            'inactive_participants' => Participant::whereIn('status', ['inactive', 'INACTIVE'])->count(),
             'total_provinces' => Participant::whereNotNull('province_id')->distinct('province_id')->count(),
             'total_submissions' => AssessmentSubmission::count(),
+            'has_submissions' => Participant::has('submissions')->count(),
+            'no_submissions' => Participant::doesntHave('submissions')->count(),
+        ];
+
+        // Demographic Insights (Aggregate Analytics)
+        $topProvinces = Participant::whereNotNull('province_id')
+            ->select('province_id', DB::raw('count(*) as count'))
+            ->groupBy('province_id')
+            ->orderByDesc('count')
+            ->take(5)
+            ->with('province')
+            ->get();
+
+        $categoryStats = Participant::select('category', DB::raw('count(*) as count'))
+            ->whereNotNull('category')
+            ->groupBy('category')
+            ->orderByDesc('count')
+            ->get();
+
+        $genderStats = [
+            'male' => Participant::whereIn('gender', ['Laki-laki', 'L', 'Pria'])->count(),
+            'female' => Participant::whereIn('gender', ['Perempuan', 'P', 'Wanita'])->count(),
         ];
 
         $query = Participant::query()->with([
+            'event',
             'institution',
             'program',
             'province',
@@ -53,6 +80,14 @@ class AdminParticipantController extends Controller
             }
         }
 
+        if ($request->filled('test_status')) {
+            if ($request->test_status === 'tested') {
+                $query->has('submissions');
+            } elseif ($request->test_status === 'untested') {
+                $query->doesntHave('submissions');
+            }
+        }
+
         if ($request->filled('q')) {
             $q = trim($request->q);
             $query->where(function ($w) use ($q) {
@@ -64,6 +99,8 @@ class AdminParticipantController extends Controller
                   ->orWhere('school_custom', 'like', "%{$q}%")
                   ->orWhere('university_custom', 'like', "%{$q}%")
                   ->orWhere('occupation_custom', 'like', "%{$q}%")
+                  ->orWhere('sub_category', 'like', "%{$q}%")
+                  ->orWhere('school_class', 'like', "%{$q}%")
                   ->orWhere('detail_institution', 'like', "%{$q}%");
             });
         }
@@ -75,6 +112,9 @@ class AdminParticipantController extends Controller
             } else {
                 $query->where('category', $cat);
             }
+        }
+        if ($request->filled('event_id')) {
+            $query->where('event_id', $request->event_id);
         }
         if ($request->filled('institution_id')) {
             $query->where('institution_id', $request->institution_id);
@@ -97,6 +137,12 @@ class AdminParticipantController extends Controller
         if ($request->filled('batch')) {
             $query->where('batch', 'like', '%' . $request->batch . '%');
         }
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
 
         $participants = $query->withCount('submissions')->latest()->paginate(15)->withQueryString();
 
@@ -106,13 +152,28 @@ class AdminParticipantController extends Controller
 
         $institutions = Institution::all();
         $programs = Program::all();
+        $events = Event::orderBy('title')->get(['id', 'title', 'event_code', 'institution_name']);
+        $categories = ParticipantCategory::getAllActive();
         $provinces = Province::orderBy('name')->get();
         $regencies = $request->filled('province_id')
             ? Regency::where('province_id', $request->province_id)->orderBy('name')->get()
             : collect([]);
         $regenciesMap = Regency::where('status', 'active')->orderBy('name')->get(['id', 'province_id', 'name', 'type'])->groupBy('province_id');
 
-        return view('admin.participants.index', compact('participants', 'institutions', 'programs', 'provinces', 'regencies', 'regenciesMap', 'stats'));
+        return view('admin.participants.index', compact(
+            'participants',
+            'institutions',
+            'programs',
+            'events',
+            'categories',
+            'provinces',
+            'regencies',
+            'regenciesMap',
+            'stats',
+            'topProvinces',
+            'categoryStats',
+            'genderStats'
+        ));
     }
 
     public function show(Participant $participant)
@@ -151,10 +212,16 @@ class AdminParticipantController extends Controller
         $validated = $request->validate([
             'institution_id' => ['nullable', 'exists:institutions,id'],
             'program_id' => ['nullable', 'exists:programs,id'],
+            'event_id' => ['nullable', 'exists:events,id'],
             'province_id' => ['nullable', 'exists:provinces,id'],
             'regency_id' => ['nullable', 'exists:regencies,id'],
+            'category' => ['nullable', 'string', 'max:100'],
+            'sub_category' => ['nullable', 'string', 'max:100'],
+            'school_level' => ['nullable', 'string', 'max:100'],
+            'school_class' => ['nullable', 'string', 'max:100'],
             'school_custom' => ['nullable', 'string', 'max:255'],
             'university_custom' => ['nullable', 'string', 'max:255'],
+            'occupation_custom' => ['nullable', 'string', 'max:255'],
             'participant_code' => ['required', 'string', 'unique:participants,participant_code'],
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email'],
@@ -162,11 +229,16 @@ class AdminParticipantController extends Controller
             'batch' => ['required', 'string'],
             'gender' => ['nullable', 'string'],
             'occupation' => ['nullable', 'string'],
+            'access_type' => ['nullable', 'string'],
             'status' => ['required', 'in:active,inactive'],
         ]);
 
         if (empty($validated['assessment_code'])) {
             $validated['assessment_code'] = Participant::generateUniqueAssessmentCode();
+        }
+
+        if (!empty($validated['event_id']) && empty($validated['access_type'])) {
+            $validated['access_type'] = 'event_only';
         }
 
         $participant = Participant::create($validated);
@@ -195,10 +267,16 @@ class AdminParticipantController extends Controller
         $validated = $request->validate([
             'institution_id' => ['nullable', 'exists:institutions,id'],
             'program_id' => ['nullable', 'exists:programs,id'],
+            'event_id' => ['nullable', 'exists:events,id'],
             'province_id' => ['nullable', 'exists:provinces,id'],
             'regency_id' => ['nullable', 'exists:regencies,id'],
+            'category' => ['nullable', 'string', 'max:100'],
+            'sub_category' => ['nullable', 'string', 'max:100'],
+            'school_level' => ['nullable', 'string', 'max:100'],
+            'school_class' => ['nullable', 'string', 'max:100'],
             'school_custom' => ['nullable', 'string', 'max:255'],
             'university_custom' => ['nullable', 'string', 'max:255'],
+            'occupation_custom' => ['nullable', 'string', 'max:255'],
             'participant_code' => ['required', 'string', 'unique:participants,participant_code,' . $participant->id],
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email'],
@@ -206,8 +284,13 @@ class AdminParticipantController extends Controller
             'batch' => ['required', 'string'],
             'gender' => ['nullable', 'string'],
             'occupation' => ['nullable', 'string'],
+            'access_type' => ['nullable', 'string'],
             'status' => ['required', 'in:active,inactive'],
         ]);
+
+        if (!empty($validated['event_id']) && empty($validated['access_type'])) {
+            $validated['access_type'] = 'event_only';
+        }
 
         $participant->update($validated);
 
@@ -236,9 +319,49 @@ class AdminParticipantController extends Controller
         return redirect()->route('admin.participants.index')->with('success', 'Peserta berhasil dihapus.');
     }
 
+    public function bulkAction(Request $request)
+    {
+        $request->validate([
+            'action' => ['required', 'in:delete,activate,deactivate,export'],
+            'ids' => ['required', 'array'],
+            'ids.*' => ['integer', 'exists:participants,id'],
+        ]);
+
+        $ids = $request->ids;
+
+        if ($request->action === 'delete') {
+            $count = Participant::whereIn('id', $ids)->delete();
+            AuditLogService::log(
+                action: 'bulk_delete',
+                module: 'Participants',
+                recordType: 'Participant',
+                recordId: 'bulk',
+                changes: ['deleted_ids' => $ids, 'count' => $count]
+            );
+            return back()->with('success', "{$count} data peserta berhasil dihapus.");
+        }
+
+        if ($request->action === 'activate') {
+            $count = Participant::whereIn('id', $ids)->update(['status' => 'active']);
+            return back()->with('success', "{$count} peserta berhasil diaktifkan.");
+        }
+
+        if ($request->action === 'deactivate') {
+            $count = Participant::whereIn('id', $ids)->update(['status' => 'inactive']);
+            return back()->with('success', "{$count} peserta berhasil dinonaktifkan.");
+        }
+
+        if ($request->action === 'export') {
+            return $this->exportCsv(new Request(['ids' => $ids]));
+        }
+
+        return back();
+    }
+
     public function exportCsv(Request $request)
     {
         $query = Participant::query()->with([
+            'event',
             'institution',
             'program',
             'province',
@@ -246,6 +369,11 @@ class AdminParticipantController extends Controller
             'school',
             'university'
         ])->withCount('submissions');
+
+        if ($request->filled('ids')) {
+            $ids = is_array($request->ids) ? $request->ids : explode(',', $request->ids);
+            $query->whereIn('id', $ids);
+        }
 
         if ($request->filled('q')) {
             $q = trim($request->q);
@@ -258,6 +386,8 @@ class AdminParticipantController extends Controller
                   ->orWhere('school_custom', 'like', "%{$q}%")
                   ->orWhere('university_custom', 'like', "%{$q}%")
                   ->orWhere('occupation_custom', 'like', "%{$q}%")
+                  ->orWhere('sub_category', 'like', "%{$q}%")
+                  ->orWhere('school_class', 'like', "%{$q}%")
                   ->orWhere('detail_institution', 'like', "%{$q}%");
             });
         }
@@ -268,6 +398,9 @@ class AdminParticipantController extends Controller
             } else {
                 $query->where('category', $cat);
             }
+        }
+        if ($request->filled('event_id')) {
+            $query->where('event_id', $request->event_id);
         }
         if ($request->filled('institution_id')) {
             $query->where('institution_id', $request->institution_id);
@@ -308,13 +441,16 @@ class AdminParticipantController extends Controller
                 'Kode Peserta',
                 'Kode Asesmen',
                 'Nama Lengkap',
+                'Kategori',
+                'Sub-Kategori / Kelas',
+                'Event / Kegiatan',
                 'Email',
                 'Telepon',
                 'Jenis Kelamin',
                 'Provinsi',
                 'Kabupaten / Kota',
                 'Sekolah / Kampus / Instansi',
-                'Institusi',
+                'Institusi Mitra',
                 'Program',
                 'Angkatan / Batch',
                 'Jumlah Sesi Test',
@@ -328,6 +464,9 @@ class AdminParticipantController extends Controller
                     $p->participant_code,
                     $p->assessment_code ?? '-',
                     $p->name,
+                    $p->category ?? 'Umum',
+                    $p->sub_category ?: ($p->school_class ?: '-'),
+                    $p->event?->title ?: ($p->access_type === 'event_only' ? 'Event Khusus' : 'Mandiri (Publik)'),
                     $p->email,
                     $p->phone ?? '-',
                     $p->gender ?? '-',
