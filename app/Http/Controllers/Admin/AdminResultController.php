@@ -6,12 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Models\AssessmentPeriod;
 use App\Models\AssessmentResult;
 use App\Models\AssessmentSubmission;
+use App\Models\Dimension;
 use App\Models\Event;
 use App\Models\Institution;
 use App\Models\Program;
 use App\Models\Province;
+use App\Models\Question;
 use App\Models\Regency;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AdminResultController extends Controller
@@ -165,18 +168,7 @@ class AdminResultController extends Controller
             foreach ($submissions as $index => $sub) {
                 $p = $sub->participant;
                 $res = $sub->result;
-
-                $institutionDetail = '-';
-                if ($p) {
-                    if ($p->category === 'Pelajar') {
-                        $schoolName = $p->school_custom ?: ($p->school->name ?? '');
-                        $institutionDetail = trim(($p->school_level ? $p->school_level . ' ' : '') . $schoolName) ?: '-';
-                    } elseif ($p->category === 'Mahasiswa/i') {
-                        $institutionDetail = $p->university_custom ?: ($p->university->name ?? '-');
-                    } else {
-                        $institutionDetail = $p->occupation_custom ?: ($p->occupation ?: 'Personal / Mandiri');
-                    }
-                }
+                $institutionDetail = $this->getInstitutionDetail($p);
 
                 $who5Status = '-';
                 if ($res && $res->who5_percentage !== null) {
@@ -198,9 +190,366 @@ class AdminResultController extends Controller
                     $res->category_name ?? '-',
                     $res->who5_percentage !== null ? $res->who5_percentage . '%' : '-',
                     $who5Status,
-                    strtoupper($sub->submission_type)
+                    strtoupper($sub->submission_type ?? 'MANDIRI')
                 ]);
             }
+
+            fclose($file);
+        };
+
+        return new StreamedResponse($callback, 200, $headers);
+    }
+
+    /**
+     * Export individual assessment dimension breakdown to Excel CSV
+     */
+    public function exportSubmissionDimensions(AssessmentSubmission $submission)
+    {
+        $submission->loadMissing([
+            'participant.province',
+            'participant.regency',
+            'participant.school',
+            'participant.university',
+            'event',
+            'result.dimensionResults.dimension'
+        ]);
+
+        $p = $submission->participant;
+        $res = $submission->result;
+        $cleanName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $p?->name ?? 'Peserta');
+        $filename = 'Capaian_Dimensi_' . $submission->submission_code . '_' . $cleanName . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+
+        $callback = function () use ($submission, $p, $res) {
+            $file = fopen('php://output', 'w');
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF)); // UTF-8 BOM
+
+            // Metadata Section
+            fputcsv($file, ['LAPORAN CAPAIAN PER DIMENSI RUHIOLOGI']);
+            fputcsv($file, ['Nama Peserta', $p?->name ?? 'Anonim']);
+            fputcsv($file, ['Kode Asesmen', $submission->submission_code]);
+            fputcsv($file, ['Kategori Peserta', $p?->category ?? 'Mandiri']);
+            fputcsv($file, ['Sub Kategori / Kelas', $p?->sub_category ?? '-']);
+            fputcsv($file, ['Event / Kegiatan', $submission->event?->title ?? ($submission->access_type === 'PUBLIC_SELF' ? 'Mandiri Publik' : 'Umum')]);
+            fputcsv($file, ['Institusi / Pekerjaan', $this->getInstitutionDetail($p)]);
+            fputcsv($file, ['Tanggal & Waktu Submit', $submission->submitted_at ? $submission->submitted_at->format('Y-m-d H:i:s') : '-']);
+            fputcsv($file, ['Skor Total RQI (0-100)', $res?->rqi_score ?? '-']);
+            fputcsv($file, ['Kategori RQI', $res?->category_name ?? '-']);
+            fputcsv($file, ['Skor WHO-5 (%)', ($res && $res->who5_percentage !== null) ? $res->who5_percentage . '%' : '-']);
+            fputcsv($file, ['Status Kesejahteraan (WHO-5)', ($res && $res->who5_percentage !== null) ? ($res->who5_percentage >= 50 ? 'Kesejahteraan Mental Terpenuhi' : 'Perlu Pendampingan / Skrining') : '-']);
+            fputcsv($file, []);
+
+            // Table Header
+            fputcsv($file, [
+                'No',
+                'Kode Dimensi',
+                'Nama Dimensi Ruhiologi',
+                'Skor Diperoleh',
+                'Skor Maksimum',
+                'Persentase Capaian (%)',
+                'Interpretasi / Kategori'
+            ]);
+
+            $dimResults = $res?->dimensionResults ?? collect();
+            foreach ($dimResults as $idx => $d) {
+                fputcsv($file, [
+                    $idx + 1,
+                    $d->dimension?->code ?? '-',
+                    $d->dimension?->name ?? '-',
+                    $d->score,
+                    $d->max_score,
+                    number_format($d->percentage, 1) . '%',
+                    $d->interpretation ?? '-'
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return new StreamedResponse($callback, 200, $headers);
+    }
+
+    /**
+     * Export individual assessment item-by-item question answers to Excel CSV
+     */
+    public function exportSubmissionAnswers(AssessmentSubmission $submission)
+    {
+        $submission->loadMissing([
+            'participant.province',
+            'participant.regency',
+            'event',
+            'result',
+            'answers.question.dimension',
+            'answers.option'
+        ]);
+
+        $p = $submission->participant;
+        $res = $submission->result;
+        $cleanName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $p?->name ?? 'Peserta');
+        $filename = 'Jawaban_Butir_Soal_' . $submission->submission_code . '_' . $cleanName . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+
+        $callback = function () use ($submission, $p, $res) {
+            $file = fopen('php://output', 'w');
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF)); // UTF-8 BOM
+
+            // Metadata Section
+            fputcsv($file, ['LEMBAR JAWABAN PER BUTIR SOAL (RAW & CALCULATED SCORE)']);
+            fputcsv($file, ['Nama Peserta', $p?->name ?? 'Anonim']);
+            fputcsv($file, ['Kode Asesmen', $submission->submission_code]);
+            fputcsv($file, ['Kategori Peserta', $p?->category ?? 'Mandiri']);
+            fputcsv($file, ['Sub Kategori / Kelas', $p?->sub_category ?? '-']);
+            fputcsv($file, ['Event / Kegiatan', $submission->event?->title ?? ($submission->access_type === 'PUBLIC_SELF' ? 'Mandiri Publik' : 'Umum')]);
+            fputcsv($file, ['Tanggal & Waktu Submit', $submission->submitted_at ? $submission->submitted_at->format('Y-m-d H:i:s') : '-']);
+            fputcsv($file, ['Total Butir Soal Dijawab', count($submission->answers)]);
+            fputcsv($file, ['Skor Total RQI (0-100)', $res?->rqi_score ?? '-']);
+            fputcsv($file, ['Skor WHO-5 (%)', ($res && $res->who5_percentage !== null) ? $res->who5_percentage . '%' : '-']);
+            fputcsv($file, []);
+
+            // Table Header
+            fputcsv($file, [
+                'No',
+                'Kode Dimensi',
+                'Nama Dimensi',
+                'Teks Pertanyaan / Soal Asesmen',
+                'Arah Penilaian',
+                'Jawaban Peserta (Opsi Dipilih)',
+                'Nilai Mentah (Raw Score)',
+                'Skor Terhitung (Calculated Score)'
+            ]);
+
+            foreach ($submission->answers as $idx => $ans) {
+                fputcsv($file, [
+                    $idx + 1,
+                    $ans->question?->dimension?->code ?? '-',
+                    $ans->question?->dimension?->name ?? '-',
+                    $ans->question?->question_text ?? '-',
+                    $ans->question?->scoring_direction === 'reverse' ? 'Reverse (Negatif)' : 'Normal (Positif)',
+                    $ans->option?->option_text ?? '-',
+                    $ans->raw_value,
+                    $ans->calculated_score
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return new StreamedResponse($callback, 200, $headers);
+    }
+
+    /**
+     * Export aggregate cohort dimension matrix to Excel CSV
+     */
+    public function exportDimensionsMatrix(Request $request)
+    {
+        $dimensions = Dimension::orderBy('code')->get();
+        $filename = 'Rekap_Capaian_Dimensi_Ruhiologi_' . date('Y-m-d_His') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+
+        $callback = function () use ($request, $dimensions) {
+            @set_time_limit(300);
+            $file = fopen('php://output', 'w');
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF)); // UTF-8 BOM
+
+            // CSV Header Row
+            $header = [
+                'No',
+                'Kode Assessment',
+                'Tanggal Submit',
+                'Nama Peserta',
+                'Kategori Peserta',
+                'Sub-Kategori / Kelas',
+                'Event / Kegiatan',
+                'Provinsi',
+                'Kabupaten/Kota',
+                'Institusi / Pekerjaan',
+                'Total Skor RQI (0-100)',
+                'Kategori RQI',
+                'Skor WHO-5 (%)',
+                'Status WHO-5',
+                'Tipe Sesi'
+            ];
+
+            foreach ($dimensions as $dim) {
+                $code = $dim->code;
+                $header[] = "[{$code}] {$dim->name} (Skor)";
+                $header[] = "[{$code}] {$dim->name} (Maks)";
+                $header[] = "[{$code}] {$dim->name} (%)";
+                $header[] = "[{$code}] {$dim->name} (Interpretasi)";
+            }
+
+            fputcsv($file, $header);
+
+            $index = 0;
+            $this->buildFilterQuery($request)
+                ->with(['result.dimensionResults.dimension'])
+                ->latest('submitted_at')
+                ->chunk(200, function ($submissions) use ($file, &$index, $dimensions) {
+                    foreach ($submissions as $sub) {
+                        $index++;
+                        $p = $sub->participant;
+                        $res = $sub->result;
+                        $institutionDetail = $this->getInstitutionDetail($p);
+
+                        $who5Status = '-';
+                        if ($res && $res->who5_percentage !== null) {
+                            $who5Status = $res->who5_percentage >= 50 ? 'Kesejahteraan Baik' : 'Indikasi Perlu Skrining';
+                        }
+
+                        $dimResults = $res ? $res->dimensionResults->keyBy('dimension_id') : collect();
+
+                        $row = [
+                            $index,
+                            $sub->submission_code,
+                            $sub->submitted_at ? $sub->submitted_at->format('Y-m-d H:i') : '-',
+                            $p?->name ?? 'Anonim',
+                            $p?->category ?? 'Mandiri',
+                            $p?->sub_category ?? '-',
+                            $sub->event->title ?? ($sub->access_type === 'PUBLIC_SELF' ? 'Mandiri Publik' : 'Umum'),
+                            $p?->province->name ?? '-',
+                            $p?->regency->name ?? '-',
+                            $institutionDetail,
+                            $res->rqi_score ?? '-',
+                            $res->category_name ?? '-',
+                            $res->who5_percentage !== null ? $res->who5_percentage . '%' : '-',
+                            $who5Status,
+                            strtoupper($sub->submission_type ?? 'MANDIRI')
+                        ];
+
+                        foreach ($dimensions as $dim) {
+                            $dRes = $dimResults->get($dim->id);
+                            if ($dRes) {
+                                $row[] = $dRes->score;
+                                $row[] = $dRes->max_score;
+                                $row[] = number_format($dRes->percentage, 1) . '%';
+                                $row[] = $dRes->interpretation ?? '-';
+                            } else {
+                                $row[] = '-';
+                                $row[] = '-';
+                                $row[] = '-';
+                                $row[] = '-';
+                            }
+                        }
+
+                        fputcsv($file, $row);
+                    }
+                    fflush($file);
+                });
+
+            fclose($file);
+        };
+
+        return new StreamedResponse($callback, 200, $headers);
+    }
+
+    /**
+     * Export aggregate cohort item response matrix (raw & calculated score) to Excel CSV
+     */
+    public function exportAnswersMatrix(Request $request)
+    {
+        $questions = Question::with('dimension')->orderBy('order')->orderBy('id')->get();
+        $filename = 'Rekap_Jawaban_Butir_Soal_Raw_Calc_' . date('Y-m-d_His') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+
+        $callback = function () use ($request, $questions) {
+            @set_time_limit(300);
+            $file = fopen('php://output', 'w');
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF)); // UTF-8 BOM
+
+            // CSV Header Row
+            $header = [
+                'No',
+                'Kode Assessment',
+                'Tanggal Submit',
+                'Nama Peserta',
+                'Kategori Peserta',
+                'Sub-Kategori / Kelas',
+                'Event / Kegiatan',
+                'Total Skor RQI',
+                'Kategori RQI',
+                'Skor WHO-5 (%)',
+                'Status WHO-5'
+            ];
+
+            foreach ($questions as $idx => $q) {
+                $qNum = $idx + 1;
+                $dimCode = $q->dimension?->code ?? 'DIM';
+                $shortText = Str::limit(strip_tags($q->question_text), 30);
+                $header[] = "Q{$qNum} [{$dimCode}] Pilihan ({$shortText})";
+                $header[] = "Q{$qNum} [{$dimCode}] Raw";
+                $header[] = "Q{$qNum} [{$dimCode}] Calc";
+            }
+
+            fputcsv($file, $header);
+
+            $index = 0;
+            $this->buildFilterQuery($request)
+                ->with([
+                    'answers.question.dimension',
+                    'answers.option',
+                    'result'
+                ])
+                ->latest('submitted_at')
+                ->chunk(150, function ($submissions) use ($file, &$index, $questions) {
+                    foreach ($submissions as $sub) {
+                        $index++;
+                        $p = $sub->participant;
+                        $res = $sub->result;
+
+                        $who5Status = '-';
+                        if ($res && $res->who5_percentage !== null) {
+                            $who5Status = $res->who5_percentage >= 50 ? 'Kesejahteraan Baik' : 'Indikasi Perlu Skrining';
+                        }
+
+                        $subAnswers = $sub->answers->keyBy('question_id');
+
+                        $row = [
+                            $index,
+                            $sub->submission_code,
+                            $sub->submitted_at ? $sub->submitted_at->format('Y-m-d H:i') : '-',
+                            $p?->name ?? 'Anonim',
+                            $p?->category ?? 'Mandiri',
+                            $p?->sub_category ?? '-',
+                            $sub->event->title ?? ($sub->access_type === 'PUBLIC_SELF' ? 'Mandiri Publik' : 'Umum'),
+                            $res->rqi_score ?? '-',
+                            $res->category_name ?? '-',
+                            $res->who5_percentage !== null ? $res->who5_percentage . '%' : '-',
+                            $who5Status
+                        ];
+
+                        foreach ($questions as $q) {
+                            $ans = $subAnswers->get($q->id);
+                            if ($ans) {
+                                $row[] = $ans->option?->option_text ?? '-';
+                                $row[] = $ans->raw_value;
+                                $row[] = $ans->calculated_score;
+                            } else {
+                                $row[] = '-';
+                                $row[] = '-';
+                                $row[] = '-';
+                            }
+                        }
+
+                        fputcsv($file, $row);
+                    }
+                    fflush($file);
+                });
 
             fclose($file);
         };
@@ -259,6 +608,22 @@ class AdminResultController extends Controller
             'levelCounts',
             'request'
         ));
+    }
+
+    private function getInstitutionDetail($p): string
+    {
+        if (!$p) {
+            return '-';
+        }
+
+        if ($p->category === 'Pelajar') {
+            $schoolName = $p->school_custom ?: ($p->school->name ?? '');
+            return trim(($p->school_level ? $p->school_level . ' ' : '') . $schoolName) ?: '-';
+        } elseif ($p->category === 'Mahasiswa/i') {
+            return $p->university_custom ?: ($p->university->name ?? '-');
+        } else {
+            return $p->occupation_custom ?: ($p->occupation ?: 'Personal / Mandiri');
+        }
     }
 
     private function buildFilterQuery(Request $request)

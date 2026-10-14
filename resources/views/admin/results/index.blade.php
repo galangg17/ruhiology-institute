@@ -37,13 +37,77 @@
             <h2 class="text-xl sm:text-2xl font-bold font-serif text-[#0F2537] tracking-tight">Hasil & Rekap Evaluasi Asesmen</h2>
             <p class="text-xs text-slate-500 mt-0.5">Laporan rekapitulasi skor Indeks Ruhiologi (RQI-15) & Skrining Kesejahteraan Emosional (WHO-5 Index).</p>
         </div>
-        <div class="flex flex-wrap items-center gap-2.5">
-            <a href="{{ route('admin.reports.export_csv', request()->all()) }}" class="px-4 py-2 bg-[#8C703E] hover:bg-[#72592F] text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer">
-                <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                </svg>
-                <span>Export Excel (.csv)</span>
-            </a>
+        <div class="flex flex-wrap items-center gap-2.5 font-sans" x-data="{ exportMenuOpen: false }">
+            <!-- Dropdown Ekspor Excel (CSV Multi-Format) -->
+            <div class="relative">
+                <button @click="exportMenuOpen = !exportMenuOpen" @click.away="exportMenuOpen = false" type="button" class="px-4 py-2 bg-[#8C703E] hover:bg-[#72592F] text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-2 cursor-pointer">
+                    <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                    </svg>
+                    <span>Opsi Ekspor Excel (.csv)</span>
+                    <svg class="w-3.5 h-3.5 text-[#DFD8C8] transition-transform duration-200" :class="{ 'rotate-180': exportMenuOpen }" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </button>
+
+                <div x-show="exportMenuOpen" 
+                     x-transition:enter="transition ease-out duration-100"
+                     x-transition:enter-start="transform opacity-0 scale-95"
+                     x-transition:enter-end="transform opacity-100 scale-100"
+                     x-transition:leave="transition ease-in duration-75"
+                     x-transition:leave-start="transform opacity-100 scale-100"
+                     x-transition:leave-end="transform opacity-0 scale-95"
+                     class="absolute right-0 sm:right-auto sm:left-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-slate-200 py-2 z-50 text-xs font-sans divide-y divide-slate-100" 
+                     style="display: none;">
+                    
+                    <div class="px-3.5 py-1.5 text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider">
+                        PILIH MODEL EKSPOR DATA
+                    </div>
+
+                    <div class="py-1">
+                        <!-- Option 1: Ringkasan Nilai & Demografi -->
+                        <a href="{{ route('admin.reports.export_csv', request()->all()) }}" class="flex items-start gap-3 px-3.5 py-2.5 text-slate-700 hover:bg-slate-50 transition">
+                            <span class="p-2 bg-emerald-50 text-emerald-700 rounded-xl mt-0.5 shrink-0 border border-emerald-100">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                            </span>
+                            <div>
+                                <strong class="block font-bold text-slate-900 text-xs">1. Ringkasan Skor & Demografi</strong>
+                                <span class="text-[11px] text-slate-500 leading-tight block mt-0.5">Daftar nilai total RQI, kategori tingkat ruh, dan status WHO-5 peserta.</span>
+                            </div>
+                        </a>
+
+                        <!-- Option 2: Capaian Per Dimensi (Matriks) -->
+                        <a href="{{ route('admin.results.export_dimensions_matrix', request()->all()) }}" class="flex items-start gap-3 px-3.5 py-2.5 text-slate-700 hover:bg-amber-50/60 transition">
+                            <span class="p-2 bg-amber-50 text-amber-800 rounded-xl mt-0.5 shrink-0 border border-amber-200">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                                </svg>
+                            </span>
+                            <div>
+                                <strong class="block font-bold text-[#8C703E] text-xs">2. Capaian Per Dimensi Ruhiologi</strong>
+                                <span class="text-[11px] text-slate-500 leading-tight block mt-0.5">Matriks pilar RQI (skor, persentase, dan interpretasi 5 dimensi).</span>
+                            </div>
+                        </a>
+
+                        <!-- Option 3: Jawaban Per Butir Soal (Raw & Calc) -->
+                        <a href="{{ route('admin.results.export_answers_matrix', request()->all()) }}" class="flex items-start gap-3 px-3.5 py-2.5 text-slate-700 hover:bg-sky-50/60 transition">
+                            <span class="p-2 bg-sky-50 text-sky-800 rounded-xl mt-0.5 shrink-0 border border-sky-200">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                                </svg>
+                            </span>
+                            <div>
+                                <strong class="block font-bold text-[#0F2537] text-xs">3. Jawaban Butir Soal (Raw & Calc)</strong>
+                                <span class="text-[11px] text-slate-500 leading-tight block mt-0.5">Analisis butir soal: opsi jawaban, skor mentah, dan skor terhitung.</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PDF Export Button -->
             <a href="{{ route('admin.reports.export_pdf', request()->all()) }}" target="_blank" class="px-4 py-2 bg-[#0F2537] hover:bg-[#1E3E5B] text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer">
                 <svg class="w-4 h-4 text-[#D4AF37]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>

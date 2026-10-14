@@ -286,11 +286,22 @@
 
         <!-- Dimension Results Table (7 cols) -->
         <div class="lg:col-span-7 bg-white rounded-3xl border border-slate-200 shadow-xs p-6 space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                <h3 class="font-bold font-serif text-slate-900 text-base">Capaian Per Dimensi Ruhiologi</h3>
-                <span class="text-xs font-mono font-bold text-amber-800 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">
-                    5 Pilar RQI
-                </span>
+            <div class="flex flex-wrap justify-between items-center border-b border-slate-100 pb-3 gap-2">
+                <div>
+                    <h3 class="font-bold font-serif text-slate-900 text-base">Capaian Per Dimensi Ruhiologi</h3>
+                    <p class="text-[11px] text-slate-500">Skor, persentase capaian, dan interpretasi 5 pilar RQI peserta.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-mono font-bold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200">
+                        5 Pilar RQI
+                    </span>
+                    <a href="{{ route('admin.results.export_dimensions', $submission) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 hover:border-emerald-400 font-bold text-xs rounded-xl transition shadow-xs" title="Download Excel CSV Capaian Dimensi">
+                        <svg class="w-3.5 h-3.5 text-emerald-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        <span>Ekspor Excel (.csv)</span>
+                    </a>
+                </div>
             </div>
 
             <div class="overflow-x-auto">
@@ -335,9 +346,17 @@
                 <h3 class="font-bold font-serif text-slate-900 text-base">Jawaban Per Butir Soal (Raw & Calculated Score)</h3>
                 <p class="text-xs text-slate-500">Daftar rekonsiliasi jawaban peserta, bobot mentah, serta kalkulasi reverse scoring.</p>
             </div>
-            <span class="text-xs font-mono font-bold bg-slate-100 text-slate-700 px-3 py-1 rounded-full">
-                {{ count($submission->answers) }} Butir Soal
-            </span>
+            <div class="flex items-center gap-2">
+                <span class="text-xs font-mono font-bold bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full border border-slate-200">
+                    {{ count($submission->answers) }} Butir Soal
+                </span>
+                <a href="{{ route('admin.results.export_answers', $submission) }}" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 hover:border-emerald-400 font-bold text-xs rounded-xl transition shadow-xs" title="Download Excel CSV Jawaban Butir Soal">
+                    <svg class="w-3.5 h-3.5 text-emerald-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    <span>Ekspor Excel (.csv)</span>
+                </a>
+            </div>
         </div>
 
         <div class="overflow-x-auto">

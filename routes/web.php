@@ -171,7 +171,11 @@ Route::middleware(['auth', \App\Http\Middleware\EnsureAdminAccess::class])
 
         // Assessment Results & Multi-dimensional Reporting Export
         Route::get('/results', [AdminResultController::class, 'index'])->name('results.index');
+        Route::get('/results/export/dimensions-matrix', [AdminResultController::class, 'exportDimensionsMatrix'])->name('results.export_dimensions_matrix');
+        Route::get('/results/export/answers-matrix', [AdminResultController::class, 'exportAnswersMatrix'])->name('results.export_answers_matrix');
         Route::get('/results/{submission}', [AdminResultController::class, 'show'])->name('results.show');
+        Route::get('/results/{submission}/export-dimensions', [AdminResultController::class, 'exportSubmissionDimensions'])->name('results.export_dimensions');
+        Route::get('/results/{submission}/export-answers', [AdminResultController::class, 'exportSubmissionAnswers'])->name('results.export_answers');
         Route::delete('/results/{submission}', [AdminResultController::class, 'destroy'])->name('results.destroy');
         Route::get('/reports/export-csv', [AdminResultController::class, 'exportCsv'])->name('reports.export_csv');
         Route::get('/reports/export-pdf', [AdminResultController::class, 'exportPdf'])->name('reports.export_pdf');
