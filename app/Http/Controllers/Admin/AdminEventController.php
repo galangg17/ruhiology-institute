@@ -7,6 +7,8 @@ use App\Models\Event;
 use App\Models\Instrument;
 use App\Models\Program;
 use App\Models\AssessmentSubmission;
+use App\Models\Dimension;
+use App\Models\Question;
 use App\Models\Province;
 use App\Models\Regency;
 use App\Services\AuditLogService;
@@ -284,12 +286,23 @@ class AdminEventController extends Controller
     }
 
     /**
-     * Export CSV of participants for this specific Event.
+     * Export CSV of participants for this specific Event with complete assessment results, RQI & WHO-5 scores, dimensions, and item responses.
      */
     public function exportCsv(Event $event)
     {
+        @set_time_limit(300);
         $eventId = $event->id;
         $eventCode = $event->event_code;
+
+        $dimensions = Dimension::whereIn('id', [1, 2, 3, 4, 5, 6])
+            ->orWhereIn('code', ['DIM-1', 'DIM-2', 'DIM-3', 'DIM-4', 'DIM-5', 'DIM-WHO5'])
+            ->orderBy('id')
+            ->get();
+        if ($dimensions->isEmpty()) {
+            $dimensions = Dimension::orderBy('id')->get();
+        }
+
+        $questions = Question::with('dimension')->orderBy('order')->orderBy('id')->get();
 
         $participants = \App\Models\Participant::where(function ($q) use ($eventId, $eventCode) {
             $q->where('event_id', $eventId)
@@ -297,9 +310,27 @@ class AdminEventController extends Controller
               ->orWhereHas('submissions', function ($sq) use ($eventId) {
                   $sq->where('event_id', $eventId);
               });
-        })->with(['province', 'regency', 'school', 'university'])->get();
+        })
+        ->with([
+            'province',
+            'regency',
+            'school',
+            'university',
+            'submissions' => function ($sq) use ($eventId) {
+                $sq->where(function ($inner) use ($eventId) {
+                    $inner->where('event_id', $eventId)
+                          ->orWhereNull('event_id');
+                })
+                ->with([
+                    'result.dimensionResults',
+                    'answers.option'
+                ])
+                ->latest('submitted_at');
+            }
+        ])
+        ->get();
 
-        $filename = 'peserta_event_' . Str::slug($event->event_code) . '_' . date('Y-m-d') . '.csv';
+        $filename = 'peserta_event_' . Str::slug($event->event_code ?: ('event-' . $event->id)) . '_' . date('Y-m-d') . '.csv';
 
         $headers = [
             'Content-Type' => 'text/csv; charset=UTF-8',
@@ -309,11 +340,11 @@ class AdminEventController extends Controller
             'Expires' => '0',
         ];
 
-        $callback = function () use ($participants) {
+        $callback = function () use ($participants, $eventId, $dimensions, $questions) {
             $file = fopen('php://output', 'w');
-            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF)); // UTF-8 BOM for Excel
 
-            fputcsv($file, [
+            $header = [
                 'Kode Peserta',
                 'Kode Asesmen',
                 'Nama Lengkap',
@@ -324,12 +355,69 @@ class AdminEventController extends Controller
                 'Kabupaten / Kota',
                 'Sekolah / Kampus',
                 'Sub Kategori / Sesi',
-                'Status'
-            ]);
+                'Status Registrasi',
+                'Status Asesmen',
+                'Kode Submission',
+                'Tanggal Submit',
+                'Skor RQI (0-100)',
+                'Kategori Level RQI',
+                'Raw Score WHO-5 (0-25)',
+                'Persentase WHO-5 (%)',
+                'Kategori Level WHO-5',
+                'Status Diagnostik WHO-5',
+            ];
+
+            foreach ($dimensions as $dim) {
+                $code = $dim->code;
+                $header[] = "[{$code}] {$dim->name} (Skor)";
+                $header[] = "[{$code}] {$dim->name} (%)";
+                $header[] = "[{$code}] {$dim->name} (Interpretasi)";
+            }
+
+            foreach ($questions as $idx => $q) {
+                $qNum = $idx + 1;
+                $dimCode = $q->dimension?->code ?? 'DIM';
+                $isWho = ($q->dimension_id == 6 || str_contains($dimCode, 'WHO'));
+                $tag = $isWho ? 'WHO5' : 'RQI';
+                $shortText = Str::limit(strip_tags($q->question_text), 35);
+                $header[] = "Q{$qNum} [{$tag}-{$dimCode}] Jawaban Dipilih ({$shortText})";
+                $header[] = "Q{$qNum} [{$tag}-{$dimCode}] Skor Poin";
+            }
+
+            fputcsv($file, $header);
 
             foreach ($participants as $p) {
                 $schoolOrUni = $p->school_custom ?: ($p->university_custom ?: ($p->school?->name ?: ($p->university?->name ?: '-')));
-                fputcsv($file, [
+
+                // Match best submission for this participant & event
+                $sub = $p->submissions->firstWhere('event_id', $eventId) ?: $p->submissions->first();
+                $res = $sub?->result;
+
+                // WHO-5 Resolution
+                $who5Raw = $res?->who5_raw_score ?? 0;
+                $who5Pct = $res?->who5_percentage ?? ($who5Raw > 0 ? round(($who5Raw / 25) * 100) : null);
+                $who5Level = null;
+                if ($res && !empty($res->snapshot_data['who5']['name'])) {
+                    $who5Level = $res->snapshot_data['who5']['name'];
+                } elseif ($who5Pct !== null) {
+                    if ($who5Pct >= 80) $who5Level = 'Level 5: Thriving & Energetic (Sangat Sejahtera)';
+                    elseif ($who5Pct >= 64) $who5Level = 'Level 4: Good Vibe & Fresh (Sejahtera)';
+                    elseif ($who5Pct >= 44) $who5Level = 'Level 3: Moderate Well-Being (Cukup Stabil)';
+                    elseif ($who5Pct >= 24) $who5Level = 'Level 2: Low Energy (Perlu Perhatian)';
+                    else $who5Level = 'Level 1: Mental Exhausted (Perlu Pendampingan)';
+                }
+
+                $who5Status = '-';
+                if ($who5Pct !== null) {
+                    $who5Status = $who5Pct >= 50 ? 'Sehat (Kesejahteraan Baik)' : 'Indikasi Perlu Skrining';
+                }
+
+                $assessmentStatus = 'BELUM ASESMEN';
+                if ($sub) {
+                    $assessmentStatus = in_array(strtolower($sub->status ?? ''), ['submitted', 'completed']) ? 'SELESAI (SUBMITTED)' : strtoupper($sub->status ?? 'PROSES');
+                }
+
+                $row = [
                     $p->participant_code,
                     $p->assessment_code ?? '-',
                     $p->name,
@@ -340,8 +428,47 @@ class AdminEventController extends Controller
                     $p->regency?->name ?? '-',
                     $schoolOrUni,
                     $p->sub_category ?? '-',
-                    strtoupper($p->status)
-                ]);
+                    strtoupper($p->status ?? 'ACTIVE'),
+                    $assessmentStatus,
+                    $sub?->submission_code ?? '-',
+                    $sub && $sub->submitted_at ? $sub->submitted_at->format('Y-m-d H:i') : '-',
+                    $res && $res->rqi_score !== null ? $res->rqi_score : '-',
+                    $res->category_name ?? '-',
+                    $who5Raw > 0 ? $who5Raw : ($res && $res->who5_raw_score !== null ? $res->who5_raw_score : '-'),
+                    $who5Pct !== null ? $who5Pct . '%' : '-',
+                    $who5Level ?? '-',
+                    $who5Status,
+                ];
+
+                // Dimensions (DIM-1 s.d. DIM-WHO5)
+                $dimResults = $res ? $res->dimensionResults->keyBy('dimension_id') : collect();
+                foreach ($dimensions as $dim) {
+                    $dRes = $dimResults->get($dim->id);
+                    if ($dRes) {
+                        $row[] = $dRes->score;
+                        $row[] = number_format($dRes->percentage, 1) . '%';
+                        $row[] = $dRes->interpretation ?? '-';
+                    } else {
+                        $row[] = '-';
+                        $row[] = '-';
+                        $row[] = '-';
+                    }
+                }
+
+                // Question answers & scores
+                $subAnswers = $sub ? $sub->answers->keyBy('question_id') : collect();
+                foreach ($questions as $q) {
+                    $ans = $subAnswers->get($q->id);
+                    if ($ans) {
+                        $row[] = $ans->option?->option_text ?? '-';
+                        $row[] = $ans->calculated_score ?? ($ans->raw_value ?? '-');
+                    } else {
+                        $row[] = '-';
+                        $row[] = '-';
+                    }
+                }
+
+                fputcsv($file, $row);
             }
 
             fclose($file);

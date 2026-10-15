@@ -47,8 +47,13 @@
                 </button>
 
                 <!-- Primary CTA: PDF Report -->
-                <a href="{{ route('admin.reports.export_pdf', ['event_id' => $event->id]) }}" target="_blank" class="px-4 py-2.5 bg-rose-700 hover:bg-rose-800 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5">
+                <a href="{{ route('admin.reports.export_pdf', ['event_id' => $event->id]) }}" target="_blank" class="px-4 py-2.5 bg-rose-700 hover:bg-rose-800 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5" title="Buka Pratinjau & Cetak PDF Buku Register Hasil Asesmen Peserta">
                     <span>📄 PDF Laporan</span>
+                </a>
+
+                <!-- Primary CTA: Ekspor Hasil & Dimensi (CSV) -->
+                <a href="{{ route('admin.events.export_csv', $event) }}" class="px-4 py-2.5 bg-[#8C703E] hover:bg-[#72592F] text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5 cursor-pointer" title="Ekspor Lengkap Peserta, Skor RQI, WHO-5, 6 Dimensi & Butir Soal">
+                    <span>📊 Ekspor Lengkap & Dimensi (CSV)</span>
                 </a>
 
                 <!-- Secondary Dropdown CTA: Alat Data Peserta -->
@@ -62,7 +67,7 @@
                             <span>⚡</span> <span>Ganti Wilayah Massal</span>
                         </button>
                         <a href="{{ route('admin.events.export_csv', $event) }}" class="w-full text-left px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 flex items-center gap-2 transition">
-                            <span>📥</span> <span>Export Data CSV</span>
+                            <span>📥</span> <span>Ekspor Lengkap Peserta & Hasil Dimensi</span>
                         </a>
                         <button @click="showImportModal = true; openDataMenu = false" type="button" class="w-full text-left px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-purple-50 hover:text-purple-700 flex items-center gap-2 transition cursor-pointer">
                             <span>📤</span> <span>Update Data CSV</span>
