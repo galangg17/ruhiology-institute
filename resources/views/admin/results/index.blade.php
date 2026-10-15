@@ -257,8 +257,8 @@
                         <th class="px-4 py-3.5 whitespace-nowrap">Akses & Event</th>
                         <th class="px-4 py-3.5 whitespace-nowrap">Tipe Sesi</th>
                         <th class="px-4 py-3.5 whitespace-nowrap">Demografi Wilayah</th>
-                        <th class="px-4 py-3.5 text-center whitespace-nowrap">Skor RQI (0-100)</th>
-                        <th class="px-4 py-3.5 text-center whitespace-nowrap">WHO-5 (%)</th>
+                        <th class="px-4 py-3.5 text-center whitespace-nowrap">Skor & Level RQI</th>
+                        <th class="px-4 py-3.5 text-center whitespace-nowrap">Skor & Level WHO-5</th>
                         <th class="px-4 py-3.5 text-right whitespace-nowrap">Aksi</th>
                     </tr>
                 </thead>
@@ -328,14 +328,29 @@
                                 <span class="text-[10px] font-semibold text-[#8C703E] bg-[#F4F1EA] px-2 py-0.5 rounded border border-[#DFD8C8] inline-block">{{ $res->category_name ?? '-' }}</span>
                             </td>
 
-                            <!-- WHO-5 Score -->
+                            <!-- WHO-5 Score & Level -->
                             <td class="p-4 text-center">
                                 @if($res && $res->who5_percentage !== null)
+                                    @php
+                                        $who5Raw = $res->who5_raw_score ?? 0;
+                                        $who5Pct = $res->who5_percentage;
+                                        $who5Level = $res->snapshot_data['who5']['name'] ?? null;
+                                        if (!$who5Level) {
+                                            if ($who5Pct >= 80) $who5Level = 'Level 5: Thriving & Energetic';
+                                            elseif ($who5Pct >= 64) $who5Level = 'Level 4: Good Vibe & Fresh';
+                                            elseif ($who5Pct >= 44) $who5Level = 'Level 3: Moderate Well-Being';
+                                            elseif ($who5Pct >= 24) $who5Level = 'Level 2: Low Energy';
+                                            else $who5Level = 'Level 1: Mental Exhausted';
+                                        }
+                                    @endphp
                                     <span class="font-mono font-bold text-sm block {{ $res->who5_percentage >= 50 ? 'text-emerald-700' : 'text-rose-700' }}">
                                         {{ $res->who5_percentage }}%
                                     </span>
-                                    <span class="text-[10px] font-semibold inline-block px-2 py-0.5 rounded {{ $res->who5_percentage >= 50 ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-rose-50 text-rose-800 border border-rose-200' }}">
-                                        {{ $res->who5_percentage >= 50 ? 'Sehat' : 'Skrining' }}
+                                    <span class="text-[10px] font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 inline-block">
+                                        {{ $who5Level }}
+                                    </span>
+                                    <span class="text-[9px] font-bold block mt-1 {{ $res->who5_percentage >= 50 ? 'text-emerald-700' : 'text-rose-700' }}">
+                                        {{ $res->who5_percentage >= 50 ? '🌱 Sehat' : '⚠️ Skrining' }}
                                     </span>
                                 @else
                                     <span class="text-slate-400">-</span>

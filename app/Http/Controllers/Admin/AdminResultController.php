@@ -131,23 +131,29 @@ class AdminResultController extends Controller
 
     public function exportCsv(Request $request)
     {
-        $submissions = $this->buildFilterQuery($request)->latest('submitted_at')->get();
+        $dimensions = Dimension::whereIn('id', [1, 2, 3, 4, 5, 6])->orderBy('id')->get();
+        if ($dimensions->isEmpty()) {
+            $dimensions = Dimension::orderBy('code')->get();
+        }
 
-        $filename = 'Rekap_Hasil_Asesmen_Ruhiology_' . date('Y-m-d_His') . '.csv';
+        $questions = Question::with('dimension')->orderBy('order')->orderBy('id')->get();
+
+        $filename = 'Rekap_Lengkap_Hasil_Asesmen_Ruhiology_' . date('Y-m-d_His') . '.csv';
 
         $headers = [
             'Content-Type' => 'text/csv; charset=UTF-8',
             'Content-Disposition' => 'attachment; filename="' . $filename . '"',
         ];
 
-        $callback = function () use ($submissions) {
+        $callback = function () use ($request, $dimensions, $questions) {
+            @set_time_limit(300);
             $file = fopen('php://output', 'w');
             
             // UTF-8 BOM for Excel compatibility
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
 
             // CSV Header Row
-            fputcsv($file, [
+            $header = [
                 'No',
                 'Kode Assessment',
                 'Tanggal Submit',
@@ -158,41 +164,123 @@ class AdminResultController extends Controller
                 'Provinsi',
                 'Kabupaten/Kota',
                 'Sekolah / Kampus / Pekerjaan',
+                'Tipe Sesi',
+                
+                // Skor & Level RQI
                 'Skor RQI (0-100)',
-                'Kategori RQI',
-                'Skor WHO-5 (%)',
-                'Status WHO-5',
-                'Tipe Sesi'
-            ]);
+                'Kategori Level RQI',
+                
+                // Skor & Level WHO-5
+                'Raw Score WHO-5 (0-25)',
+                'Persentase WHO-5 (%)',
+                'Kategori Level WHO-5',
+                'Status Diagnostik WHO-5',
+            ];
 
-            foreach ($submissions as $index => $sub) {
-                $p = $sub->participant;
-                $res = $sub->result;
-                $institutionDetail = $this->getInstitutionDetail($p);
-
-                $who5Status = '-';
-                if ($res && $res->who5_percentage !== null) {
-                    $who5Status = $res->who5_percentage >= 50 ? 'Kesejahteraan Baik' : 'Indikasi Perlu Skrining';
-                }
-
-                fputcsv($file, [
-                    $index + 1,
-                    $sub->submission_code,
-                    $sub->submitted_at ? $sub->submitted_at->format('Y-m-d H:i') : '-',
-                    $p?->name ?? 'Anonim',
-                    $p?->category ?? 'Mandiri',
-                    $p?->sub_category ?? '-',
-                    $sub->event->title ?? ($sub->access_type === 'PUBLIC_SELF' ? 'Mandiri Publik' : 'Umum'),
-                    $p?->province->name ?? '-',
-                    $p?->regency->name ?? '-',
-                    $institutionDetail,
-                    $res->rqi_score ?? '-',
-                    $res->category_name ?? '-',
-                    $res->who5_percentage !== null ? $res->who5_percentage . '%' : '-',
-                    $who5Status,
-                    strtoupper($sub->submission_type ?? 'MANDIRI')
-                ]);
+            // Dimensi RQI & WHO-5
+            foreach ($dimensions as $dim) {
+                $code = $dim->code;
+                $dimName = $dim->name;
+                $header[] = "[{$code}] {$dimName} (Skor)";
+                $header[] = "[{$code}] {$dimName} (%)";
             }
+
+            // Seluruh Butir Soal Instrumen (Q1-Q15 RQI & Q16-Q20 WHO-5)
+            foreach ($questions as $idx => $q) {
+                $qNum = $idx + 1;
+                $dimCode = $q->dimension?->code ?? 'DIM';
+                $isWho = ($q->dimension_id == 6 || str_contains($dimCode, 'WHO'));
+                $tag = $isWho ? 'WHO5' : 'RQI';
+                $shortText = Str::limit(strip_tags($q->question_text), 35);
+                $header[] = "Q{$qNum} [{$tag}-{$dimCode}] Jawaban Dipilih ({$shortText})";
+                $header[] = "Q{$qNum} [{$tag}-{$dimCode}] Skor Poin";
+            }
+
+            fputcsv($file, $header);
+
+            $index = 0;
+            $this->buildFilterQuery($request)
+                ->with([
+                    'participant.province',
+                    'participant.regency',
+                    'participant.school',
+                    'participant.university',
+                    'event',
+                    'result.dimensionResults',
+                    'answers.option'
+                ])
+                ->latest('submitted_at')
+                ->chunk(150, function ($submissions) use ($file, &$index, $dimensions, $questions) {
+                    foreach ($submissions as $sub) {
+                        $index++;
+                        $p = $sub->participant;
+                        $res = $sub->result;
+                        $institutionDetail = $this->getInstitutionDetail($p);
+
+                        // WHO-5 Resolution
+                        $who5Raw = $res?->who5_raw_score ?? 0;
+                        $who5Pct = $res?->who5_percentage ?? ($who5Raw > 0 ? round(($who5Raw / 25) * 100) : null);
+                        $who5Level = null;
+                        if ($res && !empty($res->snapshot_data['who5']['name'])) {
+                            $who5Level = $res->snapshot_data['who5']['name'];
+                        } elseif ($who5Pct !== null) {
+                            if ($who5Pct >= 80) $who5Level = 'Level 5: Thriving & Energetic (Sangat Sejahtera)';
+                            elseif ($who5Pct >= 64) $who5Level = 'Level 4: Good Vibe & Fresh (Sejahtera)';
+                            elseif ($who5Pct >= 44) $who5Level = 'Level 3: Moderate Well-Being (Cukup Stabil)';
+                            elseif ($who5Pct >= 24) $who5Level = 'Level 2: Low Energy (Perlu Perhatian)';
+                            else $who5Level = 'Level 1: Mental Exhausted (Perlu Pendampingan)';
+                        }
+
+                        $who5Status = '-';
+                        if ($who5Pct !== null) {
+                            $who5Status = $who5Pct >= 50 ? 'Sehat (Kesejahteraan Baik)' : 'Indikasi Perlu Skrining';
+                        }
+
+                        $dimResults = $res ? $res->dimensionResults->keyBy('dimension_id') : collect();
+                        $subAnswers = $sub->answers->keyBy('question_id');
+
+                        $row = [
+                            $index,
+                            $sub->submission_code,
+                            $sub->submitted_at ? $sub->submitted_at->format('Y-m-d H:i') : '-',
+                            $p?->name ?? 'Anonim',
+                            $p?->category ?? 'Mandiri',
+                            $p?->sub_category ?? '-',
+                            $sub->event->title ?? ($sub->access_type === 'PUBLIC_SELF' ? 'Mandiri Publik' : 'Umum'),
+                            $p?->province->name ?? '-',
+                            $p?->regency->name ?? '-',
+                            $institutionDetail,
+                            strtoupper($sub->submission_type ?? 'MANDIRI'),
+                            
+                            // RQI
+                            $res->rqi_score ?? '-',
+                            $res->category_name ?? '-',
+                            
+                            // WHO-5
+                            $who5Raw > 0 ? $who5Raw : ($res && $res->who5_raw_score !== null ? $res->who5_raw_score : '-'),
+                            $who5Pct !== null ? $who5Pct . '%' : '-',
+                            $who5Level ?? '-',
+                            $who5Status,
+                        ];
+
+                        // Dimensions
+                        foreach ($dimensions as $dim) {
+                            $dRes = $dimResults->get($dim->id);
+                            $row[] = $dRes ? $dRes->score : '-';
+                            $row[] = $dRes ? (number_format($dRes->percentage, 1) . '%') : '-';
+                        }
+
+                        // Questions
+                        foreach ($questions as $q) {
+                            $ans = $subAnswers->get($q->id);
+                            $row[] = $ans ? ($ans->option?->option_text ?? '-') : '-';
+                            $row[] = $ans ? $ans->calculated_score : '-';
+                        }
+
+                        fputcsv($file, $row);
+                    }
+                    fflush($file);
+                });
 
             fclose($file);
         };

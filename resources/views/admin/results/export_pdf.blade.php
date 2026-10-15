@@ -270,7 +270,7 @@
                             <th class="py-2 px-2.5 whitespace-nowrap w-24">Kategori</th>
                             <th class="py-2 px-2.5">Wilayah</th>
                             <th class="py-2 px-2.5 text-center whitespace-nowrap w-36">Skor & Level RQI</th>
-                            <th class="py-2 px-2.5 text-center whitespace-nowrap w-20">WHO-5 %</th>
+                            <th class="py-2 px-2.5 text-center whitespace-nowrap w-36">Skor & Level WHO-5</th>
                             <th class="py-2 px-2.5 text-center whitespace-nowrap w-24">Status WHO-5</th>
                         </tr>
                     </thead>
@@ -283,6 +283,20 @@
                                 $provName = $p?->province?->name;
                                 $regName = $p?->regency ? $p->regency->formatted_name : '';
                                 $regionDisplay = $regName ? ($provName ? $provName . ' (' . $regName . ')' : $regName) : ($provName ?? '-');
+
+                                // WHO-5 Score & Level Resolution
+                                $who5Raw = $res?->who5_raw_score ?? 0;
+                                $who5Pct = $res?->who5_percentage ?? ($who5Raw > 0 ? round(($who5Raw / 25) * 100) : null);
+                                $who5Level = null;
+                                if ($res && !empty($res->snapshot_data['who5']['name'])) {
+                                    $who5Level = $res->snapshot_data['who5']['name'];
+                                } elseif ($who5Pct !== null) {
+                                    if ($who5Pct >= 80) $who5Level = 'Level 5: Thriving & Energetic (Sangat Sejahtera)';
+                                    elseif ($who5Pct >= 64) $who5Level = 'Level 4: Good Vibe & Fresh (Sejahtera)';
+                                    elseif ($who5Pct >= 44) $who5Level = 'Level 3: Moderate Well-Being (Cukup Stabil)';
+                                    elseif ($who5Pct >= 24) $who5Level = 'Level 2: Low Energy (Perlu Perhatian)';
+                                    else $who5Level = 'Level 1: Mental Exhausted (Perlu Pendampingan)';
+                                }
                             @endphp
                             <tr class="{{ $index % 2 === 0 ? 'bg-white' : 'bg-slate-50/50' }}">
                                 <td class="py-1.5 px-2.5 text-center font-mono-num text-slate-400">{{ $index + 1 }}</td>
@@ -305,13 +319,24 @@
                                         </span>
                                     @endif
                                 </td>
-                                <td class="py-1.5 px-2.5 text-center font-mono-num font-semibold whitespace-nowrap {{ ($res?->who5_percentage ?? 0) >= 50 ? 'text-emerald-700' : 'text-rose-700' }}">
-                                    {{ ($res && $res->who5_percentage !== null) ? $res->who5_percentage . '%' : '-' }}
+                                <td class="py-1.5 px-2.5 text-center whitespace-nowrap">
+                                    @if($who5Pct !== null)
+                                        <span class="font-mono-num font-bold text-[10.5px] block tabular-nums {{ $who5Pct >= 50 ? 'text-emerald-700' : 'text-rose-700' }}">
+                                            {{ $who5Pct }}% <span class="text-[8px] font-normal text-slate-400">({{ $who5Raw }}/25)</span>
+                                        </span>
+                                        @if($who5Level)
+                                            <span class="text-[8px] font-medium text-slate-600 block">
+                                                {{ $who5Level }}
+                                            </span>
+                                        @endif
+                                    @else
+                                        <span class="text-slate-300">-</span>
+                                    @endif
                                 </td>
                                 <td class="py-1.5 px-2.5 text-center whitespace-nowrap">
-                                    @if($res && $res->who5_percentage !== null)
-                                        <span class="inline-block px-2 py-0.5 rounded text-[8px] font-bold {{ $res->who5_percentage >= 50 ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-rose-50 text-rose-800 border border-rose-200' }}">
-                                            {{ $res->who5_percentage >= 50 ? 'Sehat' : 'Skrining' }}
+                                    @if($who5Pct !== null)
+                                        <span class="inline-block px-2 py-0.5 rounded text-[8px] font-bold {{ $who5Pct >= 50 ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-rose-50 text-rose-800 border border-rose-200' }}">
+                                            {{ $who5Pct >= 50 ? 'Sehat' : 'Skrining' }}
                                         </span>
                                     @else
                                         <span class="text-slate-300">-</span>
