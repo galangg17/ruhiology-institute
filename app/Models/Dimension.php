@@ -13,9 +13,27 @@ class Dimension extends Model
         'instrument_id',
         'code',
         'name',
+        'name_en',
         'description',
+        'description_en',
         'order',
     ];
+
+    public function getLocalizedNameAttribute(): string
+    {
+        if (app()->getLocale() === 'en' && !empty($this->name_en)) {
+            return $this->name_en;
+        }
+        return $this->name ?? '';
+    }
+
+    public function getLocalizedDescriptionAttribute(): string
+    {
+        if (app()->getLocale() === 'en' && !empty($this->description_en)) {
+            return $this->description_en;
+        }
+        return $this->description ?? '';
+    }
 
     public function instrument()
     {

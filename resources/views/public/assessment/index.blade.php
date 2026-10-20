@@ -42,6 +42,11 @@ window.rqAssessmentIndex = function rqAssessmentIndex() {
             detail_institution: '',
             sub_category: '',
             country_id: 1,
+            country_code: 'ID',
+            country_name: 'Indonesia',
+            state_custom: '',
+            city_custom: '',
+            phone_country_code: '+62',
             province_id: null,
             regency_id: null,
             school_level: '',
@@ -242,6 +247,30 @@ window.rqAssessmentIndex = function rqAssessmentIndex() {
                 this.verifyingEvent = false;
                 this.eventCheckError = 'Terjadi kesalahan saat memverifikasi Kode Event.';
             });
+        },
+
+        onCountryChange() {
+            const countryDialCodes = {
+                'ID': { name: 'Indonesia', dial: '+62' },
+                'MY': { name: 'Malaysia', dial: '+60' },
+                'SG': { name: 'Singapore', dial: '+65' },
+                'BN': { name: 'Brunei Darussalam', dial: '+673' },
+                'SA': { name: 'Saudi Arabia', dial: '+966' },
+                'AE': { name: 'United Arab Emirates', dial: '+971' },
+                'AU': { name: 'Australia', dial: '+61' },
+                'US': { name: 'United States', dial: '+1' },
+                'GB': { name: 'United Kingdom', dial: '+44' },
+                'JP': { name: 'Japan', dial: '+81' },
+                'OTHER': { name: 'International', dial: '+' }
+            };
+            const c = countryDialCodes[this.form.country_code] || { name: 'International', dial: '+' };
+            this.form.country_name = c.name;
+            this.form.phone_country_code = c.dial;
+
+            if (this.form.country_code !== 'ID') {
+                this.form.province_id = null;
+                this.form.regency_id = null;
+            }
         },
 
         onProvinceChange() {
@@ -715,10 +744,37 @@ document.addEventListener('alpine:init', () => {
                                     </div>
                                 </div>
 
-                                <div class="grid grid-cols-2 gap-2.5">
+                                <!-- Hidden Country Fields -->
+                                <input type="hidden" name="country_code" :value="form.country_code">
+                                <input type="hidden" name="country_name" :value="form.country_name">
+                                <input type="hidden" name="phone_country_code" :value="form.phone_country_code">
+
+                                <!-- Pilihan Negara / Country Selector -->
+                                <div>
+                                    <div class="flex items-center justify-between mb-1">
+                                        <label class="font-bold text-slate-700 text-xs">{{ app()->getLocale() === 'en' ? 'Country of Residence *' : 'Negara Domisili *' }}</label>
+                                        <span x-show="form.country_code !== 'ID'" class="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">🌍 International</span>
+                                    </div>
+                                    <select x-model="form.country_code" @change="onCountryChange()" class="w-full p-2.5 text-xs font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
+                                        <option value="ID">🇮🇩 Indonesia</option>
+                                        <option value="MY">🇲🇾 Malaysia</option>
+                                        <option value="SG">🇸🇬 Singapore</option>
+                                        <option value="BN">🇧🇳 Brunei Darussalam</option>
+                                        <option value="SA">🇸🇦 Saudi Arabia</option>
+                                        <option value="AE">🇦🇪 United Arab Emirates</option>
+                                        <option value="AU">🇦🇺 Australia</option>
+                                        <option value="US">🇺🇸 United States</option>
+                                        <option value="GB">🇬🇧 United Kingdom</option>
+                                        <option value="JP">🇯🇵 Japan</option>
+                                        <option value="OTHER">🌐 Other / Lainnya</option>
+                                    </select>
+                                </div>
+
+                                <!-- Wilayah Indonesia (Provinsi & Kab/Kota) -->
+                                <div x-show="form.country_code === 'ID'" class="grid grid-cols-2 gap-2.5">
                                     <div>
                                         <label class="block font-bold text-slate-700 text-xs mb-1">Provinsi *</label>
-                                        <select x-model="form.province_id" @change="onProvinceChange()" required class="w-full p-2.5 text-xs font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
+                                        <select x-model="form.province_id" name="province_id" :required="form.country_code === 'ID'" @change="onProvinceChange()" class="w-full p-2.5 text-xs font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
                                             <option value="">-- Pilih Provinsi --</option>
                                             <template x-for="p in ((provincesList && provincesList.length > 0) ? provincesList : fallbackProvinces)" :key="p.id">
                                                 <option :value="p.id" x-text="p.name" :selected="String(p.id) === String(form.province_id)"></option>
@@ -727,12 +783,24 @@ document.addEventListener('alpine:init', () => {
                                     </div>
                                     <div>
                                         <label class="block font-bold text-slate-700 text-xs mb-1">Kab/Kota</label>
-                                        <select x-model="form.regency_id" :disabled="!form.province_id" class="w-full p-2.5 text-xs font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white disabled:bg-slate-100">
+                                        <select x-model="form.regency_id" name="regency_id" :disabled="!form.province_id" class="w-full p-2.5 text-xs font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white disabled:bg-slate-100">
                                             <option value="">-- Pilih Kab/Kota --</option>
                                             <template x-for="r in filteredRegencies" :key="r.id">
                                                 <option :value="r.id" x-text="r.formatted_name || ((r.name && (r.name.startsWith('Kota') || r.name.startsWith('Kabupaten') || !r.type)) ? r.name : ((r.type || '') + ' ' + r.name))" :selected="String(r.id) === String(form.regency_id)"></option>
                                             </template>
                                         </select>
+                                    </div>
+                                </div>
+
+                                <!-- Wilayah Luar Negeri (State & City) -->
+                                <div x-show="form.country_code !== 'ID'" class="grid grid-cols-2 gap-2.5">
+                                    <div>
+                                        <label class="block font-bold text-slate-700 text-xs mb-1">State / Province</label>
+                                        <input type="text" x-model="form.state_custom" name="state_custom" placeholder="e.g. Selangor / California" class="w-full p-2.5 text-xs font-medium rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
+                                    </div>
+                                    <div>
+                                        <label class="block font-bold text-slate-700 text-xs mb-1">City / Town</label>
+                                        <input type="text" x-model="form.city_custom" name="city_custom" placeholder="e.g. Kuala Lumpur" class="w-full p-2.5 text-xs font-medium rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
                                     </div>
                                 </div>
                             </div>

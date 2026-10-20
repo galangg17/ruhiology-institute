@@ -13,6 +13,8 @@ class Event extends Model
         'event_code',
         'title',
         'access_type',
+        'country_code',
+        'country_name',
         'assessment_type',
         'target_category',
         'group_label',

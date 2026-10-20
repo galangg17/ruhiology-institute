@@ -13,12 +13,30 @@ class Instrument extends Model
     protected $fillable = [
         'code',
         'name',
+        'name_en',
         'description',
+        'description_en',
         'version',
         'instructions',
         'status',
         'access_type',
     ];
+
+    public function getLocalizedNameAttribute(): string
+    {
+        if (app()->getLocale() === 'en' && !empty($this->name_en)) {
+            return $this->name_en;
+        }
+        return $this->name ?? '';
+    }
+
+    public function getLocalizedDescriptionAttribute(): string
+    {
+        if (app()->getLocale() === 'en' && !empty($this->description_en)) {
+            return $this->description_en;
+        }
+        return $this->description ?? '';
+    }
 
     public function dimensions()
     {

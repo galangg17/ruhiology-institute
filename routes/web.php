@@ -47,6 +47,15 @@ Route::post('/api/assessment/quick-check', [QuickCheckApiController::class, 'che
 Route::post('/api/events/verify', [PublicAssessmentController::class, 'verifyEventCode'])->name('api.events.verify');
 
 
+// Language Switcher (ID <-> EN)
+Route::get('/lang/{locale}', function ($locale) {
+    if (in_array($locale, ['id', 'en'], true)) {
+        session(['locale' => $locale]);
+        cookie()->queue('locale', $locale, 60 * 24 * 365);
+    }
+    return redirect()->back();
+})->name('lang.switch');
+
 // --- PUBLIC ROUTES ---
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/tentang-ruhiologi', [HomeController::class, 'aboutRuhiology'])->name('about.ruhiology');
@@ -153,6 +162,7 @@ Route::middleware(['auth', \App\Http\Middleware\EnsureAdminAccess::class])
         Route::put('/instruments/{instrument}/questions/{question}', [AdminInstrumentController::class, 'updateQuestion'])->name('instruments.questions.update');
         Route::delete('/instruments/{instrument}/questions/{question}', [AdminInstrumentController::class, 'destroyQuestion'])->name('instruments.questions.destroy');
         Route::post('/instruments/{instrument}/scoring', [AdminInstrumentController::class, 'updateScoringRule'])->name('instruments.scoring.update');
+        Route::post('/instruments/{instrument}/auto-translate', [AdminInstrumentController::class, 'autoTranslateInstrument'])->name('instruments.auto_translate');
 
         // Assessment Events Management (Event / Batch Program)
         Route::get('/events', [AdminEventController::class, 'index'])->name('events.index');

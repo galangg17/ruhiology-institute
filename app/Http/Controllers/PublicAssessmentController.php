@@ -95,11 +95,13 @@ class PublicAssessmentController extends Controller
             }
         }
 
-        if (empty($request->input('province_id'))) {
+        $isInternational = !empty($request->input('country_code')) && $request->input('country_code') !== 'ID';
+
+        if (!$isInternational && empty($request->input('province_id'))) {
             $defaultProvId = \App\Models\Province::where('status', 'active')->first()?->id ?? 1;
             $request->merge(['province_id' => $defaultProvId]);
         }
-        if (empty($request->input('regency_id'))) {
+        if (!$isInternational && empty($request->input('regency_id'))) {
             $defaultRegId = \App\Models\Regency::where('province_id', $request->input('province_id'))->first()?->id;
             if (!$defaultRegId) {
                 $defaultRegId = \App\Models\Regency::first()?->id;
@@ -124,10 +126,15 @@ class PublicAssessmentController extends Controller
             'birth_date' => ['required', 'date'],
             'gender' => ['nullable', 'in:Laki-laki,Perempuan'],
             'phone' => ['nullable', 'string', 'max:50'],
+            'phone_country_code' => ['nullable', 'string', 'max:10'],
             'email' => ['nullable', 'email', 'max:255'],
             'category' => ['required', 'string'],
-            'country_id' => ['nullable', 'exists:countries,id'],
-            'province_id' => ['required', 'exists:provinces,id'],
+            'country_code' => ['nullable', 'string', 'max:10'],
+            'country_name' => ['nullable', 'string', 'max:100'],
+            'state_custom' => ['nullable', 'string', 'max:150'],
+            'city_custom' => ['nullable', 'string', 'max:150'],
+            'country_id' => ['nullable'],
+            'province_id' => [$isInternational ? 'nullable' : 'required', 'exists:provinces,id'],
             'regency_id' => ['nullable', 'exists:regencies,id'],
             
             // Cascading subcategory fields
@@ -258,12 +265,17 @@ class PublicAssessmentController extends Controller
             'birth_date' => $validated['birth_date'],
             'gender' => $validated['gender'] ?? 'Laki-laki',
             'phone' => $validated['phone'] ?? null,
+            'phone_country_code' => $validated['phone_country_code'] ?? '+62',
             'category' => $validated['category'],
             'sub_category' => $safeSubCategory,
             'email' => $email,
             'country_id' => $countryId,
-            'province_id' => $validated['province_id'],
-            'regency_id' => $validated['regency_id'],
+            'country_code' => $validated['country_code'] ?? ($isInternational ? 'INT' : 'ID'),
+            'country_name' => $validated['country_name'] ?? ($isInternational ? 'International' : 'Indonesia'),
+            'state_custom' => $validated['state_custom'] ?? null,
+            'city_custom' => $validated['city_custom'] ?? null,
+            'province_id' => $validated['province_id'] ?? null,
+            'regency_id' => $validated['regency_id'] ?? null,
             'school_id' => null,
             'school_custom' => $schoolCustom ? mb_substr(trim((string) $schoolCustom), 0, 250) : null,
             'university_id' => null,

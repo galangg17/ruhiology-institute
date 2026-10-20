@@ -55,8 +55,8 @@
                 <!-- SECTION 1: INSTRUMEN RQI-15 (15 Questions) -->
                 <div class="space-y-4">
                     <div class="flex items-center gap-2 border-b border-slate-300 pb-2">
-                        <span class="text-sm sm:text-base font-serif font-bold text-[#0B2A43]">Bagian I: INVENTORI KECERDASAN RUHIOLOGI (RQI-15)</span>
-                        <span class="text-[10px] sm:text-xs font-mono font-bold text-[#C9A24D] bg-[#0B2A43] px-2.5 py-0.5 rounded-full">15 Pertanyaan</span>
+                        <span class="text-sm sm:text-base font-serif font-bold text-[#0B2A43]">{{ app()->getLocale() === 'en' ? 'Part I: RUHIOLOGY QUOTIENT INVENTORY (RQI-15)' : 'Bagian I: INVENTORI KECERDASAN RUHIOLOGI (RQI-15)' }}</span>
+                        <span class="text-[10px] sm:text-xs font-mono font-bold text-[#C9A24D] bg-[#0B2A43] px-2.5 py-0.5 rounded-full">15 {{ app()->getLocale() === 'en' ? 'Questions' : 'Pertanyaan' }}</span>
                     </div>
 
                     @foreach($rqiQuestions as $index => $q)
@@ -67,10 +67,10 @@
                                 </span>
                                 <div>
                                     <span class="text-[9px] sm:text-[10px] font-bold text-[#C9A24D] uppercase tracking-widest block mb-0.5 font-mono">
-                                        ✦ {{ $q->dimension->name ?? 'Tahap Ruhiologi' }}
+                                        ✦ {{ $q->dimension->localized_name ?? ($q->dimension->name ?? 'Tahap Ruhiologi') }}
                                     </span>
                                     <p class="text-xs sm:text-sm font-medium text-[#0B2A43] leading-relaxed">
-                                        {{ $q->question_text }}
+                                        {{ $q->localized_text }}
                                     </p>
                                 </div>
                             </div>
@@ -82,7 +82,7 @@
                                         <input type="radio" name="answers[{{ $q->id }}]" value="opt_{{ $opt->id }}" required @change="onAnswerChange()" class="peer sr-only">
                                         
                                         <span class="text-xs font-semibold text-slate-700 group-has-[:checked]:text-[#C9A24D] group-has-[:checked]:font-extrabold transition-colors leading-tight text-center">
-                                            {{ $opt->option_text }}
+                                            {{ $opt->localized_text }}
                                         </span>
                                     </label>
                                 @endforeach
@@ -95,10 +95,10 @@
                 @if(isset($who5Questions) && count($who5Questions) > 0)
                     <div class="space-y-4 pt-4 sm:pt-6">
                         <div class="flex items-center gap-2 border-b border-slate-300 pb-2">
-                            <span class="text-sm sm:text-base font-serif font-bold text-[#0B2A43]">Bagian II: INDEKS KESEJAHTERAAN MENTAL (WHO-5)</span>
-                            <span class="text-[10px] sm:text-xs font-mono font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full border border-emerald-300">5 Pertanyaan</span>
+                            <span class="text-sm sm:text-base font-serif font-bold text-[#0B2A43]">{{ app()->getLocale() === 'en' ? 'Part II: MENTAL WELL-BEING INDEX (WHO-5)' : 'Bagian II: INDEKS KESEJAHTERAAN MENTAL (WHO-5)' }}</span>
+                            <span class="text-[10px] sm:text-xs font-mono font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full border border-emerald-300">5 {{ app()->getLocale() === 'en' ? 'Questions' : 'Pertanyaan' }}</span>
                         </div>
-                        <p class="text-xs text-slate-600 font-normal">Pilihlah frekuensi perasaan yang menggambarkan kondisi Anda dalam 2 minggu terakhir:</p>
+                        <p class="text-xs text-slate-600 font-normal">{{ app()->getLocale() === 'en' ? 'Choose the frequency that best describes how you have felt over the last 2 weeks:' : 'Pilihlah frekuensi perasaan yang menggambarkan kondisi Anda dalam 2 minggu terakhir:' }}</p>
 
                         @foreach($who5Questions as $wIdx => $wq)
                             <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-3 sm:space-y-4 hover:border-slate-300 transition-all">
@@ -108,10 +108,10 @@
                                     </span>
                                     <div>
                                         <span class="text-[9px] sm:text-[10px] font-bold text-emerald-700 uppercase tracking-widest block mb-0.5 font-mono">
-                                            🌿 INDEKS KESEJAHTERAAN MENTAL (WHO-5)
+                                            🌿 {{ $wq->dimension->localized_name ?? ($wq->dimension->name ?? 'INDEKS KESEJAHTERAAN MENTAL (WHO-5)') }}
                                         </span>
                                         <p class="text-xs sm:text-sm font-medium text-[#0B2A43] leading-relaxed">
-                                            {{ $wq->question_text }}
+                                            {{ $wq->localized_text }}
                                         </p>
                                     </div>
                                 </div>
@@ -122,7 +122,7 @@
                                             <input type="radio" name="answers[{{ $wq->id }}]" value="opt_{{ $wOpt->id }}" required @change="onAnswerChange()" class="peer sr-only">
                                             
                                             <span class="text-xs font-semibold text-slate-700 group-has-[:checked]:text-white group-has-[:checked]:font-extrabold transition-colors leading-tight text-center">
-                                                {{ $wOpt->option_text }}
+                                                {{ $wOpt->localized_text }}
                                             </span>
                                         </label>
                                     @endforeach
@@ -138,7 +138,7 @@
                         <span>⚠️ Pastikan seluruh {{ (count($rqiQuestions) + count($who5Questions ?? [])) }} pertanyaan telah terisi.</span>
                     </div>
                     <button type="button" @click="openSubmitModal()" class="w-full sm:w-auto px-8 py-4 bg-[#0B2A43] hover:bg-[#123B59] text-[#C9A24D] font-bold rounded-2xl text-xs uppercase tracking-wider shadow-lg transition-transform hover:scale-105 cursor-pointer border border-[#C9A24D]/30 min-h-[44px]">
-                        Submit Sesi Asesmen Sekarang →
+                        {{ app()->getLocale() === 'en' ? 'Submit Assessment Answers Now →' : 'Submit Sesi Asesmen Sekarang →' }}
                     </button>
                 </div>
 
@@ -156,31 +156,31 @@
 
             <!-- Title & Subtitle -->
             <div class="space-y-1">
-                <h3 class="text-xl font-serif font-bold text-[#0B2A43]">Konfirmasi Submit Asesmen</h3>
+                <h3 class="text-xl font-serif font-bold text-[#0B2A43]">{{ app()->getLocale() === 'en' ? 'Confirm Assessment Submission' : 'Konfirmasi Submit Asesmen' }}</h3>
                 <p class="text-xs text-slate-500 font-medium">Ruhiology Institute Assessment Engine</p>
             </div>
 
             <!-- Progress Summary Pill -->
             <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 text-xs flex justify-between items-center">
-                <span class="text-slate-500 font-semibold">Total Terjawab:</span>
+                <span class="text-slate-500 font-semibold">{{ app()->getLocale() === 'en' ? 'Total Answered:' : 'Total Terjawab:' }}</span>
                 <span class="font-bold text-[#0B2A43]" x-text="answeredCount + ' / ' + totalCount + ' (' + progressPercentage + '%)'"></span>
             </div>
 
             <!-- Description Message -->
             <div class="text-xs text-slate-600 leading-relaxed space-y-2">
-                <p>Apakah Anda yakin ingin mengirimkan seluruh jawaban asesmen ini?</p>
+                <p>{{ app()->getLocale() === 'en' ? 'Are you sure you want to submit all assessment answers?' : 'Apakah Anda yakin ingin mengirimkan seluruh jawaban asesmen ini?' }}</p>
                 <div class="p-2.5 bg-amber-50 text-amber-900 rounded-xl border border-amber-200 text-[11px] font-bold">
-                    ⚠️ Jawaban bersifat final & tidak dapat diubah kembali setelah disubmit.
+                    {{ app()->getLocale() === 'en' ? '⚠️ Answers are final and cannot be modified after submission.' : '⚠️ Jawaban bersifat final & tidak dapat diubah kembali setelah disubmit.' }}
                 </div>
             </div>
 
             <!-- Buttons -->
             <div class="pt-2 flex flex-col sm:flex-row gap-2.5">
                 <button type="button" @click="showConfirmModal = false" class="w-full py-3.5 rounded-xl border border-slate-300 text-slate-700 font-bold text-xs hover:bg-slate-100 transition cursor-pointer">
-                    Batal & Periksa Kembali
+                    {{ app()->getLocale() === 'en' ? 'Cancel & Review' : 'Batal & Periksa Kembali' }}
                 </button>
                 <button type="button" @click="submitForm()" class="w-full py-3.5 rounded-xl bg-[#0B2A43] hover:bg-[#123B59] text-[#C9A24D] font-bold text-xs uppercase tracking-wider shadow-lg transition-transform hover:scale-[1.02] cursor-pointer border border-[#C9A24D]/30">
-                    Ya, Kirim Sekarang →
+                    {{ app()->getLocale() === 'en' ? 'Yes, Submit Answers Now →' : 'Ya, Kirim Sekarang →' }}
                 </button>
             </div>
         </div>

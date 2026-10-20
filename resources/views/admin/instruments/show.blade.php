@@ -29,6 +29,12 @@
                 <button @click="dimModal = true" class="px-3.5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center gap-1.5">
                     <span>+ Dimensi</span>
                 </button>
+                <form action="{{ route('admin.instruments.auto_translate', $instrument->id) }}" method="POST" onsubmit="return confirm('Menerjemahkan otomatis seluruh soal, dimensi, dan opsi jawaban instrumen ini ke Bahasa Inggris?');" class="inline">
+                    @csrf
+                    <button type="submit" class="px-3.5 py-2.5 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center gap-1.5 cursor-pointer" title="Auto-Translate seluruh soal dan dimensi ke Bahasa Inggris">
+                        <span>🌐 Auto-Translate EN</span>
+                    </button>
+                </form>
                 <form action="{{ route('admin.instruments.destroy', $instrument->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus seluruh paket soal \'{{ addslashes($instrument->name) }}\' beserta semua dimensi & butir soal di dalamnya? Tindakan ini tidak dapat dibatalkan.');" class="inline">
                     @csrf
                     @method('DELETE')
@@ -82,7 +88,15 @@
                             @forelse($dim->questions as $q)
                                 <tr class="hover:bg-slate-50 transition-all">
                                     <td class="p-3.5 text-center font-bold text-slate-400 font-mono">{{ $q->order }}</td>
-                                    <td class="p-3.5 font-semibold text-slate-900 leading-relaxed">{{ $q->question_text }}</td>
+                                    <td class="p-3.5 leading-relaxed">
+                                        <div class="font-semibold text-slate-900 text-xs">{{ $q->question_text }}</div>
+                                        @if($q->question_text_en)
+                                            <div class="mt-1.5 text-[11px] text-sky-800 bg-sky-50/90 border border-sky-200/90 rounded-lg p-2 font-normal flex items-start gap-1.5">
+                                                <span class="text-[9px] font-extrabold uppercase tracking-wider bg-sky-700 text-white px-1.5 py-0.5 rounded shrink-0">EN</span>
+                                                <span class="italic">{{ $q->question_text_en }}</span>
+                                            </div>
+                                        @endif
+                                    </td>
                                     <td class="p-3.5"><span class="px-2 py-0.5 bg-slate-100 border border-slate-200 font-bold rounded uppercase text-[10px] text-slate-700">{{ $q->type }}</span></td>
                                     <td class="p-3.5">
                                         <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider {{ $q->scoring_direction === 'reverse' ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-emerald-100 text-emerald-800 border border-emerald-300' }}">
@@ -98,6 +112,7 @@
                                                 id: {{ $q->id }},
                                                 dimension_id: {{ $q->dimension_id }},
                                                 question_text: '{{ addslashes($q->question_text) }}',
+                                                question_text_en: '{{ addslashes($q->question_text_en ?? '') }}',
                                                 type: '{{ $q->type }}',
                                                 scoring_direction: '{{ $q->scoring_direction }}',
                                                 order: {{ $q->order }}
@@ -318,8 +333,15 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1">Teks Pernyataan Soal *</label>
-                    <textarea name="question_text" rows="3" placeholder="Tuliskan butir soal di sini..." required class="w-full p-2.5 rounded-xl border border-slate-300"></textarea>
+                    <label class="block font-bold text-slate-700 mb-1">Teks Pernyataan Soal (Bahasa Indonesia) *</label>
+                    <textarea name="question_text" rows="2" placeholder="Tuliskan butir soal di sini..." required class="w-full p-2.5 rounded-xl border border-slate-300"></textarea>
+                </div>
+                <div>
+                    <div class="flex items-center justify-between mb-1">
+                        <label class="font-bold text-slate-700">Terjemahan Bahasa Inggris (English Translation)</label>
+                        <span class="text-[10px] text-blue-700 font-semibold bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200">✨ Otomatis Terjemah jika kosong</span>
+                    </div>
+                    <textarea name="question_text_en" rows="2" placeholder="Biarkan kosong untuk diterjemahkan otomatis oleh sistem..." class="w-full p-2.5 rounded-xl border border-slate-300 bg-slate-50"></textarea>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
@@ -369,8 +391,15 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1">Teks Pernyataan Soal *</label>
-                    <textarea name="question_text" x-model="editQData.question_text" rows="3" required class="w-full p-2.5 rounded-xl border border-slate-300"></textarea>
+                    <label class="block font-bold text-slate-700 mb-1">Teks Pernyataan Soal (Bahasa Indonesia) *</label>
+                    <textarea name="question_text" x-model="editQData.question_text" rows="2" required class="w-full p-2.5 rounded-xl border border-slate-300"></textarea>
+                </div>
+                <div>
+                    <div class="flex items-center justify-between mb-1">
+                        <label class="font-bold text-slate-700">Terjemahan Bahasa Inggris (English Translation)</label>
+                        <span class="text-[10px] text-blue-700 font-semibold bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200">✨ Auto-sync jika kosong</span>
+                    </div>
+                    <textarea name="question_text_en" x-model="editQData.question_text_en" rows="2" placeholder="Biarkan kosong untuk diterjemahkan otomatis oleh sistem..." class="w-full p-2.5 rounded-xl border border-slate-300 bg-slate-50"></textarea>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>

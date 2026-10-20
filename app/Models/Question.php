@@ -14,11 +14,20 @@ class Question extends Model
         'dimension_id',
         'indicator_id',
         'question_text',
+        'question_text_en',
         'type',
         'scoring_direction',
         'order',
         'status',
     ];
+
+    public function getLocalizedTextAttribute(): string
+    {
+        if (app()->getLocale() === 'en' && !empty($this->question_text_en)) {
+            return $this->question_text_en;
+        }
+        return $this->question_text ?? '';
+    }
 
     public function instrument()
     {

@@ -63,10 +63,20 @@
 
             </nav>
 
-            <!-- Right Action CTA Button (Proportional Rounded-XL Style with Proper Padding) -->
+            <!-- Right Action CTA Button & Language Switcher -->
             <div class="hidden sm:flex items-center gap-2 shrink-0">
+                <!-- Language Toggle Switcher (ID / EN) -->
+                <div class="flex items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200/90 text-[11px] font-bold">
+                    <a href="{{ route('lang.switch', 'id') }}" class="px-2 py-1 rounded-lg transition-all {{ app()->getLocale() === 'id' ? 'bg-[#0B2A43] text-[#C9A24D] shadow-xs' : 'text-slate-600 hover:text-slate-900' }}" title="Bahasa Indonesia">
+                        🇮🇩 ID
+                    </a>
+                    <a href="{{ route('lang.switch', 'en') }}" class="px-2 py-1 rounded-lg transition-all {{ app()->getLocale() === 'en' ? 'bg-[#0B2A43] text-[#C9A24D] shadow-xs' : 'text-slate-600 hover:text-slate-900' }}" title="English (International)">
+                        🇬🇧 EN
+                    </a>
+                </div>
+
                 <button @click="$dispatch('open-quick-check', { code: '' })" type="button" class="py-2 px-3 sm:px-3.5 bg-amber-500/10 hover:bg-amber-500/20 text-[#0B2A43] font-bold text-[11px] xl:text-xs rounded-xl border border-[#C9A24D]/40 transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer">
-                    <span>🔍</span> <span>Cek Skor / Mulai</span>
+                    <span>🔍</span> <span>{{ app()->getLocale() === 'en' ? 'Check Score' : 'Cek Skor / Mulai' }}</span>
                 </button>
 
                 @auth
@@ -93,6 +103,13 @@
 
     <!-- Mobile Navigation Drawer -->
     <div x-show="mobileOpen" x-cloak class="lg:hidden bg-white/95 backdrop-blur-md border-b border-slate-200 px-6 pt-4 pb-6 space-y-3 text-xs font-semibold shadow-2xl">
+        <div class="flex items-center justify-between py-2 border-b border-slate-100">
+            <span class="text-xs font-bold text-slate-500">Pilihan Bahasa / Language:</span>
+            <div class="flex items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200/90 text-xs font-bold">
+                <a href="{{ route('lang.switch', 'id') }}" class="px-3 py-1 rounded-lg {{ app()->getLocale() === 'id' ? 'bg-[#0B2A43] text-[#C9A24D]' : 'text-slate-600' }}">🇮🇩 ID</a>
+                <a href="{{ route('lang.switch', 'en') }}" class="px-3 py-1 rounded-lg {{ app()->getLocale() === 'en' ? 'bg-[#0B2A43] text-[#C9A24D]' : 'text-slate-600' }}">🇬🇧 EN</a>
+            </div>
+        </div>
         <a href="{{ url('/') }}" @click="mobileOpen = false" class="flex items-center gap-2 text-slate-800 py-2 border-b border-slate-100 hover:text-[#0B2A43]">
             <span>🏠</span>
             <span>Beranda</span>

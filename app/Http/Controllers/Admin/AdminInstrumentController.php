@@ -10,6 +10,7 @@ use App\Models\Question;
 use App\Models\QuestionOption;
 use App\Models\ScoringRule;
 use App\Services\AuditLogService;
+use App\Services\TranslationService;
 use Illuminate\Http\Request;
 
 class AdminInstrumentController extends Controller
@@ -230,14 +231,25 @@ class AdminInstrumentController extends Controller
         $validated = $request->validate([
             'code' => ['required', 'string'],
             'name' => ['required', 'string', 'max:255'],
+            'name_en' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
+            'description_en' => ['nullable', 'string'],
             'order' => ['required', 'integer'],
         ]);
 
         $validated['instrument_id'] = $instrument->id;
+        
+        // Auto-translate to English if not provided
+        if (empty($validated['name_en'])) {
+            $validated['name_en'] = TranslationService::translate($validated['name'], 'id', 'en');
+        }
+        if (!empty($validated['description']) && empty($validated['description_en'])) {
+            $validated['description_en'] = TranslationService::translate($validated['description'], 'id', 'en');
+        }
+
         Dimension::create($validated);
 
-        return back()->with('success', 'Dimensi berhasil ditambahkan.');
+        return back()->with('success', 'Dimensi berhasil ditambahkan (versi Indonesia & Inggris otomatis sinkron).');
     }
 
     public function destroyDimension(Instrument $instrument, Dimension $dimension)
@@ -252,6 +264,7 @@ class AdminInstrumentController extends Controller
             'dimension_id' => ['required', 'exists:dimensions,id'],
             'indicator_id' => ['nullable', 'exists:indicators,id'],
             'question_text' => ['required', 'string'],
+            'question_text_en' => ['nullable', 'string'],
             'type' => ['required', 'in:likert,multiple_choice,yes_no'],
             'scoring_direction' => ['required', 'in:normal,reverse'],
             'order' => ['required', 'integer'],
@@ -260,21 +273,27 @@ class AdminInstrumentController extends Controller
         $validated['instrument_id'] = $instrument->id;
         $validated['status'] = 'active';
 
+        // Auto-translate question into English if not provided
+        if (empty($validated['question_text_en'])) {
+            $validated['question_text_en'] = TranslationService::translate($validated['question_text'], 'id', 'en');
+        }
+
         $question = Question::create($validated);
 
         // Auto-create standard Likert options if likert
         if ($validated['type'] === 'likert') {
             $options = [
-                ['text' => 'Sangat Tidak Sesuai', 'val' => 1],
-                ['text' => 'Tidak Sesuai', 'val' => 2],
-                ['text' => 'Netral / Ragu-ragu', 'val' => 3],
-                ['text' => 'Sesuai', 'val' => 4],
-                ['text' => 'Sangat Sesuai', 'val' => 5],
+                ['text' => 'Sangat Tidak Sesuai', 'en' => 'Strongly Disagree', 'val' => 1],
+                ['text' => 'Tidak Sesuai', 'en' => 'Disagree', 'val' => 2],
+                ['text' => 'Netral / Ragu-ragu', 'en' => 'Neutral', 'val' => 3],
+                ['text' => 'Sesuai', 'en' => 'Agree', 'val' => 4],
+                ['text' => 'Sangat Sesuai', 'en' => 'Strongly Agree', 'val' => 5],
             ];
             foreach ($options as $idx => $opt) {
                 QuestionOption::create([
                     'question_id' => $question->id,
                     'option_text' => $opt['text'],
+                    'option_text_en' => $opt['en'],
                     'option_value' => $opt['val'],
                     'order' => $idx + 1,
                 ]);
@@ -289,7 +308,7 @@ class AdminInstrumentController extends Controller
             changes: ['scoring_direction' => $question->scoring_direction]
         );
 
-        return back()->with('success', 'Pertanyaan baru berhasil ditambahkan ke Bank Soal.');
+        return back()->with('success', 'Pertanyaan baru berhasil ditambahkan dan otomatis diterjemahkan ke Bahasa Inggris.');
     }
 
     public function updateQuestion(Request $request, Instrument $instrument, Question $question)
@@ -297,14 +316,56 @@ class AdminInstrumentController extends Controller
         $validated = $request->validate([
             'dimension_id' => ['required', 'exists:dimensions,id'],
             'question_text' => ['required', 'string'],
+            'question_text_en' => ['nullable', 'string'],
             'type' => ['required', 'in:likert,multiple_choice,yes_no'],
             'scoring_direction' => ['required', 'in:normal,reverse'],
             'order' => ['required', 'integer'],
         ]);
 
+        if (!empty($validated['question_text_en'])) {
+            // Keep manually edited English text
+        } else {
+            // Auto translate if changed or empty
+            if ($question->question_text !== $validated['question_text'] || empty($question->question_text_en)) {
+                $validated['question_text_en'] = TranslationService::translate($validated['question_text'], 'id', 'en');
+            }
+        }
+
         $question->update($validated);
 
-        return back()->with('success', 'Pertanyaan berhasil diperbarui.');
+        return back()->with('success', 'Pertanyaan berhasil diperbarui (versi Indonesia & Inggris sinkron).');
+    }
+
+    /**
+     * One-click trigger to auto-translate all questions and options for this instrument.
+     */
+    public function autoTranslateInstrument(Instrument $instrument)
+    {
+        @set_time_limit(300);
+        $count = 0;
+
+        foreach ($instrument->questions as $q) {
+            $q->question_text_en = TranslationService::translate($q->question_text, 'id', 'en');
+            $q->save();
+            $count++;
+
+            foreach ($q->options as $opt) {
+                if (empty($opt->option_text_en)) {
+                    $opt->option_text_en = TranslationService::translate($opt->option_text, 'id', 'en');
+                    $opt->save();
+                }
+            }
+        }
+
+        foreach ($instrument->dimensions as $dim) {
+            $dim->name_en = TranslationService::translate($dim->name, 'id', 'en');
+            if ($dim->description) {
+                $dim->description_en = TranslationService::translate($dim->description, 'id', 'en');
+            }
+            $dim->save();
+        }
+
+        return back()->with('success', "Berhasil menerjemahkan otomatis {$count} pertanyaan, opsi, dan dimensi paket soal ke Bahasa Inggris.");
     }
 
     public function destroyQuestion(Instrument $instrument, Question $question)
