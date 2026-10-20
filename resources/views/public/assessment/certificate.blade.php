@@ -250,7 +250,7 @@
                     <div class="pt-1">
                         <h1 class="font-cinzel text-[24px] font-bold tracking-[0.12em] uppercase leading-tight"
                             :class="theme === 'dark' ? 'text-white' : 'text-[#0F2537]'">
-                            SERTIFIKAT HASIL ASESMEN RQI
+                            {{ app()->getLocale() === 'en' ? 'OFFICIAL CERTIFICATE OF ASSESSMENT' : 'SERTIFIKAT HASIL ASESMEN RQI' }}
                         </h1>
                         <p class="text-[10.5px] font-serif-editorial italic tracking-wide mt-0.5"
                            :class="theme === 'dark' ? 'text-[#D5BC8A]' : 'text-slate-500'">
@@ -285,21 +285,21 @@
                         @endphp
                         <p class="text-[11px] font-normal mt-1.5 tracking-wide"
                            :class="theme === 'dark' ? 'text-slate-300' : 'text-slate-600'">
-                            <span>Kategori: <strong class="font-semibold" :class="theme === 'dark' ? 'text-white' : 'text-[#0F2537]'">{{ ucwords(strtolower($submission->participant->category ?: 'Umum')) }}</strong></span>
+                            <span>{{ app()->getLocale() === 'en' ? 'Category:' : 'Kategori:' }} <strong class="font-semibold" :class="theme === 'dark' ? 'text-white' : 'text-[#0F2537]'">{{ ucwords(strtolower($submission->participant->category ?: 'General')) }}</strong></span>
                             @if($instName)
                                 <span class="mx-2 text-[#B5945B]">|</span>
-                                <span>Instansi: <strong class="font-semibold" :class="theme === 'dark' ? 'text-white' : 'text-[#0F2537]'">{{ $instName }}</strong></span>
+                                <span>{{ app()->getLocale() === 'en' ? 'Institution:' : 'Instansi:' }} <strong class="font-semibold" :class="theme === 'dark' ? 'text-white' : 'text-[#0F2537]'">{{ $instName }}</strong></span>
                             @endif
                             @if($domisili)
                                 <span class="mx-2 text-[#B5945B]">|</span>
-                                <span>Domisili: <strong class="font-semibold" :class="theme === 'dark' ? 'text-white' : 'text-[#0F2537]'">{{ $domisili }}</strong></span>
+                                <span>{{ app()->getLocale() === 'en' ? 'Location:' : 'Domisili:' }} <strong class="font-semibold" :class="theme === 'dark' ? 'text-white' : 'text-[#0F2537]'">{{ $domisili }}</strong></span>
                             @endif
                         </p>
                     </div>
 
                     <p class="text-[11px] max-w-2xl mx-auto leading-relaxed font-normal"
                        :class="theme === 'dark' ? 'text-slate-300' : 'text-slate-600'">
-                        Telah menyelesaikan evaluasi psikometrik terstruktur pemetaan <strong class="font-semibold" :class="theme === 'dark' ? 'text-white' : 'text-[#0F2537]'">6 Dimensi Terpadu: 5 Pilar Kecerdasan Ruhiologi (RQI-15) & Indeks Kesejahteraan Mental (WHO-5)</strong> dengan rincian capaian sebagai berikut:
+                        {{ app()->getLocale() === 'en' ? 'Has successfully completed the psychometric evaluation mapping the 6 Unified Dimensions: 5 Pillars of Ruhiology Quotient (RQI-15) & Mental Well-Being Index (WHO-5) with the following achievements:' : 'Telah menyelesaikan evaluasi psikometrik terstruktur pemetaan 6 Dimensi Terpadu: 5 Pilar Kecerdasan Ruhiologi (RQI-15) & Indeks Kesejahteraan Mental (WHO-5) dengan rincian capaian sebagai berikut:' }}
                     </p>
 
                     <!-- DUAL SCORE CARDS (UNIFIED ARCHITECTURAL CARDS — CALM & AUTHORITATIVE) -->
@@ -338,16 +338,19 @@
                         }
 
                         $cleanPillarLabel = function($rawName, $isWho5 = false) {
+                            $isEn = app()->getLocale() === 'en';
                             $lower = strtolower($rawName);
-                            if ($isWho5 || str_contains($lower, 'who')) return 'Kesejahteraan WHO-5';
-                            if (str_contains($lower, 'diri')) return 'Kesadaran Diri & Ruh';
-                            if (str_contains($lower, 'puncak')) return 'Kesadaran Puncak Ilahi';
-                            if (str_contains($lower, 'god spot') || str_contains($lower, 'ketuhanan') || str_contains($lower, 'spiritual connection')) return 'Kesadaran Ketuhanan';
-                            if (str_contains($lower, 'ibadah') || str_contains($lower, 'ketaatan')) return 'Ketaatan Spiritual';
-                            if (str_contains($lower, 'tazkiyah') || str_contains($lower, 'purifikasi') || str_contains($lower, 'inner peace')) return 'Purifikasi Batin';
-                            if (str_contains($lower, 'perilaku') || str_contains($lower, 'akhlak') || str_contains($lower, 'altruistic')) return 'Akhlak & Perilaku';
-                            if (str_contains($lower, 'resiliensi') || str_contains($lower, 'ketangguhan')) return 'Resiliensi Jiwa';
+                            if ($isWho5 || str_contains($lower, 'who')) return $isEn ? 'WHO-5 Well-Being' : 'Kesejahteraan WHO-5';
+                            if (str_contains($lower, 'diri')) return $isEn ? 'Authentic Self-Awareness' : 'Kesadaran Diri & Ruh';
+                            if (str_contains($lower, 'puncak')) return $isEn ? 'Peak Divine Consciousness' : 'Kesadaran Puncak Ilahi';
+                            if (str_contains($lower, 'god spot') || str_contains($lower, 'ketuhanan') || str_contains($lower, 'spiritual connection')) return $isEn ? 'Divine Recognition' : 'Kesadaran Ketuhanan';
+                            if (str_contains($lower, 'ibadah') || str_contains($lower, 'ketaatan')) return $isEn ? 'Spiritual Devotion' : 'Ketaatan Spiritual';
+                            if (str_contains($lower, 'tazkiyah') || str_contains($lower, 'purifikasi') || str_contains($lower, 'inner peace')) return $isEn ? 'Inner Purification' : 'Purifikasi Batin';
+                            if (str_contains($lower, 'perilaku') || str_contains($lower, 'akhlak') || str_contains($lower, 'altruistic')) return $isEn ? 'Noble Character & Ethics' : 'Akhlak & Perilaku';
+                            if (str_contains($lower, 'resiliensi') || str_contains($lower, 'ketangguhan')) return $isEn ? 'Spiritual Resilience' : 'Resiliensi Jiwa';
                             $clean = preg_replace('/^\d+\.\s*/', '', trim($rawName));
+                            return $clean;
+                        };
                             $clean = preg_replace('/\s*\(.*?\)/', '', $clean);
                             return \Illuminate\Support\Str::limit($clean, 20, '');
                         };

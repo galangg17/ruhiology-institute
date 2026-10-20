@@ -21,8 +21,11 @@ class Dimension extends Model
 
     public function getLocalizedNameAttribute(): string
     {
-        if (app()->getLocale() === 'en' && !empty($this->name_en)) {
-            return $this->name_en;
+        if (app()->getLocale() === 'en') {
+            if (!empty($this->name_en)) {
+                return $this->name_en;
+            }
+            return \App\Services\TranslationService::translate($this->name ?? '', 'id', 'en');
         }
         return $this->name ?? '';
     }

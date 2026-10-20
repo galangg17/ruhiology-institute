@@ -50,7 +50,7 @@ class TranslationService
     /**
      * Curated official translations for the 20 Instrument 1 questions.
      */
-    protected static array $curatedQuestions = [
+    public static array $curatedQuestions = [
         1 => "I am aware that I am not merely physical or defined by social status, but a soul undergoing growth, thus I perceive daily activities as a medium for spiritual cultivation.",
         2 => "When mental fatigue or device distractions (scrolling for hours) arise, I know when to apply the 'emergency brake' so my time and energy are not wasted.",
         3 => "When I feel discouraged, left behind, or insecure seeing others' achievements on social media, my heart remains composed knowing my intrinsic value is not determined by digital validation.",
@@ -73,6 +73,87 @@ class TranslationService
         19 => "I woke up feeling fresh and rested.",
         20 => "My daily life has been filled with things that interest me.",
     ];
+
+    /**
+     * Get guaranteed English translation for question with intelligent keyword matching.
+     */
+    public static function getQuestionEnglishFallback(Question $q): string
+    {
+        // 1. Match by order
+        if (!empty($q->order) && isset(self::$curatedQuestions[$q->order])) {
+            return self::$curatedQuestions[$q->order];
+        }
+
+        // 2. Match by id
+        if (isset(self::$curatedQuestions[$q->id])) {
+            return self::$curatedQuestions[$q->id];
+        }
+
+        // 3. Match by content keywords in question_text
+        $text = mb_strtolower($q->question_text ?? '');
+        if (str_contains($text, 'bukan sekadar fisik') || str_contains($text, 'pembentukan jiwa')) {
+            return self::$curatedQuestions[1];
+        }
+        if (str_contains($text, 'godaan gawai') || str_contains($text, 'rem darurat')) {
+            return self::$curatedQuestions[2];
+        }
+        if (str_contains($text, 'pencapaian orang lain') || str_contains($text, 'validasi dunia maya')) {
+            return self::$curatedQuestions[3];
+        }
+        if (str_contains($text, 'ruang sunyi') || str_contains($text, 'mengingat tuhan')) {
+            return self::$curatedQuestions[4];
+        }
+        if (str_contains($text, 'nikmat yang tak terduga') || str_contains($text, 'spontan yang muncul') || str_contains($text, 'keberhasilan')) {
+            return self::$curatedQuestions[5];
+        }
+        if (str_contains($text, 'pelindung sejati') || str_contains($text, 'menghadapi masa depan') || str_contains($text, 'kecemasan')) {
+            return self::$curatedQuestions[6];
+        }
+        if (str_contains($text, 'menunaikan ibadah') || str_contains($text, 'kebutuhan jiwa') || str_contains($text, 'formalitas')) {
+            return self::$curatedQuestions[7];
+        }
+        if (str_contains($text, 'mengevaluasi diri') || str_contains($text, 'ada yang hampa') || str_contains($text, 'merenung')) {
+            return self::$curatedQuestions[8];
+        }
+        if (str_contains($text, 'kedisiplinan ibadah') || str_contains($text, 'benteng otomatis') || str_contains($text, 'perilaku menyimpang')) {
+            return self::$curatedQuestions[9];
+        }
+        if (str_contains($text, 'bersikap santun') || str_contains($text, 'memaafkan') || str_contains($text, 'mengecewakan')) {
+            return self::$curatedQuestions[10];
+        }
+        if (str_contains($text, 'menjaga kejujuran') || str_contains($text, 'meski tidak ada yang mengawasi') || str_contains($text, 'integritas')) {
+            return self::$curatedQuestions[11];
+        }
+        if (str_contains($text, 'amarah memuncak') || str_contains($text, 'menahan diri') || str_contains($text, 'konflik')) {
+            return self::$curatedQuestions[12];
+        }
+        if (str_contains($text, 'selalu mengawasi') || str_contains($text, 'muraqabah') || str_contains($text, 'ruang privat')) {
+            return self::$curatedQuestions[13];
+        }
+        if (str_contains($text, 'merasakan kehadiran tuhan') || str_contains($text, 'sendirian di kamar') || str_contains($text, 'larut malam')) {
+            return self::$curatedQuestions[14];
+        }
+        if (str_contains($text, 'proses yang jujur') || str_contains($text, 'ujian hidup') || str_contains($text, 'keberkahan')) {
+            return self::$curatedQuestions[15];
+        }
+        if (str_contains($text, 'bersemangat, ceria') || str_contains($text, 'ceria dan bersemangat') || str_contains($text, 'termotivasi')) {
+            return self::$curatedQuestions[16];
+        }
+        if (str_contains($text, 'tenang, damai') || str_contains($text, 'tenang dan rileks') || str_contains($text, 'tidak terbebani')) {
+            return self::$curatedQuestions[17];
+        }
+        if (str_contains($text, 'aktif, segar') || str_contains($text, 'aktif dan berenergi') || str_contains($text, 'bertenaga')) {
+            return self::$curatedQuestions[18];
+        }
+        if (str_contains($text, 'bangun tidur pagi') || str_contains($text, 'segar dan beristirahat') || str_contains($text, 'istirahat yang cukup')) {
+            return self::$curatedQuestions[19];
+        }
+        if (str_contains($text, 'bermakna dan memicu') || str_contains($text, 'hal-hal yang menarik') || str_contains($text, 'antusiasme')) {
+            return self::$curatedQuestions[20];
+        }
+
+        return '';
+    }
 
     /**
      * Translate text from source to target language.

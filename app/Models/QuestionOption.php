@@ -19,8 +19,11 @@ class QuestionOption extends Model
 
     public function getLocalizedTextAttribute(): string
     {
-        if (app()->getLocale() === 'en' && !empty($this->option_text_en)) {
-            return $this->option_text_en;
+        if (app()->getLocale() === 'en') {
+            if (!empty($this->option_text_en)) {
+                return $this->option_text_en;
+            }
+            return \App\Services\TranslationService::translate($this->option_text ?? '', 'id', 'en');
         }
         return $this->option_text ?? '';
     }

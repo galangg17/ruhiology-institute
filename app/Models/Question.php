@@ -23,8 +23,15 @@ class Question extends Model
 
     public function getLocalizedTextAttribute(): string
     {
-        if (app()->getLocale() === 'en' && !empty($this->question_text_en)) {
-            return $this->question_text_en;
+        if (app()->getLocale() === 'en') {
+            if (!empty($this->question_text_en)) {
+                return $this->question_text_en;
+            }
+            
+            $fallback = \App\Services\TranslationService::getQuestionEnglishFallback($this);
+            if (!empty($fallback)) {
+                return $fallback;
+            }
         }
         return $this->question_text ?? '';
     }

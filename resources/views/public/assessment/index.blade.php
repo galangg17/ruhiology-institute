@@ -27,6 +27,7 @@ window.rqAssessmentIndex = function rqAssessmentIndex() {
         eventSubcategories: [],
         publicInstruments: @json($publicInstruments ?? []),
         regenciesMap: @json($regenciesMap ?? []),
+        appLocale: '{{ app()->getLocale() }}',
         participantCategoriesList: @json($participantCategories ?? []),
 
         form: {
@@ -120,6 +121,9 @@ window.rqAssessmentIndex = function rqAssessmentIndex() {
         },
 
         getDetailLabel() {
+            if (this.appLocale === 'en') {
+                return 'Institution / School / Organization Name';
+            }
             const subs = this.getCurrentCategorySubCategories();
             if (!subs || subs.length === 0) return 'Nama Instansi / Detail Tempat';
             const sel = subs.find(s => s.name === this.form.sub_category_type);
@@ -127,6 +131,9 @@ window.rqAssessmentIndex = function rqAssessmentIndex() {
         },
 
         getDetailPlaceholder() {
+            if (this.appLocale === 'en') {
+                return 'e.g. University / High School / Public Organization';
+            }
             const lbl = this.getDetailLabel();
             return 'Contoh: ' + (lbl || 'Nama Instansi / Unit Kerja Anda');
         },
@@ -714,32 +721,32 @@ document.addEventListener('alpine:init', () => {
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
                             <!-- LEFT COLUMN: Identitas Diri & Wilayah -->
                             <div class="space-y-3.5 bg-slate-50/80 p-4 sm:p-5 rounded-2xl border border-slate-200">
-                                <h4 class="font-serif font-bold text-xs text-[#0B2A43] border-b border-slate-200 pb-1.5 uppercase font-mono tracking-wider">Langkah 1: Identitas & Wilayah</h4>
+                                <h4 class="font-serif font-bold text-xs text-[#0B2A43] border-b border-slate-200 pb-1.5 uppercase font-mono tracking-wider">{{ app()->getLocale() === 'en' ? 'Step 1: Identity & Location' : 'Langkah 1: Identitas & Wilayah' }}</h4>
 
                                 <div>
-                                    <label class="block font-bold text-slate-700 mb-1">Nama Lengkap *</label>
-                                    <input type="text" x-model="form.name" required placeholder="Masukkan nama lengkap Anda..." class="w-full p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
+                                    <label class="block font-bold text-slate-700 mb-1">{{ app()->getLocale() === 'en' ? 'Full Name *' : 'Nama Lengkap *' }}</label>
+                                    <input type="text" x-model="form.name" required :placeholder="form.country_code === 'ID' ? 'Masukkan nama lengkap Anda...' : 'Enter your full legal name...'" class="w-full p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
                                 </div>
 
                                 <div class="grid grid-cols-2 gap-2.5">
                                     <div>
-                                        <label class="block font-bold text-slate-700 mb-1">Tanggal Lahir *</label>
+                                        <label class="block font-bold text-slate-700 mb-1">{{ app()->getLocale() === 'en' ? 'Date of Birth *' : 'Tanggal Lahir *' }}</label>
                                         <input type="date" x-model="form.birth_date" required class="w-full p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white text-xs">
                                     </div>
                                     <div>
-                                        <label class="block font-bold text-slate-700 mb-1">No. WA (Opsional)</label>
-                                        <input type="tel" x-model="form.phone" placeholder="081234567890" class="w-full p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white text-xs">
+                                        <label class="block font-bold text-slate-700 mb-1">{{ app()->getLocale() === 'en' ? 'WhatsApp / Phone' : 'No. WA (Opsional)' }}</label>
+                                        <input type="tel" x-model="form.phone" placeholder="8123456789" class="w-full p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white text-xs">
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label class="block font-bold text-slate-700 mb-1">Jenis Kelamin *</label>
+                                    <label class="block font-bold text-slate-700 mb-1">{{ app()->getLocale() === 'en' ? 'Gender *' : 'Jenis Kelamin *' }}</label>
                                     <div class="grid grid-cols-2 gap-2">
                                         <button type="button" @click="form.gender = 'Laki-laki'" :class="form.gender === 'Laki-laki' ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'" class="py-2 px-3 rounded-xl border text-xs transition-colors text-center cursor-pointer">
-                                            👨 Laki-laki
+                                            👨 {{ app()->getLocale() === 'en' ? 'Male' : 'Laki-laki' }}
                                         </button>
                                         <button type="button" @click="form.gender = 'Perempuan'" :class="form.gender === 'Perempuan' ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'" class="py-2 px-3 rounded-xl border text-xs transition-colors text-center cursor-pointer">
-                                            👩 Perempuan
+                                            👩 {{ app()->getLocale() === 'en' ? 'Female' : 'Perempuan' }}
                                         </button>
                                     </div>
                                 </div>
@@ -807,11 +814,11 @@ document.addEventListener('alpine:init', () => {
 
                             <!-- RIGHT COLUMN: Profil & Kategori 3-Tingkat -->
                             <div class="space-y-3.5 bg-slate-50/80 p-4 sm:p-5 rounded-2xl border border-slate-200">
-                                <h4 class="font-serif font-bold text-xs text-[#0B2A43] border-b border-slate-200 pb-1.5 uppercase font-mono tracking-wider">Langkah 2: Kategori & Instansi Peserta</h4>
+                                <h4 class="font-serif font-bold text-xs text-[#0B2A43] border-b border-slate-200 pb-1.5 uppercase font-mono tracking-wider">{{ app()->getLocale() === 'en' ? 'Step 2: Participant Category & Organization' : 'Langkah 2: Kategori & Instansi Peserta' }}</h4>
 
                                 <!-- Level 1: Kategori Utama Dropdown -->
                                 <div>
-                                    <label class="block font-bold text-slate-800 text-xs mb-1">1. Kategori Utama *</label>
+                                    <label class="block font-bold text-slate-800 text-xs mb-1">{{ app()->getLocale() === 'en' ? '1. Primary Category *' : '1. Kategori Utama *' }}</label>
                                     <select x-model="form.category" @change="setCategory(form.category)" required class="w-full p-2.5 text-xs font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white text-slate-900 shadow-xs">
                                         <template x-for="cat in (participantCategoriesList && participantCategoriesList.length > 0 ? participantCategoriesList : [
                                             { name: 'GURU', icon: '👨‍🏫' },
@@ -833,7 +840,7 @@ document.addEventListener('alpine:init', () => {
                                 <template x-if="getCurrentCategorySubCategories() && getCurrentCategorySubCategories().length > 0">
                                     <div>
                                         <label class="block font-bold text-slate-800 text-xs mb-1">
-                                            2. Sub-Kategori / Jenis (<span x-text="form.category"></span>) *
+                                            2. {{ app()->getLocale() === 'en' ? 'Sub-Category / Stream' : 'Sub-Kategori / Jenis' }} (<span x-text="form.category"></span>) *
                                         </label>
                                         <select x-model="form.sub_category_type" @change="onSubCategoryTypeChange()" required class="w-full p-2.5 text-xs font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white text-slate-800">
                                             <template x-for="sub in getCurrentCategorySubCategories()" :key="sub.id || sub.name">
@@ -855,7 +862,7 @@ document.addEventListener('alpine:init', () => {
                                 <template x-if="form.category === 'MAHASISWA'">
                                     <div class="grid grid-cols-2 gap-2.5 pt-1">
                                         <div>
-                                            <label class="block font-bold text-slate-700 text-[11px] mb-1">Semester (Opsional)</label>
+                                            <label class="block font-bold text-slate-700 text-[11px] mb-1">{{ app()->getLocale() === 'en' ? 'Semester (Optional)' : 'Semester (Opsional)' }}</label>
                                             <select x-model="form.semester" class="w-full p-2 text-xs font-medium rounded-xl border border-slate-300 outline-none bg-white">
                                                 <template x-for="s in 12" :key="s">
                                                     <option :value="s" x-text="'Semester ' + s"></option>
@@ -863,7 +870,7 @@ document.addEventListener('alpine:init', () => {
                                             </select>
                                         </div>
                                         <div>
-                                            <label class="block font-bold text-slate-700 text-[11px] mb-1">Angkatan (Opsional)</label>
+                                            <label class="block font-bold text-slate-700 text-[11px] mb-1">{{ app()->getLocale() === 'en' ? 'Cohort Year (Optional)' : 'Angkatan (Opsional)' }}</label>
                                             <input type="text" x-model="form.entry_year" placeholder="2024" class="w-full p-2 text-xs rounded-xl border border-slate-300 outline-none bg-white">
                                         </div>
                                     </div>
@@ -871,8 +878,8 @@ document.addEventListener('alpine:init', () => {
 
                                 <template x-if="['MURID', 'GURU'].includes(form.category)">
                                     <div class="pt-1">
-                                        <label class="block font-bold text-slate-700 text-[11px] mb-1">Kelas / Rombel / Jurusan (Opsional)</label>
-                                        <input type="text" x-model="form.school_class" placeholder="Contoh: Kelas X IPA 1 / XII IPS 2" class="w-full p-2 text-xs rounded-xl border border-slate-300 outline-none bg-white">
+                                        <label class="block font-bold text-slate-700 text-[11px] mb-1">{{ app()->getLocale() === 'en' ? 'Grade / Class / Major (Optional)' : 'Kelas / Rombel / Jurusan (Opsional)' }}</label>
+                                        <input type="text" x-model="form.school_class" :placeholder="appLocale === 'en' ? 'e.g. Grade 10 Science / Major' : 'Contoh: Kelas X IPA 1 / XII IPS 2'" class="w-full p-2 text-xs rounded-xl border border-slate-300 outline-none bg-white">
                                     </div>
                                 </template>
 
@@ -884,7 +891,7 @@ document.addEventListener('alpine:init', () => {
                 <!-- Full-Width Bottom Action Bar -->
                 <div class="pt-2">
                     <button type="submit" :disabled="isSubmitting" class="w-full py-3.5 bg-[#0B2A43] hover:bg-[#123B59] text-[#C9A24D] font-extrabold rounded-2xl text-xs uppercase tracking-wider shadow-lg transition-transform hover:scale-[1.005] cursor-pointer disabled:opacity-50 border border-[#C9A24D]/30">
-                        <span x-text="isSubmitting ? 'Memproses Registrasi...' : 'Generate Kode Assessment & Mulai Test →'"></span>
+                        <span x-text="isSubmitting ? (appLocale === 'en' ? 'Processing Registration...' : 'Memproses Registrasi...') : (appLocale === 'en' ? 'Generate Assessment Code & Start Test →' : 'Generate Kode Assessment & Mulai Test →')"></span>
                     </button>
                 </div>
 
@@ -899,9 +906,9 @@ document.addEventListener('alpine:init', () => {
                 ✨
             </div>
             <div>
-                <span class="text-[10px] font-extrabold text-emerald-600 uppercase tracking-widest block font-mono">ASSESSMENT BERHASIL DIBUAT</span>
-                <h3 class="text-xl font-serif font-bold text-[#0B2A43] mt-1">Kode Assessment Unik Anda</h3>
-                <p class="text-xs text-slate-500 mt-1">Simpan kode ini untuk melihat hasil dan melanjutkan assessment di lain waktu.</p>
+                <span class="text-[10px] font-extrabold text-emerald-600 uppercase tracking-widest block font-mono">{{ app()->getLocale() === 'en' ? 'ASSESSMENT CREATED SUCCESSFULLY' : 'ASSESSMENT BERHASIL DIBUAT' }}</span>
+                <h3 class="text-xl font-serif font-bold text-[#0B2A43] mt-1">{{ app()->getLocale() === 'en' ? 'Your Unique Assessment Code' : 'Kode Assessment Unik Anda' }}</h3>
+                <p class="text-xs text-slate-500 mt-1">{{ app()->getLocale() === 'en' ? 'Save this code to check your results or resume anytime.' : 'Simpan kode ini untuk melihat hasil dan melanjutkan assessment di lain waktu.' }}</p>
             </div>
 
             <!-- Prominent Code Box -->
@@ -911,10 +918,10 @@ document.addEventListener('alpine:init', () => {
 
             <div class="flex gap-3 pt-2">
                 <button type="button" @click="copyCode()" class="flex-1 py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
-                    <span>📋</span> <span x-text="copied ? 'Tersalin!' : 'SALIN KODE'"></span>
+                    <span>📋</span> <span x-text="copied ? (appLocale === 'en' ? 'Copied!' : 'Tersalin!') : (appLocale === 'en' ? 'COPY CODE' : 'SALIN KODE')"></span>
                 </button>
                 <a :href="takeUrl" class="flex-1 py-3 px-4 bg-[#0B2A43] hover:bg-[#123B59] text-white font-bold rounded-xl text-xs shadow-md transition-colors flex items-center justify-center gap-1.5">
-                    <span>MULAI ASSESSMENT →</span>
+                    <span>{{ app()->getLocale() === 'en' ? 'START ASSESSMENT →' : 'MULAI ASSESSMENT →' }}</span>
                 </a>
             </div>
         </div>

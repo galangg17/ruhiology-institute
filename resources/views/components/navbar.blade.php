@@ -28,37 +28,37 @@
                 <a href="{{ url('/') }}"
                    class="px-2.5 xl:px-3 py-1.5 rounded-full transition-all flex items-center gap-1 whitespace-nowrap {{ request()->is('/') ? 'bg-[#0B2A43] text-white font-bold shadow-xs' : 'hover:text-[#0B2A43] hover:bg-white/80' }}">
                     <svg class="w-3.5 h-3.5 shrink-0 {{ request()->is('/') ? 'text-[#C9A24D]' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                    <span>Beranda</span>
+                    <span>{{ app()->getLocale() === 'en' ? 'Home' : 'Beranda' }}</span>
                 </a>
 
                 <a href="{{ url('/#founder') }}"
                    class="px-2.5 xl:px-3 py-1.5 rounded-full transition-all flex items-center gap-1 whitespace-nowrap hover:text-[#0B2A43] hover:bg-white/80">
                     <span class="text-xs">👨‍🏫</span>
-                    <span>Profil Founder</span>
+                    <span>{{ app()->getLocale() === 'en' ? 'Founder Profile' : 'Profil Founder' }}</span>
                 </a>
 
                 <a href="{{ route('assessment.index') }}"
                    class="px-2.5 xl:px-3 py-1.5 rounded-full transition-all flex items-center gap-1 whitespace-nowrap {{ request()->routeIs('assessment.*') ? 'bg-[#0B2A43] text-white font-bold shadow-xs' : 'hover:text-[#0B2A43] hover:bg-white/80' }}">
                     <svg class="w-3.5 h-3.5 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    <span>RQ Assessment</span>
+                    <span>{{ app()->getLocale() === 'en' ? 'RQ Assessment' : 'RQ Assessment' }}</span>
                 </a>
 
                 <a href="{{ route('consultation.index') }}"
                    class="px-2.5 xl:px-3 py-1.5 rounded-full transition-all flex items-center gap-1 whitespace-nowrap {{ request()->routeIs('consultation.*') ? 'bg-[#0B2A43] text-white font-bold shadow-xs' : 'hover:text-[#0B2A43] hover:bg-white/80' }}">
                     <span class="text-xs">💬</span>
-                    <span>Konsultasi</span>
+                    <span>{{ app()->getLocale() === 'en' ? 'Consultation' : 'Konsultasi' }}</span>
                 </a>
 
                 <a href="{{ route('catalog.index') }}"
                    class="px-2.5 xl:px-3 py-1.5 rounded-full transition-all flex items-center gap-1 whitespace-nowrap {{ request()->routeIs('catalog.*') ? 'bg-[#0B2A43] text-white font-bold shadow-xs' : 'hover:text-[#0B2A43] hover:bg-white/80' }}">
                     <svg class="w-3.5 h-3.5 text-[#C9A24D] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                    <span>Katalog Buku</span>
+                    <span>{{ app()->getLocale() === 'en' ? 'Books' : 'Katalog Buku' }}</span>
                 </a>
 
                 <a href="{{ route('articles.index') }}"
                    class="px-2.5 xl:px-3 py-1.5 rounded-full transition-all flex items-center gap-1 whitespace-nowrap {{ request()->routeIs('articles.*') ? 'bg-[#0B2A43] text-white font-bold shadow-xs' : 'hover:text-[#0B2A43] hover:bg-white/80' }}">
                     <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
-                    <span>Artikel</span>
+                    <span>{{ app()->getLocale() === 'en' ? 'Articles' : 'Artikel' }}</span>
                 </a>
 
             </nav>
@@ -82,12 +82,12 @@
                 @auth
                     <a href="{{ auth()->user()->isAdmin() ? route('admin.dashboard') : route('dashboard') }}" class="py-2 px-3.5 sm:px-4 bg-[#0B2A43] hover:bg-[#123B59] text-white font-bold text-[11px] xl:text-xs rounded-xl shadow-xs hover:shadow-sm border border-[#C9A24D]/30 transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer group">
                         <svg class="w-3.5 h-3.5 text-[#C9A24D] group-hover:rotate-12 transition-transform shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                        <span>{{ auth()->user()->isAdmin() ? 'Dashboard Admin' : 'Dashboard Saya' }}</span>
+                        <span>{{ auth()->user()->isAdmin() ? (app()->getLocale() === 'en' ? 'Admin Dashboard' : 'Dashboard Admin') : (app()->getLocale() === 'en' ? 'My Dashboard' : 'Dashboard Saya') }}</span>
                     </a>
                 @else
                     <a href="{{ route('login') }}" class="py-2 px-3.5 sm:px-4 bg-[#0B2A43] hover:bg-[#123B59] text-white font-bold text-[11px] xl:text-xs rounded-xl shadow-xs hover:shadow-sm border border-[#C9A24D]/30 transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer group">
                         <svg class="w-3.5 h-3.5 text-[#C9A24D] group-hover:translate-x-0.5 transition-transform shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
-                        <span>Masuk / Dashboard</span>
+                        <span>{{ app()->getLocale() === 'en' ? 'Sign In / Dashboard' : 'Masuk / Dashboard' }}</span>
                     </a>
                 @endauth
             </div>
