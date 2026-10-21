@@ -1,3 +1,4 @@
+@php $isEn = app()->getLocale() === 'en'; @endphp
 <div 
     x-data="{
         open: false,
@@ -5,6 +6,7 @@
         loading: false,
         resultData: null,
         errorMessage: null,
+        isEn: {{ $isEn ? 'true' : 'false' }},
         
         openModal(detail) {
             this.open = true;
@@ -21,7 +23,7 @@
 
         async fetchResult() {
             if (!this.inputCode || !this.inputCode.trim()) {
-                this.errorMessage = 'Mohon masukkan kode assessment atau kode peserta.';
+                this.errorMessage = this.isEn ? 'Please enter assessment code or participant code.' : 'Mohon masukkan kode assessment atau kode peserta.';
                 return;
             }
 
@@ -45,11 +47,11 @@
                 if (data.found) {
                     this.resultData = data;
                 } else {
-                    this.errorMessage = data.message || 'Kode tidak ditemukan dalam database.';
+                    this.errorMessage = data.message || (this.isEn ? 'Code not found in database.' : 'Kode tidak ditemukan dalam database.');
                 }
             } catch (err) {
                 this.loading = false;
-                this.errorMessage = 'Terjadi kesalahan jaringan. Silakan coba kembali.';
+                this.errorMessage = this.isEn ? 'Network error occurred. Please try again.' : 'Terjadi kesalahan jaringan. Silakan coba kembali.';
             }
         }
     }"
@@ -70,13 +72,13 @@
             </button>
 
             <div class="flex items-center gap-2.5 mb-1 text-[#C9A24D] text-xs font-mono font-bold uppercase tracking-wider">
-                <span>🔍 EVALUASI & VERIFIKASI ASESMEN</span>
+                <span>🔍 {{ $isEn ? 'ASSESSMENT EVALUATION & VERIFICATION' : 'EVALUASI & VERIFIKASI ASESMEN' }}</span>
             </div>
             <h3 class="font-serif text-2xl font-bold text-white tracking-tight">
-                Cek Skor & Status Posttest
+                {{ $isEn ? 'Check Score & Posttest Status' : 'Cek Skor & Status Posttest' }}
             </h3>
             <p class="text-xs text-slate-300 mt-1 font-normal">
-                Masukkan Kode Submission (<code class="bg-white/10 px-1.5 py-0.5 rounded text-amber-300">SUB-XXXX</code>), Kode Peserta (<code class="bg-white/10 px-1.5 py-0.5 rounded text-amber-300">PAR-XXXX</code>), atau Kode Unique.
+                {{ $isEn ? 'Enter Submission Code (' : 'Masukkan Kode Submission (' }}<code class="bg-white/10 px-1.5 py-0.5 rounded text-amber-300">SUB-XXXX</code>{{ $isEn ? '), Participant Code (' : '), Kode Peserta (' }}<code class="bg-white/10 px-1.5 py-0.5 rounded text-amber-300">PAR-XXXX</code>{{ $isEn ? '), or Unique Code.' : '), atau Kode Unique.' }}
             </p>
         </div>
 
@@ -88,7 +90,7 @@
                     <input 
                         type="text" 
                         x-model="inputCode" 
-                        placeholder="Contoh: SUB-LIIGMH9LQL atau PAR-ABCD1234" 
+                        placeholder="{{ $isEn ? 'Example: SUB-LIIGMH9LQL or PAR-ABCD1234' : 'Contoh: SUB-LIIGMH9LQL atau PAR-ABCD1234' }}" 
                         class="w-full bg-slate-50 border border-slate-300 text-slate-800 placeholder-slate-400 text-xs px-4 py-3 rounded-2xl focus:outline-none focus:border-[#0B2A43] font-mono uppercase font-bold"
                     >
                 </div>
@@ -97,7 +99,7 @@
                     :disabled="loading" 
                     class="bg-[#0B2A43] hover:bg-[#123B59] text-white font-bold text-xs px-6 py-3 rounded-2xl transition shrink-0 shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
                 >
-                    <span x-show="!loading">Cek Hasil →</span>
+                    <span x-show="!loading">{{ $isEn ? 'Check Result →' : 'Cek Hasil →' }}</span>
                     <span x-show="loading" class="animate-spin">⏳</span>
                 </button>
             </form>
@@ -105,7 +107,7 @@
             <!-- Loading Spinner State -->
             <div x-show="loading" class="text-center py-8 space-y-2">
                 <div class="inline-block w-8 h-8 border-3 border-[#0B2A43] border-t-transparent rounded-full animate-spin"></div>
-                <p class="text-xs font-bold text-slate-600">Mencari data asesmen peserta...</p>
+                <p class="text-xs font-bold text-slate-600">{{ $isEn ? 'Searching participant assessment records...' : 'Mencari data asesmen peserta...' }}</p>
             </div>
 
             <!-- Error / Not Found State -->
@@ -116,12 +118,12 @@
                 <div>
                     <h4 class="font-bold text-xs text-amber-900" x-text="errorMessage"></h4>
                     <p class="text-[11px] text-amber-700 mt-1">
-                        Belum pernah membuat asesmen? Anda dapat mendaftar sesi asesmen baru secara gratis.
+                        {{ $isEn ? 'Have not taken an assessment yet? You can register for a free assessment session.' : 'Belum pernah membuat asesmen? Anda dapat mendaftar sesi asesmen baru secara gratis.' }}
                     </p>
                 </div>
                 <div>
                     <a href="{{ route('assessment.index') }}" class="inline-flex items-center gap-1.5 px-5 py-2.5 bg-[#0B2A43] hover:bg-[#123B59] text-white rounded-xl text-xs font-bold transition shadow-sm">
-                        <span>Mulai Assessment Baru</span> <span>→</span>
+                        <span>{{ $isEn ? 'Start New Assessment' : 'Mulai Assessment Baru' }}</span> <span>→</span>
                     </a>
                 </div>
             </div>
@@ -136,7 +138,7 @@
                             <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 block" x-text="resultData.participant.institution"></span>
                             <h4 class="font-serif font-bold text-base text-[#0B2A43]" x-text="resultData.participant.name"></h4>
                             <div class="flex items-center gap-2 text-[11px] text-slate-500 font-mono">
-                                <span>Kode Peserta:</span>
+                                <span>{{ $isEn ? 'Participant Code:' : 'Kode Peserta:' }}</span>
                                 <span class="font-bold text-[#0B2A43]" x-text="resultData.participant.participant_code"></span>
                             </div>
                         </div>
@@ -149,16 +151,16 @@
                             <div class="flex items-center justify-between">
                                 <div class="space-y-1">
                                     <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-wider block">
-                                        HASIL RQ TERKINI (<span x-text="resultData.latest_result.type"></span>)
+                                        {{ $isEn ? 'LATEST RQ RESULT (' : 'HASIL RQ TERKINI (' }}<span x-text="resultData.latest_result.type"></span>)
                                     </span>
                                     <div class="font-serif font-bold text-lg text-white" x-text="resultData.latest_result.rq_level_name"></div>
                                     <div class="text-[11px] text-slate-300">
-                                        Disubmit pada: <span x-text="resultData.latest_result.submitted_at"></span>
+                                        {{ $isEn ? 'Submitted on:' : 'Disubmit pada:' }} <span x-text="resultData.latest_result.submitted_at"></span>
                                     </div>
                                 </div>
                                 <div class="text-right shrink-0">
                                     <div class="text-3xl font-black font-mono text-[#C9A24D]" x-text="resultData.latest_result.total_score"></div>
-                                    <div class="text-[10px] text-slate-300 font-bold uppercase">Skor Total</div>
+                                    <div class="text-[10px] text-slate-300 font-bold uppercase">{{ $isEn ? 'Total Score' : 'Skor Total' }}</div>
                                 </div>
                             </div>
                         </div>
@@ -188,7 +190,7 @@
                                 :href="resultData.latest_result.result_url" 
                                 class="w-full py-3 px-4 bg-white border-2 border-[#0B2A43] text-[#0B2A43] hover:bg-slate-50 font-bold text-xs rounded-2xl transition shadow-sm flex items-center justify-center gap-2 text-center"
                             >
-                                <span>📊</span> <span>Lihat Hasil & Refleksi</span>
+                                <span>📊</span> <span>{{ $isEn ? 'View Result & Reflection' : 'Lihat Hasil & Refleksi' }}</span>
                             </a>
                         </template>
 
@@ -204,7 +206,7 @@
                                     type="submit" 
                                     class="w-full py-3 px-4 bg-gradient-to-r from-[#C9A24D] to-[#B48A16] hover:from-[#B48A16] hover:to-[#96710E] text-[#0B2A43] font-bold text-xs rounded-2xl transition shadow-md flex items-center justify-center gap-2 text-center cursor-pointer"
                                 >
-                                    <span>🚀</span> <span>Lanjut Kerjakan Posttest</span>
+                                    <span>🚀</span> <span>{{ $isEn ? 'Proceed to Posttest' : 'Lanjut Kerjakan Posttest' }}</span>
                                 </button>
                             </form>
                         </template>
@@ -215,7 +217,7 @@
                                 href="{{ route('assessment.index') }}" 
                                 class="w-full py-3 px-4 bg-[#0B2A43] text-white font-bold text-xs rounded-2xl transition shadow-sm text-center block"
                             >
-                                <span>Mulai Evaluasi Baru</span>
+                                <span>{{ $isEn ? 'Start New Assessment' : 'Mulai Evaluasi Baru' }}</span>
                             </a>
                         </template>
 

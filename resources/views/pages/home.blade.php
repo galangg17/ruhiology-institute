@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+@php $isEn = app()->getLocale() === 'en'; @endphp
 <div>
 
     <!-- HERO SECTION COMPONENT -->
@@ -25,9 +26,9 @@
                     <div>
                         <div class="flex items-baseline gap-1">
                             <span class="text-lg sm:text-2xl font-black font-mono text-[#0F2537]" x-text="current"></span>
-                            <span class="text-[11px] sm:text-xs font-bold text-[#0F2537]">Provinsi</span>
+                            <span class="text-[11px] sm:text-xs font-bold text-[#0F2537]">{{ $isEn ? 'Regions / Provinces' : 'Provinsi' }}</span>
                         </div>
-                        <span class="text-[10px] sm:text-[11px] text-slate-500 font-normal block leading-tight">Cakupan Indonesia</span>
+                        <span class="text-[10px] sm:text-[11px] text-slate-500 font-normal block leading-tight">{{ $isEn ? 'Geographic Reach' : 'Cakupan Indonesia' }}</span>
                     </div>
                 </div>
 
@@ -44,9 +45,9 @@
                     <div>
                         <div class="flex items-baseline gap-1">
                             <span class="text-lg sm:text-2xl font-black font-mono text-[#0F2537]" x-text="current"></span>
-                            <span class="text-[11px] sm:text-xs font-bold text-[#0F2537]">Institusi</span>
+                            <span class="text-[11px] sm:text-xs font-bold text-[#0F2537]">{{ $isEn ? 'Institutions' : 'Institusi' }}</span>
                         </div>
-                        <span class="text-[10px] sm:text-[11px] text-slate-500 font-normal block leading-tight">Kampus & Sekolah</span>
+                        <span class="text-[10px] sm:text-[11px] text-slate-500 font-normal block leading-tight">{{ $isEn ? 'Campuses & Schools' : 'Kampus & Sekolah' }}</span>
                     </div>
                 </div>
 
@@ -63,9 +64,9 @@
                     <div>
                         <div class="flex items-baseline gap-1">
                             <span class="text-lg sm:text-2xl font-black font-mono text-[#0F2537]" x-text="current"></span>
-                            <span class="text-[11px] sm:text-xs font-bold text-[#0F2537]">Peserta</span>
+                            <span class="text-[11px] sm:text-xs font-bold text-[#0F2537]">{{ $isEn ? 'Participants' : 'Peserta' }}</span>
                         </div>
-                        <span class="text-[10px] sm:text-[11px] text-slate-500 font-normal block leading-tight">Pengguna Asesmen</span>
+                        <span class="text-[10px] sm:text-[11px] text-slate-500 font-normal block leading-tight">{{ $isEn ? 'Assessment Takers' : 'Pengguna Asesmen' }}</span>
                     </div>
                 </div>
 
@@ -82,7 +83,7 @@
                     <div>
                         <div class="flex items-baseline gap-1">
                             <span class="text-lg sm:text-2xl font-black font-mono text-[#0F2537]" x-text="current"></span>
-                            <span class="text-[11px] sm:text-xs font-bold text-[#0F2537]">Sesi Evaluasi</span>
+                            <span class="text-[11px] sm:text-xs font-bold text-[#0F2537]">{{ $isEn ? 'Evaluation Sessions' : 'Sesi Evaluasi' }}</span>
                         </div>
                         <span class="text-[10px] sm:text-[11px] text-slate-500 font-normal block leading-tight">Pretest & Posttest</span>
                     </div>
@@ -117,20 +118,20 @@
                     <!-- Left Teaser Intro -->
                     <div class="lg:col-span-5 space-y-4 text-center lg:text-left">
                         <span class="inline-flex items-center space-x-2 bg-[#C9A24D]/20 text-[#C9A24D] text-xs font-mono font-bold px-3.5 py-1.5 rounded-full border border-[#C9A24D]/30 uppercase tracking-widest">
-                            <span>⚡ CEK RQ 1-MENIT</span>
+                            <span>⚡ {{ $isEn ? '1-MINUTE RQ CHECK' : 'CEK RQ 1-MENIT' }}</span>
                         </span>
                         <h2 class="font-serif text-2xl sm:text-3xl font-bold text-white leading-tight">
-                            Uji Cepat Potensi Ruhiologi Anda (Mini Quiz)
+                            {{ $isEn ? 'Quick-Test Your Ruhiology Potential (Mini Quiz)' : 'Uji Cepat Potensi Ruhiologi Anda (Mini Quiz)' }}
                         </h2>
                         <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">
-                            Jawab 3 pertanyaan reflektif berikut untuk mendapatkan estimasi tingkat kesadaran batin Anda secara instan sebelum mengambil asesmen lengkap terstruktur (20 soal).
+                            {{ $isEn ? 'Answer these 3 reflective questions for an instant estimate of your inner spiritual quotient before taking the full 20-question structured assessment.' : 'Jawab 3 pertanyaan reflektif berikut untuk mendapatkan estimasi tingkat kesadaran batin Anda secara instan sebelum mengambil asesmen lengkap terstruktur (20 soal).' }}
                         </p>
 
                         <!-- Live Mini Score Box -->
                         <template x-if="isDone">
                             <div class="p-4 bg-white/10 rounded-2xl border border-[#C9A24D]/40 backdrop-blur-md space-y-3 animate-fade-in text-left">
                                 <div class="flex items-center justify-between text-xs text-slate-300 font-mono">
-                                    <span>Estimasi Indeks Ruhiologi (RQ):</span>
+                                    <span>{{ $isEn ? 'Estimated Ruhiology Index (RQ):' : 'Estimasi Indeks Ruhiologi (RQ):' }}</span>
                                     <strong class="text-[#C9A24D] font-bold text-sm font-mono" x-text="Math.round((total / 15) * 100) + '%'"></strong>
                                 </div>
 
@@ -141,11 +142,11 @@
 
                                 <div class="space-y-1 pt-1">
                                     <span class="text-xs font-bold text-emerald-300 block" x-text="'✦ ' + category"></span>
-                                    <span class="text-[11px] block font-medium" :class="total >= 9 ? 'text-emerald-300' : 'text-amber-300'" x-text="total >= 9 ? '🟢 Prediksi WHO-5: Kesejahteraan Mental Baik' : '⚠️ Prediksi WHO-5: Indikasi Perlu Skrining Stres'"></span>
+                                    <span class="text-[11px] block font-medium" :class="total >= 9 ? 'text-emerald-300' : 'text-amber-300'" x-text="total >= 9 ? '{{ $isEn ? '🟢 WHO-5 Prediction: Positive Well-Being' : '🟢 Prediksi WHO-5: Kesejahteraan Mental Baik' }}' : '{{ $isEn ? '⚠️ WHO-5 Prediction: Stress Screening Advised' : '⚠️ Prediksi WHO-5: Indikasi Perlu Skrining Stres' }}'"></span>
                                 </div>
 
                                 <a href="{{ route('assessment.index') }}#mulai-mandiri" class="w-full mt-2 py-3 bg-[#C9A24D] hover:bg-[#B48A16] text-[#0B2A43] font-black text-xs rounded-xl shadow-lg transition transform hover:scale-[1.02] flex items-center justify-center gap-2 cursor-pointer">
-                                    <span>🚀 Mulai Asesmen Terstruktur (20 Soal)</span>
+                                    <span>🚀 {{ $isEn ? 'Start Structured Assessment (20 Questions)' : 'Mulai Asesmen Terstruktur (20 Soal)' }}</span>
                                     <span>→</span>
                                 </a>
                             </div>
@@ -158,8 +159,8 @@
                         <!-- Question 1 -->
                         <div class="space-y-2">
                             <label class="text-xs sm:text-sm font-bold text-slate-200 block">
-                                1. Penataan Niat & Orientasi Ilahi:
-                                <span class="text-slate-300 font-normal block text-[11px] mt-0.5">Seberapa sering Anda menata niat demi keridhaan Tuhan sebelum belajar atau bekerja?</span>
+                                {{ $isEn ? '1. Intention & Divine Alignment:' : '1. Penataan Niat & Orientasi Ilahi:' }}
+                                <span class="text-slate-300 font-normal block text-[11px] mt-0.5">{{ $isEn ? 'How frequently do you align your intentions for divine pleasure before studying or working?' : 'Seberapa sering Anda menata niat demi keridhaan Tuhan sebelum belajar atau bekerja?' }}</span>
                             </label>
                             <div class="grid grid-cols-5 gap-1.5 sm:gap-2">
                                 <template x-for="i in 5">
@@ -173,8 +174,8 @@
                         <!-- Question 2 -->
                         <div class="space-y-2">
                             <label class="text-xs sm:text-sm font-bold text-slate-200 block">
-                                2. Ketenangan & Purifikasi Batin:
-                                <span class="text-slate-300 font-normal block text-[11px] mt-0.5">Seberapa tenang dan mampu Anda mengendalikan emosi amarah ketika sedang tertekan?</span>
+                                {{ $isEn ? '2. Inner Peace & Emotional Restraint:' : '2. Ketenangan & Purifikasi Batin:' }}
+                                <span class="text-slate-300 font-normal block text-[11px] mt-0.5">{{ $isEn ? 'How composed and capable are you in controlling anger when under pressure?' : 'Seberapa tenang dan mampu Anda mengendalikan emosi amarah ketika sedang tertekan?' }}</span>
                             </label>
                             <div class="grid grid-cols-5 gap-1.5 sm:gap-2">
                                 <template x-for="i in 5">
@@ -188,8 +189,8 @@
                         <!-- Question 3 -->
                         <div class="space-y-2">
                             <label class="text-xs sm:text-sm font-bold text-slate-200 block">
-                                3. Keberfungsian Sosial & Altruisme:
-                                <span class="text-slate-300 font-normal block text-[11px] mt-0.5">Seberapa dorongan dalam diri Anda untuk membantu sesama secara tulus tanpa mengharapkan balasan?</span>
+                                {{ $isEn ? '3. Social Altruism & Empathy:' : '3. Keberfungsian Sosial & Altruisme:' }}
+                                <span class="text-slate-300 font-normal block text-[11px] mt-0.5">{{ $isEn ? 'How strong is your natural urge to genuinely help others without expecting reward?' : 'Seberapa dorongan dalam diri Anda untuk membantu sesama secara tulus tanpa mengharapkan balasan?' }}</span>
                             </label>
                             <div class="grid grid-cols-5 gap-1.5 sm:gap-2">
                                 <template x-for="i in 5">
@@ -729,17 +730,17 @@
                             <!-- Center Content -->
                             <div class="lg:col-span-7 space-y-3 sm:space-y-4 text-center lg:text-left">
                                 <h2 class="text-2xl sm:text-4xl font-bold font-serif text-[#0B2A43] tracking-tight">
-                                    Kenali Profil Ruhiologi Anda
+                                    {{ $isEn ? 'Discover Your Ruhiology Profile' : 'Kenali Profil Ruhiologi Anda' }}
                                 </h2>
                                 <p class="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
-                                    RQ Assessment dirancang sebagai instrumen ilmiah terstruktur untuk memetakan 5 Pilar Dimensi Ruhiologi (RQI-15) dan Indeks Kesejahteraan Mental (WHO-5).
+                                    {{ $isEn ? 'The RQ Assessment is scientifically designed to evaluate the 5 Ruhiology Intelligence Dimensions (RQI-15) alongside the WHO-5 Mental Well-Being Index.' : 'RQ Assessment dirancang sebagai instrumen ilmiah terstruktur untuk memetakan 5 Pilar Dimensi Ruhiologi (RQI-15) dan Indeks Kesejahteraan Mental (WHO-5).' }}
                                 </p>
                                 <div class="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-3">
                                     <a href="{{ route('assessment.index') }}" class="px-7 py-3.5 bg-[#0B2A43] hover:bg-[#123B59] text-white rounded-full text-xs font-bold uppercase tracking-wider shadow-md transition-transform hover:scale-105 inline-flex items-center gap-2 min-h-[44px]">
-                                        <span>Mulai Assessment</span> <span>→</span>
+                                        <span>{{ $isEn ? 'Start Assessment' : 'Mulai Assessment' }}</span> <span>→</span>
                                     </a>
                                     <a href="{{ route('assessment.index') }}#cek-hasil" class="px-5 py-3.5 bg-white hover:bg-slate-50 text-[#0B2A43] border border-slate-300 rounded-full text-xs font-bold tracking-wider shadow-2xs transition inline-flex items-center gap-2 min-h-[44px]">
-                                        <span>🔍 Cek Hasil / Sertifikat Saya</span>
+                                        <span>🔍 {{ $isEn ? 'Check My Results / Certificate' : 'Cek Hasil / Sertifikat Saya' }}</span>
                                     </a>
                                 </div>
                             </div>
@@ -751,7 +752,7 @@
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                     </div>
                                     <div>
-                                        <strong class="text-[#0B2A43] block font-bold">Instrumen Terstruktur (20 Soal)</strong>
+                                        <strong class="text-[#0B2A43] block font-bold">{{ $isEn ? 'Structured Scale (20 Questions)' : 'Instrumen Terstruktur (20 Soal)' }}</strong>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-3 text-xs sm:text-sm">
@@ -759,7 +760,7 @@
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                                     </div>
                                     <div>
-                                        <strong class="text-[#0B2A43] block font-bold">Laporan Dual-Pilar & Radar</strong>
+                                        <strong class="text-[#0B2A43] block font-bold">{{ $isEn ? 'Dual-Pillar & Radar Chart Report' : 'Laporan Dual-Pilar & Radar' }}</strong>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-3 text-xs sm:text-sm">
@@ -767,7 +768,7 @@
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                                     </div>
                                     <div>
-                                        <strong class="text-[#0B2A43] block font-bold">Sertifikat Resmi & Kartu Story</strong>
+                                        <strong class="text-[#0B2A43] block font-bold">{{ $isEn ? 'Official Certificate & Story Card' : 'Sertifikat Resmi & Kartu Story' }}</strong>
                                     </div>
                                 </div>
                             </div>
@@ -778,32 +779,32 @@
                         <div class="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-slate-300/80">
                             <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                                 <span class="text-xs font-bold text-[#0B2A43] uppercase tracking-wider font-mono flex items-center gap-1.5">
-                                    <span>✨</span> <span>5 Pilar Pengukuran RQI-15 + WHO-5</span>
+                                    <span>✨</span> <span>{{ $isEn ? '5 RQI-15 Pillars + WHO-5 Well-Being' : '5 Pilar Pengukuran RQI-15 + WHO-5' }}</span>
                                 </span>
                                 <span class="text-[10px] sm:text-[11px] font-mono font-bold text-emerald-800 bg-emerald-100/80 px-2.5 py-0.5 rounded-full border border-emerald-300">
-                                    📊 {{ number_format($stats['total_participants'] ?? 14000) }}+ Peserta Terukur
+                                    📊 {{ number_format($stats['total_participants'] ?? 14000) }}+ {{ $isEn ? 'Participants Assessed' : 'Peserta Terukur' }}
                                 </span>
                             </div>
                             <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
                                 <a href="#dimensi-rqi" class="bg-white hover:bg-amber-50/70 p-2.5 rounded-xl border border-slate-200 hover:border-[#C9A24D] text-center space-y-0.5 shadow-2xs transition group">
                                     <span class="text-sm inline-block group-hover:scale-110 transition-transform">🌌</span>
-                                    <div class="text-[10px] font-bold text-[#0B2A43]">Kesadaran Ilahi (God Spot)</div>
+                                    <div class="text-[10px] font-bold text-[#0B2A43]">{{ $isEn ? 'Divine Awareness (God Spot)' : 'Kesadaran Ilahi (God Spot)' }}</div>
                                 </a>
                                 <a href="#dimensi-rqi" class="bg-white hover:bg-amber-50/70 p-2.5 rounded-xl border border-slate-200 hover:border-[#C9A24D] text-center space-y-0.5 shadow-2xs transition group">
                                     <span class="text-sm inline-block group-hover:scale-110 transition-transform">🕌</span>
-                                    <div class="text-[10px] font-bold text-[#0B2A43]">Ketaatan Spiritual</div>
+                                    <div class="text-[10px] font-bold text-[#0B2A43]">{{ $isEn ? 'Spiritual Devotion' : 'Ketaatan Spiritual' }}</div>
                                 </a>
                                 <a href="#dimensi-rqi" class="bg-white hover:bg-amber-50/70 p-2.5 rounded-xl border border-slate-200 hover:border-[#C9A24D] text-center space-y-0.5 shadow-2xs transition group">
                                     <span class="text-sm inline-block group-hover:scale-110 transition-transform">🌿</span>
-                                    <div class="text-[10px] font-bold text-[#0B2A43]">Purifikasi Batin (Tazkiyah)</div>
+                                    <div class="text-[10px] font-bold text-[#0B2A43]">{{ $isEn ? 'Inner Purification (Tazkiyah)' : 'Purifikasi Batin (Tazkiyah)' }}</div>
                                 </a>
                                 <a href="#dimensi-rqi" class="bg-white hover:bg-amber-50/70 p-2.5 rounded-xl border border-slate-200 hover:border-[#C9A24D] text-center space-y-0.5 shadow-2xs transition group">
                                     <span class="text-sm inline-block group-hover:scale-110 transition-transform">🤝</span>
-                                    <div class="text-[10px] font-bold text-[#0B2A43]">Akhlak & Kepedulian Sosial</div>
+                                    <div class="text-[10px] font-bold text-[#0B2A43]">{{ $isEn ? 'Noble Character & Social Care' : 'Akhlak & Kepedulian Sosial' }}</div>
                                 </a>
                                 <a href="#dimensi-rqi" class="bg-white hover:bg-amber-50/70 p-2.5 rounded-xl border border-slate-200 hover:border-[#C9A24D] text-center space-y-0.5 shadow-2xs col-span-2 sm:col-span-1 transition group">
                                     <span class="text-sm inline-block group-hover:scale-110 transition-transform">🛡️</span>
-                                    <div class="text-[10px] font-bold text-[#0B2A43]">Ketangguhan & Resiliensi</div>
+                                    <div class="text-[10px] font-bold text-[#0B2A43]">{{ $isEn ? 'Resilience & Soul Strength' : 'Ketangguhan & Resiliensi' }}</div>
                                 </a>
                             </div>
                         </div>
@@ -819,11 +820,11 @@
     <section class="py-14 sm:py-20 bg-[#F8F6F0] border-y border-slate-200/80">
         <div class="max-w-[1280px] mx-auto px-4 sm:px-10">
             <div class="text-center max-w-2xl mx-auto mb-10 sm:mb-14 space-y-2">
-                <span class="text-xs font-mono font-bold text-[#C9A24D] uppercase tracking-widest block">✦ ALUR & PROSES EVALUASI</span>
+                <span class="text-xs font-mono font-bold text-[#C9A24D] uppercase tracking-widest block">✦ {{ $isEn ? 'ASSESSMENT PROCESS & STEPS' : 'ALUR & PROSES EVALUASI' }}</span>
                 <h2 class="font-serif text-2xl sm:text-4xl font-bold text-[#0B2A43] tracking-tight">
-                    4 Langkah Mudah Mengikuti Assessment RQ
+                    {{ $isEn ? '4 Simple Steps to Complete Your RQ Assessment' : '4 Langkah Mudah Mengikuti Assessment RQ' }}
                 </h2>
-                <p class="text-xs sm:text-sm text-slate-600 font-normal">Proses praktis dan terstruktur dari registrasi hingga lembar rekomendasi potensi.</p>
+                <p class="text-xs sm:text-sm text-slate-600 font-normal">{{ $isEn ? 'A structured and streamlined evaluation process from intake to executive recommendations.' : 'Proses praktis dan terstruktur dari registrasi hingga lembar rekomendasi potensi.' }}</p>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 relative">
@@ -835,13 +836,13 @@
                             <span class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-[#0B2A43] group-hover:bg-[#C9A24D] group-hover:text-[#0B2A43] text-white font-mono font-bold text-base sm:text-lg flex items-center justify-center shadow-sm transition-colors">01</span>
                             <span class="text-xl sm:text-2xl group-hover:scale-110 transition-transform">📝</span>
                         </div>
-                        <h3 class="font-serif font-bold text-base text-[#0B2A43] group-hover:text-[#B48A16] transition-colors">Intake Data & Kode</h3>
+                        <h3 class="font-serif font-bold text-base text-[#0B2A43] group-hover:text-[#B48A16] transition-colors">{{ $isEn ? 'Data Intake & Code' : 'Intake Data & Kode' }}</h3>
                         <p class="text-xs text-slate-600 leading-relaxed">
-                            Pilih jalur Asesmen Mandiri atau masukkan Kode Akses Event dari kampus/sekolah/instansi Anda.
+                            {{ $isEn ? 'Select Individual Assessment or enter the Event Access Code provided by your institution/campus/school.' : 'Pilih jalur Asesmen Mandiri atau masukkan Kode Akses Event dari kampus/sekolah/instansi Anda.' }}
                         </p>
                     </div>
                     <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-[#C9A24D] group-hover:text-[#0B2A43] transition-colors">
-                        <span>Akses Instan</span>
+                        <span>{{ $isEn ? 'Instant Access' : 'Akses Instan' }}</span>
                         <span class="transform group-hover:translate-x-1 transition-transform">➔</span>
                     </div>
                 </a>
@@ -853,13 +854,13 @@
                             <span class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-[#0B2A43] group-hover:bg-[#C9A24D] group-hover:text-[#0B2A43] text-white font-mono font-bold text-base sm:text-lg flex items-center justify-center shadow-sm transition-colors">02</span>
                             <span class="text-xl sm:text-2xl group-hover:scale-110 transition-transform">⏱️</span>
                         </div>
-                        <h3 class="font-serif font-bold text-base text-[#0B2A43] group-hover:text-[#B48A16] transition-colors">Pengerjaan 10-15 Menit</h3>
+                        <h3 class="font-serif font-bold text-base text-[#0B2A43] group-hover:text-[#B48A16] transition-colors">{{ $isEn ? '10-15 Min Test' : 'Pengerjaan 10-15 Menit' }}</h3>
                         <p class="text-xs text-slate-600 leading-relaxed">
-                            Isikan 20 pernyataan terstruktur (15 butir RQI & 5 butir WHO-5) dengan fitur auto-save otomatis.
+                            {{ $isEn ? 'Answer 20 structured items (15 RQI & 5 WHO-5) with real-time automatic saving on your device.' : 'Isikan 20 pernyataan terstruktur (15 butir RQI & 5 butir WHO-5) dengan fitur auto-save otomatis.' }}
                         </p>
                     </div>
                     <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-[#C9A24D] group-hover:text-[#0B2A43] transition-colors">
-                        <span>20 Pertanyaan</span>
+                        <span>20 {{ $isEn ? 'Questions' : 'Pertanyaan' }}</span>
                         <span class="transform group-hover:translate-x-1 transition-transform">➔</span>
                     </div>
                 </a>
@@ -871,13 +872,13 @@
                             <span class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-[#0B2A43] group-hover:bg-[#C9A24D] group-hover:text-[#0B2A43] text-white font-mono font-bold text-base sm:text-lg flex items-center justify-center shadow-sm transition-colors">03</span>
                             <span class="text-xl sm:text-2xl group-hover:scale-110 transition-transform">📊</span>
                         </div>
-                        <h3 class="font-serif font-bold text-base text-[#0B2A43] group-hover:text-[#B48A16] transition-colors">Kalkulasi Dual-Pilar</h3>
+                        <h3 class="font-serif font-bold text-base text-[#0B2A43] group-hover:text-[#B48A16] transition-colors">{{ $isEn ? 'Dual-Pillar Scoring' : 'Kalkulasi Dual-Pilar' }}</h3>
                         <p class="text-xs text-slate-600 leading-relaxed">
-                            Sistem secara instan menghitung skor RQI-15 (15–75 Poin), Indeks WHO-5 (0–100%), dan Grafik Radar 5 Dimensi.
+                            {{ $isEn ? 'Instant psychometric calculation for RQI-15 (15-75 Pts), WHO-5 Index (0-100%), and 5-Dimension Radar Balance.' : 'Sistem secara instan menghitung skor RQI-15 (15–75 Poin), Indeks WHO-5 (0–100%), dan Grafik Radar 5 Dimensi.' }}
                         </p>
                     </div>
                     <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-[#C9A24D] group-hover:text-[#0B2A43] transition-colors">
-                        <span>Kalkulasi Instan</span>
+                        <span>{{ $isEn ? 'Instant Calculation' : 'Kalkulasi Instan' }}</span>
                         <span class="transform group-hover:translate-x-1 transition-transform">➔</span>
                     </div>
                 </a>
@@ -889,13 +890,13 @@
                             <span class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-emerald-600 group-hover:bg-emerald-500 text-white font-mono font-bold text-base sm:text-lg flex items-center justify-center shadow-sm transition-colors">04</span>
                             <span class="text-xl sm:text-2xl group-hover:scale-110 transition-transform">📄</span>
                         </div>
-                        <h3 class="font-serif font-bold text-base text-[#0B2A43] group-hover:text-emerald-700 transition-colors">Laporan & Sertifikat</h3>
+                        <h3 class="font-serif font-bold text-base text-[#0B2A43] group-hover:text-emerald-700 transition-colors">{{ $isEn ? 'Report & Certificate' : 'Laporan & Sertifikat' }}</h3>
                         <p class="text-xs text-slate-600 leading-relaxed">
-                            Unduh Sertifikat Resmi A4, Laporan PDF Eksekutif, serta Kartu Shareable 4:5 untuk Instagram/WhatsApp.
+                            {{ $isEn ? 'Download your Official A4 Certificate, Executive PDF Report, and 4:5 Social Media Story Card.' : 'Unduh Sertifikat Resmi A4, Laporan PDF Eksekutif, serta Kartu Shareable 4:5 untuk Instagram/WhatsApp.' }}
                         </p>
                     </div>
                     <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-emerald-600 group-hover:text-emerald-800 transition-colors">
-                        <span>Unduh Sertifikat & Kartu</span>
+                        <span>{{ $isEn ? 'Download Certificate & Card' : 'Unduh Sertifikat & Kartu' }}</span>
                         <span class="transform group-hover:translate-x-1 transition-transform">➔</span>
                     </div>
                 </a>
@@ -908,12 +909,12 @@
     <section id="dimensi-rqi" class="py-14 sm:py-20 bg-[#0B2A43] text-white scroll-mt-20">
         <div class="max-w-[1280px] mx-auto px-4 sm:px-10">
             <div class="text-center max-w-2xl mx-auto mb-10 sm:mb-12">
-                <span class="text-xs font-bold text-[#C9A24D] uppercase tracking-widest block mb-2 font-mono">✦ Dimensi & Kerangka Teori</span>
+                <span class="text-xs font-bold text-[#C9A24D] uppercase tracking-widest block mb-2 font-mono">✦ {{ $isEn ? 'THEORETICAL FRAMEWORK & PILLARS' : 'Dimensi & Kerangka Teori' }}</span>
                 <h2 class="font-serif text-2xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight">
-                    Lima Pilar Dimensi Kecerdasan Ruhiologi (RQI-15)
+                    {{ $isEn ? 'Five Core Pillars of Ruhiology Quotient (RQI-15)' : 'Lima Pilar Dimensi Kecerdasan Ruhiologi (RQI-15)' }}
                 </h2>
                 <p class="text-slate-200 text-xs sm:text-sm mt-3 font-normal leading-relaxed">
-                    Lima pilar utama yang dirumuskan oleh Prof. Dr. Iskandar Nazari sebagai pusat inteligensi dan keseimbangan potensi kemanusiaan.
+                    {{ $isEn ? 'The five foundational pillars formulated by Prof. Dr. Iskandar Nazari as the central intelligence and equilibrium of human potential.' : 'Lima pilar utama yang dirumuskan oleh Prof. Dr. Iskandar Nazari sebagai pusat inteligensi dan keseimbangan potensi kemanusiaan.' }}
                 </p>
             </div>
 
@@ -925,9 +926,9 @@
                         <div class="w-10 h-10 rounded-2xl bg-[#C9A24D]/20 text-[#C9A24D] flex items-center justify-center font-bold text-lg mb-4 border border-[#C9A24D]/30">
                             ✦
                         </div>
-                        <h3 class="font-serif font-bold text-base text-white mb-2 tracking-tight">1. Kesadaran Ketuhanan (God Spot)</h3>
+                        <h3 class="font-serif font-bold text-base text-white mb-2 tracking-tight">{{ $isEn ? '1. Divine Awareness (God Spot)' : '1. Kesadaran Ketuhanan (God Spot)' }}</h3>
                         <p class="text-xs text-slate-200 leading-relaxed font-normal">
-                            Kesadaran mendalam akan kehadiran Sang Pencipta, keikhlasan niat, dan orientasi hidup transendental.
+                            {{ $isEn ? 'Deep consciousness of divine presence, sincerity of purpose, and transcendental orientation in life.' : 'Kesadaran mendalam akan kehadiran Sang Pencipta, keikhlasan niat, dan orientasi hidup transendental.' }}
                         </p>
                     </div>
                 </div>
@@ -938,9 +939,9 @@
                         <div class="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-300 flex items-center justify-center font-bold text-lg mb-4 border border-amber-400/30">
                             🕌
                         </div>
-                        <h3 class="font-serif font-bold text-base text-white mb-2 tracking-tight">2. Ketaatan Spiritual & Ibadah</h3>
+                        <h3 class="font-serif font-bold text-base text-white mb-2 tracking-tight">{{ $isEn ? '2. Spiritual Devotion & Practice' : '2. Ketaatan Spiritual & Ibadah' }}</h3>
                         <p class="text-xs text-slate-200 leading-relaxed font-normal">
-                            Kedisiplinan ibadah ritual, penghayatan doa/zikir, dan konsistensi menjaga hubungan vertikal.
+                            {{ $isEn ? 'Consistent discipline in worship rituals, prayer, contemplation, and strengthening the vertical bond with God.' : 'Kedisiplinan ibadah ritual, penghayatan doa/zikir, dan konsistensi menjaga hubungan vertikal.' }}
                         </p>
                     </div>
                 </div>
@@ -951,9 +952,9 @@
                         <div class="w-10 h-10 rounded-2xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold text-lg mb-4 border border-emerald-400/30">
                             ✨
                         </div>
-                        <h3 class="font-serif font-bold text-base text-white mb-2 tracking-tight">3. Purifikasi Batin (Tazkiyah)</h3>
+                        <h3 class="font-serif font-bold text-base text-white mb-2 tracking-tight">{{ $isEn ? '3. Inner Purification (Tazkiyah)' : '3. Purifikasi Batin (Tazkiyah)' }}</h3>
                         <p class="text-xs text-slate-200 leading-relaxed font-normal">
-                            Kebersihan hati dari penyakit iri, dengki, keangkuhan intelektual, serta kejujuran nurani.
+                            {{ $isEn ? 'Purity of heart from envy, arrogance, intellectual pride, and cultivating sincere conscience and integrity.' : 'Kebersihan hati dari penyakit iri, dengki, keangkuhan intelektual, serta kejujuran nurani.' }}
                         </p>
                     </div>
                 </div>
@@ -964,9 +965,9 @@
                         <div class="w-10 h-10 rounded-2xl bg-sky-500/20 text-sky-300 flex items-center justify-center font-bold text-lg mb-4 border border-sky-400/30">
                             🤝
                         </div>
-                        <h3 class="font-serif font-bold text-base text-white mb-2 tracking-tight">4. Akhlak & Kepedulian Sosial</h3>
+                        <h3 class="font-serif font-bold text-base text-white mb-2 tracking-tight">{{ $isEn ? '4. Noble Character & Social Care' : '4. Akhlak & Kepedulian Sosial' }}</h3>
                         <p class="text-xs text-slate-200 leading-relaxed font-normal">
-                            Adab pergaulan, empati tulus, dan keberfungsian sosial yang membawa manfaat nyata bagi sesama.
+                            {{ $isEn ? 'Graceful social conduct, genuine empathy, and altruistic actions that bring tangible benefit to society.' : 'Adab pergaulan, empati tulus, dan keberfungsian sosial yang membawa manfaat nyata bagi sesama.' }}
                         </p>
                     </div>
                 </div>
@@ -977,9 +978,9 @@
                         <div class="w-10 h-10 rounded-2xl bg-purple-500/20 text-purple-300 flex items-center justify-center font-bold text-lg mb-4 border border-purple-400/30">
                             🛡️
                         </div>
-                        <h3 class="font-serif font-bold text-base text-white mb-2 tracking-tight">5. Ketangguhan & Resiliensi Jiwa</h3>
+                        <h3 class="font-serif font-bold text-base text-white mb-2 tracking-tight">{{ $isEn ? '5. Soul Resilience & Fortitude' : '5. Ketangguhan & Resiliensi Jiwa' }}</h3>
                         <p class="text-xs text-slate-200 leading-relaxed font-normal">
-                            Ketenangan batin, kesabaran menghadapi tekanan/ujian hidup, dan optimisme bangkit dari kesulitan.
+                            {{ $isEn ? 'Inner serenity, patience when facing trials and crises, and faith-driven optimism to rebound.' : 'Ketenangan batin, kesabaran menghadapi tekanan/ujian hidup, dan optimisme bangkit dari kesulitan.' }}
                         </p>
                     </div>
                 </div>
@@ -990,39 +991,39 @@
             <div class="mt-12 pt-10 border-t border-white/10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                 <div class="lg:col-span-5 bg-white/10 p-6 rounded-3xl border border-white/20 backdrop-blur-md">
                     <h4 class="font-serif font-bold text-base text-[#C9A24D] mb-1 flex items-center gap-2">
-                        <span>🕸️</span> <span>Visualisasi Balance 5 Dimensi RQ</span>
+                        <span>🕸️</span> <span>{{ $isEn ? '5-Dimension RQ Balance Visualization' : 'Visualisasi Balance 5 Dimensi RQ' }}</span>
                     </h4>
-                    <p class="text-xs text-slate-200 mb-4">Grafik keseimbangan potensi ruhiologi dari hasil asesmen terstruktur.</p>
+                    <p class="text-xs text-slate-200 mb-4">{{ $isEn ? 'Proportional equilibrium chart of spiritual dimensions from structured assessment results.' : 'Grafik keseimbangan potensi ruhiologi dari hasil asesmen terstruktur.' }}</p>
                     <div class="relative w-full aspect-square max-w-xs mx-auto">
                         <canvas id="landingRadarChart"></canvas>
                     </div>
                 </div>
                 <div class="lg:col-span-7 space-y-4">
                     <div class="inline-flex items-center space-x-2 bg-[#C9A24D]/20 text-[#C9A24D] text-xs font-mono font-bold px-3.5 py-1.5 rounded-full border border-[#C9A24D]/30 uppercase tracking-widest">
-                        <span>✦ PEMETAAN INTEGRATIF</span>
+                        <span>✦ {{ $isEn ? 'INTEGRATIVE MAPPING' : 'PEMETAAN INTEGRATIF' }}</span>
                     </div>
                     <h3 class="font-serif font-bold text-xl sm:text-3xl text-white leading-snug">
-                        Keseimbangan Integratif Antara Batin, Pikiran, & Aksi Real
+                        {{ $isEn ? 'Harmonious Balance of Inner Soul, Mind, & Ethical Action' : 'Keseimbangan Integratif Antara Batin, Pikiran, & Aksi Real' }}
                     </h3>
                     <p class="text-xs sm:text-sm text-slate-200 leading-relaxed font-normal">
-                        Kecerdasan Ruhiologi (RQ) mengukur integrasi harmonis antara kesadaran ketuhanan, ketaatan spiritual, kebersihan batin, akhlak sosial, dan ketangguhan mental (WHO-5).
+                        {{ $isEn ? 'Ruhiology Quotient (RQ) measures the harmonious integration between transcendental awareness, devotional practice, emotional purity, social ethics, and psychological well-being (WHO-5).' : 'Kecerdasan Ruhiologi (RQ) mengukur integrasi harmonis antara kesadaran ketuhanan, ketaatan spiritual, kebersihan batin, akhlak sosial, dan ketangguhan mental (WHO-5).' }}
                     </p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                         <div class="p-3.5 bg-white/10 rounded-2xl border border-white/10">
-                            <strong class="text-xs text-[#C9A24D] block font-bold">1. Kesadaran Ketuhanan & Spiritual</strong>
-                            <span class="text-[11px] text-slate-300">Koneksi vertikal (God Spot) & kualitas ibadah.</span>
+                            <strong class="text-xs text-[#C9A24D] block font-bold">{{ $isEn ? '1. Divine Consciousness (God Spot)' : '1. Kesadaran Ketuhanan & Spiritual' }}</strong>
+                            <span class="text-[11px] text-slate-300">{{ $isEn ? 'Vertical transcendental connection & quality of devotion.' : 'Koneksi vertikal (God Spot) & kualitas ibadah.' }}</span>
                         </div>
                         <div class="p-3.5 bg-white/10 rounded-2xl border border-white/10">
-                            <strong class="text-xs text-[#C9A24D] block font-bold">2. Purifikasi Batin (Tazkiyah)</strong>
-                            <span class="text-[11px] text-slate-300">Regulasi amarah & kejujuran nurani.</span>
+                            <strong class="text-xs text-[#C9A24D] block font-bold">{{ $isEn ? '2. Inner Purification (Tazkiyah)' : '2. Purifikasi Batin (Tazkiyah)' }}</strong>
+                            <span class="text-[11px] text-slate-300">{{ $isEn ? 'Emotional regulation, sincerity, & inner conscience.' : 'Regulasi amarah & kejujuran nurani.' }}</span>
                         </div>
                         <div class="p-3.5 bg-white/10 rounded-2xl border border-white/10">
-                            <strong class="text-xs text-[#C9A24D] block font-bold">3. Akhlak & Kepedulian Sosial</strong>
-                            <span class="text-[11px] text-slate-300">Adab, empati, & kontribusi bagi sesama.</span>
+                            <strong class="text-xs text-[#C9A24D] block font-bold">{{ $isEn ? '3. Character & Social Impact' : '3. Akhlak & Kepedulian Sosial' }}</strong>
+                            <span class="text-[11px] text-slate-300">{{ $isEn ? 'Empathy, ethics, and meaningful contribution to others.' : 'Adab, empati, & kontribusi bagi sesama.' }}</span>
                         </div>
                         <div class="p-3.5 bg-white/10 rounded-2xl border border-white/10">
-                            <strong class="text-xs text-emerald-300 block font-bold">4. Resiliensi & Skrining WHO-5</strong>
-                            <span class="text-[11px] text-slate-300">Ketangguhan menghadapi stres & kesejahteraan mental.</span>
+                            <strong class="text-xs text-emerald-300 block font-bold">{{ $isEn ? '4. Resilience & WHO-5 Screening' : '4. Resiliensi & Skrining WHO-5' }}</strong>
+                            <span class="text-[11px] text-slate-300">{{ $isEn ? 'Stress coping, emotional vitality, and flourishing.' : 'Ketangguhan menghadapi stres & kesejahteraan mental.' }}</span>
                         </div>
                     </div>
                 </div>
@@ -1419,17 +1420,17 @@
     <!-- FLOATING STICKY ACTION BAR -->
     <div x-data="{ showFloating: false }" @scroll.window="showFloating = (window.pageYOffset > 400)" class="fixed bottom-5 right-4 sm:right-6 z-50 flex flex-col gap-2 items-end font-sans">
         
-        <a x-show="showFloating" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" href="#assessment" class="px-4 py-2.5 bg-[#C9A24D] hover:bg-[#B48A16] text-[#0B2A43] font-black rounded-full text-xs shadow-2xl flex items-center gap-2 border-2 border-white transition transform hover:scale-105 cursor-pointer">
+        <a x-show="showFloating" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" href="{{ route('assessment.index') }}" class="px-4 py-2.5 bg-[#C9A24D] hover:bg-[#B48A16] text-[#0B2A43] font-black rounded-full text-xs shadow-2xl flex items-center gap-2 border-2 border-white transition transform hover:scale-105 cursor-pointer">
             <span>✨</span>
-            <span class="font-serif">Ikuti Asesmen RQI</span>
+            <span class="font-serif">{{ $isEn ? 'Take RQ Assessment' : 'Ikuti Asesmen RQI' }}</span>
         </a>
 
-        <a href="https://wa.me/6281234567890?text=Halo%20Ruhiology%20Institute,%20saya%20ingin%20bertanya%20seputar%20Assessment%20dan%20Pelatihan" target="_blank" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-bold text-xs shadow-2xl flex items-center gap-2 transition transform hover:scale-105 border-2 border-white">
+        <a href="https://wa.me/6281234567890?text={{ urlencode($isEn ? 'Hello Ruhiology Institute, I would like to consult about Assessment and Training programs.' : 'Halo Ruhiology Institute, saya ingin bertanya seputar Assessment dan Pelatihan') }}" target="_blank" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-bold text-xs shadow-2xl flex items-center gap-2 transition transform hover:scale-105 border-2 border-white">
             <span class="text-sm">💬</span>
-            <span class="hidden sm:inline">WhatsApp Konsultasi</span>
+            <span class="hidden sm:inline">{{ $isEn ? 'WhatsApp Consultation' : 'WhatsApp Konsultasi' }}</span>
         </a>
 
-        <button x-show="showFloating" x-transition @click="window.scrollTo({ top: 0, behavior: 'smooth' })" class="w-9 h-9 bg-[#0B2A43] hover:bg-[#123B59] text-white rounded-full font-bold text-xs shadow-lg flex items-center justify-center transition border-2 border-white cursor-pointer" title="Ke Atas Halaman">
+        <button x-show="showFloating" x-transition @click="window.scrollTo({ top: 0, behavior: 'smooth' })" class="w-9 h-9 bg-[#0B2A43] hover:bg-[#123B59] text-white rounded-full font-bold text-xs shadow-lg flex items-center justify-center transition border-2 border-white cursor-pointer" title="{{ $isEn ? 'Back to top' : 'Ke Atas Halaman' }}">
             ↑
         </button>
     </div>
@@ -1441,10 +1442,17 @@
 document.addEventListener('DOMContentLoaded', function() {
     const ctx = document.getElementById('landingRadarChart');
     if (ctx && typeof Chart !== 'undefined') {
+        const isEn = {{ $isEn ? 'true' : 'false' }};
         new Chart(ctx, {
             type: 'radar',
             data: {
-                labels: [
+                labels: isEn ? [
+                    'Transcendence',
+                    'Inner Purity',
+                    'Sincere Intention',
+                    'Altruism',
+                    'Social Action'
+                ] : [
                     'Transendental',
                     'Tazkiyah Mental',
                     'Niat Intensional',
@@ -1452,7 +1460,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     'Fungsi Sosial'
                 ],
                 datasets: [{
-                    label: 'Benchmark RQI (%)',
+                    label: isEn ? 'Benchmark RQI (%)' : 'Benchmark RQI (%)',
                     data: [88, 82, 90, 85, 84],
                     backgroundColor: 'rgba(201, 162, 77, 0.25)',
                     borderColor: '#C9A24D',

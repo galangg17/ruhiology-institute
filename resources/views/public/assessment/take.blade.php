@@ -1,6 +1,30 @@
 @extends('layouts.app')
 
 @section('content')
+@php
+    $isEn = app()->getLocale() === 'en';
+    $displayTitle = $period->title;
+    if ($isEn) {
+        $displayTitle = str_replace(
+            ['Asesmen Nasional Kesadaran Ruhiologi', 'Asesmen Nasional', 'Kesadaran Ruhiologi'],
+            ['National Ruhiology Intelligence Assessment', 'National Assessment', 'Ruhiology Intelligence'],
+            $period->title
+        );
+    }
+    $categoryDisplay = $participant->category;
+    if ($isEn) {
+        $catMap = [
+            'MURID' => 'STUDENT',
+            'SISWA' => 'STUDENT',
+            'MAHASISWA' => 'COLLEGE STUDENT',
+            'GURU' => 'TEACHER',
+            'DOSEN' => 'LECTURER',
+            'UMUM' => 'GENERAL PUBLIC',
+            'KARYAWAN' => 'PROFESSIONAL / EMPLOYEE'
+        ];
+        $categoryDisplay = $catMap[strtoupper($participant->category)] ?? $participant->category;
+    }
+@endphp
 <div x-data="rqTakeAssessment()" class="bg-[#F8F6F0] min-h-screen">
     
     <!-- Mobile-First Sticky Header Banner -->
@@ -11,10 +35,10 @@
                     <span class="text-[9px] sm:text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest bg-white/10 px-2 py-0.5 rounded-full border border-white/20">
                         {{ strtoupper($type) }}
                     </span>
-                    <span class="text-[10px] sm:text-xs text-slate-300 font-mono truncate" x-text="'Kode: ' + '{{ $participant->assessment_code ?? $participant->participant_code }}'"></span>
+                    <span class="text-[10px] sm:text-xs text-slate-300 font-mono truncate" x-text="'{{ $isEn ? 'Code: ' : 'Kode: ' }}' + '{{ $participant->assessment_code ?? $participant->participant_code }}'"></span>
                 </div>
-                <h1 class="text-xs sm:text-xl font-serif font-bold text-white truncate">{{ $period->title }}</h1>
-                <p class="text-[10px] sm:text-xs text-slate-300 hidden sm:block">Peserta: <strong class="text-white">{{ $participant->name }}</strong> ({{ $participant->category }})</p>
+                <h1 class="text-xs sm:text-xl font-serif font-bold text-white truncate">{{ $displayTitle }}</h1>
+                <p class="text-[10px] sm:text-xs text-slate-300 hidden sm:block">{{ $isEn ? 'Participant: ' : 'Peserta: ' }}<strong class="text-white">{{ $participant->name }}</strong> ({{ $categoryDisplay }})</p>
             </div>
 
             <!-- Realtime Progress Indicator Bar -->
@@ -36,17 +60,17 @@
             
             <!-- Instructions Notice -->
             <div class="bg-white p-4 sm:p-5 rounded-2xl border-l-4 border-[#C9A24D] shadow-sm text-xs text-slate-700 leading-relaxed font-normal">
-                <strong class="text-[#0B2A43] block font-bold mb-1">📖 Petunjuk Pengisian Asesmen:</strong>
-                {{ $period->instrument->instructions ?? 'Bacalah setiap pernyataan di bawah ini dengan seksama. Pilihlah opsi yang paling mencerminkan kondisi batiniah dan pengalaman diri Anda.' }}
+                <strong class="text-[#0B2A43] block font-bold mb-1">{{ $isEn ? '📖 Assessment Instructions:' : '📖 Petunjuk Pengisian Asesmen:' }}</strong>
+                {{ $isEn ? 'Please read each statement carefully. Choose the option that most honestly reflects your true condition, feelings, and inner experience.' : ($period->instrument->instructions ?? 'Bacalah setiap pernyataan di bawah ini dengan seksama. Pilihlah opsi yang paling mencerminkan kondisi batiniah dan pengalaman diri Anda.') }}
             </div>
 
             <!-- Auto-save Live Indicator Badge -->
             <div class="flex items-center justify-between text-[11px] text-slate-500 bg-white/80 px-4 py-2 rounded-xl border border-slate-200 shadow-2xs">
                 <span class="flex items-center gap-1.5 text-emerald-700 font-medium">
                     <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span>💾 Jawaban tersimpan otomatis di perangkat Anda secara realtime</span>
+                    <span>{{ $isEn ? '💾 Answers are automatically saved on your device in real-time' : '💾 Jawaban tersimpan otomatis di perangkat Anda secara realtime' }}</span>
                 </span>
-                <span class="font-mono text-slate-400 text-[10px]" x-text="answeredCount > 0 ? answeredCount + ' tersimpan' : 'Belum diisi'"></span>
+                <span class="font-mono text-slate-400 text-[10px]" x-text="answeredCount > 0 ? (answeredCount + ' {{ $isEn ? 'saved' : 'tersimpan' }}') : '{{ $isEn ? 'Not yet filled' : 'Belum diisi' }}'"></span>
             </div>
 
             <form action="{{ route('assessment.submit', ['period_code' => $period->period_code, 'type' => $type]) }}" method="POST" class="space-y-6">
@@ -60,6 +84,9 @@
                     </div>
 
                     @foreach($rqiQuestions as $index => $q)
+                        @php
+                            $qText = $isEn ? (!empty($q->question_text_en) ? $q->question_text_en : \App\Services\TranslationService::getQuestionEnglishFallback($q)) : $q->question_text;
+                        @endphp
                         <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-3 sm:space-y-4 hover:border-slate-300 transition-all">
                             <div class="flex items-start gap-3">
                                 <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#0B2A43] text-[#C9A24D] font-mono font-bold text-xs flex items-center justify-center shrink-0 border border-[#C9A24D]/40">
@@ -70,7 +97,7 @@
                                         ✦ {{ $q->dimension->localized_name ?? ($q->dimension->name ?? 'Tahap Ruhiologi') }}
                                     </span>
                                     <p class="text-xs sm:text-sm font-medium text-[#0B2A43] leading-relaxed">
-                                        {{ $q->localized_text }}
+                                        {{ $qText }}
                                     </p>
                                 </div>
                             </div>
@@ -95,12 +122,15 @@
                 @if(isset($who5Questions) && count($who5Questions) > 0)
                     <div class="space-y-4 pt-4 sm:pt-6">
                         <div class="flex items-center gap-2 border-b border-slate-300 pb-2">
-                            <span class="text-sm sm:text-base font-serif font-bold text-[#0B2A43]">{{ app()->getLocale() === 'en' ? 'Part II: MENTAL WELL-BEING INDEX (WHO-5)' : 'Bagian II: INDEKS KESEJAHTERAAN MENTAL (WHO-5)' }}</span>
-                            <span class="text-[10px] sm:text-xs font-mono font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full border border-emerald-300">5 {{ app()->getLocale() === 'en' ? 'Questions' : 'Pertanyaan' }}</span>
+                            <span class="text-sm sm:text-base font-serif font-bold text-[#0B2A43]">{{ $isEn ? 'Part II: MENTAL WELL-BEING INDEX (WHO-5)' : 'Bagian II: INDEKS KESEJAHTERAAN MENTAL (WHO-5)' }}</span>
+                            <span class="text-[10px] sm:text-xs font-mono font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full border border-emerald-300">5 {{ $isEn ? 'Questions' : 'Pertanyaan' }}</span>
                         </div>
-                        <p class="text-xs text-slate-600 font-normal">{{ app()->getLocale() === 'en' ? 'Choose the frequency that best describes how you have felt over the last 2 weeks:' : 'Pilihlah frekuensi perasaan yang menggambarkan kondisi Anda dalam 2 minggu terakhir:' }}</p>
+                        <p class="text-xs text-slate-600 font-normal">{{ $isEn ? 'Choose the frequency that best describes how you have felt over the last 2 weeks:' : 'Pilihlah frekuensi perasaan yang menggambarkan kondisi Anda dalam 2 minggu terakhir:' }}</p>
 
                         @foreach($who5Questions as $wIdx => $wq)
+                            @php
+                                $wqText = $isEn ? (!empty($wq->question_text_en) ? $wq->question_text_en : \App\Services\TranslationService::getQuestionEnglishFallback($wq)) : $wq->question_text;
+                            @endphp
                             <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-3 sm:space-y-4 hover:border-slate-300 transition-all">
                                 <div class="flex items-start gap-3">
                                     <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-emerald-800 text-white font-mono font-bold text-xs flex items-center justify-center shrink-0">
@@ -111,7 +141,7 @@
                                             🌿 {{ $wq->dimension->localized_name ?? ($wq->dimension->name ?? 'INDEKS KESEJAHTERAAN MENTAL (WHO-5)') }}
                                         </span>
                                         <p class="text-xs sm:text-sm font-medium text-[#0B2A43] leading-relaxed">
-                                            {{ $wq->localized_text }}
+                                            {{ $wqText }}
                                         </p>
                                     </div>
                                 </div>
@@ -135,10 +165,10 @@
                 <!-- Submit Action Footer -->
                 <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-md flex flex-col sm:flex-row justify-between items-center gap-4">
                     <div class="text-xs text-slate-500 font-normal text-center sm:text-left">
-                        <span>⚠️ Pastikan seluruh {{ (count($rqiQuestions) + count($who5Questions ?? [])) }} pertanyaan telah terisi.</span>
+                        <span>{{ $isEn ? '⚠️ Please ensure all questions are answered before submitting.' : '⚠️ Pastikan seluruh pertanyaan telah terisi sebelum mengirimkan.' }}</span>
                     </div>
                     <button type="button" @click="openSubmitModal()" class="w-full sm:w-auto px-8 py-4 bg-[#0B2A43] hover:bg-[#123B59] text-[#C9A24D] font-bold rounded-2xl text-xs uppercase tracking-wider shadow-lg transition-transform hover:scale-105 cursor-pointer border border-[#C9A24D]/30 min-h-[44px]">
-                        {{ app()->getLocale() === 'en' ? 'Submit Assessment Answers Now →' : 'Submit Sesi Asesmen Sekarang →' }}
+                        {{ $isEn ? 'Submit Assessment Answers Now →' : 'Submit Sesi Asesmen Sekarang →' }}
                     </button>
                 </div>
 
@@ -256,7 +286,11 @@ function rqTakeAssessment() {
                         }
                     }
                 }
-                alert(`Masih ada ${this.totalCount - this.answeredCount} pertanyaan yang belum dijawab. Halaman telah diarahkan ke pertanyaan yang belum terisi.`);
+                const remaining = this.totalCount - this.answeredCount;
+                const alertMsg = '{{ $isEn ? "en" : "id" }}' === 'en'
+                    ? `There are still ${remaining} unanswered questions. You have been directed to the first missing item.`
+                    : `Masih ada ${remaining} pertanyaan yang belum dijawab. Halaman telah diarahkan ke pertanyaan yang belum terisi.`;
+                alert(alertMsg);
                 return;
             }
             this.showConfirmModal = true;

@@ -1,6 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
+@php
+    $isEn = app()->getLocale() === 'en';
+@endphp
 <script>
 window.rqAssessmentIndex = function rqAssessmentIndex() {
     return {
@@ -415,27 +418,27 @@ document.addEventListener('alpine:init', () => {
             
             <!-- Eyebrow Badge -->
             <div class="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-md border border-white/20 text-[#C9A24D] text-xs font-mono font-bold px-4 py-2 rounded-full shadow-sm uppercase tracking-widest">
-                <span>✦ RUHIOLOGY ASSESSMENT ENGINE</span>
+                <span>✦ {{ $isEn ? 'RUHIOLOGY ASSESSMENT ENGINE' : 'RUHIOLOGY ASSESSMENT ENGINE' }}</span>
             </div>
 
             <!-- Title -->
             <h1 class="font-serif font-bold text-4xl sm:text-5xl lg:text-6xl text-white tracking-tight leading-tight">
-                Kenali Kesadaran Batin Anda
+                {{ $isEn ? 'Discover Your Inner Consciousness' : 'Kenali Kesadaran Batin Anda' }}
             </h1>
 
             <!-- Subtitle -->
             <p class="text-slate-200 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed font-normal opacity-95">
-                Evaluasi tingkat kesadaran batiniah (RQI-15) & vitalitas kesehatan emosional (WHO-5) secara terstruktur, terpercaya, dan aman.
+                {{ $isEn ? 'Evaluate your inner spiritual quotient (RQI-15) and emotional vitality (WHO-5) through structured, scientifically validated self-assessment.' : 'Evaluasi tingkat kesadaran batiniah (RQI-15) & vitalitas kesehatan emosional (WHO-5) secara terstruktur, terpercaya, dan aman.' }}
             </p>
 
             <!-- Action Buttons -->
             <div class="pt-4 flex flex-wrap items-center justify-center gap-4">
                 <button type="button" @click="openRegistrationModal('PUBLIC_SELF')" class="bg-gradient-to-r from-[#C9A24D] to-[#B48A16] hover:from-[#B48A16] hover:to-[#96710E] text-[#0B2A43] font-extrabold text-xs sm:text-sm px-8 py-4 rounded-2xl shadow-xl hover:shadow-[#C9A24D]/30 transition transform hover:-translate-y-0.5 flex items-center space-x-2 cursor-pointer">
-                    <span>✨ MULAI ASESMEN MANDIRI</span>
+                    <span>✨ {{ $isEn ? 'START SELF ASSESSMENT' : 'MULAI ASESMEN MANDIRI' }}</span>
                 </button>
 
                 <button type="button" @click="openEventSelectorModal()" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 text-xs sm:text-sm font-bold px-8 py-4 rounded-2xl transition backdrop-blur-md flex items-center space-x-2 cursor-pointer">
-                    <span>🎯 PILIH EVENT / KODE ACARA</span>
+                    <span>🎯 {{ $isEn ? 'SELECT EVENT / EVENT CODE' : 'PILIH EVENT / KODE ACARA' }}</span>
                 </button>
             </div>
 
@@ -443,27 +446,27 @@ document.addEventListener('alpine:init', () => {
             <div class="pt-10 max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-left">
                 <div class="p-4 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-sm space-y-1">
                     <div class="text-xs font-bold text-[#C9A24D] flex items-center gap-1.5">
-                        <span>🔒</span> <span>Personal & Rahasia</span>
+                        <span>🔒</span> <span>{{ $isEn ? 'Confidential & Private' : 'Personal & Rahasia' }}</span>
                     </div>
-                    <p class="text-[11px] text-slate-300 font-normal">Hasil asesmen diproses khusus untuk pengembangan diri Anda.</p>
+                    <p class="text-[11px] text-slate-300 font-normal">{{ $isEn ? 'Assessment results are strictly processed for your personal development.' : 'Hasil asesmen diproses khusus untuk pengembangan diri Anda.' }}</p>
                 </div>
                 <div class="p-4 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-sm space-y-1">
                     <div class="text-xs font-bold text-[#C9A24D] flex items-center gap-1.5">
-                        <span>🛡️</span> <span>Tersimpan Aman</span>
+                        <span>🛡️</span> <span>{{ $isEn ? 'Securely Stored' : 'Tersimpan Aman' }}</span>
                     </div>
-                    <p class="text-[11px] text-slate-300 font-normal">Jawaban dan identitas dilindungi dengan standar privasi ketat.</p>
+                    <p class="text-[11px] text-slate-300 font-normal">{{ $isEn ? 'Responses and identities are protected under strict privacy standards.' : 'Jawaban dan identitas dilindungi dengan standar privasi ketat.' }}</p>
                 </div>
                 <div class="p-4 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-sm space-y-1">
                     <div class="text-xs font-bold text-[#C9A24D] flex items-center gap-1.5">
-                        <span>🩺</span> <span>Bukan Medis</span>
+                        <span>🩺</span> <span>{{ $isEn ? 'Non-Medical' : 'Bukan Medis' }}</span>
                     </div>
-                    <p class="text-[11px] text-slate-300 font-normal">Hasil ini merupakan refleksi batin, bukan klaim/diagnosis medis.</p>
+                    <p class="text-[11px] text-slate-300 font-normal">{{ $isEn ? 'This result is a reflective spiritual assessment, not a medical diagnosis.' : 'Hasil ini merupakan refleksi batin, bukan klaim/diagnosis medis.' }}</p>
                 </div>
                 <div class="p-4 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-sm space-y-1">
                     <div class="text-xs font-bold text-[#C9A24D] flex items-center gap-1.5">
-                        <span>📊</span> <span>Skrining WHO-5</span>
+                        <span>📊</span> <span>{{ $isEn ? 'WHO-5 Well-Being Index' : 'Skrining WHO-5' }}</span>
                     </div>
-                    <p class="text-[11px] text-slate-300 font-normal">Instrumen terstandar untuk memetakan kesejahteraan batiniah.</p>
+                    <p class="text-[11px] text-slate-300 font-normal">{{ $isEn ? 'Standardized international instrument to map psychological well-being.' : 'Instrumen terstandar untuk memetakan kesejahteraan batiniah.' }}</p>
                 </div>
             </div>
 
@@ -476,29 +479,29 @@ document.addEventListener('alpine:init', () => {
             <div class="bg-white rounded-3xl p-8 border border-slate-200/80 shadow-sm max-w-3xl mx-auto space-y-6">
                 <div class="flex items-center justify-between border-b border-slate-100 pb-4">
                     <div>
-                        <h3 class="font-serif font-bold text-lg text-[#0B2A43]">Punya Kode Peserta / Kode Assessment Lama?</h3>
-                        <p class="text-xs text-slate-500 font-normal mt-0.5">Masukkan kode Anda di bawah ini untuk verifikasi langsung ke sesi Pretest/Posttest.</p>
+                        <h3 class="font-serif font-bold text-lg text-[#0B2A43]">{{ $isEn ? 'Already Have an Assessment or Participant Code?' : 'Punya Kode Peserta / Kode Assessment Lama?' }}</h3>
+                        <p class="text-xs text-slate-500 font-normal mt-0.5">{{ $isEn ? 'Enter your code below to directly access your Pretest/Posttest session.' : 'Masukkan kode Anda di bawah ini untuk verifikasi langsung ke sesi Pretest/Posttest.' }}</p>
                     </div>
-                    <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">Sesi Aktif</span>
+                    <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">{{ $isEn ? 'Active Session' : 'Sesi Aktif' }}</span>
                 </div>
 
                 <form action="{{ route('assessment.verify') }}" method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-sans">
                     @csrf
                     <div>
-                        <label class="block font-bold text-slate-700 mb-1">Kode Assessment / Peserta</label>
-                        <input type="text" name="participant_code" required placeholder="Contoh: RQI-7F82K9" class="w-full p-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none font-medium">
+                        <label class="block font-bold text-slate-700 mb-1">{{ $isEn ? 'Assessment / Participant Code' : 'Kode Assessment / Peserta' }}</label>
+                        <input type="text" name="participant_code" required placeholder="{{ $isEn ? 'Example: RQI-7F82K9' : 'Contoh: RQI-7F82K9' }}" class="w-full p-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none font-medium">
                     </div>
                     <div>
-                        <label class="block font-bold text-slate-700 mb-1">Tipe Sesi</label>
+                        <label class="block font-bold text-slate-700 mb-1">{{ $isEn ? 'Session Type' : 'Tipe Sesi' }}</label>
                         <select name="type" class="w-full p-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none font-medium bg-slate-50">
-                            <option value="pretest">PRETEST (Pengukuran Awal)</option>
-                            <option value="posttest">POSTTEST (Evaluasi Akhir)</option>
+                            <option value="pretest">{{ $isEn ? 'PRETEST (Initial Baseline)' : 'PRETEST (Pengukuran Awal)' }}</option>
+                            <option value="posttest">{{ $isEn ? 'POSTTEST (Final Evaluation)' : 'POSTTEST (Evaluasi Akhir)' }}</option>
                         </select>
                     </div>
                     <input type="hidden" name="period_code" value="{{ $defaultPeriod->period_code ?? 'RQI-PERIOD-2026' }}">
                     <div class="flex items-end">
                         <button type="submit" class="w-full py-3 px-4 bg-[#0B2A43] hover:bg-[#123B59] text-white font-bold rounded-xl shadow transition-colors cursor-pointer">
-                            Masuk Sesi →
+                            {{ $isEn ? 'Enter Session →' : 'Masuk Sesi →' }}
                         </button>
                     </div>
                 </form>
@@ -516,21 +519,21 @@ document.addEventListener('alpine:init', () => {
                     🎯
                 </div>
                 <div>
-                    <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest block">EVENT & ACARA ASESMEN</span>
-                    <h3 class="text-xl font-serif font-bold text-[#0B2A43]">Verifikasi Akses Event</h3>
+                    <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest block">{{ $isEn ? 'ASSESSMENT EVENTS & WORKSHOPS' : 'EVENT & ACARA ASESMEN' }}</span>
+                    <h3 class="text-xl font-serif font-bold text-[#0B2A43]">{{ $isEn ? 'Verify Event Access' : 'Verifikasi Akses Event' }}</h3>
                 </div>
             </div>
 
             <p class="text-xs text-slate-500 leading-relaxed">
-                Silakan pilih nama event dari daftar atau ketik Kode Event / Kunci Sesi yang diberikan oleh panitia untuk memverifikasi akses Anda.
+                {{ $isEn ? 'Please select your active event from the list or enter the Event Passcode provided by your event facilitator.' : 'Silakan pilih nama event dari daftar atau ketik Kode Event / Kunci Sesi yang diberikan oleh panitia untuk memverifikasi akses Anda.' }}
             </p>
 
             <div class="space-y-4 text-xs font-sans">
                 <!-- Dropdown Select Active Events -->
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1.5">Pilih Event Aktif (Opsional)</label>
+                    <label class="block font-bold text-slate-700 mb-1.5">{{ $isEn ? 'Select Active Event (Optional)' : 'Pilih Event Aktif (Opsional)' }}</label>
                     <select x-model="selectedEventId" @change="onEventSelectChange()" class="w-full p-3.5 rounded-2xl border border-slate-300 bg-slate-50 font-medium focus:bg-white focus:ring-2 focus:ring-[#0B2A43] outline-none text-xs">
-                        <option value="">-- Pilih Nama Event dari Daftar --</option>
+                        <option value="">{{ $isEn ? '-- Select Event from List --' : '-- Pilih Nama Event dari Daftar --' }}</option>
                         <template x-for="evt in activeEventsList" :key="evt.id">
                             <option :value="evt.id" x-text="evt.title + (evt.institution_name ? ' — ' + evt.institution_name : '')"></option>
                         </template>
@@ -539,9 +542,9 @@ document.addEventListener('alpine:init', () => {
 
                 <!-- Input Event Code / Kunci Passcode -->
                 <div>
-                    <label class="block font-bold text-slate-800 mb-1.5">Masukkan Kode Event / Kunci Sesi *</label>
-                    <input type="text" x-model="inputEventCode" placeholder="Masukkan Kode Event (Contoh: RQ-JAMBI-26)" class="w-full p-3.5 rounded-2xl border-2 border-slate-300 focus:border-[#0B2A43] focus:ring-2 focus:ring-[#0B2A43]/20 font-mono font-bold uppercase text-sm tracking-wider text-center outline-none">
-                    <span class="text-[10px] text-slate-400 mt-1 block text-center">Kode resmi diberikan oleh panitia / narasumber event Anda.</span>
+                    <label class="block font-bold text-slate-800 mb-1.5">{{ $isEn ? 'Enter Event Code / Session Passcode *' : 'Masukkan Kode Event / Kunci Sesi *' }}</label>
+                    <input type="text" x-model="inputEventCode" placeholder="{{ $isEn ? 'Enter Event Code (e.g. RQ-GLOBAL-26)' : 'Masukkan Kode Event (Contoh: RQ-JAMBI-26)' }}" class="w-full p-3.5 rounded-2xl border-2 border-slate-300 focus:border-[#0B2A43] focus:ring-2 focus:ring-[#0B2A43]/20 font-mono font-bold uppercase text-sm tracking-wider text-center outline-none">
+                    <span class="text-[10px] text-slate-400 mt-1 block text-center">{{ $isEn ? 'Official code is provided by your event facilitator or host institution.' : 'Kode resmi diberikan oleh panitia / narasumber event Anda.' }}</span>
                 </div>
 
                 <template x-if="eventCheckError">
@@ -552,10 +555,10 @@ document.addEventListener('alpine:init', () => {
 
                 <div class="pt-2 flex gap-3">
                     <button type="button" @click="showEventSelectorModal = false" class="flex-1 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl text-xs transition cursor-pointer">
-                        Batal
+                        {{ $isEn ? 'Cancel' : 'Batal' }}
                     </button>
                     <button type="button" @click="proceedWithEventSelection()" :disabled="verifyingEvent" class="flex-1 py-3.5 bg-gradient-to-r from-[#C9A24D] to-[#B48A16] hover:from-[#B48A16] hover:to-[#96710E] text-[#0B2A43] font-extrabold rounded-2xl text-xs shadow-lg transition transform hover:-translate-y-0.5 cursor-pointer disabled:opacity-50">
-                        <span x-text="verifyingEvent ? 'Memverifikasi...' : 'Verifikasi & Lanjut →'"></span>
+                        <span x-text="verifyingEvent ? (appLocale === 'en' ? 'Verifying...' : 'Memverifikasi...') : (appLocale === 'en' ? 'Verify & Continue →' : 'Verifikasi & Lanjut →')"></span>
                     </button>
                 </div>
             </div>
@@ -573,12 +576,12 @@ document.addEventListener('alpine:init', () => {
 
             <div class="mb-4 pb-2 border-b border-slate-100 flex items-center justify-between">
                 <div>
-                    <span class="text-[10px] font-extrabold text-[#C9A24D] uppercase tracking-widest block font-mono">REGISTRASI PESERTA</span>
-                    <h3 class="text-lg sm:text-xl font-bold font-serif text-[#0B2A43]">Form Intake Asesmen Ruhiologi</h3>
+                    <span class="text-[10px] font-extrabold text-[#C9A24D] uppercase tracking-widest block font-mono">{{ $isEn ? 'PARTICIPANT REGISTRATION' : 'REGISTRASI PESERTA' }}</span>
+                    <h3 class="text-lg sm:text-xl font-bold font-serif text-[#0B2A43]">{{ $isEn ? 'Ruhiology Assessment Intake Form' : 'Form Intake Asesmen Ruhiologi' }}</h3>
                 </div>
                 <template x-if="eventCode">
                     <span class="text-xs font-mono font-bold bg-[#0B2A43] text-[#C9A24D] px-3 py-1 rounded-full border border-[#C9A24D]/30">
-                        📌 Mode Event: <span x-text="eventCode"></span>
+                        📌 {{ $isEn ? 'Event Mode: ' : 'Mode Event: ' }}<span x-text="eventCode"></span>
                     </span>
                 </template>
             </div>
@@ -591,60 +594,60 @@ document.addEventListener('alpine:init', () => {
                         <!-- LEFT COLUMN (5 cols): Locked Event Metadata Card -->
                         <div class="md:col-span-5 bg-[#0B2A43] text-white p-5 rounded-2xl shadow-md border border-slate-800 space-y-4">
                             <div class="border-b border-slate-700/80 pb-3">
-                                <span class="text-[9px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest block mb-1">🎯 TERVERIFIKASI EVENT</span>
+                                <span class="text-[9px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest block mb-1">🎯 {{ $isEn ? 'VERIFIED EVENT' : 'TERVERIFIKASI EVENT' }}</span>
                                 <h4 class="font-serif font-bold text-base text-white leading-tight" x-text="eventName || eventCode"></h4>
-                                <p class="text-xs text-slate-300 mt-1 font-medium" x-text="eventInstitution || 'Instansi Terdaftar'"></p>
+                                <p class="text-xs text-slate-300 mt-1 font-medium" x-text="eventInstitution || '{{ $isEn ? 'Registered Institution' : 'Instansi Terdaftar' }}'"></p>
                             </div>
 
                             <div class="space-y-2 text-xs">
                                 <div class="flex justify-between items-center bg-white/10 p-2.5 rounded-xl border border-white/10">
-                                    <span class="text-slate-300">Kode Event:</span>
+                                    <span class="text-slate-300">{{ $isEn ? 'Event Code:' : 'Kode Event:' }}</span>
                                     <span class="font-mono font-bold text-[#C9A24D]" x-text="eventCode"></span>
                                 </div>
                                 <div class="flex justify-between items-center bg-white/10 p-2.5 rounded-xl border border-white/10">
-                                    <span class="text-slate-300">Kategori Peserta:</span>
+                                    <span class="text-slate-300">{{ $isEn ? 'Participant Category:' : 'Kategori Peserta:' }}</span>
                                     <span class="font-bold text-emerald-400" x-text="form.category"></span>
                                 </div>
                             </div>
 
                             <div class="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-[11px] text-amber-200/90 leading-relaxed space-y-1">
                                 <div class="font-bold text-amber-400 flex items-center gap-1">
-                                    <span>🔒 Data Instansi Dikunci</span>
+                                    <span>🔒 {{ $isEn ? 'Organization Profile Locked' : 'Data Instansi Dikunci' }}</span>
                                 </div>
                                 <p class="text-[10px] text-slate-300">
-                                    Profil sekolah, instansi, & wilayah sudah diset otomatis oleh panitia event. Anda cukup mengisi identitas diri di samping.
+                                    {{ $isEn ? 'Institution and regional details are pre-configured by your host organizer. You only need to fill in your personal identity.' : 'Profil sekolah, instansi, & wilayah sudah diset otomatis oleh panitia event. Anda cukup mengisi identitas diri di samping.' }}
                                 </p>
                             </div>
                         </div>
 
                         <!-- RIGHT COLUMN (7 cols): Quick Personal Intake Inputs -->
                         <div class="md:col-span-7 space-y-3.5 bg-slate-50/80 p-5 rounded-2xl border border-slate-200">
-                            <h4 class="font-serif font-bold text-sm text-[#0B2A43] border-b border-slate-200 pb-2">Identitas Peserta Event</h4>
+                            <h4 class="font-serif font-bold text-sm text-[#0B2A43] border-b border-slate-200 pb-2">{{ $isEn ? 'Participant Details' : 'Identitas Peserta Event' }}</h4>
 
                             <div>
-                                <label class="block font-bold text-slate-700 mb-1">Nama Lengkap *</label>
-                                <input type="text" x-model="form.name" required placeholder="Masukkan nama lengkap Anda..." class="w-full p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
+                                <label class="block font-bold text-slate-700 mb-1">{{ $isEn ? 'Full Name *' : 'Nama Lengkap *' }}</label>
+                                <input type="text" x-model="form.name" required placeholder="{{ $isEn ? 'Enter your full legal name...' : 'Masukkan nama lengkap Anda...' }}" class="w-full p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
                             </div>
 
                             <div class="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label class="block font-bold text-slate-700 mb-1">Tanggal Lahir *</label>
+                                    <label class="block font-bold text-slate-700 mb-1">{{ $isEn ? 'Date of Birth *' : 'Tanggal Lahir *' }}</label>
                                     <input type="date" x-model="form.birth_date" required class="w-full p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white text-xs">
                                 </div>
                                 <div>
-                                    <label class="block font-bold text-slate-700 mb-1">No. WA / HP (Opsional)</label>
-                                    <input type="tel" x-model="form.phone" placeholder="081234567890" class="w-full p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white text-xs">
+                                    <label class="block font-bold text-slate-700 mb-1">{{ $isEn ? 'WhatsApp / Phone (Optional)' : 'No. WA / HP (Opsional)' }}</label>
+                                    <input type="tel" x-model="form.phone" placeholder="{{ $isEn ? '+1234567890' : '081234567890' }}" class="w-full p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white text-xs">
                                 </div>
                             </div>
 
                             <div>
-                                <label class="block font-bold text-slate-700 mb-1">Jenis Kelamin *</label>
+                                <label class="block font-bold text-slate-700 mb-1">{{ $isEn ? 'Gender *' : 'Jenis Kelamin *' }}</label>
                                 <div class="grid grid-cols-2 gap-2">
                                     <button type="button" @click="form.gender = 'Laki-laki'" :class="form.gender === 'Laki-laki' ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'" class="py-2 px-3 rounded-xl border text-xs transition-colors text-center cursor-pointer">
-                                        👨 Laki-laki
+                                        👨 {{ $isEn ? 'Male' : 'Laki-laki' }}
                                     </button>
                                     <button type="button" @click="form.gender = 'Perempuan'" :class="form.gender === 'Perempuan' ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'" class="py-2 px-3 rounded-xl border text-xs transition-colors text-center cursor-pointer">
-                                        👩 Perempuan
+                                        👩 {{ $isEn ? 'Female' : 'Perempuan' }}
                                     </button>
                                 </div>
                             </div>
@@ -653,10 +656,10 @@ document.addEventListener('alpine:init', () => {
                             <template x-if="eventSubcategories && eventSubcategories.length > 0">
                                 <div>
                                     <label class="block font-bold text-[#0B2A43] mb-1">
-                                        <span x-text="eventGroupLabel || 'Pilih Sub-Kategori / Kelas / Bidang'"></span> *
+                                        <span x-text="eventGroupLabel || '{{ $isEn ? 'Select Sub-Category / Class / Department' : 'Pilih Sub-Kategori / Kelas / Bidang' }}'"></span> *
                                     </label>
                                     <select x-model="form.sub_category" required class="w-full p-2.5 text-xs font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
-                                        <option value="">-- Pilih Opsi Kelas --</option>
+                                        <option value="">{{ $isEn ? '-- Select Class / Stream Option --' : '-- Pilih Opsi Kelas --' }}</option>
                                         <template x-for="item in eventSubcategories" :key="item">
                                             <option :value="item" x-text="item"></option>
                                         </template>
@@ -665,8 +668,8 @@ document.addEventListener('alpine:init', () => {
                             </template>
                             <template x-if="!eventSubcategories || eventSubcategories.length === 0">
                                 <div>
-                                    <label class="block font-bold text-slate-700 mb-1">Kelas / Rombel / Jurusan (Opsional)</label>
-                                    <input type="text" x-model="form.school_class" placeholder="Contoh: Kelas X IPA 1 / XII IPS 2" class="w-full p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white text-xs">
+                                    <label class="block font-bold text-slate-700 mb-1">{{ $isEn ? 'Class / Major / Department (Optional)' : 'Kelas / Rombel / Jurusan (Opsional)' }}</label>
+                                    <input type="text" x-model="form.school_class" placeholder="{{ $isEn ? 'e.g. Class 10 A / Dept HR' : 'Contoh: Kelas X IPA 1 / XII IPS 2' }}" class="w-full p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white text-xs">
                                 </div>
                             </template>
                         </div>
@@ -678,9 +681,9 @@ document.addEventListener('alpine:init', () => {
                 <template x-if="!eventCode">
                     <div class="space-y-4">
                         <div class="flex items-center justify-between p-3 bg-[#0B2A43]/5 border border-[#0B2A43]/15 rounded-2xl">
-                            <span class="font-bold text-[#0B2A43] text-xs">🟢 Track Asesmen Mandiri / Personal</span>
+                            <span class="font-bold text-[#0B2A43] text-xs">🟢 {{ $isEn ? 'Self / Personal Assessment Track' : 'Track Asesmen Mandiri / Personal' }}</span>
                             <button type="button" @click="showRegModal = false; openEventSelectorModal()" class="text-[11px] font-bold text-[#C9A24D] hover:underline cursor-pointer flex items-center gap-1">
-                                <span>🎯 Punya Kode Event Panitia?</span>
+                                <span>🎯 {{ $isEn ? 'Have an Organizer Event Code?' : 'Punya Kode Event Panitia?' }}</span>
                             </button>
                         </div>
 
@@ -689,13 +692,13 @@ document.addEventListener('alpine:init', () => {
                             <div class="p-3.5 bg-amber-500/10 border border-amber-400/40 rounded-2xl space-y-2">
                                 <div class="flex items-center justify-between">
                                     <label class="block font-serif font-bold text-xs text-[#0B2A43] flex items-center gap-1.5">
-                                        <span>📋</span> <span>Pilih Paket Soal / Instrumen Asesmen *</span>
+                                        <span>📋</span> <span>{{ $isEn ? 'Select Assessment Instrument / Package *' : 'Pilih Paket Soal / Instrumen Asesmen *' }}</span>
                                     </label>
-                                    <span class="text-[10px] font-mono font-bold text-amber-800 bg-amber-100 border border-amber-300 px-2.5 py-0.5 rounded-full" x-text="publicInstruments.length + ' Paket Soal Publik'"></span>
+                                    <span class="text-[10px] font-mono font-bold text-amber-800 bg-amber-100 border border-amber-300 px-2.5 py-0.5 rounded-full" x-text="publicInstruments.length + ' {{ $isEn ? 'Public Instruments' : 'Paket Soal Publik' }}'"></span>
                                 </div>
                                 <select x-model="form.instrument_id" required class="w-full p-2.5 text-xs font-bold rounded-xl border border-amber-400 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white text-slate-800 shadow-xs">
                                     <template x-for="inst in publicInstruments" :key="inst.id">
-                                        <option :value="inst.id" x-text="inst.name + (inst.title ? ' — ' + inst.title : '') + (inst.questions_count ? ' (' + inst.questions_count + ' Soal)' : '')"></option>
+                                        <option :value="inst.id" x-text="inst.name + (inst.title ? ' — ' + inst.title : '') + (inst.questions_count ? ' (' + inst.questions_count + ' {{ $isEn ? 'Questions' : 'Soal' }})' : '')"></option>
                                     </template>
                                 </select>
                             </div>
@@ -707,13 +710,13 @@ document.addEventListener('alpine:init', () => {
                                 <div class="flex items-center gap-2">
                                     <span class="text-base">📝</span>
                                     <div>
-                                        <span class="text-[9px] font-bold text-slate-400 uppercase font-mono tracking-wider block">PAKET SOAL ASESMEN</span>
+                                        <span class="text-[9px] font-bold text-slate-400 uppercase font-mono tracking-wider block">{{ $isEn ? 'ASSESSMENT PACKAGE' : 'PAKET SOAL ASESMEN' }}</span>
                                         <strong class="font-bold text-[#0B2A43]" x-text="publicInstruments[0].name"></strong>
-                                        <span class="text-slate-500 text-[11px]" x-text="publicInstruments[0].questions_count ? ' (' + publicInstruments[0].questions_count + ' Soal)' : ''"></span>
+                                        <span class="text-slate-500 text-[11px]" x-text="publicInstruments[0].questions_count ? ' (' + publicInstruments[0].questions_count + ' {{ $isEn ? 'Questions' : 'Soal' }})' : ''"></span>
                                     </div>
                                 </div>
                                 <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
-                                    ✓ Aktif
+                                    ✓ {{ $isEn ? 'Active' : 'Aktif' }}
                                 </span>
                             </div>
                         </template>
@@ -933,25 +936,25 @@ document.addEventListener('alpine:init', () => {
             <button @click="showCheckScoreModal = false" class="absolute top-5 right-5 text-slate-400 hover:text-slate-700 cursor-pointer">✕</button>
             
             <div class="mb-5 pb-3 border-b border-slate-100">
-                <span class="text-[10px] font-extrabold text-[#C9A24D] uppercase tracking-widest block font-mono">CEK HASIL & SERTIFIKAT RESMI</span>
-                <h3 class="text-xl font-serif font-bold text-[#0B2A43]">Cek Skor & Unduh Sertifikat</h3>
-                <p class="text-xs text-slate-500 mt-1">Masukkan Kode Assessment (`RQI-...`), Kode Sesi (`SUB-...`), Nomor WhatsApp, atau Nama Lengkap Anda.</p>
+                <span class="text-[10px] font-extrabold text-[#C9A24D] uppercase tracking-widest block font-mono">{{ $isEn ? 'OFFICIAL RESULT & CERTIFICATE LOOKUP' : 'CEK HASIL & SERTIFIKAT RESMI' }}</span>
+                <h3 class="text-xl font-serif font-bold text-[#0B2A43]">{{ $isEn ? 'Check Score & Download Certificate' : 'Cek Skor & Unduh Sertifikat' }}</h3>
+                <p class="text-xs text-slate-500 mt-1">{{ $isEn ? 'Enter your Assessment Code (`RQI-...`), Session Code (`SUB-...`), WhatsApp number, or Full Name.' : 'Masukkan Kode Assessment (`RQI-...`), Kode Sesi (`SUB-...`), Nomor WhatsApp, atau Nama Lengkap Anda.' }}</p>
             </div>
 
             <form action="{{ route('assessment.check_score') }}" method="POST" class="space-y-4 text-xs font-sans">
                 @csrf
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1">Kode Assessment / No. WhatsApp / Nama Lengkap *</label>
-                    <input type="text" name="assessment_code" required placeholder="Contoh: RQI-7F82K9 atau 081234567890 atau Nama..." class="w-full p-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none font-bold text-sm">
+                    <label class="block font-bold text-slate-700 mb-1">{{ $isEn ? 'Assessment Code / WhatsApp / Full Name *' : 'Kode Assessment / No. WhatsApp / Nama Lengkap *' }}</label>
+                    <input type="text" name="assessment_code" required placeholder="{{ $isEn ? 'e.g. RQI-7F82K9 or +123456789 or John Doe...' : 'Contoh: RQI-7F82K9 atau 081234567890 atau Nama...' }}" class="w-full p-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none font-bold text-sm">
                 </div>
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1">Tanggal Lahir <span class="text-slate-400 font-normal">(Opsional, untuk verifikasi tambahan)</span></label>
+                    <label class="block font-bold text-slate-700 mb-1">{{ $isEn ? 'Date of Birth' : 'Tanggal Lahir' }} <span class="text-slate-400 font-normal">{{ $isEn ? '(Optional, for additional verification)' : '(Opsional, untuk verifikasi tambahan)' }}</span></label>
                     <input type="date" name="birth_date" class="w-full p-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none font-medium">
                 </div>
 
                 <div class="pt-2">
                     <button type="submit" class="w-full py-3.5 bg-[#0B2A43] hover:bg-[#123B59] text-[#C9A24D] font-bold rounded-xl text-xs uppercase tracking-wider shadow-md transition-colors cursor-pointer">
-                         Cari Laporan Hasil & Sertifikat →
+                        {{ $isEn ? 'Search Report & Certificate →' : 'Cari Laporan Hasil & Sertifikat →' }}
                     </button>
                 </div>
             </form>

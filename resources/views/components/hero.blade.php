@@ -1,4 +1,5 @@
 <!-- HERO SECTION COMPONENT (FULLY EDITABLE VIA SYSTEM SETTINGS & MOBILE-FIRST OPTIMIZED) -->
+@php $isEn = app()->getLocale() === 'en'; @endphp
 <section id="hero" class="relative bg-[#0B2A43] text-white pt-8 pb-16 sm:pt-14 sm:pb-24 lg:pt-20 lg:pb-28 overflow-hidden border-b border-slate-800">
     
     <!-- Background Atmosphere Image Overlay -->
@@ -18,27 +19,35 @@
                 <!-- Eyebrow Location Pill Badge -->
                 <div class="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-md border border-white/20 text-[#C9A24D] text-[11px] sm:text-xs font-mono font-bold px-3.5 sm:px-4.5 py-1.5 sm:py-2 rounded-full shadow-sm">
                     <span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
-                    <span>{{ \App\Models\Setting::get('hero_eyebrow', '✨ Ruhiology Institute · Jambi, Indonesia') }}</span>
+                    <span>{{ $isEn ? '✨ Ruhiology Institute · International Center' : \App\Models\Setting::get('hero_eyebrow', '✨ Ruhiology Institute · Jambi, Indonesia') }}</span>
                 </div>
 
                 <!-- Main Headline -->
                 <h1 class="font-serif font-bold text-3xl sm:text-5xl lg:text-6xl text-white leading-[1.15] tracking-tight">
-                    {!! nl2br(e(\App\Models\Setting::get('hero_headline', "Mengenal Diri.\nMengembangkan Potensi.\nMenumbuhkan Ruh."))) !!}
+                    @if($isEn)
+                        {!! nl2br(e("Know Thyself.\nUnleash Potential.\nNurture the Soul.")) !!}
+                    @else
+                        {!! nl2br(e(\App\Models\Setting::get('hero_headline', "Mengenal Diri.\nMengembangkan Potensi.\nMenumbuhkan Ruh."))) !!}
+                    @endif
                 </h1>
 
                 <!-- Sub-headline Narrative -->
                 <p class="text-slate-200 text-xs sm:text-base leading-relaxed max-w-2xl mx-auto lg:mx-0 font-normal opacity-95">
-                    {{ \App\Models\Setting::get('hero_narrative', 'Ruhiology Institute adalah ekosistem pendidikan, assessment, training, konsultasi, dan pengembangan yang berfokus pada Kecerdasan Ruhiologi (Ruhiology Quotient / RQ) untuk membentuk manusia berkarakter paripurna.') }}
+                    @if($isEn)
+                        Ruhiology Institute is an international educational ecosystem for assessment, training, consultation, and holistic human development centered on Ruhiology Quotient (RQ) to cultivate the complete human character.
+                    @else
+                        {{ \App\Models\Setting::get('hero_narrative', 'Ruhiology Institute adalah ekosistem pendidikan, assessment, training, konsultasi, dan pengembangan yang berfokus pada Kecerdasan Ruhiologi (Ruhiology Quotient / RQ) untuk membentuk manusia berkarakter paripurna.') }}
+                    @endif
                 </p>
 
                 <!-- Action Buttons (CTA) -->
                 <div class="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3 sm:gap-4">
                     <a href="#tentang-ruhiologi" class="bg-gradient-to-r from-[#C9A24D] to-[#B48A16] hover:from-[#B48A16] hover:to-[#96710E] text-[#0B2A43] font-bold text-xs sm:text-sm px-7 py-3.5 sm:py-4 rounded-2xl shadow-xl hover:shadow-[#C9A24D]/30 transition transform hover:-translate-y-0.5 flex items-center justify-center space-x-2.5 min-h-[44px]">
-                        <span>Eksplorasi Ruhiologi</span>
+                        <span>{{ $isEn ? 'Explore Ruhiology' : 'Eksplorasi Ruhiologi' }}</span>
                         <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                     </a>
 
-                    <a href="#assessment" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 text-xs sm:text-sm font-bold px-6 py-3.5 sm:py-4 rounded-2xl transition backdrop-blur-md flex items-center justify-center space-x-2 min-h-[44px]">
+                    <a href="{{ route('assessment.index') }}" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 text-xs sm:text-sm font-bold px-6 py-3.5 sm:py-4 rounded-2xl transition backdrop-blur-md flex items-center justify-center space-x-2 min-h-[44px]">
                         <span>RQ Assessment</span>
                         <svg class="w-4 h-4 text-[#C9A24D]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                     </a>
@@ -49,10 +58,10 @@
                     <!-- Tab Selector Buttons -->
                     <div class="flex items-center gap-1.5 p-1 bg-slate-950/60 rounded-xl border border-white/10 text-xs">
                         <button type="button" @click="tab = 'event'" :class="tab === 'event' ? 'bg-[#C9A24D] text-[#0B2A43] font-extrabold shadow' : 'text-slate-300 hover:text-white font-medium'" class="flex-1 py-1.5 px-3 rounded-lg transition text-[11px] flex items-center justify-center gap-1.5 cursor-pointer">
-                            <span>🚀</span> <span>Masuk Event Sekolah / Instansi</span>
+                            <span>🚀</span> <span>{{ $isEn ? 'Join School / Institutional Event' : 'Masuk Event Sekolah / Instansi' }}</span>
                         </button>
                         <button type="button" @click="tab = 'check'" :class="tab === 'check' ? 'bg-[#C9A24D] text-[#0B2A43] font-extrabold shadow' : 'text-slate-300 hover:text-white font-medium'" class="flex-1 py-1.5 px-3 rounded-lg transition text-[11px] flex items-center justify-center gap-1.5 cursor-pointer">
-                            <span>🔍</span> <span>Cek Skor / Hasil Saya</span>
+                            <span>🔍</span> <span>{{ $isEn ? 'Check My Score / Results' : 'Cek Skor / Hasil Saya' }}</span>
                         </button>
                     </div>
 
@@ -60,13 +69,13 @@
                     <template x-if="tab === 'event'">
                         <div class="space-y-2 animate-fadeIn">
                             <div class="flex justify-between text-[11px] text-slate-300">
-                                <span>Punya Kode Event dari Sekolah / Kampus Anda?</span>
-                                <span class="text-[#C9A24D] font-bold">Akses Instan</span>
+                                <span>{{ $isEn ? 'Have an Event Code from your School or Organization?' : 'Punya Kode Event dari Sekolah / Kampus Anda?' }}</span>
+                                <span class="text-[#C9A24D] font-bold">{{ $isEn ? 'Instant Access' : 'Akses Instan' }}</span>
                             </div>
                             <form action="{{ route('assessment.index') }}" method="GET" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                                <input type="text" name="event_code" x-model="eventCode" required placeholder="Ketik Kode Event (misal: SMANTT, RQ-JAMBI-26)..." class="flex-1 bg-slate-900/90 border border-white/25 text-white placeholder-slate-400 text-xs px-3.5 py-2.5 rounded-xl focus:outline-none focus:border-[#C9A24D] uppercase font-mono font-bold min-h-[42px]">
+                                <input type="text" name="event_code" x-model="eventCode" required placeholder="{{ $isEn ? 'Enter Event Code (e.g. SMANTT, RQ-GLOBAL)...' : 'Ketik Kode Event (misal: SMANTT, RQ-JAMBI-26)...' }}" class="flex-1 bg-slate-900/90 border border-white/25 text-white placeholder-slate-400 text-xs px-3.5 py-2.5 rounded-xl focus:outline-none focus:border-[#C9A24D] uppercase font-mono font-bold min-h-[42px]">
                                 <button type="submit" class="bg-gradient-to-r from-[#C9A24D] to-[#B48A16] hover:from-[#B48A16] hover:to-[#96710E] text-[#0B2A43] font-extrabold text-xs px-5 py-2.5 rounded-xl transition shrink-0 shadow cursor-pointer min-h-[42px] flex items-center justify-center gap-1.5">
-                                    <span>Masuk Event</span> <span>→</span>
+                                    <span>{{ $isEn ? 'Join Event' : 'Masuk Event' }}</span> <span>→</span>
                                 </button>
                             </form>
                         </div>
@@ -76,13 +85,13 @@
                     <template x-if="tab === 'check'">
                         <div class="space-y-2 animate-fadeIn">
                             <div class="flex justify-between text-[11px] text-slate-300">
-                                <span>Cek Hasil Tes Menggunakan Kode Sesi / Peserta</span>
-                                <span class="text-emerald-400 font-bold">Hasil Real-time</span>
+                                <span>{{ $isEn ? 'Check Test Results via Session or Participant Code' : 'Cek Hasil Tes Menggunakan Kode Sesi / Peserta' }}</span>
+                                <span class="text-emerald-400 font-bold">{{ $isEn ? 'Real-time Results' : 'Hasil Real-time' }}</span>
                             </div>
                             <form @submit.prevent="$dispatch('open-quick-check', { code: subCode })" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                                <input type="text" x-model="subCode" required placeholder="Contoh: SUB-GY5FRHTJRG atau RQI-XXXXX..." class="flex-1 bg-slate-900/90 border border-white/25 text-white placeholder-slate-400 text-xs px-3.5 py-2.5 rounded-xl focus:outline-none focus:border-[#C9A24D] uppercase font-mono font-bold min-h-[42px]">
+                                <input type="text" x-model="subCode" required placeholder="{{ $isEn ? 'Example: SUB-GY5FRHTJRG or PAR-XXXX...' : 'Contoh: SUB-GY5FRHTJRG atau RQI-XXXXX...' }}" class="flex-1 bg-slate-900/90 border border-white/25 text-white placeholder-slate-400 text-xs px-3.5 py-2.5 rounded-xl focus:outline-none focus:border-[#C9A24D] uppercase font-mono font-bold min-h-[42px]">
                                 <button type="submit" class="bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-xs px-5 py-2.5 rounded-xl transition shrink-0 shadow cursor-pointer min-h-[42px] flex items-center justify-center gap-1.5">
-                                    <span>Cek Hasil</span> <span>→</span>
+                                    <span>{{ $isEn ? 'Check Result' : 'Cek Hasil' }}</span> <span>→</span>
                                 </button>
                             </form>
                         </div>
@@ -93,15 +102,15 @@
                 <div class="pt-2 flex flex-wrap lg:grid lg:grid-cols-3 justify-center lg:justify-start gap-3 sm:gap-4 text-xs text-slate-200 border-t border-white/10">
                     <div class="flex items-center space-x-2 bg-white/5 px-3 py-1.5 rounded-xl border border-white/10">
                         <span class="text-[#C9A24D] font-bold text-sm">📜</span>
-                        <span class="font-medium text-slate-200 text-[11px] sm:text-xs">Paradigma Pendidikan</span>
+                        <span class="font-medium text-slate-200 text-[11px] sm:text-xs">{{ $isEn ? 'Educational Paradigm' : 'Paradigma Pendidikan' }}</span>
                     </div>
                     <div class="flex items-center space-x-2 bg-white/5 px-3 py-1.5 rounded-xl border border-white/10">
                         <span class="text-emerald-400 font-bold text-sm">✨</span>
-                        <span class="font-medium text-slate-200 text-[11px] sm:text-xs">Kecerdasan Ruhiologi (RQ)</span>
+                        <span class="font-medium text-slate-200 text-[11px] sm:text-xs">{{ $isEn ? 'Ruhiology Quotient (RQ)' : 'Kecerdasan Ruhiologi (RQ)' }}</span>
                     </div>
                     <div class="flex items-center space-x-2 bg-white/5 px-3 py-1.5 rounded-xl border border-white/10">
                         <span class="text-amber-400 font-bold text-sm">📖</span>
-                        <span class="font-medium text-slate-200 text-[11px] sm:text-xs">Berbasis Nilai Islam</span>
+                        <span class="font-medium text-slate-200 text-[11px] sm:text-xs">{{ $isEn ? 'Faith & Universal Values' : 'Berbasis Nilai Islam' }}</span>
                     </div>
                 </div>
 
@@ -116,19 +125,19 @@
                     
                     <!-- Top Badge Tag -->
                     <div class="absolute top-4 left-4 bg-[#0B2A43]/95 backdrop-blur-md text-[#C9A24D] text-[10px] sm:text-[11px] font-bold px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full shadow border border-[#C9A24D]/30">
-                        {{ \App\Models\Setting::get('hero_card_badge_top', '🌾 Ekosistem & Riset Ruhiologi') }}
+                        {{ $isEn ? '🌾 Ruhiology Research & Ecosystem' : \App\Models\Setting::get('hero_card_badge_top', '🌾 Ekosistem & Riset Ruhiologi') }}
                     </div>
 
                     <!-- Bottom Caption Overlay -->
                     <div class="absolute bottom-4 left-4 right-4 sm:bottom-5 sm:left-5 sm:right-5 text-white space-y-1.5 sm:space-y-2">
                         <div class="inline-flex items-center space-x-1.5 bg-[#C9A24D] text-[#0B2A43] text-[9px] sm:text-[10px] font-bold px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-lg">
-                            <span>{{ \App\Models\Setting::get('hero_card_badge_bottom', 'Pusat Inteligensi Ruh') }}</span>
+                            <span>{{ $isEn ? 'Spiritual Intelligence Center' : \App\Models\Setting::get('hero_card_badge_bottom', 'Pusat Inteligensi Ruh') }}</span>
                         </div>
                         <h3 class="font-serif text-lg sm:text-2xl font-bold leading-snug">
-                            {{ \App\Models\Setting::get('hero_card_title', 'Menumbuhkan Potensi Manusia Paripurna') }}
+                            {{ $isEn ? 'Cultivating the Complete Human Potential' : \App\Models\Setting::get('hero_card_title', 'Menumbuhkan Potensi Manusia Paripurna') }}
                         </h3>
                         <p class="text-[11px] sm:text-xs text-slate-200 font-normal opacity-90 leading-relaxed">
-                            {{ \App\Models\Setting::get('hero_card_subtitle', 'Pengembangan karakter berbasis nilai wahyu dan metodologi psikometri ilmiah.') }}
+                            {{ $isEn ? 'Character development grounded in transcendent spiritual values and empirical psychometrics.' : \App\Models\Setting::get('hero_card_subtitle', 'Pengembangan karakter berbasis nilai wahyu dan metodologi psikometri ilmiah.') }}
                         </p>
                     </div>
                 </div>

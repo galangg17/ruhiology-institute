@@ -2,9 +2,29 @@
 
 @section('content')
 @php
+    $isEn = app()->getLocale() === 'en';
     $rqiScore = number_format($submission->result->rqi_score ?? $submission->result->total_score, 0);
     $maxRqiScore = $submission->result->max_score ?? 75;
-    $catName = $submission->result->category_name ?? 'Level 3: Developing Soul (Jiwa Berproses Stabil)';
+    
+    // Localize Category Name
+    $rawCatName = $submission->result->category_name ?? 'Level 3: Developing Soul (Jiwa Berproses Stabil)';
+    if ($isEn) {
+        $catMap = [
+            'Level 5: Enlightened Soul (Jiwa Mutmainnah Paripurna)' => 'Level 5: Enlightened Soul (Complete Serenity & Harmony)',
+            'Level 4: Mindful Youth (Jiwa Sadar Bertumbuh)' => 'Level 4: Mindful Soul (Conscious Growth & Alignment)',
+            'Level 3: Developing Soul (Jiwa Berproses Stabil)' => 'Level 3: Developing Soul (Stable Process & Balance)',
+            'Level 2: Awakening Pilgrim (Jiwa Mulai Terpanggil)' => 'Level 2: Awakening Pilgrim (Spiritual Awakening Phase)',
+            'Level 1: Spiritual Lowbat (Jiwa Membutuhkan Pengisian)' => 'Level 1: Spiritual Recharge (Seeking Guidance & Renewal)',
+        ];
+        $catName = $catMap[$rawCatName] ?? str_replace(
+            ['Jiwa Mutmainnah Paripurna', 'Jiwa Sadar Bertumbuh', 'Jiwa Berproses Stabil', 'Jiwa Mulai Terpanggil', 'Jiwa Membutuhkan Pengisian'],
+            ['Complete Serenity', 'Conscious Growth', 'Stable Growth', 'Awakening Phase', 'Needs Renewal'],
+            $rawCatName
+        );
+    } else {
+        $catName = $rawCatName;
+    }
+    
     $scorePct = round(($rqiScore / $maxRqiScore) * 100, 1);
 
     $allDimResults = $submission->result->dimensionResults ?? collect();
@@ -33,6 +53,9 @@
         ?: null;
 
     $regionText = trim(($submission->participant->regency->name ?? '') . (isset($submission->participant->regency) && isset($submission->participant->province) ? ', ' : '') . ($submission->participant->province->name ?? ''));
+    if (empty($regionText) && !empty($submission->participant->country_name)) {
+        $regionText = trim(($submission->participant->city_custom ? $submission->participant->city_custom . ', ' : '') . ($submission->participant->state_custom ? $submission->participant->state_custom . ', ' : '') . $submission->participant->country_name);
+    }
 
     $who5Raw = $submission->result->who5_raw_score
         ?? ($who5DimRecord ? $who5DimRecord->score : round(($scorePct / 100) * 25));
@@ -41,45 +64,58 @@
     $hasWho5 = true;
     
     if ($who5Raw >= 20 || $who5Pct >= 80) {
-        $who5LevelName = 'Level 5: Thriving & Energetic (Sangat Sejahtera)';
+        $who5LevelName = $isEn ? 'Level 5: Thriving & Energetic (Highly Flourishing)' : 'Level 5: Thriving & Energetic (Sangat Sejahtera)';
         $who5BadgeTitleShort = 'Level 5: Thriving & Energetic';
-        $who5DefaultNote = 'Kondisi kesejahteraan psikologis dan vitalitas emosional berada pada tingkat sangat prima, penuh energi positif, dan sangat sejahtera.';
+        $who5DefaultNote = $isEn ? 'Psychological well-being and emotional vitality are at an optimal level, filled with positive energy.' : 'Kondisi kesejahteraan psikologis dan vitalitas emosional berada pada tingkat sangat prima, penuh energi positif, dan sangat sejahtera.';
     } elseif ($who5Raw >= 16 || $who5Pct >= 64) {
-        $who5LevelName = 'Level 4: Good Vibe & Fresh (Sejahtera)';
+        $who5LevelName = $isEn ? 'Level 4: Good Vibe & Fresh (Flourishing)' : 'Level 4: Good Vibe & Fresh (Sejahtera)';
         $who5BadgeTitleShort = 'Level 4: Good Vibe & Fresh';
-        $who5DefaultNote = 'Kondisi emosional tergolong sehat, segar, dan stabil dalam menjalani aktivitas harian.';
+        $who5DefaultNote = $isEn ? 'Emotional condition is healthy, fresh, and resilient in navigating daily challenges.' : 'Kondisi emosional tergolong sehat, segar, dan stabil dalam menjalani aktivitas harian.';
     } elseif ($who5Raw >= 11 || $who5Pct >= 44) {
-        $who5LevelName = 'Level 3: Moderate Well-Being (Cukup Stabil)';
+        $who5LevelName = $isEn ? 'Level 3: Moderate Well-Being (Moderately Stable)' : 'Level 3: Moderate Well-Being (Cukup Stabil)';
         $who5BadgeTitleShort = 'Level 3: Moderate Well-Being';
-        $who5DefaultNote = 'Kesejahteraan emosional berada pada rentang cukup stabil, namun perlu menjaga keseimbangan istirahat dan ketenangan batin.';
+        $who5DefaultNote = $isEn ? 'Emotional well-being is fairly stable, with a recommendation to maintain inner peace and balanced rest.' : 'Kesejahteraan emosional berada pada rentang cukup stabil, namun perlu menjaga keseimbangan istirahat dan ketenangan batin.';
     } elseif ($who5Raw >= 6 || $who5Pct >= 24) {
-        $who5LevelName = 'Level 2: Low Energy (Perlu Perhatian)';
+        $who5LevelName = $isEn ? 'Level 2: Low Energy (Needs Attention)' : 'Level 2: Low Energy (Perlu Perhatian)';
         $who5BadgeTitleShort = 'Level 2: Low Energy';
-        $who5DefaultNote = 'Terdapat indikasi kelelahan emosional. Disarankan memperkuat relaksasi spiritual dan pendampingan konseling.';
+        $who5DefaultNote = $isEn ? 'Indications of emotional fatigue. Strengthening spiritual relaxation and counseling is recommended.' : 'Terdapat indikasi kelelahan emosional. Disarankan memperkuat relaksasi spiritual dan pendampingan konseling.';
     } else {
-        $who5LevelName = 'Level 1: Mental Exhausted (Perlu Pendampingan)';
+        $who5LevelName = $isEn ? 'Level 1: Mental Exhausted (Needs Support)' : 'Level 1: Mental Exhausted (Perlu Pendampingan)';
         $who5BadgeTitleShort = 'Level 1: Mental Exhausted';
-        $who5DefaultNote = 'Kelelahan mental cukup signifikan. Sangat disarankan berkonsultasi dengan pakar/konselor Ruhiology Institute.';
+        $who5DefaultNote = $isEn ? 'Significant mental fatigue. Consultation with Ruhiology Institute counselors is strongly advised.' : 'Kelelahan mental cukup signifikan. Sangat disarankan berkonsultasi dengan pakar/konselor Ruhiology Institute.';
     }
 
-    $who5ScreeningNote = $submission->result->who5_screening_note ?: $who5DefaultNote;
+    $who5ScreeningNote = $isEn ? $who5DefaultNote : ($submission->result->who5_screening_note ?: $who5DefaultNote);
 
     // Build unified 6 Dimensions (5 Pilar RQI + Dimensi ke-6 WHO-5)
-    $allSixDimensions = $rqiOnlyDimensions->map(function($dr, $idx) {
+    $allSixDimensions = $rqiOnlyDimensions->map(function($dr, $idx) use ($isEn) {
+        $name = $dr->dimension->name ?? ('Dimensi ' . ($idx + 1));
+        if ($isEn) {
+            $name = $dr->dimension->localized_name ?? \App\Services\TranslationService::getCuratedDictionary($name) ?? $name;
+        }
+        $interpretation = $dr->interpretation;
+        if ($isEn && !empty($interpretation)) {
+            $interpretation = str_replace(
+                ['Sangat Baik', 'Baik', 'Cukup', 'Kurang', 'Tingkat kesadaran sangat prima', 'Perlu ditingkatkan'],
+                ['Excellent', 'Good', 'Moderate', 'Needs Improvement', 'Optimal consciousness level', 'Room for growth'],
+                $interpretation
+            );
+        }
         return (object) [
             'code' => $dr->dimension->code ?? ('DIM-' . ($idx + 1)),
-            'name' => $dr->dimension->name ?? ('Dimensi ' . ($idx + 1)),
+            'name' => $name,
             'score' => $dr->score,
             'max_score' => $dr->max_score,
             'percentage' => $dr->percentage,
-            'interpretation' => $dr->interpretation,
+            'interpretation' => $interpretation,
             'is_who5' => false,
         ];
     })->values();
 
+    $who5Name = $isEn ? 'Dimension 6: Mental Well-Being Index (WHO-5)' : 'Dimensi ke-6: Indeks Kesejahteraan Mental (WHO-5)';
     $allSixDimensions->push((object) [
         'code' => $who5DimRecord?->dimension?->code ?: 'DIM-6 (WHO-5)',
-        'name' => $who5DimRecord?->dimension?->name ?: 'Dimensi ke-6: Indeks Kesejahteraan Mental (WHO-5)',
+        'name' => $who5Name,
         'score' => $who5Raw,
         'max_score' => 25,
         'percentage' => $who5Pct,
@@ -87,18 +123,26 @@
         'is_who5' => true,
     ]);
 
-    $canvasPillars = $allSixDimensions->map(function($dr) {
+    $canvasPillars = $allSixDimensions->map(function($dr) use ($isEn) {
         $rawName = trim($dr->name ?? 'Dimensi');
         $lower = strtolower($rawName);
-        if (!empty($dr->is_who5) || str_contains($lower, 'who')) $cleanName = 'Kesejahteraan Mental (WHO-5)';
-        elseif (str_contains($lower, 'diri')) $cleanName = 'Kesadaran Diri & Ruh';
-        elseif (str_contains($lower, 'puncak')) $cleanName = 'Kesadaran Puncak Ilahi';
-        elseif (str_contains($lower, 'god spot') || str_contains($lower, 'ketuhanan') || str_contains($lower, 'spiritual connection')) $cleanName = 'Kesadaran Ketuhanan (God Spot)';
-        elseif (str_contains($lower, 'ibadah') || str_contains($lower, 'ketaatan')) $cleanName = 'Ketaatan Spiritual & Ibadah';
-        elseif (str_contains($lower, 'tazkiyah') || str_contains($lower, 'purifikasi') || str_contains($lower, 'inner peace')) $cleanName = 'Purifikasi Batin (Tazkiyah)';
-        elseif (str_contains($lower, 'perilaku') || str_contains($lower, 'akhlak') || str_contains($lower, 'altruistic')) $cleanName = 'Perubahan Perilaku & Akhlak';
-        elseif (str_contains($lower, 'resiliensi') || str_contains($lower, 'ketangguhan')) $cleanName = 'Ketangguhan & Resiliensi';
-        else {
+        if (!empty($dr->is_who5) || str_contains($lower, 'who')) {
+            $cleanName = $isEn ? 'Mental Well-Being (WHO-5)' : 'Kesejahteraan Mental (WHO-5)';
+        } elseif (str_contains($lower, 'diri') || str_contains($lower, 'authentic self')) {
+            $cleanName = $isEn ? 'Self-Awareness & Soul' : 'Kesadaran Diri & Ruh';
+        } elseif (str_contains($lower, 'puncak') || str_contains($lower, 'peak divine')) {
+            $cleanName = $isEn ? 'Peak Divine Awareness' : 'Kesadaran Puncak Ilahi';
+        } elseif (str_contains($lower, 'god spot') || str_contains($lower, 'ketuhanan') || str_contains($lower, 'divine recognition')) {
+            $cleanName = $isEn ? 'Divine Recognition (God Spot)' : 'Kesadaran Ketuhanan (God Spot)';
+        } elseif (str_contains($lower, 'ibadah') || str_contains($lower, 'ketaatan') || str_contains($lower, 'devotion')) {
+            $cleanName = $isEn ? 'Spiritual Devotion' : 'Ketaatan Spiritual & Ibadah';
+        } elseif (str_contains($lower, 'tazkiyah') || str_contains($lower, 'purifikasi') || str_contains($lower, 'inner peace')) {
+            $cleanName = $isEn ? 'Inner Purification (Tazkiyah)' : 'Purifikasi Batin (Tazkiyah)';
+        } elseif (str_contains($lower, 'perilaku') || str_contains($lower, 'akhlak') || str_contains($lower, 'noble ethics')) {
+            $cleanName = $isEn ? 'Character & Noble Ethics' : 'Perubahan Perilaku & Akhlak';
+        } elseif (str_contains($lower, 'resiliensi') || str_contains($lower, 'ketangguhan') || str_contains($lower, 'resilience')) {
+            $cleanName = $isEn ? 'Resilience & Soul Strength' : 'Ketangguhan & Resiliensi';
+        } else {
             $cleanName = preg_replace('/^\d+\.\s*/', '', $rawName);
             $cleanName = preg_replace('/\s*\(.*?\)/', '', $cleanName);
         }
@@ -151,29 +195,29 @@
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
                 <span class="text-[10px] font-mono font-semibold text-[#C5A059] uppercase tracking-[0.18em] block mb-1.5">
-                    LAPORAN HASIL INDIVIDUAL RQ ASSESSMENT
+                    {{ $isEn ? 'INDIVIDUAL RQ ASSESSMENT REPORT' : 'LAPORAN HASIL INDIVIDUAL RQ ASSESSMENT' }}
                 </span>
                 <h1 class="text-xl sm:text-3xl font-bold font-serif text-white tracking-tight">{{ $submission->period->title }}</h1>
                 <p class="text-xs text-slate-300 mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
-                    <span>Kode Assessment: <strong class="font-mono text-white">{{ $submission->participant->assessment_code ?? $submission->participant->participant_code }}</strong></span>
+                    <span>{{ $isEn ? 'Assessment Code:' : 'Kode Assessment:' }} <strong class="font-mono text-white">{{ $submission->participant->assessment_code ?? $submission->participant->participant_code }}</strong></span>
                     <span class="text-slate-600">|</span>
-                    <span>Kode Sesi: <strong class="font-mono text-[#C5A059]">{{ $submission->submission_code }}</strong></span>
+                    <span>{{ $isEn ? 'Session Code:' : 'Kode Sesi:' }} <strong class="font-mono text-[#C5A059]">{{ $submission->submission_code }}</strong></span>
                     <span class="text-slate-600">|</span>
-                    <span>Tipe Sesi: <strong class="uppercase text-slate-200">{{ $submission->submission_type }}</strong></span>
+                    <span>{{ $isEn ? 'Session Type:' : 'Tipe Sesi:' }} <strong class="uppercase text-slate-200">{{ $submission->submission_type }}</strong></span>
                 </p>
             </div>
             <div class="flex flex-wrap gap-2.5 w-full md:w-auto">
                 <a href="{{ route('assessment.certificate', $submission->submission_code) }}" target="_blank" class="flex-1 md:flex-none justify-center px-4 py-2.5 bg-[#B5945B] hover:bg-[#A3834B] text-white text-xs font-semibold rounded-xl shadow-xs transition cursor-pointer flex items-center gap-2 min-h-[42px]">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
-                    <span>Sertifikat Resmi</span>
+                    <span>{{ $isEn ? 'Official Certificate' : 'Sertifikat Resmi' }}</span>
                 </a>
                 <button @click="openStoryModal()" class="flex-1 md:flex-none justify-center px-4 py-2.5 bg-white/10 hover:bg-white/15 text-white border border-white/20 text-xs font-semibold rounded-xl transition cursor-pointer flex items-center gap-2 min-h-[42px]">
                     <svg class="w-4 h-4 text-[#C5A059]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
-                    <span>Kartu Sosmed (IG/WA)</span>
+                    <span>{{ $isEn ? 'Social Card (IG/WA)' : 'Kartu Sosmed (IG/WA)' }}</span>
                 </button>
                 <button onclick="window.print()" class="flex-1 md:flex-none justify-center px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold rounded-xl transition cursor-pointer flex items-center gap-2 min-h-[42px]">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-                    <span>Cetak Laporan</span>
+                    <span>{{ $isEn ? 'Print Report' : 'Cetak Laporan' }}</span>
                 </button>
             </div>
         </div>
@@ -196,12 +240,12 @@
                     <img src="{{ asset('images/ruhiology-logo.png') }}" class="w-11 h-11 object-contain" alt="Logo">
                     <div>
                         <h2 class="text-lg font-serif font-bold text-[#0F2537] tracking-wide uppercase">RUHIOLOGY INSTITUTE</h2>
-                        <p class="text-[11px] text-slate-600">Laporan Resmi Hasil Individu Asesmen Kesadaran Ruhiologi (RQI-15 & WHO-5 Index)</p>
+                        <p class="text-[11px] text-slate-600">{{ $isEn ? 'Official Individual Assessment Report on Ruhiology Intelligence (RQI-15 & WHO-5 Index)' : 'Laporan Resmi Hasil Individu Asesmen Kesadaran Ruhiologi (RQI-15 & WHO-5 Index)' }}</p>
                     </div>
                 </div>
                 <div class="text-right text-[11px] font-mono">
                     <p class="font-bold text-[#0F2537]">NO: {{ $submission->submission_code }}</p>
-                    <p class="text-slate-500">Tanggal: {{ optional($submission->submitted_at)->format('d/m/Y H:i') }}</p>
+                    <p class="text-slate-500">{{ $isEn ? 'Date:' : 'Tanggal:' }} {{ optional($submission->submitted_at)->format('d/m/Y H:i') }}</p>
                 </div>
             </div>
         </div>
@@ -214,13 +258,13 @@
                         {{ strtoupper(substr($submission->participant->name, 0, 2)) }}
                     </div>
                     <div>
-                        <span class="text-slate-400 uppercase font-semibold text-[9px] block font-mono tracking-wider">NAMA LENGKAP PESERTA</span>
+                        <span class="text-slate-400 uppercase font-semibold text-[9px] block font-mono tracking-wider">{{ $isEn ? 'PARTICIPANT FULL NAME' : 'NAMA LENGKAP PESERTA' }}</span>
                         <strong class="font-bold text-[#0F2537] text-sm block leading-snug mt-0.5">{{ $submission->participant->name }}</strong>
                     </div>
                 </div>
 
                 <div>
-                    <span class="text-slate-400 uppercase font-semibold text-[9px] block font-mono tracking-wider">KATEGORI & ASAL INSTANSI</span>
+                    <span class="text-slate-400 uppercase font-semibold text-[9px] block font-mono tracking-wider">{{ $isEn ? 'CATEGORY & INSTITUTION' : 'KATEGORI & ASAL INSTANSI' }}</span>
                     <span class="font-semibold text-[#0F2537] text-xs block mt-0.5 leading-snug">
                         {{ $submission->participant->category ?: 'UMUM' }}
                         @if($instName)
@@ -231,18 +275,18 @@
 
                 <div>
                     <div class="flex items-center justify-between">
-                        <span class="text-slate-400 uppercase font-semibold text-[9px] block font-mono tracking-wider">WILAYAH ASAL (DOMISILI)</span>
+                        <span class="text-slate-400 uppercase font-semibold text-[9px] block font-mono tracking-wider">{{ $isEn ? 'REGION / DOMICILE' : 'WILAYAH ASAL (DOMISILI)' }}</span>
                         <button type="button" @click="openEditRegionModal()" class="no-print text-[10px] text-[#8C703E] hover:text-[#0F2537] font-semibold underline cursor-pointer">
-                            Ubah
+                            {{ $isEn ? 'Change' : 'Ubah' }}
                         </button>
                     </div>
                     <span class="font-semibold text-[#0F2537] text-xs block mt-0.5">
-                        {{ $regionText ?: 'Tidak diisi' }}
+                        {{ $regionText ?: ($isEn ? 'Not specified' : 'Tidak diisi') }}
                     </span>
                 </div>
 
                 <div>
-                    <span class="text-slate-400 uppercase font-semibold text-[9px] block font-mono tracking-wider">TANGGAL & STATUS SESI</span>
+                    <span class="text-slate-400 uppercase font-semibold text-[9px] block font-mono tracking-wider">{{ $isEn ? 'DATE & SESSION STATUS' : 'TANGGAL & STATUS SESI' }}</span>
                     <div class="flex items-center gap-2 mt-0.5">
                         <span class="font-semibold text-slate-700 text-xs">
                             {{ $submission->submitted_at ? $submission->submitted_at->format('d M Y, H:i') : '-' }}
@@ -263,9 +307,9 @@
                 <div class="space-y-5">
                     <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                         <span class="text-[10px] font-mono font-semibold text-[#8C703E] uppercase tracking-[0.14em]">
-                            PILAR 01 · KECERDASAN RUHIOLOGI (RQI-15)
+                            {{ $isEn ? 'PILLAR 01 · RUHIOLOGY QUOTIENT (RQI-15)' : 'PILAR 01 · KECERDASAN RUHIOLOGI (RQI-15)' }}
                         </span>
-                        <span class="text-[10px] font-mono text-slate-400 font-medium">SKALA 15 – 75 POIN</span>
+                        <span class="text-[10px] font-mono text-slate-400 font-medium">{{ $isEn ? 'SCALE 15 – 75 PTS' : 'SKALA 15 – 75 POIN' }}</span>
                     </div>
 
                     <div class="flex flex-col sm:flex-row items-center gap-5 sm:gap-6">
@@ -276,15 +320,15 @@
                             </svg>
                             <div class="absolute flex flex-col items-center justify-center text-center">
                                 <span class="font-mono font-bold text-sm text-[#0F2537] leading-none">{{ $scorePct }}%</span>
-                                <span class="text-[8px] font-mono uppercase text-slate-400 mt-0.5">CAPAIAN</span>
+                                <span class="text-[8px] font-mono uppercase text-slate-400 mt-0.5">{{ $isEn ? 'SCORE' : 'CAPAIAN' }}</span>
                             </div>
                         </div>
 
                         <div class="text-center sm:text-left space-y-1.5 flex-1">
-                            <span class="text-[10px] font-mono font-semibold text-slate-400 uppercase tracking-wider block">SKOR TOTAL RQI-15</span>
+                            <span class="text-[10px] font-mono font-semibold text-slate-400 uppercase tracking-wider block">{{ $isEn ? 'TOTAL RQI-15 SCORE' : 'SKOR TOTAL RQI-15' }}</span>
                             <div class="text-3xl sm:text-4xl font-bold font-serif text-[#0F2537] tracking-tight flex items-baseline justify-center sm:justify-start gap-1.5">
                                 <span>{{ $rqiScore }}</span>
-                                <span class="text-sm text-slate-400 font-normal font-sans">/ {{ $maxRqiScore }} Poin</span>
+                                <span class="text-sm text-slate-400 font-normal font-sans">/ {{ $maxRqiScore }} {{ $isEn ? 'Pts' : 'Poin' }}</span>
                             </div>
                             <div class="pt-0.5">
                                 <span class="inline-block px-3 py-1 rounded-lg text-[11px] font-semibold bg-[#F4F1EA] text-[#0F2537] border border-[#DFD8C8]">
@@ -295,7 +339,7 @@
                     </div>
 
                     <div class="space-y-1.5 pt-1">
-                        <span class="text-[10px] font-mono font-semibold text-slate-400 uppercase tracking-wider block">GAMBARAN PROFIL & REFLEKSI BATINIAH</span>
+                        <span class="text-[10px] font-mono font-semibold text-slate-400 uppercase tracking-wider block">{{ $isEn ? 'PROFILE SUMMARY & INNER REFLECTION' : 'GAMBARAN PROFIL & REFLEKSI BATINIAH' }}</span>
                         <div class="bg-[#FAF9F6] p-4 rounded-xl border border-[#EFECE6]">
                             <p class="text-xs italic text-slate-700 leading-relaxed font-normal">
                                 "{{ $submission->result->overall_interpretation }}"
@@ -306,9 +350,9 @@
 
                 @if($submission->result->pre_post_diff !== null)
                     <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-                        <span class="text-slate-500 font-medium">Perkembangan Delta RQI:</span>
+                        <span class="text-slate-500 font-medium">{{ $isEn ? 'RQI Delta Progress:' : 'Perkembangan Delta RQI:' }}</span>
                         <span class="font-semibold font-mono px-2.5 py-0.5 rounded-md text-xs bg-slate-100 text-[#0F2537]">
-                            {{ $submission->result->pre_post_diff >= 0 ? '+' : '' }}{{ number_format($submission->result->pre_post_diff, 1) }} poin
+                            {{ $submission->result->pre_post_diff >= 0 ? '+' : '' }}{{ number_format($submission->result->pre_post_diff, 1) }} {{ $isEn ? 'pts' : 'poin' }}
                         </span>
                     </div>
                 @endif
@@ -320,9 +364,9 @@
                     <div class="space-y-5">
                         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                             <span class="text-[10px] font-mono font-semibold text-[#1E4E44] uppercase tracking-[0.14em]">
-                                PILAR 02 · KESEJAHTERAAN MENTAL (WHO-5)
+                                {{ $isEn ? 'PILLAR 02 · MENTAL WELL-BEING (WHO-5)' : 'PILAR 02 · KESEJAHTERAAN MENTAL (WHO-5)' }}
                             </span>
-                            <span class="text-[10px] font-mono text-slate-400 font-medium">SKALA 0 – 25 POIN</span>
+                            <span class="text-[10px] font-mono text-slate-400 font-medium">{{ $isEn ? 'SCALE 0 – 25 PTS' : 'SKALA 0 – 25 POIN' }}</span>
                         </div>
 
                         <div class="flex flex-col sm:flex-row items-center gap-5 sm:gap-6">
@@ -333,15 +377,15 @@
                                 </svg>
                                 <div class="absolute flex flex-col items-center justify-center text-center">
                                     <span class="font-mono font-bold text-sm text-[#1E4E44] leading-none">{{ number_format($who5Pct, 0) }}%</span>
-                                    <span class="text-[8px] font-mono uppercase text-slate-400 mt-0.5">INDEKS</span>
+                                    <span class="text-[8px] font-mono uppercase text-slate-400 mt-0.5">{{ $isEn ? 'INDEX' : 'INDEKS' }}</span>
                                 </div>
                             </div>
 
                             <div class="text-center sm:text-left space-y-1.5 flex-1">
-                                <span class="text-[10px] font-mono font-semibold text-slate-400 uppercase tracking-wider block">SKOR MENTAH WHO-5</span>
+                                <span class="text-[10px] font-mono font-semibold text-slate-400 uppercase tracking-wider block">{{ $isEn ? 'RAW WHO-5 SCORE' : 'SKOR MENTAH WHO-5' }}</span>
                                 <div class="text-3xl sm:text-4xl font-bold font-serif text-[#1E4E44] tracking-tight flex items-baseline justify-center sm:justify-start gap-1.5">
                                     <span>{{ $who5Raw }}</span>
-                                    <span class="text-sm text-slate-400 font-normal font-sans">/ 25 Poin ({{ number_format($who5Pct, 0) }}%)</span>
+                                    <span class="text-sm text-slate-400 font-normal font-sans">/ 25 {{ $isEn ? 'Pts' : 'Poin' }} ({{ number_format($who5Pct, 0) }}%)</span>
                                 </div>
                                 <div class="pt-0.5">
                                     <span class="inline-block px-3 py-1 rounded-lg text-[11px] font-semibold bg-[#F0F5F3] text-[#1E4E44] border border-[#CFE0DA]">
@@ -352,7 +396,7 @@
                         </div>
 
                         <div class="space-y-1.5 pt-1">
-                            <span class="text-[10px] font-mono font-semibold text-slate-400 uppercase tracking-wider block">DESKRIPSI KESEJAHTERAAN EMOSIONAL</span>
+                            <span class="text-[10px] font-mono font-semibold text-slate-400 uppercase tracking-wider block">{{ $isEn ? 'EMOTIONAL WELL-BEING DESCRIPTION' : 'DESKRIPSI KESEJAHTERAAN EMOSIONAL' }}</span>
                             <div class="bg-[#FAF9F6] p-4 rounded-xl border border-[#EFECE6]">
                                 <p class="text-xs text-slate-700 leading-relaxed font-normal">
                                     "{{ $who5ScreeningNote }}"
@@ -362,7 +406,7 @@
                     </div>
 
                     <div class="pt-3 border-t border-slate-100 text-[10px] text-slate-400 italic leading-snug">
-                        *World Health Organization-5 (WHO-5) Well-Being Index: instrumen psikometrik terstandar untuk pemetaan vitalitas emosional.
+                        {{ $isEn ? '*World Health Organization-5 (WHO-5) Well-Being Index: standardized psychometric scale for assessing emotional vitality.' : '*World Health Organization-5 (WHO-5) Well-Being Index: instrumen psikometrik terstandar untuk pemetaan vitalitas emosional.' }}
                     </div>
                 </div>
             @endif
@@ -374,10 +418,10 @@
             <div class="bg-white p-6 sm:p-8 rounded-2xl border border-[#E5E0D5] shadow-2xs space-y-6 print-avoid-break">
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-slate-100 pb-4 gap-2">
                     <div>
-                        <span class="text-[10px] font-mono font-semibold text-[#1E4E44] uppercase tracking-widest block">PERBANDINGAN SIKLUS PRE VS POST</span>
-                        <h3 class="text-lg sm:text-xl font-serif font-bold text-[#0F2537]">Hasil Perkembangan & Evaluasi Diri</h3>
+                        <span class="text-[10px] font-mono font-semibold text-[#1E4E44] uppercase tracking-widest block">{{ $isEn ? 'PRE VS POST LONGITUDINAL COMPARISON' : 'PERBANDINGAN SIKLUS PRE VS POST' }}</span>
+                        <h3 class="text-lg sm:text-xl font-serif font-bold text-[#0F2537]">{{ $isEn ? 'Development & Self-Evaluation Results' : 'Hasil Perkembangan & Evaluasi Diri' }}</h3>
                     </div>
-                    <span class="px-3 py-1 bg-[#F0F5F3] text-[#1E4E44] text-xs font-semibold rounded-lg border border-[#CFE0DA]">Matrik Evaluasi Longitudinal</span>
+                    <span class="px-3 py-1 bg-[#F0F5F3] text-[#1E4E44] text-xs font-semibold rounded-lg border border-[#CFE0DA]">{{ $isEn ? 'Longitudinal Evaluation Matrix' : 'Matrik Evaluasi Longitudinal' }}</span>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
@@ -394,14 +438,14 @@
                     </div>
 
                     <div class="p-5 bg-[#F4F1EA] rounded-xl border border-[#DFD8C8] text-center space-y-1 flex flex-col justify-center">
-                        <span class="text-xs text-[#8C703E] font-semibold uppercase tracking-wider block">PERUBAHAN SKOR</span>
+                        <span class="text-xs text-[#8C703E] font-semibold uppercase tracking-wider block">{{ $isEn ? 'SCORE CHANGE' : 'PERUBAHAN SKOR' }}</span>
                         @php
                             $diff = ($postSubmission->result->rqi_score ?? 0) - ($preSubmission->result->rqi_score ?? 0);
                         @endphp
                         <div class="text-3xl font-serif font-bold text-[#0F2537]">
-                            {{ $diff >= 0 ? '+' : '' }}{{ number_format($diff, 0) }} Poin
+                            {{ $diff >= 0 ? '+' : '' }}{{ number_format($diff, 0) }} {{ $isEn ? 'Pts' : 'Poin' }}
                         </div>
-                        <span class="text-[11px] text-slate-600">Perbandingan capaian awal dan evaluasi akhir</span>
+                        <span class="text-[11px] text-slate-600">{{ $isEn ? 'Baseline vs final cycle comparison' : 'Perbandingan capaian awal dan evaluasi akhir' }}</span>
                     </div>
                 </div>
             </div>
@@ -411,22 +455,22 @@
         <div class="bg-[#0F2537] text-white p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-sm grid grid-cols-1 lg:grid-cols-12 gap-6 items-center print-avoid-break">
             <div class="lg:col-span-5 bg-white/5 p-5 rounded-xl border border-white/10">
                 <h4 class="font-serif font-bold text-sm text-[#C5A059] mb-1">
-                    Grafik Keseimbangan 6 Dimensi (RQI & WHO-5)
+                    {{ $isEn ? '6-Dimensional Balance Radar (RQI & WHO-5)' : 'Grafik Keseimbangan 6 Dimensi (RQI & WHO-5)' }}
                 </h4>
-                <p class="text-[11px] text-slate-300 mb-3">Pemetaan proporsional 5 pilar kesadaran ruhiologi & indeks kesejahteraan mental WHO-5.</p>
+                <p class="text-[11px] text-slate-300 mb-3">{{ $isEn ? 'Proportional mapping across 5 Ruhiology intelligence pillars & the WHO-5 mental well-being index.' : 'Pemetaan proporsional 5 pilar kesadaran ruhiologi & indeks kesejahteraan mental WHO-5.' }}</p>
                 <div class="relative w-full aspect-square max-w-xs mx-auto">
                     <canvas id="resultRadarChart"></canvas>
                 </div>
             </div>
             <div class="lg:col-span-7 space-y-3">
                 <span class="text-[10px] font-mono font-semibold text-[#C5A059] uppercase tracking-[0.16em] block">
-                    PROFIL METRIK 6 DIMENSI ASESMEN (RQI-15 & WHO-5)
+                    {{ $isEn ? '6-DIMENSION ASSESSMENT METRIC PROFILE' : 'PROFIL METRIK 6 DIMENSI ASESMEN (RQI-15 & WHO-5)' }}
                 </span>
                 <h3 class="text-xl sm:text-2xl font-serif font-bold text-white leading-snug">
-                    Pemetaan Keseimbangan Potensi Ruh & Vitalitas Mental
+                    {{ $isEn ? 'Mapping the Balance of Soul Potential & Mental Vitality' : 'Pemetaan Keseimbangan Potensi Ruh & Vitalitas Mental' }}
                 </h3>
                 <p class="text-xs text-slate-300 leading-relaxed font-normal">
-                    Keenam dimensi merepresentasikan kesatuan utuh antara kesadaran ruhiologi (pengenalan diri, ketuhanan, ketaatan ibadah, akhlak karimah, kesadaran puncak) dan kesejahteraan psikologis harian (WHO-5 Index).
+                    {{ $isEn ? 'The six dimensions represent a holistic synthesis of spiritual consciousness (self-awareness, divine recognition, devotional practice, noble ethics, peak awareness) and daily emotional flourishing (WHO-5 Index).' : 'Keenam dimensi merepresentasikan kesatuan utuh antara kesadaran ruhiologi (pengenalan diri, ketuhanan, ketaatan ibadah, akhlak karimah, kesadaran puncak) dan kesejahteraan psikologis harian (WHO-5 Index).' }}
                 </p>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2">
                     @foreach($allSixDimensions as $dRes)
@@ -448,10 +492,10 @@
         <div class="bg-white rounded-2xl border border-[#E5E0D5] shadow-2xs overflow-hidden print-avoid-break">
             <div class="p-5 sm:p-6 border-b border-slate-100 flex flex-wrap justify-between items-center gap-2">
                 <div>
-                    <h3 class="font-serif font-bold text-[#0F2537] text-base sm:text-lg">Rincian Analisis 6 Dimensi (RQI-15 & Indeks WHO-5)</h3>
-                    <p class="text-[11px] text-slate-500 mt-0.5">Evaluasi skor mentah, persentase capaian, dan interpretasi kualitatif untuk 5 dimensi RQI serta dimensi ke-6 WHO-5.</p>
+                    <h3 class="font-serif font-bold text-[#0F2537] text-base sm:text-lg">{{ $isEn ? '6 Dimensions Breakdown (RQI-15 & WHO-5 Index)' : 'Rincian Analisis 6 Dimensi (RQI-15 & Indeks WHO-5)' }}</h3>
+                    <p class="text-[11px] text-slate-500 mt-0.5">{{ $isEn ? 'Raw score evaluation, percentage attainment, and qualitative interpretation for RQI and WHO-5.' : 'Evaluasi skor mentah, persentase capaian, dan interpretasi kualitatif untuk 5 dimensi RQI serta dimensi ke-6 WHO-5.' }}</p>
                 </div>
-                <span class="text-[10px] sm:text-xs font-mono font-semibold text-[#8C703E] uppercase bg-[#F4F1EA] px-3 py-1 rounded-md border border-[#DFD8C8]">6 Dimensi Terpadu</span>
+                <span class="text-[10px] sm:text-xs font-mono font-semibold text-[#8C703E] uppercase bg-[#F4F1EA] px-3 py-1 rounded-md border border-[#DFD8C8]">{{ $isEn ? '6 Unified Dimensions' : '6 Dimensi Terpadu' }}</span>
             </div>
 
             <!-- Desktop View: Table -->
@@ -459,11 +503,11 @@
                 <table class="w-full text-left text-xs">
                     <thead class="bg-[#FAF9F6] text-slate-500 font-semibold uppercase tracking-wider border-b border-[#EFECE6]">
                         <tr>
-                            <th class="px-6 py-3.5">Kode</th>
-                            <th class="px-6 py-3.5">Dimensi Kecerdasan Ruhiologi & Kesejahteraan</th>
-                            <th class="px-6 py-3.5">Skor Mentah</th>
-                            <th class="px-6 py-3.5">Capaian (%)</th>
-                            <th class="px-6 py-3.5">Interpretasi Kualitatif</th>
+                            <th class="px-6 py-3.5">{{ $isEn ? 'Code' : 'Kode' }}</th>
+                            <th class="px-6 py-3.5">{{ $isEn ? 'Dimension & Well-Being Domain' : 'Dimensi Kecerdasan Ruhiologi & Kesejahteraan' }}</th>
+                            <th class="px-6 py-3.5">{{ $isEn ? 'Raw Score' : 'Skor Mentah' }}</th>
+                            <th class="px-6 py-3.5">{{ $isEn ? 'Attainment (%)' : 'Capaian (%)' }}</th>
+                            <th class="px-6 py-3.5">{{ $isEn ? 'Qualitative Interpretation' : 'Interpretasi Kualitatif' }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100 font-medium">
@@ -499,13 +543,13 @@
                     <div class="p-4 rounded-xl border space-y-2 {{ !empty($dimRes->is_who5) ? 'bg-[#F6F9F8] border-[#CFE0DA]' : 'bg-[#FAF9F6] border-[#EFECE6]' }}">
                         <div class="flex justify-between items-center border-b border-slate-200/60 pb-2">
                             <span class="font-mono font-semibold text-xs {{ !empty($dimRes->is_who5) ? 'text-[#1E4E44]' : 'text-[#8C703E]' }}">{{ $dimRes->code }}</span>
-                            <span class="font-semibold text-xs text-[#0F2537] font-mono">{{ number_format($dimRes->score, 2) }} / {{ number_format($dimRes->max_score, 2) }} Poin</span>
+                            <span class="font-semibold text-xs text-[#0F2537] font-mono">{{ number_format($dimRes->score, 2) }} / {{ number_format($dimRes->max_score, 2) }} {{ $isEn ? 'Pts' : 'Poin' }}</span>
                         </div>
                         <h4 class="font-semibold text-sm {{ !empty($dimRes->is_who5) ? 'text-[#1E4E44]' : 'text-[#0F2537]' }}">{{ $dimRes->name }}</h4>
                         
                         <div class="space-y-1 pt-1">
                             <div class="flex justify-between text-xs font-semibold">
-                                <span class="text-slate-500">Capaian:</span>
+                                <span class="text-slate-500">{{ $isEn ? 'Attainment:' : 'Capaian:' }}</span>
                                 <span class="{{ !empty($dimRes->is_who5) ? 'text-[#1E4E44]' : 'text-[#0F2537]' }}">{{ number_format($dimRes->percentage, 1) }}%</span>
                             </div>
                             <div class="w-full bg-[#EFECE6] h-1.5 rounded-full overflow-hidden">
@@ -524,19 +568,19 @@
         <!-- PERSONAL REFLECTION & TEKAD PERUBAHAN BATIN FORM -->
         <div class="bg-white p-6 sm:p-8 rounded-2xl border border-[#E5E0D5] shadow-2xs space-y-4 no-print">
             <div>
-                <span class="text-[10px] font-mono font-semibold text-[#8C703E] uppercase tracking-widest block">KOMITMEN REFLEKSI BATIN</span>
-                <h3 class="text-base sm:text-lg font-serif font-bold text-[#0F2537]">Tekad Perubahan Batin Anda</h3>
+                <span class="text-[10px] font-mono font-semibold text-[#8C703E] uppercase tracking-widest block">{{ $isEn ? 'INNER REFLECTION COMMITMENT' : 'KOMITMEN REFLEKSI BATIN' }}</span>
+                <h3 class="text-base sm:text-lg font-serif font-bold text-[#0F2537]">{{ $isEn ? 'Your Personal Growth & Spiritual Pledge' : 'Tekad Perubahan Batin Anda' }}</h3>
                 <p class="text-xs text-slate-600 font-normal mt-1">
-                    "Tuliskan satu tekad perubahan batin yang paling ingin Anda wujudkan agar studi, karier, dan hidup Anda terasa lebih bermakna dan damai."
+                    {{ $isEn ? '"Write down one personal pledge or inner commitment you wish to realize so your study, career, and life feel more meaningful and peaceful."' : '"Tuliskan satu tekad perubahan batin yang paling ingin Anda wujudkan agar studi, karier, dan hidup Anda terasa lebih bermakna dan damai."' }}
                 </p>
             </div>
 
             <form action="{{ route('assessment.reflection', ['submission_code' => $submission->submission_code]) }}" method="POST" class="space-y-3">
                 @csrf
-                <textarea name="reflection_text" rows="3" required placeholder="Tuliskan tekad perubahan batin Anda di sini..." class="w-full p-4 rounded-xl border border-slate-300 text-xs font-medium focus:ring-2 focus:ring-[#0F2537] focus:border-[#0F2537] outline-none transition">{{ old('reflection_text', $submission->result->reflection_text ?? '') }}</textarea>
+                <textarea name="reflection_text" rows="3" required placeholder="{{ $isEn ? 'Write your personal inner pledge here...' : 'Tuliskan tekad perubahan batin Anda di sini...' }}" class="w-full p-4 rounded-xl border border-slate-300 text-xs font-medium focus:ring-2 focus:ring-[#0F2537] focus:border-[#0F2537] outline-none transition">{{ old('reflection_text', $submission->result->reflection_text ?? '') }}</textarea>
                 <div class="flex justify-end">
                     <button type="submit" class="w-full sm:w-auto py-3 px-6 bg-[#0F2537] hover:bg-[#183650] text-white font-semibold text-xs rounded-xl transition-colors cursor-pointer min-h-[42px]">
-                        Simpan Tekad Perubahan Batin →
+                        {{ $isEn ? 'Save Personal Pledge →' : 'Simpan Tekad Perubahan Batin →' }}
                     </button>
                 </div>
             </form>
@@ -545,11 +589,11 @@
         <!-- CONSULTATION CTA FOOTER -->
         <div class="bg-[#0F2537] p-6 sm:p-8 rounded-2xl text-white border border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-6 no-print text-center sm:text-left">
             <div class="space-y-1">
-                <h3 class="text-lg sm:text-xl font-serif font-bold text-white">Ingin Diskusi / Pendampingan Lebih Lanjut?</h3>
-                <p class="text-xs text-slate-300 font-normal">Konsultasikan hasil profil RQ Anda bersama para pakar & konselor berpengalaman Ruhiology Institute.</p>
+                <h3 class="text-lg sm:text-xl font-serif font-bold text-white">{{ $isEn ? 'Seeking Deeper Guidance & Consultation?' : 'Ingin Diskusi / Pendampingan Lebih Lanjut?' }}</h3>
+                <p class="text-xs text-slate-300 font-normal">{{ $isEn ? 'Discuss your RQ profile and spiritual resilience with certified Ruhiology Institute counselors.' : 'Konsultasikan hasil profil RQ Anda bersama para pakar & konselor berpengalaman Ruhiology Institute.' }}</p>
             </div>
             <a href="{{ route('consultation.index') }}" class="w-full sm:w-auto px-7 py-3.5 bg-[#B5945B] hover:bg-[#A3834B] text-white font-semibold rounded-xl text-xs uppercase tracking-wider transition whitespace-nowrap inline-block text-center min-h-[42px]">
-                Konsultasi Dengan Pakar →
+                {{ $isEn ? 'Consult with Experts →' : 'Konsultasi Dengan Pakar →' }}
             </a>
         </div>
 
