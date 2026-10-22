@@ -349,8 +349,6 @@
                             if (str_contains($lower, 'perilaku') || str_contains($lower, 'akhlak') || str_contains($lower, 'altruistic')) return $isEn ? 'Noble Character & Ethics' : 'Akhlak & Perilaku';
                             if (str_contains($lower, 'resiliensi') || str_contains($lower, 'ketangguhan')) return $isEn ? 'Spiritual Resilience' : 'Resiliensi Jiwa';
                             $clean = preg_replace('/^\d+\.\s*/', '', trim($rawName));
-                            return $clean;
-                        };
                             $clean = preg_replace('/\s*\(.*?\)/', '', $clean);
                             return \Illuminate\Support\Str::limit($clean, 20, '');
                         };
