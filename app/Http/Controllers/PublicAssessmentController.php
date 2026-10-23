@@ -89,8 +89,13 @@ class PublicAssessmentController extends Controller
                 if (empty($request->input('regency_id'))) {
                     $request->merge(['regency_id' => $defaultRegId]);
                 }
-                if (empty($request->input('category'))) {
-                    $request->merge(['category' => $eventModel->target_category ?? 'Pelajar']);
+                if (!empty($eventModel->target_category)) {
+                    $request->merge(['category' => $eventModel->target_category]);
+                } elseif (empty($request->input('category'))) {
+                    $request->merge(['category' => 'PELAJAR']);
+                }
+                if (!empty($eventModel->institution_name)) {
+                    $request->merge(['detail_institution' => $eventModel->institution_name]);
                 }
             }
         }
@@ -241,6 +246,18 @@ class PublicAssessmentController extends Controller
 
         $schoolCustom = $validated['school_custom'] ?? $validated['school_name'] ?? null;
         $universityCustom = $validated['university_custom'] ?? $validated['university_name'] ?? null;
+
+        // If event has institution_name, propagate to custom institution fields
+        if ($eventId && isset($event) && !empty(trim((string) $event->institution_name))) {
+            $eventInst = trim((string) $event->institution_name);
+            if (in_array(strtoupper($validated['category']), ['MURID', 'PELAJAR', 'GURU'])) {
+                $schoolCustom = $schoolCustom ?: $eventInst;
+            } elseif (in_array(strtoupper($validated['category']), ['MAHASISWA', 'DOSEN'])) {
+                $universityCustom = $universityCustom ?: $eventInst;
+            } else {
+                $detailInst = $detailInst ?: $eventInst;
+            }
+        }
 
         if (empty($schoolCustom) && !empty($detailInst) && in_array(strtoupper($validated['category']), ['MURID', 'PELAJAR', 'GURU'])) {
             $schoolCustom = $detailInst;
@@ -467,6 +484,9 @@ class PublicAssessmentController extends Controller
     {
         $submission = AssessmentSubmission::where('submission_code', $submissionCode)
             ->with([
+                'event',
+                'participant.event',
+                'participant.institution',
                 'participant.country',
                 'participant.province',
                 'participant.regency',
@@ -543,6 +563,9 @@ class PublicAssessmentController extends Controller
     {
         $submission = AssessmentSubmission::where('submission_code', $submissionCode)
             ->with([
+                'event',
+                'participant.event',
+                'participant.institution',
                 'participant.country',
                 'participant.province',
                 'participant.regency',

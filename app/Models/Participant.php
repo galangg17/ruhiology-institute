@@ -133,4 +133,67 @@ class Participant extends Model
 
         return $code;
     }
+
+    public function getResolvedCategoryAttribute(): string
+    {
+        $isEn = app()->getLocale() === 'en';
+        $rawCat = $this->event?->target_category ?: ($this->category ?: 'UMUM');
+        $catUpper = strtoupper(trim((string) $rawCat));
+
+        $labels = [
+            'GURU' => $isEn ? 'Teacher / Educator' : 'Guru / Pendidik',
+            'DOSEN' => $isEn ? 'Lecturer / Academician' : 'Dosen / Akademisi',
+            'MURID' => $isEn ? 'Student (K-12)' : 'Siswa / Pelajar',
+            'PELAJAR' => $isEn ? 'Student (K-12)' : 'Siswa / Pelajar',
+            'MAHASISWA' => $isEn ? 'University Student' : 'Mahasiswa',
+            'ASN' => $isEn ? 'Civil Servant (ASN)' : 'Aparatur Sipil Negara (ASN)',
+            'APH' => $isEn ? 'Law Enforcement Officer' : 'Aparat Penegak Hukum (APH)',
+            'TENAGA KEPENDIDIKAN' => $isEn ? 'Educational Staff (Tendik)' : 'Tenaga Kependidikan (Tendik)',
+            'WARGA BINAAN' => $isEn ? 'Correctional Facility Inmate' : 'Warga Binaan Pemasyarakatan',
+            'UMUM' => $isEn ? 'General Public / Professional' : 'Umum / Profesional',
+        ];
+
+        return $labels[$catUpper] ?? ucwords(strtolower((string) $rawCat));
+    }
+
+    public function getResolvedInstitutionAttribute(): ?string
+    {
+        $inst = null;
+
+        if ($this->event && !empty(trim((string) $this->event->institution_name))) {
+            $inst = trim((string) $this->event->institution_name);
+        }
+
+        if (!$inst) {
+            $inst = $this->school_custom
+                ?: $this->university_custom
+                ?: $this->occupation_custom
+                ?: $this->school?->name
+                ?: $this->university?->name
+                ?: null;
+        }
+
+        if (!$inst && !empty($this->sub_category) && str_contains($this->sub_category, '—')) {
+            $parts = explode('—', $this->sub_category);
+            $afterDash = trim((string) end($parts));
+            if (!empty($afterDash)) {
+                $inst = $afterDash;
+            }
+        }
+
+        $genericLevels = [
+            'sma / sederajat', 'smp / sederajat', 'sd / sederajat', 'tk / paud',
+            'perguruan tinggi', 'd3', 'd4', 's1', 's2', 's3',
+            'sma', 'smk', 'ma', 'smp', 'mts', 'sd', 'mi', 'umum', 'mandiri'
+        ];
+        if ($inst && in_array(strtolower(trim((string) $inst)), $genericLevels)) {
+            $inst = null;
+        }
+
+        if ($inst && !empty($this->school_class) && !str_contains($inst, $this->school_class)) {
+            $inst .= " ({$this->school_class})";
+        }
+
+        return $inst;
+    }
 }

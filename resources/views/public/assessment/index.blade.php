@@ -223,6 +223,9 @@ window.rqAssessmentIndex = function rqAssessmentIndex() {
                     this.eventName = evt.title;
                     this.eventInstitution = evt.institution_name || '';
                     this.form.event_code = evt.event_code;
+                    if (evt.institution_name) {
+                        this.form.detail_institution = evt.institution_name;
+                    }
 
                     if (evt.custom_subcategories && evt.custom_subcategories.length > 0) {
                         this.eventGroupLabel = evt.group_label || 'Pilih Sub-Kategori / Kelas / Bidang';
@@ -339,10 +342,16 @@ window.rqAssessmentIndex = function rqAssessmentIndex() {
         submitRegistration() {
             this.isSubmitting = true;
 
-            if (this.form.sub_category_type) {
-                this.form.sub_category = this.form.sub_category_type + (this.form.detail_institution ? ' — ' + this.form.detail_institution : '');
+            if (this.eventCode) {
+                if (this.eventInstitution) {
+                    this.form.detail_institution = this.eventInstitution;
+                }
             } else {
-                this.form.sub_category = this.form.detail_institution || '';
+                if (this.form.sub_category_type) {
+                    this.form.sub_category = this.form.sub_category_type + (this.form.detail_institution ? ' — ' + this.form.detail_institution : '');
+                } else {
+                    this.form.sub_category = this.form.detail_institution || '';
+                }
             }
 
             const catUpper = (this.form.category || '').toUpperCase();

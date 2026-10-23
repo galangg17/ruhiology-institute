@@ -43,19 +43,9 @@
         return str_contains($code, 'who') || str_contains($name, 'who');
     });
 
-    $instName = $submission->participant->sub_category
-        ?: $submission->participant->detail_institution
-        ?: $submission->participant->university_custom 
-        ?: $submission->participant->school_custom 
-        ?: $submission->participant->occupation_custom 
-        ?: $submission->participant->school?->name 
-        ?: $submission->participant->university?->name 
-        ?: null;
-
-    $regionText = trim(($submission->participant->regency->name ?? '') . (isset($submission->participant->regency) && isset($submission->participant->province) ? ', ' : '') . ($submission->participant->province->name ?? ''));
-    if (empty($regionText) && !empty($submission->participant->country_name)) {
-        $regionText = trim(($submission->participant->city_custom ? $submission->participant->city_custom . ', ' : '') . ($submission->participant->state_custom ? $submission->participant->state_custom . ', ' : '') . $submission->participant->country_name);
-    }
+    $instName = $submission->resolved_institution;
+    $regionText = $submission->resolved_domicile;
+    $categoryText = $submission->resolved_category;
 
     $who5Raw = $submission->result->who5_raw_score
         ?? ($who5DimRecord ? $who5DimRecord->score : round(($scorePct / 100) * 25));
@@ -266,7 +256,7 @@
                 <div>
                     <span class="text-slate-400 uppercase font-semibold text-[9px] block font-mono tracking-wider">{{ $isEn ? 'CATEGORY & INSTITUTION' : 'KATEGORI & ASAL INSTANSI' }}</span>
                     <span class="font-semibold text-[#0F2537] text-xs block mt-0.5 leading-snug">
-                        {{ $submission->participant->category ?: 'UMUM' }}
+                        {{ $categoryText }}
                         @if($instName)
                             &mdash; <span class="text-slate-600 font-normal">{{ $instName }}</span>
                         @endif
@@ -899,7 +889,7 @@ function rqResultPage() {
                 ctx.font = pName.length > 28 ? '700 27px "Poppins", sans-serif' : '700 30px "Poppins", sans-serif';
                 ctx.fillText(pName, W / 2, curY + (isStory ? 52 : 44));
 
-                const catStr = cleanText('{{ addslashes(ucwords(strtolower($submission->participant->category ?: "Umum"))) }}');
+                const catStr = cleanText('{{ addslashes($categoryText) }}');
                 const instStr = cleanText('{{ addslashes($instName ?? "") }}');
                 const regStr = cleanText('{{ addslashes($regionText ?? "") }}');
                 const subLine1 = instStr ? `${catStr}  |  ${instStr}` : `Kategori: ${catStr}`;

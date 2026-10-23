@@ -273,22 +273,16 @@
                             {{ $submission->participant->name }}
                         </h2>
                         @php
-                            $instName = $submission->participant->sub_category 
-                                ?: $submission->participant->detail_institution
-                                ?: $submission->participant->university_custom 
-                                ?: $submission->participant->school_custom 
-                                ?: $submission->participant->occupation_custom 
-                                ?: $submission->participant->school?->name 
-                                ?: $submission->participant->university?->name 
-                                ?: null;
-                            $domisili = trim(($submission->participant->regency?->name ?? '') . ($submission->participant->regency && $submission->participant->province ? ', ' : '') . ($submission->participant->province?->name ?? ''));
+                            $certCategory = $submission->resolved_category;
+                            $certInstitution = $submission->resolved_institution;
+                            $domisili = $submission->resolved_domicile;
                         @endphp
                         <p class="text-[11px] font-normal mt-1.5 tracking-wide"
                            :class="theme === 'dark' ? 'text-slate-300' : 'text-slate-600'">
-                            <span>{{ app()->getLocale() === 'en' ? 'Category:' : 'Kategori:' }} <strong class="font-semibold" :class="theme === 'dark' ? 'text-white' : 'text-[#0F2537]'">{{ ucwords(strtolower($submission->participant->category ?: 'General')) }}</strong></span>
-                            @if($instName)
+                            <span>{{ app()->getLocale() === 'en' ? 'Category:' : 'Kategori:' }} <strong class="font-semibold" :class="theme === 'dark' ? 'text-white' : 'text-[#0F2537]'">{{ $certCategory }}</strong></span>
+                            @if($certInstitution)
                                 <span class="mx-2 text-[#B5945B]">|</span>
-                                <span>{{ app()->getLocale() === 'en' ? 'Institution:' : 'Instansi:' }} <strong class="font-semibold" :class="theme === 'dark' ? 'text-white' : 'text-[#0F2537]'">{{ $instName }}</strong></span>
+                                <span>{{ app()->getLocale() === 'en' ? 'Institution:' : 'Instansi:' }} <strong class="font-semibold" :class="theme === 'dark' ? 'text-white' : 'text-[#0F2537]'">{{ $certInstitution }}</strong></span>
                             @endif
                             @if($domisili)
                                 <span class="mx-2 text-[#B5945B]">|</span>
