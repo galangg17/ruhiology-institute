@@ -297,7 +297,18 @@ function formBuilder() {
 
         submitForm(targetStatus) {
             this.status = targetStatus;
-            document.getElementById('mainFormBuilder').submit();
+
+            // Bersihkan field kosong yang tidak sengaja ditambahkan sebelum dikirim
+            const validFields = this.fields.filter(f => f.label && f.label.trim().length > 0);
+            if (validFields.length === 0) {
+                alert('Mohon isi minimal satu pertanyaan dengan judul/label yang jelas.');
+                return;
+            }
+            this.fields = validFields;
+
+            this.$nextTick(() => {
+                document.getElementById('mainFormBuilder').submit();
+            });
         }
     };
 }

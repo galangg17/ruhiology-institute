@@ -50,6 +50,14 @@ class AdminCustomFormController extends Controller
 
     public function store(Request $request)
     {
+        // Auto-clean any blank or unused field cards before validation
+        if ($request->has('fields') && is_array($request->input('fields'))) {
+            $cleanedFields = array_values(array_filter($request->input('fields'), function ($f) {
+                return !empty(trim($f['label'] ?? ''));
+            }));
+            $request->merge(['fields' => $cleanedFields]);
+        }
+
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'slug' => ['nullable', 'string', 'max:255', 'unique:custom_forms,slug'],
@@ -67,6 +75,11 @@ class AdminCustomFormController extends Controller
             'fields.*.placeholder' => ['nullable', 'string', 'max:255'],
             'fields.*.is_required' => ['nullable'],
             'fields.*.options' => ['nullable'],
+        ], [
+            'title.required' => 'Judul formulir wajib diisi.',
+            'fields.required' => 'Formulir harus memiliki minimal 1 pertanyaan.',
+            'fields.min' => 'Formulir harus memiliki minimal 1 pertanyaan dengan judul yang jelas.',
+            'fields.*.label.required' => 'Pertanyaan nomor :position wajib memiliki judul/label.',
         ]);
 
         if (empty($validated['slug'])) {
@@ -148,6 +161,14 @@ class AdminCustomFormController extends Controller
 
     public function update(Request $request, CustomForm $form)
     {
+        // Auto-clean any blank or unused field cards before validation
+        if ($request->has('fields') && is_array($request->input('fields'))) {
+            $cleanedFields = array_values(array_filter($request->input('fields'), function ($f) {
+                return !empty(trim($f['label'] ?? ''));
+            }));
+            $request->merge(['fields' => $cleanedFields]);
+        }
+
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'slug' => ['required', 'string', 'max:255', 'unique:custom_forms,slug,' . $form->id],
@@ -165,6 +186,11 @@ class AdminCustomFormController extends Controller
             'fields.*.placeholder' => ['nullable', 'string', 'max:255'],
             'fields.*.is_required' => ['nullable'],
             'fields.*.options' => ['nullable'],
+        ], [
+            'title.required' => 'Judul formulir wajib diisi.',
+            'fields.required' => 'Formulir harus memiliki minimal 1 pertanyaan.',
+            'fields.min' => 'Formulir harus memiliki minimal 1 pertanyaan dengan judul yang jelas.',
+            'fields.*.label.required' => 'Pertanyaan nomor :position wajib memiliki judul/label.',
         ]);
 
         $validated['slug'] = Str::slug($validated['slug']);
