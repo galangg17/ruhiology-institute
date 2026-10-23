@@ -128,8 +128,12 @@ class AdminCustomFormController extends Controller
             AuditLogService::log(
                 action: 'create_custom_form',
                 module: 'Forms',
-                description: "Membuat Formulir Kuisioner Dinamis: {$form->title} ({$form->slug})",
-                referenceId: $form->id
+                recordType: 'CustomForm',
+                recordId: (string) $form->id,
+                changes: [
+                    'title' => $form->title,
+                    'slug' => $form->slug,
+                ]
             );
         });
 
@@ -220,8 +224,12 @@ class AdminCustomFormController extends Controller
             AuditLogService::log(
                 action: 'update_custom_form',
                 module: 'Forms',
-                description: "Memperbarui Formulir Kuisioner Dinamis: {$form->title}",
-                referenceId: $form->id
+                recordType: 'CustomForm',
+                recordId: (string) $form->id,
+                changes: [
+                    'title' => $form->title,
+                    'slug' => $form->slug,
+                ]
             );
         });
 
@@ -231,13 +239,17 @@ class AdminCustomFormController extends Controller
     public function destroy(CustomForm $form)
     {
         $title = $form->title;
+        $formId = (string) $form->id;
         $form->delete();
 
         AuditLogService::log(
             action: 'delete_custom_form',
             module: 'Forms',
-            description: "Menghapus Formulir Kuisioner: {$title}",
-            referenceId: $form->id
+            recordType: 'CustomForm',
+            recordId: $formId,
+            changes: [
+                'title' => $title,
+            ]
         );
 
         return back()->with('success', "Formulir \"{$title}\" berhasil dihapus.");

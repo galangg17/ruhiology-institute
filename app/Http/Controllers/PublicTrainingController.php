@@ -156,8 +156,12 @@ class PublicTrainingController extends Controller
         AuditLogService::log(
             action: 'upload_payment_proof',
             module: 'Training',
-            description: "Peserta {$registration->participant_name} mengunggah bukti pembayaran untuk registrasi {$registration->registration_number}",
-            referenceId: $registration->id
+            recordType: 'TrainingRegistration',
+            recordId: (string) $registration->id,
+            changes: [
+                'participant_name' => $registration->participant_name,
+                'registration_number' => $registration->registration_number,
+            ]
         );
 
         return back()->with('success', 'Bukti transfer berhasil diunggah! Tim Admin Ruhiology akan memverifikasi dalam waktu maksimal 1x24 jam.');
