@@ -45,4 +45,14 @@ class TrainingBatch extends Model
         if ($this->registration_close && $now->gt($this->registration_close)) return false;
         return true;
     }
+
+    public function getRegisteredCountAttribute(): int
+    {
+        return $this->registrations()->whereIn('registration_status', ['pending', 'approved', 'completed'])->count();
+    }
+
+    public function getRemainingQuotaAttribute(): int
+    {
+        return max(0, $this->quota - $this->registered_count);
+    }
 }

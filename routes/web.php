@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\AdminProgramController;
 use App\Http\Controllers\Admin\AdminResultController;
 use App\Http\Controllers\Admin\AdminSettingController;
 use App\Http\Controllers\Admin\AdminTrainingController;
+use App\Http\Controllers\Admin\AdminCustomFormController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AdminMediaController;
 use App\Http\Controllers\Admin\AdminMasterDataController;
@@ -25,6 +26,7 @@ use App\Http\Controllers\PublicCatalogController;
 use App\Http\Controllers\PublicCmsController;
 use App\Http\Controllers\PublicConsultationController;
 use App\Http\Controllers\PublicTrainingController;
+use App\Http\Controllers\PublicCustomFormController;
 use App\Http\Controllers\Api\MasterDataApiController;
 use Illuminate\Support\Facades\Route;
 
@@ -75,8 +77,16 @@ Route::post('/assessment/update-region/{submission_code}', [PublicAssessmentCont
 
 // Training Center
 Route::get('/training', [PublicTrainingController::class, 'index'])->name('training.index');
+Route::get('/training/invoice/{registration_number}', [PublicTrainingController::class, 'invoice'])->name('training.invoice');
+Route::post('/training/invoice/{registration_number}/upload-proof', [PublicTrainingController::class, 'uploadProof'])->name('training.invoice.upload_proof');
 Route::get('/training/{slug}', [PublicTrainingController::class, 'show'])->name('training.show');
 Route::post('/training/{slug}/register', [PublicTrainingController::class, 'register'])->name('training.register');
+
+// Dynamic Forms (Google Form Ruhiology)
+Route::get('/f/{slug}', [PublicCustomFormController::class, 'show'])->name('public.form.show');
+Route::post('/f/{slug}', [PublicCustomFormController::class, 'show'])->name('public.form.verify');
+Route::post('/f/{slug}/submit', [PublicCustomFormController::class, 'submit'])->name('public.form.submit');
+Route::get('/f/{slug}/success/{response_code}', [PublicCustomFormController::class, 'success'])->name('public.form.success');
 
 // Book Store / Catalog
 Route::get('/katalog', [PublicCatalogController::class, 'index'])->name('catalog.index');
@@ -198,7 +208,20 @@ Route::middleware(['auth', \App\Http\Middleware\EnsureAdminAccess::class])
         Route::delete('/training/{training}', [AdminTrainingController::class, 'destroy'])->name('training.destroy');
         Route::post('/training/{training}/batches', [AdminTrainingController::class, 'storeBatch'])->name('training.batches.store');
         Route::get('/training-registrations', [AdminTrainingController::class, 'registrations'])->name('training.registrations');
+        Route::get('/training-registrations/export-csv', [AdminTrainingController::class, 'exportCsv'])->name('training.registrations.export_csv');
         Route::put('/training-registrations/{registration}', [AdminTrainingController::class, 'updateRegistrationStatus'])->name('training.registrations.update');
+
+        // Dynamic Forms Management (Google Form Ruhiology)
+        Route::get('/forms', [AdminCustomFormController::class, 'index'])->name('forms.index');
+        Route::get('/forms/create', [AdminCustomFormController::class, 'create'])->name('forms.create');
+        Route::post('/forms', [AdminCustomFormController::class, 'store'])->name('forms.store');
+        Route::get('/forms/{form}/edit', [AdminCustomFormController::class, 'edit'])->name('forms.edit');
+        Route::put('/forms/{form}', [AdminCustomFormController::class, 'update'])->name('forms.update');
+        Route::delete('/forms/{form}', [AdminCustomFormController::class, 'destroy'])->name('forms.destroy');
+        Route::post('/forms/{form}/toggle-status', [AdminCustomFormController::class, 'toggleStatus'])->name('forms.toggle_status');
+        Route::get('/forms/{form}/responses', [AdminCustomFormController::class, 'responses'])->name('forms.responses');
+        Route::get('/forms/{form}/export-csv', [AdminCustomFormController::class, 'exportCsv'])->name('forms.export_csv');
+        Route::delete('/forms/responses/{response}', [AdminCustomFormController::class, 'destroyResponse'])->name('forms.responses.destroy');
 
         // Store & Order Management
         Route::get('/products', [AdminCmsController::class, 'products'])->name('products.index');

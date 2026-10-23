@@ -28,10 +28,15 @@ class AdminTrainingController extends Controller
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
+            'syllabus' => ['nullable', 'string'],
+            'facilities' => ['nullable', 'string'],
+            'target_audience' => ['nullable', 'string'],
             'category' => ['required', 'string'],
             'trainer' => ['required', 'string'],
+            'trainer_bio' => ['nullable', 'string'],
             'duration' => ['required', 'string'],
             'location' => ['required', 'string'],
+            'contact_person' => ['nullable', 'string'],
             'is_online' => ['required', 'boolean'],
             'price' => ['required', 'numeric', 'min:0'],
             'quota' => ['required', 'integer', 'min:1'],
@@ -71,10 +76,15 @@ class AdminTrainingController extends Controller
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
+            'syllabus' => ['nullable', 'string'],
+            'facilities' => ['nullable', 'string'],
+            'target_audience' => ['nullable', 'string'],
             'category' => ['required', 'string'],
             'trainer' => ['required', 'string'],
+            'trainer_bio' => ['nullable', 'string'],
             'duration' => ['required', 'string'],
             'location' => ['required', 'string'],
+            'contact_person' => ['nullable', 'string'],
             'is_online' => ['required', 'boolean'],
             'price' => ['required', 'numeric', 'min:0'],
             'quota' => ['required', 'integer', 'min:1'],
@@ -144,16 +154,33 @@ class AdminTrainingController extends Controller
     {
         $query = TrainingRegistration::with(['training', 'batch']);
 
+        if ($request->filled('q')) {
+            $q = trim($request->input('q'));
+            $query->where(function ($w) use ($q) {
+                $w->where('registration_number', 'like', "%{$q}%")
+                  ->orWhere('participant_name', 'like', "%{$q}%")
+                  ->orWhere('email', 'like', "%{$q}%")
+                  ->orWhere('phone', 'like', "%{$q}%")
+                  ->orWhere('institution', 'like', "%{$q}%");
+            });
+        }
+
+        if ($request->filled('training_id')) {
+            $query->where('training_id', $request->training_id);
+        }
+
         if ($request->filled('registration_status')) {
             $query->where('registration_status', $request->registration_status);
         }
+
         if ($request->filled('payment_status')) {
             $query->where('payment_status', $request->payment_status);
         }
 
-        $registrations = $query->latest()->paginate(15);
+        $registrations = $query->latest()->paginate(15)->withQueryString();
+        $trainings = TrainingProgram::orderBy('title')->get();
 
-        return view('admin.training.registrations', compact('registrations'));
+        return view('admin.training.registrations', compact('registrations', 'trainings'));
     }
 
     public function updateRegistrationStatus(Request $request, TrainingRegistration $registration)
@@ -175,5 +202,92 @@ class AdminTrainingController extends Controller
         );
 
         return back()->with('success', 'Status pendaftaran berhasil diperbarui.');
+    }
+
+    public function exportCsv(Request $request)
+    {
+        $query = TrainingRegistration::with(['training', 'batch']);
+
+        if ($request->filled('q')) {
+            $q = trim($request->input('q'));
+            $query->where(function ($w) use ($q) {
+                $w->where('registration_number', 'like', "%{$q}%")
+                  ->orWhere('participant_name', 'like', "%{$q}%")
+                  ->orWhere('email', 'like', "%{$q}%")
+                  ->orWhere('phone', 'like', "%{$q}%")
+                  ->orWhere('institution', 'like', "%{$q}%");
+            });
+        }
+
+        if ($request->filled('training_id')) {
+            $query->where('training_id', $request->training_id);
+        }
+
+        if ($request->filled('registration_status')) {
+            $query->where('registration_status', $request->registration_status);
+        }
+
+        if ($request->filled('payment_status')) {
+            $query->where('payment_status', $request->payment_status);
+        }
+
+        $registrations = $query->latest()->get();
+        $filename = 'Pendaftar_Pelatihan_Ruhiology_' . date('Ymd_His') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
+        ];
+
+        $callback = function () use ($registrations) {
+            $file = fopen('php://output', 'w');
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM for Excel
+
+            fputcsv($file, [
+                'No',
+                'No. Registrasi',
+                'Nama Peserta',
+                'Email',
+                'WhatsApp',
+                'Institusi / Lembaga',
+                'Program Pelatihan',
+                'Angkatan / Batch',
+                'Jadwal Pelaksanaan',
+                'Biaya (Rp)',
+                'Status Pembayaran',
+                'Status Pendaftaran',
+                'Link Bukti Transfer',
+                'Catatan Admin',
+                'Waktu Registrasi'
+            ]);
+
+            $no = 1;
+            foreach ($registrations as $r) {
+                fputcsv($file, [
+                    $no++,
+                    $r->registration_number,
+                    $r->participant_name,
+                    $r->email,
+                    $r->phone,
+                    $r->institution ?? '-',
+                    $r->training?->title ?? '-',
+                    $r->batch?->batch_name ?? '-',
+                    $r->batch?->start_date ? $r->batch->start_date->format('d/m/Y') : '-',
+                    number_format($r->price, 0, ',', '.'),
+                    strtoupper($r->payment_status),
+                    strtoupper($r->registration_status),
+                    $r->payment_proof_path ?? '-',
+                    $r->admin_notes ?? '-',
+                    $r->created_at ? $r->created_at->format('d/m/Y H:i') : '-',
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }
