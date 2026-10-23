@@ -184,7 +184,8 @@ class Participant extends Model
         $genericLevels = [
             'sma / sederajat', 'smp / sederajat', 'sd / sederajat', 'tk / paud',
             'perguruan tinggi', 'd3', 'd4', 's1', 's2', 's3',
-            'sma', 'smk', 'ma', 'smp', 'mts', 'sd', 'mi', 'umum', 'mandiri'
+            'sma', 'smk', 'ma', 'smp', 'mts', 'sd', 'mi', 'umum', 'mandiri',
+            'tidak ada', '-', 'none', 'n/a', 'belum bekerja', 'belum / tidak bekerja'
         ];
         if ($inst && in_array(strtolower(trim((string) $inst)), $genericLevels)) {
             $inst = null;
