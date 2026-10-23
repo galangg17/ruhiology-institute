@@ -259,6 +259,8 @@
                         {{ $categoryText }}
                         @if($instName)
                             &mdash; <span class="text-slate-600 font-normal">{{ $instName }}</span>
+                        @else
+                            &mdash; <span class="text-slate-600 font-normal">{{ $isEn ? 'Verified Self-Assessment' : 'Asesmen Mandiri Terverifikasi' }}</span>
                         @endif
                     </span>
                 </div>
@@ -890,9 +892,9 @@ function rqResultPage() {
                 ctx.fillText(pName, W / 2, curY + (isStory ? 52 : 44));
 
                 const catStr = cleanText('{{ addslashes($categoryText) }}');
-                const instStr = cleanText('{{ addslashes($instName ?? "") }}');
+                const instStr = cleanText('{{ addslashes($instName ?: ($isEn ? "Verified Self-Assessment" : "Asesmen Mandiri Terverifikasi")) }}');
                 const regStr = cleanText('{{ addslashes($regionText ?? "") }}');
-                const subLine1 = instStr ? `${catStr}  |  ${instStr}` : `Kategori: ${catStr}`;
+                const subLine1 = `${catStr}  |  ${instStr}`;
 
                 ctx.fillStyle = palette.goldAccent;
                 ctx.font = '600 16px "Plus Jakarta Sans", sans-serif';

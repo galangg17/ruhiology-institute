@@ -276,17 +276,20 @@
                             $certCategory = $submission->resolved_category;
                             $certInstitution = $submission->resolved_institution;
                             $domisili = $submission->resolved_domicile;
+                            $isEn = app()->getLocale() === 'en';
                         @endphp
                         <p class="text-[11px] font-normal mt-1.5 tracking-wide"
                            :class="theme === 'dark' ? 'text-slate-300' : 'text-slate-600'">
-                            <span>{{ app()->getLocale() === 'en' ? 'Category:' : 'Kategori:' }} <strong class="font-semibold" :class="theme === 'dark' ? 'text-white' : 'text-[#0F2537]'">{{ $certCategory }}</strong></span>
+                            <span>{{ $isEn ? 'Category:' : 'Kategori:' }} <strong class="font-semibold" :class="theme === 'dark' ? 'text-white' : 'text-[#0F2537]'">{{ $certCategory }}</strong></span>
+                            <span class="mx-2 text-[#B5945B]">|</span>
                             @if($certInstitution)
-                                <span class="mx-2 text-[#B5945B]">|</span>
-                                <span>{{ app()->getLocale() === 'en' ? 'Institution:' : 'Instansi:' }} <strong class="font-semibold" :class="theme === 'dark' ? 'text-white' : 'text-[#0F2537]'">{{ $certInstitution }}</strong></span>
+                                <span>{{ $isEn ? 'Institution:' : 'Instansi:' }} <strong class="font-semibold" :class="theme === 'dark' ? 'text-white' : 'text-[#0F2537]'">{{ $certInstitution }}</strong></span>
+                            @else
+                                <span>{{ $isEn ? 'Track:' : 'Jalur:' }} <strong class="font-semibold" :class="theme === 'dark' ? 'text-white' : 'text-[#0F2537]'">{{ $isEn ? 'Verified Self-Assessment' : 'Asesmen Mandiri Terverifikasi' }}</strong></span>
                             @endif
                             @if($domisili)
                                 <span class="mx-2 text-[#B5945B]">|</span>
-                                <span>{{ app()->getLocale() === 'en' ? 'Location:' : 'Domisili:' }} <strong class="font-semibold" :class="theme === 'dark' ? 'text-white' : 'text-[#0F2537]'">{{ $domisili }}</strong></span>
+                                <span>{{ $isEn ? 'Location:' : 'Domisili:' }} <strong class="font-semibold" :class="theme === 'dark' ? 'text-white' : 'text-[#0F2537]'">{{ $domisili }}</strong></span>
                             @endif
                         </p>
                     </div>
