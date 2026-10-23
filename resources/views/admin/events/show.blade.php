@@ -163,7 +163,23 @@
                                 <strong class="text-slate-900 block font-bold text-sm">{{ $p->name ?? 'Anonim' }}</strong>
                                 <span class="text-[10px] text-slate-400 font-mono">{{ $p->assessment_code ?? '-' }}</span>
                                 @if(!empty($p->sub_category))
-                                    <span class="inline-block mt-0.5 px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-[10px] font-semibold border border-blue-200/60">{{ $p->sub_category }}</span>
+                                    @php
+                                        $subLabel = $p->sub_category;
+                                        $catUpper = strtoupper(trim($p->category ?? ''));
+                                        if ($catUpper === 'GURU') {
+                                            $subLabel = 'Guru ' . $p->sub_category;
+                                        } elseif ($catUpper === 'DOSEN') {
+                                            $subLabel = 'Dosen ' . $p->sub_category;
+                                        } elseif (in_array($catUpper, ['MURID', 'PELAJAR'])) {
+                                            $subLabel = 'Siswa ' . $p->sub_category;
+                                        }
+                                        if (!empty($p->school_class) && !str_contains($subLabel, $p->school_class)) {
+                                            $subLabel .= ' (' . $p->school_class . ')';
+                                        }
+                                    @endphp
+                                    <span class="inline-block mt-0.5 px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-[10px] font-semibold border border-blue-200/60">{{ $subLabel }}</span>
+                                @elseif(!empty($p->school_class))
+                                    <span class="inline-block mt-0.5 px-2 py-0.5 bg-slate-100 text-slate-700 rounded text-[10px] font-semibold border border-slate-200">{{ $p->school_class }}</span>
                                 @endif
                             </td>
                             <td class="p-4">

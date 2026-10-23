@@ -97,18 +97,9 @@
             <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100 space-y-1">
                 <span class="text-slate-400 font-mono text-[10px] uppercase block">Kategori & Instansi</span>
                 <strong class="text-slate-900 text-xs block leading-snug">
-                    {{ $submission->participant->category }}
-                    @php
-                        $instName = $submission->participant->sub_category 
-                            ?? $submission->participant->occupation_custom 
-                            ?? $submission->participant->school_custom 
-                            ?? $submission->participant->university_custom 
-                            ?? $submission->participant->school?->name 
-                            ?? $submission->participant->university?->name 
-                            ?? null;
-                    @endphp
-                    @if($instName)
-                        <span class="text-slate-600 block text-[11px] font-normal mt-0.5">{{ $instName }}</span>
+                    {{ $submission->resolved_category }}
+                    @if($submission->resolved_institution)
+                        <span class="text-slate-600 block text-[11px] font-normal mt-0.5">{{ $submission->resolved_institution }}</span>
                     @endif
                 </strong>
             </div>
