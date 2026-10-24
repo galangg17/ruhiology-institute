@@ -20,8 +20,8 @@
             </p>
 
             <!-- Custom or Default Success Message -->
-            <div class="mt-4 text-xs md:text-sm text-slate-600 leading-relaxed max-w-md mx-auto whitespace-pre-line">
-                {{ $form->success_message ?? 'Jawaban Anda telah kami terima dan dicatat dengan aman di sistem Ruhiology Institute. Terima kasih atas partisipasi dan waktu yang telah Anda berikan.' }}
+            <div class="mt-4 text-xs md:text-sm text-slate-600 leading-relaxed max-w-md mx-auto">
+                {!! $form->formatted_success_message !!}
             </div>
 
             <!-- Response Code Card -->

@@ -86,8 +86,8 @@
                         </h1>
 
                         @if($form->description)
-                            <div class="mt-4 text-xs md:text-sm text-slate-600 leading-relaxed whitespace-pre-line border-t border-slate-100 pt-4">
-                                {{ $form->description }}
+                            <div class="mt-4 text-xs md:text-sm text-slate-600 leading-relaxed border-t border-slate-100 pt-4">
+                                {!! $form->formatted_description !!}
                             </div>
                         @endif
 
