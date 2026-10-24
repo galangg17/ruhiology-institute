@@ -233,16 +233,7 @@ function formBuilder() {
         slug: @json($form->slug),
         description: @json($form->description ?? ''),
         status: @json($form->status),
-        fields: @json($form->fields->map(function($f) {
-            return [
-                'id' => $f->id,
-                'label' => $f->label,
-                'field_type' => $f->field_type,
-                'placeholder' => $f->placeholder ?? '',
-                'is_required' => (bool) $f->is_required,
-                'options' => $f->options ?? []
-            ];
-        })),
+        fields: @json($fieldsData),
 
         addField() {
             this.fields.push({

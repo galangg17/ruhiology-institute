@@ -156,7 +156,19 @@ class AdminCustomFormController extends Controller
     public function edit(CustomForm $form)
     {
         $form->load('fields');
-        return view('admin.forms.edit', compact('form'));
+
+        $fieldsData = $form->fields->map(function ($f) {
+            return [
+                'id' => $f->id,
+                'label' => $f->label,
+                'field_type' => $f->field_type,
+                'placeholder' => $f->placeholder ?? '',
+                'is_required' => (bool) $f->is_required,
+                'options' => $f->options ?? [],
+            ];
+        })->values()->toArray();
+
+        return view('admin.forms.edit', compact('form', 'fieldsData'));
     }
 
     public function update(Request $request, CustomForm $form)
