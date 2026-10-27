@@ -14,17 +14,33 @@ use Illuminate\Support\Str;
 
 class AdminCustomFormController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $forms = CustomForm::withCount(['fields', 'responses'])
-            ->with(['creator'])
-            ->latest()
-            ->paginate(12);
+        $query = CustomForm::withCount(['fields', 'responses'])
+            ->with(['creator']);
+
+        if ($request->filled('q')) {
+            $q = trim($request->input('q'));
+            $query->where(function ($w) use ($q) {
+                $w->where('title', 'like', "%{$q}%")
+                  ->orWhere('description', 'like', "%{$q}%")
+                  ->orWhere('slug', 'like', "%{$q}%");
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
+        $forms = $query->latest()->paginate(12)->withQueryString();
 
         $stats = [
+            'total' => CustomForm::count(),
+            'published' => CustomForm::where('status', 'published')->count(),
+            'closed' => CustomForm::whereIn('status', ['closed', 'draft'])->count(),
+            'total_responses' => CustomFormResponse::count(),
             'total_forms' => CustomForm::count(),
             'published_forms' => CustomForm::where('status', 'published')->count(),
-            'total_responses' => CustomFormResponse::count(),
         ];
 
         return view('admin.forms.index', compact('forms', 'stats'));

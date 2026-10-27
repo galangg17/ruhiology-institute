@@ -27,22 +27,22 @@
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs space-y-1">
             <span class="text-[10px] uppercase font-bold text-slate-400 font-mono tracking-wider block">Total Formulir</span>
-            <div class="text-2xl font-black text-[#0B2A43]">{{ number_format($stats['total']) }}</div>
+            <div class="text-2xl font-black text-[#0B2A43]">{{ number_format($stats['total'] ?? $stats['total_forms'] ?? 0) }}</div>
             <span class="text-[11px] text-slate-500 font-medium">Semua form dibuat</span>
         </div>
         <div class="bg-white p-4 rounded-2xl border border-emerald-100 shadow-2xs space-y-1 bg-gradient-to-br from-white to-emerald-50/30">
             <span class="text-[10px] uppercase font-bold text-emerald-600 font-mono tracking-wider block">Aktif / Terbuka</span>
-            <div class="text-2xl font-black text-emerald-700">{{ number_format($stats['published']) }}</div>
+            <div class="text-2xl font-black text-emerald-700">{{ number_format($stats['published'] ?? $stats['published_forms'] ?? 0) }}</div>
             <span class="text-[11px] text-emerald-600 font-medium">Menerima respon</span>
         </div>
         <div class="bg-white p-4 rounded-2xl border border-amber-100 shadow-2xs space-y-1 bg-gradient-to-br from-white to-amber-50/30">
             <span class="text-[10px] uppercase font-bold text-amber-700 font-mono tracking-wider block">Ditutup / Draft</span>
-            <div class="text-2xl font-black text-amber-800">{{ number_format($stats['closed']) }}</div>
+            <div class="text-2xl font-black text-amber-800">{{ number_format($stats['closed'] ?? 0) }}</div>
             <span class="text-[11px] text-amber-700 font-medium">Pengisian nonaktif</span>
         </div>
         <div class="bg-white p-4 rounded-2xl border border-blue-100 shadow-2xs space-y-1 bg-gradient-to-br from-white to-blue-50/30">
             <span class="text-[10px] uppercase font-bold text-blue-600 font-mono tracking-wider block">Total Respon Masuk</span>
-            <div class="text-2xl font-black text-blue-800">{{ number_format($stats['total_responses']) }}</div>
+            <div class="text-2xl font-black text-blue-800">{{ number_format($stats['total_responses'] ?? 0) }}</div>
             <span class="text-[11px] text-blue-600 font-medium">Data terkumpul</span>
         </div>
     </div>
@@ -102,7 +102,7 @@
                                 <div class="flex items-center gap-2 mt-1.5 text-[10px] text-slate-400 font-mono">
                                     <span>{{ $form->created_at->format('d M Y') }}</span>
                                     <span>•</span>
-                                    <span>{{ $form->fields()->count() }} Kolom Pertanyaan</span>
+                                    <span>{{ $form->fields_count ?? $form->fields()->count() }} Kolom Pertanyaan</span>
                                     @if($form->access_code)
                                         <span>•</span>
                                         <span class="text-amber-700 bg-amber-50 px-1.5 py-0.2 rounded border border-amber-200 font-bold">🔒 Kunci: {{ $form->access_code }}</span>
