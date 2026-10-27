@@ -1,30 +1,138 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="space-y-6">
-    <div class="flex justify-between items-center">
+<div x-data="{
+    settingsTab: (function() {
+        const hash = (window.location.hash || '').replace('#', '');
+        if (hash === 'founder' || hash === 'kontak-rekening' || hash === 'founder_general') return 'founder_general';
+        if (hash === 'hero-card' || hash === 'dokumentasi-filosofi' || hash === 'hero_philosophy') return 'hero_philosophy';
+        if (hash === 'landasan-teori' || hash === 'enam-pilar' || hash === 'theory_dimensions') return 'theory_dimensions';
+        if (hash === 'kenali-profil' || hash === 'alur-proses' || hash === 'assessment_flow') return 'assessment_flow';
+        if (hash === 'sertifikat-preview' || hash === 'certificate_preview') return 'certificate_preview';
+        return 'hero_philosophy';
+    })(),
+    founderName: '{{ addslashes($settings['founder_name'] ?? 'Prof. Dr. Iskandar Nazari, S.Ag., M.Pd., M.S.I., M.H., Ph.D.') }}',
+    founderTitle: '{{ addslashes($settings['founder_title'] ?? 'Founder Ruhiology Institute & Guru Besar UIN STS Jambi') }}',
+    setTab(tab) {
+        this.settingsTab = tab;
+        window.location.hash = tab;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+    getTabName() {
+        const names = {
+            'hero_philosophy': 'Hero & Filosofi',
+            'theory_dimensions': 'Teori & 6 Dimensi',
+            'assessment_flow': 'Showcase Asesmen & Alur',
+            'certificate_preview': 'Template Sertifikat & Preview',
+            'founder_general': 'Profil Founder, Kontak & Bank'
+        };
+        return names[this.settingsTab] || 'Pengaturan';
+    }
+}" x-init="
+    window.addEventListener('hashchange', () => {
+        const hash = (window.location.hash || '').replace('#', '');
+        if (hash === 'founder' || hash === 'kontak-rekening' || hash === 'founder_general') settingsTab = 'founder_general';
+        else if (hash === 'hero-card' || hash === 'dokumentasi-filosofi' || hash === 'hero_philosophy') settingsTab = 'hero_philosophy';
+        else if (hash === 'landasan-teori' || hash === 'enam-pilar' || hash === 'theory_dimensions') settingsTab = 'theory_dimensions';
+        else if (hash === 'kenali-profil' || hash === 'alur-proses' || hash === 'assessment_flow') settingsTab = 'assessment_flow';
+        else if (hash === 'sertifikat-preview' || hash === 'certificate_preview') settingsTab = 'certificate_preview';
+    });
+" class="space-y-6 pb-28">
+
+    <!-- PAGE HEADER -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs">
         <div>
-            <h2 class="text-xl font-bold font-serif text-slate-900">Pengaturan Sistem & Konten Landing Page</h2>
-            <p class="text-xs text-slate-500">Kelola gambar hero, teks narasi filosofi, identitas lembaga, kontak, dan rekening pembayaran.</p>
+            <div class="flex items-center gap-2">
+                <span class="text-xs uppercase font-mono font-bold tracking-wider text-slate-400">Pengaturan CMS</span>
+                <span class="text-slate-300">•</span>
+                <span class="text-[11px] font-bold text-[#D4AF37] bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/60" x-text="getTabName()"></span>
+            </div>
+            <h2 class="text-xl font-bold font-serif text-slate-900 mt-1">Pengaturan Sistem & Konten Landing Page</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Kelola narasi filosofi, kerangka 6 dimensi, template sertifikat digital, dan identitas institusi.</p>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="text-[11px] font-medium text-slate-400 hidden md:inline">5 Kategori Fokus</span>
         </div>
     </div>
 
-    <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6 text-xs font-sans">
+    <!-- TABBED NAVIGATION BAR (Sticky) -->
+    <div class="bg-white/95 backdrop-blur-md p-1.5 rounded-2xl border border-slate-200 shadow-xs sticky top-3 z-30">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1.5 text-xs font-sans">
+            <!-- TAB 1 -->
+            <button type="button" @click="setTab('hero_philosophy')"
+                :class="settingsTab === 'hero_philosophy' ? 'bg-[#0B2A43] text-white shadow-sm ring-1 ring-[#0B2A43]' : 'bg-slate-50 hover:bg-slate-100 text-slate-700'"
+                class="p-2.5 rounded-xl transition text-left flex flex-col justify-center cursor-pointer group">
+                <div class="flex items-center gap-1.5 font-bold text-xs">
+                    <span>🌟</span>
+                    <span class="truncate">Hero & Filosofi</span>
+                </div>
+                <span :class="settingsTab === 'hero_philosophy' ? 'text-amber-300' : 'text-slate-400'" class="text-[10px] truncate mt-0.5 font-medium">Hero Card & Riset</span>
+            </button>
+
+            <!-- TAB 2 -->
+            <button type="button" @click="setTab('theory_dimensions')"
+                :class="settingsTab === 'theory_dimensions' ? 'bg-[#0B2A43] text-white shadow-sm ring-1 ring-[#0B2A43]' : 'bg-slate-50 hover:bg-slate-100 text-slate-700'"
+                class="p-2.5 rounded-xl transition text-left flex flex-col justify-center cursor-pointer group">
+                <div class="flex items-center gap-1.5 font-bold text-xs">
+                    <span>🔬</span>
+                    <span class="truncate">Teori & 6 Dimensi</span>
+                </div>
+                <span :class="settingsTab === 'theory_dimensions' ? 'text-amber-300' : 'text-slate-400'" class="text-[10px] truncate mt-0.5 font-medium">Landasan & WHO-5</span>
+            </button>
+
+            <!-- TAB 3 -->
+            <button type="button" @click="setTab('assessment_flow')"
+                :class="settingsTab === 'assessment_flow' ? 'bg-[#0B2A43] text-white shadow-sm ring-1 ring-[#0B2A43]' : 'bg-slate-50 hover:bg-slate-100 text-slate-700'"
+                class="p-2.5 rounded-xl transition text-left flex flex-col justify-center cursor-pointer group">
+                <div class="flex items-center gap-1.5 font-bold text-xs">
+                    <span>📊</span>
+                    <span class="truncate">Showcase & Alur</span>
+                </div>
+                <span :class="settingsTab === 'assessment_flow' ? 'text-amber-300' : 'text-slate-400'" class="text-[10px] truncate mt-0.5 font-medium">Profil RQ & 4 Langkah</span>
+            </button>
+
+            <!-- TAB 4 -->
+            <button type="button" @click="setTab('certificate_preview')"
+                :class="settingsTab === 'certificate_preview' ? 'bg-[#0B2A43] text-white shadow-sm ring-1 ring-[#0B2A43]' : 'bg-slate-50 hover:bg-slate-100 text-slate-700'"
+                class="p-2.5 rounded-xl transition text-left flex flex-col justify-center cursor-pointer group">
+                <div class="flex items-center gap-1.5 font-bold text-xs">
+                    <span>📜</span>
+                    <span class="truncate">Sertifikat & Preview</span>
+                </div>
+                <span :class="settingsTab === 'certificate_preview' ? 'text-amber-300' : 'text-slate-400'" class="text-[10px] truncate mt-0.5 font-medium">A4 PDF & Story 9:16</span>
+            </button>
+
+            <!-- TAB 5 -->
+            <button type="button" @click="setTab('founder_general')"
+                :class="settingsTab === 'founder_general' ? 'bg-[#0B2A43] text-white shadow-sm ring-1 ring-[#0B2A43]' : 'bg-slate-50 hover:bg-slate-100 text-slate-700'"
+                class="p-2.5 rounded-xl transition text-left flex flex-col justify-center col-span-2 sm:col-span-1 cursor-pointer group">
+                <div class="flex items-center gap-1.5 font-bold text-xs">
+                    <span>👤</span>
+                    <span class="truncate">Founder & Kontak</span>
+                </div>
+                <span :class="settingsTab === 'founder_general' ? 'text-amber-300' : 'text-slate-400'" class="text-[10px] truncate mt-0.5 font-medium">Prof. Iskandar & Bank</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- FORM UTAMA -->
+    <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data" novalidate class="space-y-6 text-xs font-sans">
         @csrf
 
-        <!-- Quick Jump Navigation Bar -->
-        <div class="bg-slate-100 p-2.5 rounded-2xl border border-slate-200/80 flex flex-wrap items-center gap-1.5 text-xs font-medium sticky top-2 z-30 shadow-xs backdrop-blur-md bg-slate-100/90">
-            <span class="text-slate-400 px-2 font-bold text-[11px] uppercase tracking-wider">Lompat Ke:</span>
-            <a href="#hero-card" class="px-2.5 py-1 rounded-lg bg-white hover:bg-slate-200 text-slate-700 transition">🖼️ Hero Card</a>
-            <a href="#dokumentasi-filosofi" class="px-2.5 py-1 rounded-lg bg-white hover:bg-slate-200 text-slate-700 transition">📚 Filosofi</a>
-            <a href="#landasan-teori" class="px-2.5 py-1 rounded-lg bg-white hover:bg-slate-200 text-slate-700 transition">🔬 Landasan Teori</a>
-            <a href="#kenali-profil" class="px-2.5 py-1 rounded-lg bg-white hover:bg-slate-200 text-slate-700 transition">✨ Kenali Profil RQ</a>
-            <a href="#alur-proses" class="px-2.5 py-1 rounded-lg bg-white hover:bg-slate-200 text-slate-700 transition">🪜 Alur 4 Langkah</a>
-            <a href="#enam-pilar" class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 font-bold transition">🏛️ 6 Pilar Dimensi & WHO</a>
-            <a href="#sertifikat-preview" class="px-2.5 py-1 rounded-lg bg-white hover:bg-slate-200 text-slate-700 transition">📜 Sertifikat & Preview</a>
-            <a href="#founder" class="px-2.5 py-1 rounded-lg bg-white hover:bg-slate-200 text-slate-700 transition">👨‍🏫 Profil Founder</a>
-            <a href="#kontak-rekening" class="px-2.5 py-1 rounded-lg bg-white hover:bg-slate-200 text-slate-700 transition">💳 Kontak & Bank</a>
-        </div>
+        <!-- ========================================== -->
+        <!-- TAB 1: HERO & FILOSOFI                     -->
+        <!-- ========================================== -->
+        <div x-show="settingsTab === 'hero_philosophy'" class="space-y-6" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0">
+            <div class="bg-blue-50/70 border border-blue-200/70 p-4 rounded-2xl flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">🌟</span>
+                    <div>
+                        <h4 class="font-bold text-sm text-[#0B2A43]">Bagian 1: Hero Beranda & Narasi Filosofi</h4>
+                        <p class="text-[11px] text-slate-600">Mengatur visual kartu kanan pada hero section serta dokumentasi filosofi kesadaran ruh.</p>
+                    </div>
+                </div>
+                <span class="text-[11px] font-mono font-bold bg-white px-2.5 py-1 rounded-lg border border-blue-200 text-[#0B2A43]">Tab 1 dari 5</span>
+            </div>
 
         <!-- Hero Card & Visual Banner Settings -->
         <div id="hero-card" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4 scroll-mt-16">
@@ -66,6 +174,7 @@
                 <textarea name="hero_card_subtitle" rows="2" required class="w-full p-2.5 rounded border border-slate-300">{{ $settings['hero_card_subtitle'] ?? 'Pengembangan karakter berbasis nilai wahyu dan metodologi psikometri ilmiah.' }}</textarea>
             </div>
         </div>
+
 
         <!-- Section 2: Storytelling & Filosofi Ruhiologi Settings -->
         <div id="dokumentasi-filosofi" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4 scroll-mt-16">
@@ -132,6 +241,29 @@
                 </div>
             </div>
         </div>
+
+
+            <div class="flex justify-end pt-2">
+                <button type="submit" class="px-6 py-3 bg-[#0B2A43] hover:bg-[#123B59] text-white font-extrabold rounded-xl shadow-md transition cursor-pointer flex items-center gap-2">
+                    <span>💾</span> Simpan Perubahan Hero & Filosofi
+                </button>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 2: TEORI & 6 PILAR DIMENSI             -->
+        <!-- ========================================== -->
+        <div x-show="settingsTab === 'theory_dimensions'" class="space-y-6" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" style="display: none;">
+            <div class="bg-emerald-50/70 border border-emerald-200/70 p-4 rounded-2xl flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">🔬</span>
+                    <div>
+                        <h4 class="font-bold text-sm text-emerald-950">Bagian 2: Landasan Riset & Enam Pilar Dimensi (RQI-15 + WHO-5)</h4>
+                        <p class="text-[11px] text-emerald-800">Mengatur metodologi riset psikometri dan 6 pilar dimensi lengkap yang dirumuskan Prof. Dr. Iskandar Nazari.</p>
+                    </div>
+                </div>
+                <span class="text-[11px] font-mono font-bold bg-white px-2.5 py-1 rounded-lg border border-emerald-200 text-emerald-900">Tab 2 dari 5</span>
+            </div>
 
         <!-- Section: Landasan Teori & Metodologi -->
         <div id="landasan-teori" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4 scroll-mt-16">
@@ -217,180 +349,6 @@
             </div>
         </div>
 
-        <!-- Section: Kenali Profil Ruhiologi Anda -->
-        <div id="kenali-profil" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4 scroll-mt-16">
-            <h3 class="font-bold font-serif text-slate-900 text-sm border-b border-slate-100 pb-2 flex items-center justify-between">
-                <span class="flex items-center gap-2">
-                    <span>✨</span>
-                    <span>Section: Kenali Profil Ruhiologi Anda (Card Asesmen)</span>
-                </span>
-                <span class="text-[10px] font-mono bg-emerald-50 text-emerald-800 px-2.5 py-0.5 rounded-full font-bold">Assessment Showcase</span>
-            </h3>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1">Upload Gambar Banner Profil Asesmen</label>
-                    <input type="file" name="rq_assessment_image_file" accept="image/*" class="w-full p-2 rounded border border-slate-300 bg-slate-50">
-                    <p class="text-[11px] text-slate-400 mt-1">Pilih file jika ingin mengganti gambar visual kartu profil di landing page.</p>
-                </div>
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1">URL Gambar Banner Profil Asesmen</label>
-                    <input type="text" name="rq_assessment_image" value="{{ $settings['rq_assessment_image'] ?? asset('images/god-spot-light.jpg') }}" class="w-full p-2.5 rounded border border-slate-300">
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1">Judul Utama</label>
-                    <input type="text" name="profile_title" value="{{ $settings['profile_title'] ?? 'Kenali Profil Ruhiologi Anda' }}" required class="w-full p-2.5 rounded border border-slate-300 font-serif font-bold text-sm">
-                </div>
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1">Judul List 6 Dimensi Bawah</label>
-                    <input type="text" name="profile_pills_title" value="{{ $settings['profile_pills_title'] ?? '6 Dimensi Pengukuran: Pilar RQI-15 + Indeks WHO-5' }}" required class="w-full p-2.5 rounded border border-slate-300">
-                </div>
-            </div>
-
-            <div>
-                <label class="block font-bold text-slate-700 mb-1">Deskripsi Narasi Profil Asesmen</label>
-                <textarea name="profile_description" rows="2" required class="w-full p-2.5 rounded border border-slate-300 leading-relaxed">{{ $settings['profile_description'] ?? 'RQ Assessment dirancang sebagai instrumen ilmiah terstruktur untuk memetakan 6 Pilar Dimensi Ruhiologi (RQI-15) dan Indeks Kesejahteraan Mental (WHO-5).' }}</textarea>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1">Poin Keunggulan 1</label>
-                    <input type="text" name="profile_bullet1" value="{{ $settings['profile_bullet1'] ?? 'Instrumen Terstruktur (20 Soal)' }}" required class="w-full p-2 rounded border border-slate-300">
-                </div>
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1">Poin Keunggulan 2</label>
-                    <input type="text" name="profile_bullet2" value="{{ $settings['profile_bullet2'] ?? 'Laporan Dual-Pilar & Radar' }}" required class="w-full p-2 rounded border border-slate-300">
-                </div>
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1">Poin Keunggulan 3</label>
-                    <input type="text" name="profile_bullet3" value="{{ $settings['profile_bullet3'] ?? 'Sertifikat Resmi & Kartu Story' }}" required class="w-full p-2 rounded border border-slate-300">
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1">Teks Tombol 1 (Mulai)</label>
-                    <input type="text" name="profile_btn1_text" value="{{ $settings['profile_btn1_text'] ?? 'Mulai Assessment' }}" required class="w-full p-2 rounded border border-slate-300">
-                </div>
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1">Teks Tombol 2 (Cek Hasil)</label>
-                    <input type="text" name="profile_btn2_text" value="{{ $settings['profile_btn2_text'] ?? 'Cek Hasil / Sertifikat Saya' }}" required class="w-full p-2 rounded border border-slate-300">
-                </div>
-            </div>
-        </div>
-
-        <!-- Section: Alur & Proses Evaluasi (4 Langkah) -->
-        <div id="alur-proses" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4 scroll-mt-16">
-            <h3 class="font-bold font-serif text-slate-900 text-sm border-b border-slate-100 pb-2 flex items-center justify-between">
-                <span class="flex items-center gap-2">
-                    <span>🪜</span>
-                    <span>Section: Alur & Proses Evaluasi (4 Langkah Mengikuti Assessment)</span>
-                </span>
-                <span class="text-[10px] font-mono bg-amber-50 text-amber-800 px-2.5 py-0.5 rounded-full font-bold">Process Steps</span>
-            </h3>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1">Badge Section</label>
-                    <input type="text" name="flow_badge" value="{{ $settings['flow_badge'] ?? '✦ ALUR & PROSES EVALUASI' }}" required class="w-full p-2.5 rounded border border-slate-300">
-                </div>
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1">Judul Section</label>
-                    <input type="text" name="flow_title" value="{{ $settings['flow_title'] ?? '4 Langkah Mudah Mengikuti Assessment RQ' }}" required class="w-full p-2.5 rounded border border-slate-300 font-serif font-bold text-sm">
-                </div>
-            </div>
-
-            <div>
-                <label class="block font-bold text-slate-700 mb-1">Deskripsi Singkat Alur</label>
-                <textarea name="flow_description" rows="2" required class="w-full p-2.5 rounded border border-slate-300">{{ $settings['flow_description'] ?? 'Proses praktis dan terstruktur dari registrasi hingga lembar rekomendasi potensi.' }}</textarea>
-            </div>
-
-            <!-- 4 Langkah Cards Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
-                <!-- Step 1 -->
-                <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-                    <div class="flex items-center justify-between">
-                        <span class="font-mono font-bold text-xs text-[#0B2A43]">Langkah 01</span>
-                        <input type="text" name="flow_step1_icon" value="{{ $settings['flow_step1_icon'] ?? '📝' }}" class="w-10 text-center p-1 rounded border border-slate-300 text-sm bg-white">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] text-slate-500 font-bold uppercase">Judul</label>
-                        <input type="text" name="flow_step1_title" value="{{ $settings['flow_step1_title'] ?? 'Intake Data & Kode' }}" class="w-full p-1.5 rounded border border-slate-300 text-xs font-bold bg-white">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] text-slate-500 font-bold uppercase">Deskripsi</label>
-                        <textarea name="flow_step1_desc" rows="3" class="w-full p-1.5 rounded border border-slate-300 text-[11px] leading-relaxed bg-white">{{ $settings['flow_step1_desc'] ?? 'Pilih jalur Asesmen Mandiri atau masukkan Kode Akses Event dari kampus/sekolah/instansi Anda.' }}</textarea>
-                    </div>
-                    <div>
-                        <label class="block text-[10px] text-slate-500 font-bold uppercase">Label Tombol</label>
-                        <input type="text" name="flow_step1_tag" value="{{ $settings['flow_step1_tag'] ?? 'Akses Instan' }}" class="w-full p-1 rounded border border-slate-300 text-[10px] font-bold bg-white">
-                    </div>
-                </div>
-
-                <!-- Step 2 -->
-                <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-                    <div class="flex items-center justify-between">
-                        <span class="font-mono font-bold text-xs text-[#0B2A43]">Langkah 02</span>
-                        <input type="text" name="flow_step2_icon" value="{{ $settings['flow_step2_icon'] ?? '⏱️' }}" class="w-10 text-center p-1 rounded border border-slate-300 text-sm bg-white">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] text-slate-500 font-bold uppercase">Judul</label>
-                        <input type="text" name="flow_step2_title" value="{{ $settings['flow_step2_title'] ?? 'Pengerjaan 10-15 Menit' }}" class="w-full p-1.5 rounded border border-slate-300 text-xs font-bold bg-white">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] text-slate-500 font-bold uppercase">Deskripsi</label>
-                        <textarea name="flow_step2_desc" rows="3" class="w-full p-1.5 rounded border border-slate-300 text-[11px] leading-relaxed bg-white">{{ $settings['flow_step2_desc'] ?? 'Isikan 20 pernyataan terstruktur (15 butir RQI & 5 butir WHO-5) dengan fitur auto-save otomatis.' }}</textarea>
-                    </div>
-                    <div>
-                        <label class="block text-[10px] text-slate-500 font-bold uppercase">Label Tombol</label>
-                        <input type="text" name="flow_step2_tag" value="{{ $settings['flow_step2_tag'] ?? '20 Pertanyaan' }}" class="w-full p-1 rounded border border-slate-300 text-[10px] font-bold bg-white">
-                    </div>
-                </div>
-
-                <!-- Step 3 -->
-                <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-                    <div class="flex items-center justify-between">
-                        <span class="font-mono font-bold text-xs text-[#0B2A43]">Langkah 03</span>
-                        <input type="text" name="flow_step3_icon" value="{{ $settings['flow_step3_icon'] ?? '📊' }}" class="w-10 text-center p-1 rounded border border-slate-300 text-sm bg-white">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] text-slate-500 font-bold uppercase">Judul</label>
-                        <input type="text" name="flow_step3_title" value="{{ $settings['flow_step3_title'] ?? 'Kalkulasi Dual-Pilar' }}" class="w-full p-1.5 rounded border border-slate-300 text-xs font-bold bg-white">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] text-slate-500 font-bold uppercase">Deskripsi</label>
-                        <textarea name="flow_step3_desc" rows="3" class="w-full p-1.5 rounded border border-slate-300 text-[11px] leading-relaxed bg-white">{{ $settings['flow_step3_desc'] ?? 'Sistem secara instan menghitung skor RQI-15 (15–75 Poin), Indeks WHO-5 (0–100%), dan Grafik Radar 6 Dimensi.' }}</textarea>
-                    </div>
-                    <div>
-                        <label class="block text-[10px] text-slate-500 font-bold uppercase">Label Tombol</label>
-                        <input type="text" name="flow_step3_tag" value="{{ $settings['flow_step3_tag'] ?? 'Kalkulasi Instan' }}" class="w-full p-1 rounded border border-slate-300 text-[10px] font-bold bg-white">
-                    </div>
-                </div>
-
-                <!-- Step 4 -->
-                <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-                    <div class="flex items-center justify-between">
-                        <span class="font-mono font-bold text-xs text-[#0B2A43]">Langkah 04</span>
-                        <input type="text" name="flow_step4_icon" value="{{ $settings['flow_step4_icon'] ?? '📄' }}" class="w-10 text-center p-1 rounded border border-slate-300 text-sm bg-white">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] text-slate-500 font-bold uppercase">Judul</label>
-                        <input type="text" name="flow_step4_title" value="{{ $settings['flow_step4_title'] ?? 'Laporan & Sertifikat' }}" class="w-full p-1.5 rounded border border-slate-300 text-xs font-bold bg-white">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] text-slate-500 font-bold uppercase">Deskripsi</label>
-                        <textarea name="flow_step4_desc" rows="3" class="w-full p-1.5 rounded border border-slate-300 text-[11px] leading-relaxed bg-white">{{ $settings['flow_step4_desc'] ?? 'Unduh Sertifikat Resmi A4, Laporan PDF Eksekutif, serta Kartu Shareable 4:5 untuk Instagram/WhatsApp.' }}</textarea>
-                    </div>
-                    <div>
-                        <label class="block text-[10px] text-slate-500 font-bold uppercase">Label Tombol</label>
-                        <input type="text" name="flow_step4_tag" value="{{ $settings['flow_step4_tag'] ?? 'Unduh Sertifikat & Kartu' }}" class="w-full p-1 rounded border border-slate-300 text-[10px] font-bold bg-white">
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- Section: 6 Pilar Dimensi Ruhiologi & WHO-5 -->
         <div id="enam-pilar" class="bg-white p-6 rounded-2xl border-2 border-emerald-500/30 shadow-md space-y-4 scroll-mt-16">
@@ -519,6 +477,228 @@
 
             </div>
         </div>
+
+
+            <div class="flex justify-end pt-2">
+                <button type="submit" class="px-6 py-3 bg-[#0B2A43] hover:bg-[#123B59] text-white font-extrabold rounded-xl shadow-md transition cursor-pointer flex items-center gap-2">
+                    <span>💾</span> Simpan Perubahan Teori & 6 Dimensi
+                </button>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 3: SHOWCASE ASESMEN & ALUR             -->
+        <!-- ========================================== -->
+        <div x-show="settingsTab === 'assessment_flow'" class="space-y-6" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" style="display: none;">
+            <div class="bg-amber-50/70 border border-amber-200/70 p-4 rounded-2xl flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">📊</span>
+                    <div>
+                        <h4 class="font-bold text-sm text-amber-950">Bagian 3: Showcase Profil Asesmen & 4 Langkah Alur</h4>
+                        <p class="text-[11px] text-amber-800">Mengatur kartu promosi asesmen RQ dan langkah-langkah alur registrasi hingga penerbitan hasil.</p>
+                    </div>
+                </div>
+                <span class="text-[11px] font-mono font-bold bg-white px-2.5 py-1 rounded-lg border border-amber-200 text-amber-900">Tab 3 dari 5</span>
+            </div>
+
+        <!-- Section: Kenali Profil Ruhiologi Anda -->
+        <div id="kenali-profil" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4 scroll-mt-16">
+            <h3 class="font-bold font-serif text-slate-900 text-sm border-b border-slate-100 pb-2 flex items-center justify-between">
+                <span class="flex items-center gap-2">
+                    <span>✨</span>
+                    <span>Section: Kenali Profil Ruhiologi Anda (Card Asesmen)</span>
+                </span>
+                <span class="text-[10px] font-mono bg-emerald-50 text-emerald-800 px-2.5 py-0.5 rounded-full font-bold">Assessment Showcase</span>
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Upload Gambar Banner Profil Asesmen</label>
+                    <input type="file" name="rq_assessment_image_file" accept="image/*" class="w-full p-2 rounded border border-slate-300 bg-slate-50">
+                    <p class="text-[11px] text-slate-400 mt-1">Pilih file jika ingin mengganti gambar visual kartu profil di landing page.</p>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">URL Gambar Banner Profil Asesmen</label>
+                    <input type="text" name="rq_assessment_image" value="{{ $settings['rq_assessment_image'] ?? asset('images/god-spot-light.jpg') }}" class="w-full p-2.5 rounded border border-slate-300">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Judul Utama</label>
+                    <input type="text" name="profile_title" value="{{ $settings['profile_title'] ?? 'Kenali Profil Ruhiologi Anda' }}" required class="w-full p-2.5 rounded border border-slate-300 font-serif font-bold text-sm">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Judul List 6 Dimensi Bawah</label>
+                    <input type="text" name="profile_pills_title" value="{{ $settings['profile_pills_title'] ?? '6 Dimensi Pengukuran: Pilar RQI-15 + Indeks WHO-5' }}" required class="w-full p-2.5 rounded border border-slate-300">
+                </div>
+            </div>
+
+            <div>
+                <label class="block font-bold text-slate-700 mb-1">Deskripsi Narasi Profil Asesmen</label>
+                <textarea name="profile_description" rows="2" required class="w-full p-2.5 rounded border border-slate-300 leading-relaxed">{{ $settings['profile_description'] ?? 'RQ Assessment dirancang sebagai instrumen ilmiah terstruktur untuk memetakan 6 Pilar Dimensi Ruhiologi (RQI-15) dan Indeks Kesejahteraan Mental (WHO-5).' }}</textarea>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Poin Keunggulan 1</label>
+                    <input type="text" name="profile_bullet1" value="{{ $settings['profile_bullet1'] ?? 'Instrumen Terstruktur (20 Soal)' }}" required class="w-full p-2 rounded border border-slate-300">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Poin Keunggulan 2</label>
+                    <input type="text" name="profile_bullet2" value="{{ $settings['profile_bullet2'] ?? 'Laporan Dual-Pilar & Radar' }}" required class="w-full p-2 rounded border border-slate-300">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Poin Keunggulan 3</label>
+                    <input type="text" name="profile_bullet3" value="{{ $settings['profile_bullet3'] ?? 'Sertifikat Resmi & Kartu Story' }}" required class="w-full p-2 rounded border border-slate-300">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Teks Tombol 1 (Mulai)</label>
+                    <input type="text" name="profile_btn1_text" value="{{ $settings['profile_btn1_text'] ?? 'Mulai Assessment' }}" required class="w-full p-2 rounded border border-slate-300">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Teks Tombol 2 (Cek Hasil)</label>
+                    <input type="text" name="profile_btn2_text" value="{{ $settings['profile_btn2_text'] ?? 'Cek Hasil / Sertifikat Saya' }}" required class="w-full p-2 rounded border border-slate-300">
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Section: Alur & Proses Evaluasi (4 Langkah) -->
+        <div id="alur-proses" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4 scroll-mt-16">
+            <h3 class="font-bold font-serif text-slate-900 text-sm border-b border-slate-100 pb-2 flex items-center justify-between">
+                <span class="flex items-center gap-2">
+                    <span>🪜</span>
+                    <span>Section: Alur & Proses Evaluasi (4 Langkah Mengikuti Assessment)</span>
+                </span>
+                <span class="text-[10px] font-mono bg-amber-50 text-amber-800 px-2.5 py-0.5 rounded-full font-bold">Process Steps</span>
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Badge Section</label>
+                    <input type="text" name="flow_badge" value="{{ $settings['flow_badge'] ?? '✦ ALUR & PROSES EVALUASI' }}" required class="w-full p-2.5 rounded border border-slate-300">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Judul Section</label>
+                    <input type="text" name="flow_title" value="{{ $settings['flow_title'] ?? '4 Langkah Mudah Mengikuti Assessment RQ' }}" required class="w-full p-2.5 rounded border border-slate-300 font-serif font-bold text-sm">
+                </div>
+            </div>
+
+            <div>
+                <label class="block font-bold text-slate-700 mb-1">Deskripsi Singkat Alur</label>
+                <textarea name="flow_description" rows="2" required class="w-full p-2.5 rounded border border-slate-300">{{ $settings['flow_description'] ?? 'Proses praktis dan terstruktur dari registrasi hingga lembar rekomendasi potensi.' }}</textarea>
+            </div>
+
+            <!-- 4 Langkah Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
+                <!-- Step 1 -->
+                <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="font-mono font-bold text-xs text-[#0B2A43]">Langkah 01</span>
+                        <input type="text" name="flow_step1_icon" value="{{ $settings['flow_step1_icon'] ?? '📝' }}" class="w-10 text-center p-1 rounded border border-slate-300 text-sm bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-500 font-bold uppercase">Judul</label>
+                        <input type="text" name="flow_step1_title" value="{{ $settings['flow_step1_title'] ?? 'Intake Data & Kode' }}" class="w-full p-1.5 rounded border border-slate-300 text-xs font-bold bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-500 font-bold uppercase">Deskripsi</label>
+                        <textarea name="flow_step1_desc" rows="3" class="w-full p-1.5 rounded border border-slate-300 text-[11px] leading-relaxed bg-white">{{ $settings['flow_step1_desc'] ?? 'Pilih jalur Asesmen Mandiri atau masukkan Kode Akses Event dari kampus/sekolah/instansi Anda.' }}</textarea>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-500 font-bold uppercase">Label Tombol</label>
+                        <input type="text" name="flow_step1_tag" value="{{ $settings['flow_step1_tag'] ?? 'Akses Instan' }}" class="w-full p-1 rounded border border-slate-300 text-[10px] font-bold bg-white">
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="font-mono font-bold text-xs text-[#0B2A43]">Langkah 02</span>
+                        <input type="text" name="flow_step2_icon" value="{{ $settings['flow_step2_icon'] ?? '⏱️' }}" class="w-10 text-center p-1 rounded border border-slate-300 text-sm bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-500 font-bold uppercase">Judul</label>
+                        <input type="text" name="flow_step2_title" value="{{ $settings['flow_step2_title'] ?? 'Pengerjaan 10-15 Menit' }}" class="w-full p-1.5 rounded border border-slate-300 text-xs font-bold bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-500 font-bold uppercase">Deskripsi</label>
+                        <textarea name="flow_step2_desc" rows="3" class="w-full p-1.5 rounded border border-slate-300 text-[11px] leading-relaxed bg-white">{{ $settings['flow_step2_desc'] ?? 'Isikan 20 pernyataan terstruktur (15 butir RQI & 5 butir WHO-5) dengan fitur auto-save otomatis.' }}</textarea>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-500 font-bold uppercase">Label Tombol</label>
+                        <input type="text" name="flow_step2_tag" value="{{ $settings['flow_step2_tag'] ?? '20 Pertanyaan' }}" class="w-full p-1 rounded border border-slate-300 text-[10px] font-bold bg-white">
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="font-mono font-bold text-xs text-[#0B2A43]">Langkah 03</span>
+                        <input type="text" name="flow_step3_icon" value="{{ $settings['flow_step3_icon'] ?? '📊' }}" class="w-10 text-center p-1 rounded border border-slate-300 text-sm bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-500 font-bold uppercase">Judul</label>
+                        <input type="text" name="flow_step3_title" value="{{ $settings['flow_step3_title'] ?? 'Kalkulasi Dual-Pilar' }}" class="w-full p-1.5 rounded border border-slate-300 text-xs font-bold bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-500 font-bold uppercase">Deskripsi</label>
+                        <textarea name="flow_step3_desc" rows="3" class="w-full p-1.5 rounded border border-slate-300 text-[11px] leading-relaxed bg-white">{{ $settings['flow_step3_desc'] ?? 'Sistem secara instan menghitung skor RQI-15 (15–75 Poin), Indeks WHO-5 (0–100%), dan Grafik Radar 6 Dimensi.' }}</textarea>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-500 font-bold uppercase">Label Tombol</label>
+                        <input type="text" name="flow_step3_tag" value="{{ $settings['flow_step3_tag'] ?? 'Kalkulasi Instan' }}" class="w-full p-1 rounded border border-slate-300 text-[10px] font-bold bg-white">
+                    </div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="font-mono font-bold text-xs text-[#0B2A43]">Langkah 04</span>
+                        <input type="text" name="flow_step4_icon" value="{{ $settings['flow_step4_icon'] ?? '📄' }}" class="w-10 text-center p-1 rounded border border-slate-300 text-sm bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-500 font-bold uppercase">Judul</label>
+                        <input type="text" name="flow_step4_title" value="{{ $settings['flow_step4_title'] ?? 'Laporan & Sertifikat' }}" class="w-full p-1.5 rounded border border-slate-300 text-xs font-bold bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-500 font-bold uppercase">Deskripsi</label>
+                        <textarea name="flow_step4_desc" rows="3" class="w-full p-1.5 rounded border border-slate-300 text-[11px] leading-relaxed bg-white">{{ $settings['flow_step4_desc'] ?? 'Unduh Sertifikat Resmi A4, Laporan PDF Eksekutif, serta Kartu Shareable 4:5 untuk Instagram/WhatsApp.' }}</textarea>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-500 font-bold uppercase">Label Tombol</label>
+                        <input type="text" name="flow_step4_tag" value="{{ $settings['flow_step4_tag'] ?? 'Unduh Sertifikat & Kartu' }}" class="w-full p-1 rounded border border-slate-300 text-[10px] font-bold bg-white">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+            <div class="flex justify-end pt-2">
+                <button type="submit" class="px-6 py-3 bg-[#0B2A43] hover:bg-[#123B59] text-white font-extrabold rounded-xl shadow-md transition cursor-pointer flex items-center gap-2">
+                    <span>💾</span> Simpan Perubahan Showcase Asesmen & Alur
+                </button>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 4: TEMPLATE SERTIFIKAT & PREVIEW       -->
+        <!-- ========================================== -->
+        <div x-show="settingsTab === 'certificate_preview'" class="space-y-6" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" style="display: none;">
+            <div class="bg-slate-100 border border-slate-200 p-4 rounded-2xl flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">📜</span>
+                    <div>
+                        <h4 class="font-bold text-sm text-slate-900">Bagian 4: Template Sertifikat Digital & Pratinjau Langsung</h4>
+                        <p class="text-[11px] text-slate-600">Sesuaikan tata letak sertifikat PDF A4 resmi, tanda tangan founder, background, dan kartu story 9:16.</p>
+                    </div>
+                </div>
+                <span class="text-[11px] font-mono font-bold bg-white px-2.5 py-1 rounded-lg border border-slate-300 text-slate-800">Tab 4 dari 5</span>
+            </div>
 
         <!-- Section 3: Sertifikat Digital, Tanda Tangan Founder & Kartu Hasil dengan Live Preview -->
         <div id="sertifikat-preview" x-data="{
@@ -786,6 +966,29 @@
             </div>
         </div>
 
+
+            <div class="flex justify-end pt-2">
+                <button type="submit" class="px-6 py-3 bg-[#0B2A43] hover:bg-[#123B59] text-white font-extrabold rounded-xl shadow-md transition cursor-pointer flex items-center gap-2">
+                    <span>💾</span> Simpan Template Sertifikat & Preview
+                </button>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 5: FOUNDER, KONTAK & REKENING BANK     -->
+        <!-- ========================================== -->
+        <div x-show="settingsTab === 'founder_general'" class="space-y-6" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" style="display: none;">
+            <div class="bg-amber-50/50 border border-[#D4AF37]/30 p-4 rounded-2xl flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">👤</span>
+                    <div>
+                        <h4 class="font-bold text-sm text-slate-900">Bagian 5: Profil Founder, Alamat Lembaga & Rekening Bank</h4>
+                        <p class="text-[11px] text-slate-600">Mengelola biografi Prof. Dr. Iskandar Nazari, kanal komunikasi resmi, dan nomor rekening pembayaran.</p>
+                    </div>
+                </div>
+                <span class="text-[11px] font-mono font-bold bg-white px-2.5 py-1 rounded-lg border border-[#D4AF37]/40 text-amber-900">Tab 5 dari 5</span>
+            </div>
+
         <!-- Dedicated Founder Profile (Prof. Dr. Iskandar Nazari) Settings -->
         <div id="founder" class="bg-white p-6 rounded-2xl border-2 border-[#C9A24D]/30 shadow-md space-y-4 scroll-mt-6">
             <h3 class="font-bold font-serif text-slate-900 text-sm border-b border-slate-100 pb-2 flex items-center justify-between">
@@ -841,6 +1044,7 @@
             </div>
         </div>
 
+
         <!-- Contact & Location -->
         <div id="kontak-rekening" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4 scroll-mt-16">
             <h3 class="font-bold font-serif text-slate-900 text-sm border-b border-slate-100 pb-2">Kontak & Alamat Sekretariat</h3>
@@ -864,6 +1068,7 @@
             </div>
         </div>
 
+
         <!-- Payment Instructions for Books & Training -->
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
             <h3 class="font-bold font-serif text-slate-900 text-sm border-b border-slate-100 pb-2">Rekening Pembayaran Resmi</h3>
@@ -883,9 +1088,36 @@
             </div>
         </div>
 
-        <button type="submit" class="px-7 py-3.5 bg-[#0B2A43] hover:bg-[#123B59] text-white font-extrabold rounded-xl shadow-md transition cursor-pointer">
-            Simpan Seluruh Pengaturan Sistem & Tampilan →
-        </button>
+            <div class="flex justify-end pt-2">
+                <button type="submit" class="px-6 py-3 bg-[#0B2A43] hover:bg-[#123B59] text-white font-extrabold rounded-xl shadow-md transition cursor-pointer flex items-center gap-2">
+                    <span>💾</span> Simpan Profil Founder, Kontak & Bank
+                </button>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- STICKY BOTTOM ACTION BAR                   -->
+        <!-- ========================================== -->
+        <div class="fixed bottom-4 left-4 right-4 md:left-68 lg:left-72 z-30 pointer-events-none">
+            <div class="max-w-7xl mx-auto bg-slate-900/95 backdrop-blur-md text-white px-5 py-3.5 rounded-2xl shadow-2xl border border-slate-700/80 flex flex-wrap items-center justify-between gap-3 pointer-events-auto">
+                <div class="flex items-center gap-3">
+                    <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></div>
+                    <div>
+                        <p class="text-xs font-bold text-white flex items-center gap-1.5">
+                            <span class="text-slate-400">Sedang mengedit:</span>
+                            <span class="text-[#D4AF37] font-semibold" x-text="getTabName()"></span>
+                        </p>
+                        <p class="text-[10px] text-slate-400 hidden sm:block">Seluruh perubahan pada tab aktif maupun tab lainnya tersimpan saat Anda menekan tombol simpan.</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="submit" class="px-5 py-2.5 bg-gradient-to-r from-[#D4AF37] to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-black rounded-xl text-xs shadow-lg transition flex items-center gap-2 cursor-pointer active:scale-95">
+                        <span>💾 Simpan Seluruh Pengaturan</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
     </form>
 </div>
 @endsection
