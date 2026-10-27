@@ -52,6 +52,41 @@
                 </div>
             </div>
 
+            <!-- Event Certificate Card (if enabled) -->
+            @if($form->has_certificate)
+                <div class="mt-6 p-5 rounded-2xl border text-left max-w-sm mx-auto {{ $form->isCertificateReleased() ? 'bg-emerald-50/80 border-emerald-200' : 'bg-amber-50/80 border-amber-200' }}">
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl shrink-0">{{ $form->isCertificateReleased() ? '🎓' : '🔒' }}</span>
+                        <div class="space-y-1 flex-1">
+                            <h4 class="font-bold text-xs {{ $form->isCertificateReleased() ? 'text-emerald-950' : 'text-amber-950' }}">
+                                {{ $form->isCertificateReleased() ? 'Sertifikat Resmi Telah Terbit' : 'Sertifikat Resmi Ber-JP' }}
+                            </h4>
+                            <p class="text-[11px] leading-relaxed {{ $form->isCertificateReleased() ? 'text-emerald-800' : 'text-amber-800' }}">
+                                @if($form->isCertificateReleased())
+                                    Sertifikat dengan bobot <strong>{{ $form->calculated_total_jp }}</strong> siap diunduh.
+                                @else
+                                    Sertifikat dengan bobot <strong>{{ $form->calculated_total_jp }}</strong> akan dapat diunduh setelah sesi kegiatan selesai ditutup.
+                                @endif
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t {{ $form->isCertificateReleased() ? 'border-emerald-200' : 'border-amber-200' }}">
+                        @if($form->isCertificateReleased())
+                            <a href="{{ route('public.form.view_certificate', [$form->slug, $response->response_code]) }}" target="_blank"
+                               class="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs text-center flex items-center justify-center gap-1.5 shadow-sm transition">
+                                <span>Unduh Sertifikat PDF ↗</span>
+                            </a>
+                        @else
+                            <a href="{{ route('public.form.claim_certificate', $form->slug) }}"
+                               class="w-full py-2 px-3 rounded-xl bg-white border border-amber-300 text-amber-900 font-semibold text-[11px] text-center block hover:bg-amber-50 transition">
+                                Buka Halaman Klaim Sertifikat ↗
+                            </a>
+                        @endif
+                    </div>
+                </div>
+            @endif
+
             <!-- Actions -->
             <div class="mt-8 pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-center gap-3">
                 @if($form->isAcceptingResponses())

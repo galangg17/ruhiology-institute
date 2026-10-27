@@ -22,11 +22,33 @@ class CustomForm extends Model
         'closes_at',
         'success_message',
         'created_by',
+        // Certificate Settings
+        'has_certificate',
+        'certificate_status',
+        'certificate_released_at',
+        'certificate_event_name',
+        'certificate_event_date',
+        'certificate_event_location',
+        'certificate_total_jp',
+        'certificate_number_pattern',
+        'certificate_signer1_name',
+        'certificate_signer1_role',
+        'certificate_signer1_signature',
+        'certificate_signer2_name',
+        'certificate_signer2_role',
+        'certificate_signer2_signature',
+        'certificate_partner_logo',
+        'certificate_curriculum',
+        'certificate_name_field_id',
+        'certificate_phone_field_id',
+        'certificate_inst_field_id',
     ];
 
     protected $casts = [
         'is_public' => 'boolean',
+        'has_certificate' => 'boolean',
         'closes_at' => 'datetime',
+        'certificate_released_at' => 'datetime',
     ];
 
     public function fields()
@@ -44,6 +66,21 @@ class CustomForm extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    public function nameField()
+    {
+        return $this->belongsTo(CustomFormField::class, 'certificate_name_field_id');
+    }
+
+    public function phoneField()
+    {
+        return $this->belongsTo(CustomFormField::class, 'certificate_phone_field_id');
+    }
+
+    public function instField()
+    {
+        return $this->belongsTo(CustomFormField::class, 'certificate_inst_field_id');
+    }
+
     public function isAcceptingResponses(): bool
     {
         if ($this->status !== 'published') {
@@ -55,9 +92,79 @@ class CustomForm extends Model
         return true;
     }
 
+    public function isCertificateReleased(): bool
+    {
+        if (!$this->has_certificate) {
+            return false;
+        }
+        return $this->certificate_status === 'released';
+    }
+
+    public function getParsedCurriculumAttribute(): array
+    {
+        if (empty($this->certificate_curriculum)) {
+            return [];
+        }
+        if (is_array($this->certificate_curriculum)) {
+            return $this->certificate_curriculum;
+        }
+        $decoded = json_decode($this->certificate_curriculum, true);
+        if (is_array($decoded)) {
+            return $decoded;
+        }
+        return [];
+    }
+
+    public function getCalculatedTotalJpAttribute(): string
+    {
+        if (!empty($this->certificate_total_jp)) {
+            return $this->certificate_total_jp;
+        }
+        $curriculum = $this->parsed_curriculum;
+        if (empty($curriculum)) {
+            return '32 JP';
+        }
+
+        $sum = 0;
+        foreach ($curriculum as $item) {
+            $jpVal = $item['jp'] ?? 0;
+            if (preg_match('/(\d+)/', (string)$jpVal, $m)) {
+                $sum += (int)$m[1];
+            }
+        }
+        return $sum > 0 ? "{$sum} Jam Pelajaran (JP)" : '32 JP';
+    }
+
+    public function generateCertificateNumber(int $seq): string
+    {
+        $seqPadded = str_pad((string)$seq, 3, '0', STR_PAD_LEFT);
+        $romanMonths = [
+            1 => 'I', 2 => 'II', 3 => 'III', 4 => 'IV', 5 => 'V', 6 => 'VI',
+            7 => 'VII', 8 => 'VIII', 9 => 'IX', 10 => 'X', 11 => 'XI', 12 => 'XII'
+        ];
+        $monthRoman = $romanMonths[(int)date('n')] ?? date('m');
+        $year = date('Y');
+
+        if (!empty($this->certificate_number_pattern)) {
+            return str_replace(
+                ['{no}', '{bulan}', '{m}', '{tahun}', '{Y}'],
+                [$seqPadded, $monthRoman, $monthRoman, $year, $year],
+                $this->certificate_number_pattern
+            );
+        }
+
+        $slugSlug = strtoupper(substr(preg_replace('/[^a-zA-Z0-9]/', '', $this->slug), 0, 8));
+        return "{$seqPadded}/SERT-RQ/{$slugSlug}/{$monthRoman}/{$year}";
+    }
+
     public function getPublicUrlAttribute(): string
     {
         return route('public.form.show', $this->slug);
+    }
+
+    public function getCertificateClaimUrlAttribute(): string
+    {
+        return route('public.form.claim_certificate', $this->slug);
     }
 
     public function getFormattedSuccessMessageAttribute(): string
@@ -77,7 +184,6 @@ class CustomForm extends Model
             return '';
         }
 
-        // Regex matches URLs with http(s), www., chat.whatsapp.com, or wa.me
         $pattern = '/((?:https?:\/\/|www\.|chat\.whatsapp\.com|wa\.me)[^\s<]+)/i';
         $parts = preg_split($pattern, $text, -1, PREG_SPLIT_DELIM_CAPTURE);
 
@@ -92,7 +198,6 @@ class CustomForm extends Model
                 $escapedHref = htmlspecialchars($href, ENT_QUOTES, 'UTF-8');
                 $escapedText = htmlspecialchars($rawUrl, ENT_QUOTES, 'UTF-8');
 
-                // If WhatsApp Group or Contact Link, render attractive button
                 if (str_contains($rawUrl, 'chat.whatsapp.com') || str_contains($rawUrl, 'wa.me') || str_contains($rawUrl, 'api.whatsapp.com')) {
                     $output .= '<span class="block my-3 text-center">'
                         . '<a href="' . $escapedHref . '" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-200 transition hover:scale-[1.02]">'

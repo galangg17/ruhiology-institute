@@ -14,29 +14,16 @@ use Illuminate\Support\Str;
 
 class AdminCustomFormController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $query = CustomForm::withCount('responses')->latest();
-
-        if ($request->filled('q')) {
-            $q = trim($request->input('q'));
-            $query->where(function ($w) use ($q) {
-                $w->where('title', 'like', "%{$q}%")
-                  ->orWhere('description', 'like', "%{$q}%")
-                  ->orWhere('slug', 'like', "%{$q}%");
-            });
-        }
-
-        if ($request->filled('status')) {
-            $query->where('status', $request->input('status'));
-        }
-
-        $forms = $query->paginate(15)->withQueryString();
+        $forms = CustomForm::withCount(['fields', 'responses'])
+            ->with(['creator'])
+            ->latest()
+            ->paginate(12);
 
         $stats = [
-            'total' => CustomForm::count(),
-            'published' => CustomForm::where('status', 'published')->count(),
-            'closed' => CustomForm::where('status', 'closed')->count(),
+            'total_forms' => CustomForm::count(),
+            'published_forms' => CustomForm::where('status', 'published')->count(),
             'total_responses' => CustomFormResponse::count(),
         ];
 
@@ -75,6 +62,29 @@ class AdminCustomFormController extends Controller
             'fields.*.placeholder' => ['nullable', 'string', 'max:255'],
             'fields.*.is_required' => ['nullable'],
             'fields.*.options' => ['nullable'],
+
+            // Certificate Configurations
+            'has_certificate' => ['nullable'],
+            'certificate_status' => ['nullable', 'in:locked,released'],
+            'certificate_event_name' => ['nullable', 'string', 'max:255'],
+            'certificate_event_date' => ['nullable', 'string', 'max:255'],
+            'certificate_event_location' => ['nullable', 'string', 'max:255'],
+            'certificate_total_jp' => ['nullable', 'string', 'max:100'],
+            'certificate_number_pattern' => ['nullable', 'string', 'max:255'],
+            'certificate_signer1_name' => ['nullable', 'string', 'max:255'],
+            'certificate_signer1_role' => ['nullable', 'string', 'max:255'],
+            'certificate_signer1_signature' => ['nullable', 'string'],
+            'signer1_sig_file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:3072'],
+            'certificate_signer2_name' => ['nullable', 'string', 'max:255'],
+            'certificate_signer2_role' => ['nullable', 'string', 'max:255'],
+            'certificate_signer2_signature' => ['nullable', 'string'],
+            'signer2_sig_file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:3072'],
+            'certificate_partner_logo' => ['nullable', 'string'],
+            'partner_logo_file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:3072'],
+            'certificate_curriculum' => ['nullable'],
+            'certificate_name_field_id' => ['nullable', 'integer'],
+            'certificate_phone_field_id' => ['nullable', 'integer'],
+            'certificate_inst_field_id' => ['nullable', 'integer'],
         ], [
             'title.required' => 'Judul formulir wajib diisi.',
             'fields.required' => 'Formulir harus memiliki minimal 1 pertanyaan.',
@@ -88,16 +98,65 @@ class AdminCustomFormController extends Controller
             $validated['slug'] = Str::slug($validated['slug']);
         }
 
+        // Header image
         if ($request->hasFile('header_file')) {
             $file = $request->file('header_file');
             $filename = 'form_hdr_' . time() . '_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
             $path = public_path('images/forms');
-            if (!file_exists($path)) {
-                mkdir($path, 0755, true);
-            }
+            if (!file_exists($path)) mkdir($path, 0755, true);
             $file->move($path, $filename);
             $validated['header_image'] = asset('images/forms/' . $filename);
         }
+
+        // Signer 1 file
+        if ($request->hasFile('signer1_sig_file')) {
+            $file = $request->file('signer1_sig_file');
+            $fn = 'sig1_' . time() . '_' . Str::random(5) . '.' . $file->getClientOriginalExtension();
+            $p = public_path('images/forms/signatures');
+            if (!file_exists($p)) mkdir($p, 0755, true);
+            $file->move($p, $fn);
+            $validated['certificate_signer1_signature'] = asset('images/forms/signatures/' . $fn);
+        }
+
+        // Signer 2 file
+        if ($request->hasFile('signer2_sig_file')) {
+            $file = $request->file('signer2_sig_file');
+            $fn = 'sig2_' . time() . '_' . Str::random(5) . '.' . $file->getClientOriginalExtension();
+            $p = public_path('images/forms/signatures');
+            if (!file_exists($p)) mkdir($p, 0755, true);
+            $file->move($p, $fn);
+            $validated['certificate_signer2_signature'] = asset('images/forms/signatures/' . $fn);
+        }
+
+        // Partner Logo file
+        if ($request->hasFile('partner_logo_file')) {
+            $file = $request->file('partner_logo_file');
+            $fn = 'logo_' . time() . '_' . Str::random(5) . '.' . $file->getClientOriginalExtension();
+            $p = public_path('images/forms/logos');
+            if (!file_exists($p)) mkdir($p, 0755, true);
+            $file->move($p, $fn);
+            $validated['certificate_partner_logo'] = asset('images/forms/logos/' . $fn);
+        }
+
+        // Process Curriculum
+        $curriculumInput = $request->input('certificate_curriculum', []);
+        if (is_string($curriculumInput)) {
+            $curriculumInput = json_decode($curriculumInput, true) ?? [];
+        }
+        $cleanCurriculum = [];
+        if (is_array($curriculumInput)) {
+            foreach ($curriculumInput as $c) {
+                if (!empty(trim($c['title'] ?? ''))) {
+                    $cleanCurriculum[] = [
+                        'title' => trim($c['title']),
+                        'jp' => trim((string)($c['jp'] ?? '4 JP')),
+                    ];
+                }
+            }
+        }
+        $validated['certificate_curriculum'] = json_encode($cleanCurriculum);
+        $validated['has_certificate'] = $request->boolean('has_certificate');
+        $validated['certificate_status'] = $request->input('certificate_status', 'locked');
 
         DB::transaction(function () use ($validated, $request) {
             $form = CustomForm::create([
@@ -110,6 +169,25 @@ class AdminCustomFormController extends Controller
                 'closes_at' => $validated['closes_at'] ?? null,
                 'success_message' => $validated['success_message'] ?? 'Terima kasih, data formulir Anda telah berhasil dikirimkan.',
                 'created_by' => Auth::id(),
+
+                'has_certificate' => $validated['has_certificate'],
+                'certificate_status' => $validated['certificate_status'],
+                'certificate_event_name' => $validated['certificate_event_name'] ?? null,
+                'certificate_event_date' => $validated['certificate_event_date'] ?? null,
+                'certificate_event_location' => $validated['certificate_event_location'] ?? null,
+                'certificate_total_jp' => $validated['certificate_total_jp'] ?? null,
+                'certificate_number_pattern' => $validated['certificate_number_pattern'] ?? null,
+                'certificate_signer1_name' => $validated['certificate_signer1_name'] ?? 'Prof. Dr. Iskandar Nazari, M.Pd',
+                'certificate_signer1_role' => $validated['certificate_signer1_role'] ?? 'Direktur Ruhiology Institute',
+                'certificate_signer1_signature' => $validated['certificate_signer1_signature'] ?? null,
+                'certificate_signer2_name' => $validated['certificate_signer2_name'] ?? null,
+                'certificate_signer2_role' => $validated['certificate_signer2_role'] ?? null,
+                'certificate_signer2_signature' => $validated['certificate_signer2_signature'] ?? null,
+                'certificate_partner_logo' => $validated['certificate_partner_logo'] ?? null,
+                'certificate_curriculum' => $validated['certificate_curriculum'],
+                'certificate_name_field_id' => $validated['certificate_name_field_id'] ?? null,
+                'certificate_phone_field_id' => $validated['certificate_phone_field_id'] ?? null,
+                'certificate_inst_field_id' => $validated['certificate_inst_field_id'] ?? null,
             ]);
 
             $order = 1;
@@ -146,6 +224,7 @@ class AdminCustomFormController extends Controller
                 changes: [
                     'title' => $form->title,
                     'slug' => $form->slug,
+                    'has_certificate' => $form->has_certificate,
                 ]
             );
         });
@@ -168,7 +247,9 @@ class AdminCustomFormController extends Controller
             ];
         })->values()->toArray();
 
-        return view('admin.forms.edit', compact('form', 'fieldsData'));
+        $curriculumData = $form->parsed_curriculum;
+
+        return view('admin.forms.edit', compact('form', 'fieldsData', 'curriculumData'));
     }
 
     public function update(Request $request, CustomForm $form)
@@ -198,6 +279,29 @@ class AdminCustomFormController extends Controller
             'fields.*.placeholder' => ['nullable', 'string', 'max:255'],
             'fields.*.is_required' => ['nullable'],
             'fields.*.options' => ['nullable'],
+
+            // Certificate Configurations
+            'has_certificate' => ['nullable'],
+            'certificate_status' => ['nullable', 'in:locked,released'],
+            'certificate_event_name' => ['nullable', 'string', 'max:255'],
+            'certificate_event_date' => ['nullable', 'string', 'max:255'],
+            'certificate_event_location' => ['nullable', 'string', 'max:255'],
+            'certificate_total_jp' => ['nullable', 'string', 'max:100'],
+            'certificate_number_pattern' => ['nullable', 'string', 'max:255'],
+            'certificate_signer1_name' => ['nullable', 'string', 'max:255'],
+            'certificate_signer1_role' => ['nullable', 'string', 'max:255'],
+            'certificate_signer1_signature' => ['nullable', 'string'],
+            'signer1_sig_file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:3072'],
+            'certificate_signer2_name' => ['nullable', 'string', 'max:255'],
+            'certificate_signer2_role' => ['nullable', 'string', 'max:255'],
+            'certificate_signer2_signature' => ['nullable', 'string'],
+            'signer2_sig_file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:3072'],
+            'certificate_partner_logo' => ['nullable', 'string'],
+            'partner_logo_file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:3072'],
+            'certificate_curriculum' => ['nullable'],
+            'certificate_name_field_id' => ['nullable', 'integer'],
+            'certificate_phone_field_id' => ['nullable', 'integer'],
+            'certificate_inst_field_id' => ['nullable', 'integer'],
         ], [
             'title.required' => 'Judul formulir wajib diisi.',
             'fields.required' => 'Formulir harus memiliki minimal 1 pertanyaan.',
@@ -211,12 +315,60 @@ class AdminCustomFormController extends Controller
             $file = $request->file('header_file');
             $filename = 'form_hdr_' . time() . '_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
             $path = public_path('images/forms');
-            if (!file_exists($path)) {
-                mkdir($path, 0755, true);
-            }
+            if (!file_exists($path)) mkdir($path, 0755, true);
             $file->move($path, $filename);
             $validated['header_image'] = asset('images/forms/' . $filename);
         }
+
+        // Signer 1 file
+        if ($request->hasFile('signer1_sig_file')) {
+            $file = $request->file('signer1_sig_file');
+            $fn = 'sig1_' . time() . '_' . Str::random(5) . '.' . $file->getClientOriginalExtension();
+            $p = public_path('images/forms/signatures');
+            if (!file_exists($p)) mkdir($p, 0755, true);
+            $file->move($p, $fn);
+            $validated['certificate_signer1_signature'] = asset('images/forms/signatures/' . $fn);
+        }
+
+        // Signer 2 file
+        if ($request->hasFile('signer2_sig_file')) {
+            $file = $request->file('signer2_sig_file');
+            $fn = 'sig2_' . time() . '_' . Str::random(5) . '.' . $file->getClientOriginalExtension();
+            $p = public_path('images/forms/signatures');
+            if (!file_exists($p)) mkdir($p, 0755, true);
+            $file->move($p, $fn);
+            $validated['certificate_signer2_signature'] = asset('images/forms/signatures/' . $fn);
+        }
+
+        // Partner Logo file
+        if ($request->hasFile('partner_logo_file')) {
+            $file = $request->file('partner_logo_file');
+            $fn = 'logo_' . time() . '_' . Str::random(5) . '.' . $file->getClientOriginalExtension();
+            $p = public_path('images/forms/logos');
+            if (!file_exists($p)) mkdir($p, 0755, true);
+            $file->move($p, $fn);
+            $validated['certificate_partner_logo'] = asset('images/forms/logos/' . $fn);
+        }
+
+        // Process Curriculum
+        $curriculumInput = $request->input('certificate_curriculum', []);
+        if (is_string($curriculumInput)) {
+            $curriculumInput = json_decode($curriculumInput, true) ?? [];
+        }
+        $cleanCurriculum = [];
+        if (is_array($curriculumInput)) {
+            foreach ($curriculumInput as $c) {
+                if (!empty(trim($c['title'] ?? ''))) {
+                    $cleanCurriculum[] = [
+                        'title' => trim($c['title']),
+                        'jp' => trim((string)($c['jp'] ?? '4 JP')),
+                    ];
+                }
+            }
+        }
+        $validated['certificate_curriculum'] = json_encode($cleanCurriculum);
+        $validated['has_certificate'] = $request->boolean('has_certificate');
+        $validated['certificate_status'] = $request->input('certificate_status', $form->certificate_status ?? 'locked');
 
         DB::transaction(function () use ($form, $validated, $request) {
             $form->update([
@@ -227,10 +379,29 @@ class AdminCustomFormController extends Controller
                 'status' => $validated['status'],
                 'access_code' => !empty($validated['access_code']) ? strtoupper(trim($validated['access_code'])) : null,
                 'closes_at' => $validated['closes_at'] ?? null,
-                'success_message' => $validated['success_message'] ?? $form->success_message,
+                'success_message' => $validated['success_message'] ?? null,
+
+                'has_certificate' => $validated['has_certificate'],
+                'certificate_status' => $validated['certificate_status'],
+                'certificate_event_name' => $validated['certificate_event_name'] ?? null,
+                'certificate_event_date' => $validated['certificate_event_date'] ?? null,
+                'certificate_event_location' => $validated['certificate_event_location'] ?? null,
+                'certificate_total_jp' => $validated['certificate_total_jp'] ?? null,
+                'certificate_number_pattern' => $validated['certificate_number_pattern'] ?? null,
+                'certificate_signer1_name' => $validated['certificate_signer1_name'] ?? 'Prof. Dr. Iskandar Nazari, M.Pd',
+                'certificate_signer1_role' => $validated['certificate_signer1_role'] ?? 'Direktur Ruhiology Institute',
+                'certificate_signer1_signature' => $validated['certificate_signer1_signature'] ?? $form->certificate_signer1_signature,
+                'certificate_signer2_name' => $validated['certificate_signer2_name'] ?? null,
+                'certificate_signer2_role' => $validated['certificate_signer2_role'] ?? null,
+                'certificate_signer2_signature' => $validated['certificate_signer2_signature'] ?? $form->certificate_signer2_signature,
+                'certificate_partner_logo' => $validated['certificate_partner_logo'] ?? $form->certificate_partner_logo,
+                'certificate_curriculum' => $validated['certificate_curriculum'],
+                'certificate_name_field_id' => $validated['certificate_name_field_id'] ?? null,
+                'certificate_phone_field_id' => $validated['certificate_phone_field_id'] ?? null,
+                'certificate_inst_field_id' => $validated['certificate_inst_field_id'] ?? null,
             ]);
 
-            // Re-sync fields cleanly
+            // Sync dynamic fields: delete old and recreate with preserved IDs if needed
             $form->fields()->delete();
 
             $order = 1;
@@ -267,6 +438,7 @@ class AdminCustomFormController extends Controller
                 changes: [
                     'title' => $form->title,
                     'slug' => $form->slug,
+                    'has_certificate' => $form->has_certificate,
                 ]
             );
         });
@@ -301,6 +473,21 @@ class AdminCustomFormController extends Controller
         return back()->with('success', "Status formulir berhasil diubah menjadi: " . strtoupper($newStatus));
     }
 
+    public function toggleCertificateRelease(CustomForm $form)
+    {
+        $newStatus = $form->certificate_status === 'released' ? 'locked' : 'released';
+        $form->update([
+            'certificate_status' => $newStatus,
+            'certificate_released_at' => $newStatus === 'released' ? now() : $form->certificate_released_at,
+        ]);
+
+        $msg = $newStatus === 'released'
+            ? "Akses Sertifikat Resmi untuk \"{$form->title}\" BERHASIL DIBUKA! Peserta kini dapat mengunduh sertifikat mereka."
+            : "Akses Sertifikat Resmi untuk \"{$form->title}\" BERHASIL DIKUNCI.";
+
+        return back()->with('success', $msg);
+    }
+
     public function responses(Request $request, CustomForm $form)
     {
         $form->load(['fields']);
@@ -311,6 +498,8 @@ class AdminCustomFormController extends Controller
             $q = trim($request->input('q'));
             $query->where(function ($w) use ($q) {
                 $w->where('response_code', 'like', "%{$q}%")
+                  ->orWhere('certificate_number', 'like', "%{$q}%")
+                  ->orWhere('participant_name_cache', 'like', "%{$q}%")
                   ->orWhereHas('answers', function ($a) use ($q) {
                       $a->where('answer_value', 'like', "%{$q}%");
                   });
@@ -354,7 +543,7 @@ class AdminCustomFormController extends Controller
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
 
             // Header Row
-            $headerRow = ['No', 'Kode Respon', 'Waktu Pengisian', 'IP Address'];
+            $headerRow = ['No', 'Kode Respon', 'No. Sertifikat', 'Nama Peserta', 'Nomor WA', 'Waktu Pengisian', 'IP Address'];
             foreach ($fields as $field) {
                 $headerRow[] = $field->label;
             }
@@ -367,6 +556,9 @@ class AdminCustomFormController extends Controller
                 $row = [
                     $no++,
                     $r->response_code,
+                    $r->certificate_number ?? '-',
+                    $r->participant_name,
+                    $r->participant_phone ?? '-',
                     $r->submitted_at ? $r->submitted_at->format('d/m/Y H:i:s') : '-',
                     $r->ip_address ?? '-',
                 ];

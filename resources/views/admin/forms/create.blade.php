@@ -89,7 +89,202 @@
             </div>
         </div>
 
-        <!-- 2. DYNAMIC QUESTIONS BUILDER SECTION -->
+        <!-- 2. CERTIFICATE SETTINGS CARD (EVENT & DIKLAT JP) -->
+        <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-6 relative overflow-hidden">
+            <!-- Top Toggle Header -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+                <div class="flex items-start gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-600 flex items-center justify-center font-bold text-xl flex-shrink-0">
+                        🎓
+                    </div>
+                    <div>
+                        <h2 class="text-base sm:text-lg font-serif font-bold text-[#0B2A43] flex items-center gap-2">
+                            <span>Penerbitan Sertifikat Resmi Event & JP</span>
+                            <span class="text-[10px] font-sans font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-800 uppercase tracking-wider">Diklat & Pelatihan</span>
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-0.5">
+                            Hasilkan sertifikat resmi 2 halaman (Piagam + Matriks Materi & JP) untuk peserta formulir ini.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Main Toggle Switch -->
+                <label class="relative inline-flex items-center cursor-pointer select-none">
+                    <input type="checkbox" name="has_certificate" value="1" x-model="hasCertificate" class="sr-only peer">
+                    <div class="w-12 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0B2A43]"></div>
+                    <span class="ml-3 text-xs font-bold text-slate-700" x-text="hasCertificate ? 'Sertifikat Aktif' : 'Nonaktif'"></span>
+                </label>
+            </div>
+
+            <!-- Certificate Configuration Body (shown if hasCertificate is true) -->
+            <div x-show="hasCertificate" x-transition.duration.200ms class="space-y-6 pt-1" style="display: none;">
+                
+                <!-- Notice & Status Release Switch -->
+                <div class="p-4 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50/50 border border-amber-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="space-y-1">
+                        <span class="text-xs font-bold text-amber-900 flex items-center gap-1.5">
+                            <span>Status Kesiapan Sertifikat Saat Ini:</span>
+                        </span>
+                        <p class="text-[11px] text-amber-800 leading-relaxed">
+                            Pilih <strong class="underline">Terkunci</strong> jika acara masih berlangsung agar peserta tidak bisa klaim lebih awal. Buka setelah acara tuntas.
+                        </p>
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <label class="inline-flex items-center gap-2 p-2 px-3 rounded-xl border cursor-pointer text-xs font-semibold"
+                               :class="certificateStatus === 'locked' ? 'bg-amber-500 text-white border-amber-600' : 'bg-white text-slate-700 border-slate-200'">
+                            <input type="radio" name="certificate_status" value="locked" x-model="certificateStatus" class="sr-only">
+                            <span>🔒 Terkunci (Acara Berlangsung)</span>
+                        </label>
+                        <label class="inline-flex items-center gap-2 p-2 px-3 rounded-xl border cursor-pointer text-xs font-semibold"
+                               :class="certificateStatus === 'released' ? 'bg-emerald-600 text-white border-emerald-700' : 'bg-white text-slate-700 border-slate-200'">
+                            <input type="radio" name="certificate_status" value="released" x-model="certificateStatus" class="sr-only">
+                            <span>🚀 Terbuka (Siap Klaim)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Event Details Grid -->
+                <div class="space-y-4">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">1. Data Pokok Agenda / Pelatihan</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="md:col-span-2">
+                            <label class="block font-bold text-slate-700 mb-1">Nama Agenda / Kegiatan Pelatihan *</label>
+                            <input type="text" name="certificate_event_name" placeholder="Contoh: Ruhiology Assessment & Peningkatan Kompetensi Guru SMAN TT" class="w-full p-2.5 rounded-xl border border-slate-300 outline-none text-xs bg-white focus:border-[#0B2A43] focus:ring-1 focus:ring-[#0B2A43]">
+                            <span class="text-[10px] text-slate-400 mt-0.5 block">Nama ini akan tercantum tebal di badan piagam sertifikat peserta.</span>
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Waktu / Tanggal Pelaksanaan</label>
+                            <input type="text" name="certificate_event_date" placeholder="Contoh: 24 - 26 Oktober 2026" class="w-full p-2.5 rounded-xl border border-slate-300 outline-none text-xs bg-white focus:border-[#0B2A43]">
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Tempat / Kota Kegiatan</label>
+                            <input type="text" name="certificate_event_location" value="Tanjung Jabung Timur, Jambi" placeholder="Contoh: Tanjung Jabung Timur, Jambi" class="w-full p-2.5 rounded-xl border border-slate-300 outline-none text-xs bg-white focus:border-[#0B2A43]">
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Total Bobot Jam Pelajaran (JP)</label>
+                            <input type="text" name="certificate_total_jp" value="32 JP" placeholder="Contoh: 32 JP" class="w-full p-2.5 rounded-xl border border-slate-300 outline-none text-xs bg-white focus:border-[#0B2A43]">
+                            <span class="text-[10px] text-slate-400 mt-0.5 block">Tercantum di piagam depan & total di tabel lembar belakang.</span>
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Format / Pola Nomor Sertifikat</label>
+                            <input type="text" name="certificate_number_pattern" value="{no}/SERT-RQ/SMAN-TT/{m}/{Y}" placeholder="{no}/SERT-RQ/SMAN-TT/{m}/{Y}" class="w-full p-2.5 rounded-xl border border-slate-300 outline-none text-xs font-mono bg-white focus:border-[#0B2A43]">
+                            <span class="text-[10px] text-slate-400 mt-0.5 block">Gunakan tag: <code>{no}</code> (nomor urut), <code>{m}</code> (bulan romawi), <code>{Y}</code> (tahun).</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Signers & Logo Grid -->
+                <div class="space-y-4 pt-3 border-t border-slate-100">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">2. Penandatangan & Identitas Mitra</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        
+                        <!-- Signer 1: Ruhiology -->
+                        <div class="p-4 bg-slate-50/70 rounded-2xl border border-slate-200/80 space-y-3">
+                            <span class="text-xs font-bold text-slate-800 block">Tanda Tangan 1: Direktur Ruhiology Institute</span>
+                            <div>
+                                <label class="block text-[11px] text-slate-600 mb-1">Nama Lengkap & Gelar</label>
+                                <input type="text" name="certificate_signer1_name" value="Prof. Dr. Iskandar Nazari, M.Pd" class="w-full p-2 rounded-lg border border-slate-300 text-xs bg-white">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] text-slate-600 mb-1">Jabatan Resmi</label>
+                                <input type="text" name="certificate_signer1_role" value="Direktur Ruhiology Institute" class="w-full p-2 rounded-lg border border-slate-300 text-xs bg-white">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] text-slate-600 mb-1">File Tanda Tangan Digital (.png transparan)</label>
+                                <input type="file" name="signer1_sig_file" accept="image/*" class="w-full text-xs p-1 rounded-lg border border-slate-300 bg-white">
+                            </div>
+                        </div>
+
+                        <!-- Signer 2: Partner / School -->
+                        <div class="p-4 bg-slate-50/70 rounded-2xl border border-slate-200/80 space-y-3">
+                            <span class="text-xs font-bold text-slate-800 block">Tanda Tangan 2: Pimpinan Mitra / Sekolah</span>
+                            <div>
+                                <label class="block text-[11px] text-slate-600 mb-1">Nama Lengkap & Gelar</label>
+                                <input type="text" name="certificate_signer2_name" placeholder="Contoh: Drs. H. Ahmad Sobri, M.Si" class="w-full p-2 rounded-lg border border-slate-300 text-xs bg-white">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] text-slate-600 mb-1">Jabatan Resmi</label>
+                                <input type="text" name="certificate_signer2_role" placeholder="Contoh: Kepala Sekolah SMAN TT" class="w-full p-2 rounded-lg border border-slate-300 text-xs bg-white">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] text-slate-600 mb-1">File Tanda Tangan Digital (.png transparan)</label>
+                                <input type="file" name="signer2_sig_file" accept="image/*" class="w-full text-xs p-1 rounded-lg border border-slate-300 bg-white">
+                            </div>
+                        </div>
+
+                        <!-- Partner Logo -->
+                        <div class="md:col-span-2 p-4 bg-slate-50/70 rounded-2xl border border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div class="space-y-1">
+                                <span class="text-xs font-bold text-slate-800 block">Logo Mitra / Sekolah (Opsional)</span>
+                                <p class="text-[11px] text-slate-500">
+                                    Akan ditampilkan berdampingan dengan lambang resmi Ruhiology Institute di kop sertifikat.
+                                </p>
+                            </div>
+                            <div>
+                                <input type="file" name="partner_logo_file" accept="image/*" class="text-xs p-1.5 rounded-xl border border-slate-300 bg-white">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Dynamic Curriculum Matrix (Halaman 2 / Lembar Belakang) -->
+                <div class="space-y-4 pt-3 border-t border-slate-100">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">3. Matriks Materi Pelatihan & Alokasi JP (Halaman 2)</h3>
+                            <p class="text-[11px] text-slate-500 mt-0.5">
+                                Isi pokok materi/modul pembelajaran yang diajarkan beserta alokasi jam pelajarannya.
+                            </p>
+                        </div>
+                        <button type="button" @click="addCurriculum()" class="px-3.5 py-1.5 bg-[#0B2A43] hover:bg-[#123B59] text-[#D4AF37] font-bold rounded-xl text-xs transition flex items-center gap-1.5 cursor-pointer">
+                            <span>➕ Tambah Materi</span>
+                        </button>
+                    </div>
+
+                    <input type="hidden" name="certificate_curriculum" :value="JSON.stringify(curriculum)">
+
+                    <div class="border border-slate-200 rounded-2xl overflow-hidden bg-slate-50/50">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-600 font-bold border-b border-slate-200">
+                                    <th class="p-3 w-12 text-center">No</th>
+                                    <th class="p-3">Pokok Materi / Modul Pembelajaran</th>
+                                    <th class="p-3 w-32">Alokasi JP</th>
+                                    <th class="p-3 w-16 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 bg-white">
+                                <template x-for="(item, idx) in curriculum" :key="idx">
+                                    <tr class="hover:bg-slate-50/80 transition">
+                                        <td class="p-3 text-center font-bold text-slate-400" x-text="idx + 1"></td>
+                                        <td class="p-2.5">
+                                            <input type="text" x-model="item.title" placeholder="Contoh: Psikologi Karakter & Asesmen Holistik Siswa" class="w-full p-2 rounded-lg border border-slate-300 text-xs bg-white outline-none focus:ring-1 focus:ring-[#0B2A43]">
+                                        </td>
+                                        <td class="p-2.5">
+                                            <input type="text" x-model="item.jp" placeholder="Contoh: 10 JP" class="w-full p-2 rounded-lg border border-slate-300 text-xs font-mono text-center bg-white outline-none focus:ring-1 focus:ring-[#0B2A43]">
+                                        </td>
+                                        <td class="p-2.5 text-center">
+                                            <button type="button" @click="removeCurriculum(idx)" :disabled="curriculum.length <= 1" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 disabled:opacity-30 cursor-pointer transition">
+                                                ✕
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 3. DYNAMIC QUESTIONS BUILDER SECTION -->
         <div class="space-y-4">
             <div class="flex items-center justify-between">
                 <div>
@@ -227,6 +422,28 @@ function formBuilder() {
         slug: '',
         description: '',
         status: 'published',
+        hasCertificate: false,
+        certificateStatus: 'locked',
+        curriculum: [
+            { title: 'Pondasi Ruhiology & Integritas Kepemimpinan Pendidik', jp: '6 JP' },
+            { title: 'Psikologi Karakter & Asesmen Holistik Siswa', jp: '10 JP' },
+            { title: 'Strategi Pedagogik Berbasis Asesmen & Empati', jp: '10 JP' },
+            { title: 'Implementasi Kurikulum & Evaluasi Tindak Lanjut', jp: '6 JP' }
+        ],
+
+        addCurriculum() {
+            this.curriculum.push({
+                title: '',
+                jp: '4 JP'
+            });
+        },
+
+        removeCurriculum(idx) {
+            if (this.curriculum.length > 1) {
+                this.curriculum.splice(idx, 1);
+            }
+        },
+
         fields: [
             {
                 id: Date.now(),

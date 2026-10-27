@@ -82,11 +82,16 @@ Route::post('/training/invoice/{registration_number}/upload-proof', [PublicTrain
 Route::get('/training/{slug}', [PublicTrainingController::class, 'show'])->name('training.show');
 Route::post('/training/{slug}/register', [PublicTrainingController::class, 'register'])->name('training.register');
 
-// Dynamic Forms (Google Form Ruhiology)
+// Dynamic Forms (Google Form Ruhiology) & Event Certificates
 Route::get('/f/{slug}', [PublicCustomFormController::class, 'show'])->name('public.form.show');
 Route::post('/f/{slug}', [PublicCustomFormController::class, 'show'])->name('public.form.verify');
 Route::post('/f/{slug}/submit', [PublicCustomFormController::class, 'submit'])->name('public.form.submit');
 Route::get('/f/{slug}/success/{response_code}', [PublicCustomFormController::class, 'success'])->name('public.form.success');
+Route::get('/f/{slug}/sertifikat', [PublicCustomFormController::class, 'claimCertificate'])->name('public.form.claim_certificate');
+Route::post('/f/{slug}/sertifikat/search', [PublicCustomFormController::class, 'searchCertificate'])->name('public.form.search_certificate');
+Route::post('/f/{slug}/sertifikat/update-name/{response_code}', [PublicCustomFormController::class, 'updateCertificateName'])->name('public.form.update_certificate_name');
+Route::get('/f/{slug}/certificate/{response_code}', [PublicCustomFormController::class, 'viewCertificate'])->name('public.form.view_certificate');
+Route::get('/verify-certificate/{response_code}', [PublicCustomFormController::class, 'verifyCertificate'])->name('public.certificate.verify');
 
 // Book Store / Catalog
 Route::get('/katalog', [PublicCatalogController::class, 'index'])->name('catalog.index');
@@ -219,6 +224,7 @@ Route::middleware(['auth', \App\Http\Middleware\EnsureAdminAccess::class])
         Route::put('/forms/{form}', [AdminCustomFormController::class, 'update'])->name('forms.update');
         Route::delete('/forms/{form}', [AdminCustomFormController::class, 'destroy'])->name('forms.destroy');
         Route::post('/forms/{form}/toggle-status', [AdminCustomFormController::class, 'toggleStatus'])->name('forms.toggle_status');
+        Route::post('/forms/{form}/toggle-certificate-release', [AdminCustomFormController::class, 'toggleCertificateRelease'])->name('forms.toggle_certificate_release');
         Route::get('/forms/{form}/responses', [AdminCustomFormController::class, 'responses'])->name('forms.responses');
         Route::get('/forms/{form}/export-csv', [AdminCustomFormController::class, 'exportCsv'])->name('forms.export_csv');
         Route::delete('/forms/responses/{response}', [AdminCustomFormController::class, 'destroyResponse'])->name('forms.responses.destroy');

@@ -106,6 +106,10 @@ class PublicCustomFormController extends Controller
                 'submitted_at' => now(),
             ]);
 
+            $detectedName = null;
+            $detectedPhone = null;
+            $detectedInst = null;
+
             foreach ($fields as $field) {
                 $fieldKey = 'field_' . $field->id;
                 $val = null;
@@ -128,12 +132,31 @@ class PublicCustomFormController extends Controller
                     $val = $request->input($fieldKey);
                 }
 
-                CustomFormResponseAnswer::create([
+                $ans = CustomFormResponseAnswer::create([
                     'response_id' => $response->id,
                     'field_id' => $field->id,
                     'answer_value' => $val !== null ? (string) $val : null,
                 ]);
+
+                // Check mapping or label pattern for name, phone, inst
+                $labelLower = strtolower($field->label);
+                if ($form->certificate_name_field_id == $field->id || (!$detectedName && str_contains($labelLower, 'nama'))) {
+                    $detectedName = $val;
+                }
+                if ($form->certificate_phone_field_id == $field->id || (!$detectedPhone && (str_contains($labelLower, 'wa') || str_contains($labelLower, 'whatsapp') || str_contains($labelLower, 'hp')))) {
+                    $detectedPhone = $val;
+                }
+                if ($form->certificate_inst_field_id == $field->id || (!$detectedInst && (str_contains($labelLower, 'instansi') || str_contains($labelLower, 'sekolah') || str_contains($labelLower, 'lembaga')))) {
+                    $detectedInst = $val;
+                }
             }
+
+            // Cache identity for fast search & certificate generation
+            $response->update([
+                'participant_name_cache' => $detectedName ? trim((string)$detectedName) : null,
+                'participant_phone_cache' => $detectedPhone ? trim((string)$detectedPhone) : null,
+                'participant_inst_cache' => $detectedInst ? trim((string)$detectedInst) : null,
+            ]);
         });
 
         return redirect()->route('public.form.success', [
@@ -150,5 +173,115 @@ class PublicCustomFormController extends Controller
             ->firstOrFail();
 
         return view('public.forms.success', compact('form', 'response'));
+    }
+
+    public function claimCertificate(Request $request, string $slug)
+    {
+        $form = CustomForm::where('slug', $slug)->firstOrFail();
+
+        if (!$form->has_certificate) {
+            return redirect()->route('public.form.show', $slug);
+        }
+
+        $results = collect();
+        $searchQuery = null;
+
+        if ($request->filled('q')) {
+            $searchQuery = trim($request->input('q'));
+            $cleanDigits = preg_replace('/[^0-9]/', '', $searchQuery);
+
+            $query = $form->responses()->with(['answers.field']);
+
+            $query->where(function ($w) use ($searchQuery, $cleanDigits) {
+                $w->where('response_code', $searchQuery)
+                  ->orWhere('certificate_number', 'like', "%{$searchQuery}%")
+                  ->orWhere('participant_name_cache', 'like', "%{$searchQuery}%")
+                  ->orWhereHas('answers', function ($a) use ($searchQuery) {
+                      $a->where('answer_value', 'like', "%{$searchQuery}%");
+                  });
+
+                if (strlen($cleanDigits) >= 6) {
+                    $w->orWhere('participant_phone_cache', 'like', "%{$cleanDigits}%");
+                }
+            });
+
+            $results = $query->get();
+        }
+
+        return view('public.forms.claim_certificate', compact('form', 'results', 'searchQuery'));
+    }
+
+    public function searchCertificate(Request $request, string $slug)
+    {
+        $q = trim($request->input('q', ''));
+        return redirect()->route('public.form.claim_certificate', [
+            'slug' => $slug,
+            'q' => $q,
+        ]);
+    }
+
+    public function updateCertificateName(Request $request, string $slug, string $response_code)
+    {
+        $form = CustomForm::where('slug', $slug)->firstOrFail();
+        $response = CustomFormResponse::where('custom_form_id', $form->id)
+            ->where('response_code', $response_code)
+            ->firstOrFail();
+
+        $validated = $request->validate([
+            'participant_name' => ['required', 'string', 'max:255'],
+        ], [
+            'participant_name.required' => 'Nama lengkap beserta gelar tidak boleh kosong.',
+        ]);
+
+        $newName = trim($validated['participant_name']);
+
+        $response->update([
+            'participant_name_cache' => $newName,
+        ]);
+
+        // Also sync corresponding answer if mapped
+        if ($form->certificate_name_field_id) {
+            $ans = $response->answers()->where('field_id', $form->certificate_name_field_id)->first();
+            if ($ans) {
+                $ans->update(['answer_value' => $newName]);
+            }
+        }
+
+        return back()->with('name_success', 'Nama dan gelar pada sertifikat berhasil diperbarui!');
+    }
+
+    public function viewCertificate(string $slug, string $response_code)
+    {
+        $form = CustomForm::where('slug', $slug)->firstOrFail();
+
+        if (!$form->has_certificate) {
+            abort(404, 'Formulir ini tidak menyediakan penerbitan sertifikat.');
+        }
+
+        if (!$form->isCertificateReleased()) {
+            return redirect()->route('public.form.claim_certificate', $slug)
+                ->with('locked_warning', 'Mohon maaf, akses unduh sertifikat resmi untuk kegiatan ini belum dibuka oleh panitia.');
+        }
+
+        $response = CustomFormResponse::where('custom_form_id', $form->id)
+            ->where('response_code', $response_code)
+            ->firstOrFail();
+
+        // Ensure official certificate number is generated and stored
+        $response->ensureCertificateNumber();
+
+        return view('public.forms.certificate', compact('form', 'response'));
+    }
+
+    public function verifyCertificate(string $response_code)
+    {
+        $response = CustomFormResponse::where('response_code', $response_code)
+            ->orWhere('certificate_number', $response_code)
+            ->with(['form', 'answers.field'])
+            ->firstOrFail();
+
+        $form = $response->form;
+
+        return view('public.forms.verify_certificate', compact('form', 'response'));
     }
 }
