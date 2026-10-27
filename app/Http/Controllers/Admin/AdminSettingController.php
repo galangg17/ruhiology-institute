@@ -17,7 +17,29 @@ class AdminSettingController extends Controller
 
     public function update(Request $request)
     {
-        $data = $request->except(['_token', 'hero_card_image_file', 'about_image_file', 'founder_signature_file', 'founder_photo_file', 'certificate_logo_file', 'certificate_bg_file', 'story_bg_file']);
+        $data = $request->except([
+            '_token',
+            'hero_card_image_file',
+            'about_image_file',
+            'founder_signature_file',
+            'founder_photo_file',
+            'certificate_logo_file',
+            'certificate_bg_file',
+            'story_bg_file',
+            'rq_assessment_image_file',
+        ]);
+
+        // Handle RQ Assessment Image Upload
+        if ($request->hasFile('rq_assessment_image_file')) {
+            $file = $request->file('rq_assessment_image_file');
+            $filename = 'rq_assess_' . time() . '.' . $file->getClientOriginalExtension();
+            $path = public_path('images/settings');
+            if (!file_exists($path)) {
+                mkdir($path, 0755, true);
+            }
+            $file->move($path, $filename);
+            $data['rq_assessment_image'] = asset('images/settings/' . $filename);
+        }
 
         // Handle Founder Photo Upload
         if ($request->hasFile('founder_photo_file')) {

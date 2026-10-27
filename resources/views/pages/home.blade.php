@@ -412,40 +412,40 @@
     </section>
 
     <!-- SPOTLIGHT RISET & LANDASAN TEORI PROF. ISKANDAR NAZARI -->
-    <section class="py-14 sm:py-20 bg-[#0B2A43] text-white border-b border-slate-800">
+    <section id="landasan-teori" class="py-14 sm:py-20 bg-[#0B2A43] text-white border-b border-slate-800 scroll-mt-20">
         <div class="max-w-[1280px] mx-auto px-4 sm:px-10">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 items-center">
                 
                 <div class="lg:col-span-7 space-y-5 text-center lg:text-left">
                     <div class="inline-flex items-center space-x-2 bg-[#C9A24D]/20 text-[#C9A24D] text-xs font-mono font-bold px-3.5 py-1.5 rounded-full border border-[#C9A24D]/30 uppercase tracking-widest">
-                        <span>✦ LANDASAN TEORI & METODOLOGI</span>
+                        <span>{{ \App\Models\Setting::get('theory_badge', '✦ LANDASAN TEORI & METODOLOGI') }}</span>
                     </div>
 
                     <h2 class="font-serif text-2xl sm:text-4xl font-bold text-white leading-tight tracking-tight">
-                        Riset Psikometri & Integrasi Nilai-Nilai Ruhiologi
+                        {{ \App\Models\Setting::get('theory_title', 'Riset Psikometri & Integrasi Nilai-Nilai Ruhiologi') }}
                     </h2>
 
                     <p class="text-xs sm:text-sm text-slate-200 leading-relaxed font-normal">
-                        Pengembangan instrumen kecerdasan ruhiologi (*Ruhiology Quotient*) berakar pada riset panjang Prof. Dr. Iskandar Nazari yang memadukan kajian tekstual-klasik dan uji validitas psikometri ilmiah modern.
+                        {{ \App\Models\Setting::get('theory_description', 'Pengembangan instrumen kecerdasan ruhiologi (Ruhiology Quotient) berakar pada riset panjang Prof. Dr. Iskandar Nazari yang memadukan kajian tekstual-klasik dan uji validitas psikometri ilmiah modern.') }}
                     </p>
 
                     <!-- Key Metrics Grid -->
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
                         <div class="bg-white/10 p-3 sm:p-3.5 rounded-2xl border border-white/15 backdrop-blur-md text-left">
-                            <span class="text-lg sm:text-2xl font-black font-mono text-[#C9A24D] block">&gt; 0.88</span>
-                            <span class="text-[10px] sm:text-[11px] text-slate-300 block font-medium mt-0.5">Reliabilitas Alpha</span>
+                            <span class="text-lg sm:text-2xl font-black font-mono text-[#C9A24D] block">{{ \App\Models\Setting::get('theory_metric1_val', '> 0.88') }}</span>
+                            <span class="text-[10px] sm:text-[11px] text-slate-300 block font-medium mt-0.5">{{ \App\Models\Setting::get('theory_metric1_lbl', 'Reliabilitas Alpha') }}</span>
                         </div>
                         <div class="bg-white/10 p-3 sm:p-3.5 rounded-2xl border border-white/15 backdrop-blur-md text-left">
-                            <span class="text-lg sm:text-2xl font-black font-mono text-[#C9A24D] block">RQI-15</span>
-                            <span class="text-[10px] sm:text-[11px] text-slate-300 block font-medium mt-0.5">Scale Terstruktur</span>
+                            <span class="text-lg sm:text-2xl font-black font-mono text-[#C9A24D] block">{{ \App\Models\Setting::get('theory_metric2_val', 'RQI-15') }}</span>
+                            <span class="text-[10px] sm:text-[11px] text-slate-300 block font-medium mt-0.5">{{ \App\Models\Setting::get('theory_metric2_lbl', 'Scale Terstruktur') }}</span>
                         </div>
                         <div class="bg-white/10 p-3 sm:p-3.5 rounded-2xl border border-white/15 backdrop-blur-md text-left">
-                            <span class="text-lg sm:text-2xl font-black font-mono text-[#C9A24D] block">WHO-5</span>
-                            <span class="text-[10px] sm:text-[11px] text-slate-300 block font-medium mt-0.5">Well-being Index</span>
+                            <span class="text-lg sm:text-2xl font-black font-mono text-[#C9A24D] block">{{ \App\Models\Setting::get('theory_metric3_val', 'WHO-5') }}</span>
+                            <span class="text-[10px] sm:text-[11px] text-slate-300 block font-medium mt-0.5">{{ \App\Models\Setting::get('theory_metric3_lbl', 'Well-being Index') }}</span>
                         </div>
                         <div class="bg-white/10 p-3 sm:p-3.5 rounded-2xl border border-white/15 backdrop-blur-md text-left">
-                            <span class="text-lg sm:text-2xl font-black font-mono text-[#C9A24D] block">100%</span>
-                            <span class="text-[10px] sm:text-[11px] text-slate-300 block font-medium mt-0.5">Peer-Reviewed</span>
+                            <span class="text-lg sm:text-2xl font-black font-mono text-[#C9A24D] block">{{ \App\Models\Setting::get('theory_metric4_val', '100%') }}</span>
+                            <span class="text-[10px] sm:text-[11px] text-slate-300 block font-medium mt-0.5">{{ \App\Models\Setting::get('theory_metric4_lbl', 'Peer-Reviewed') }}</span>
                         </div>
                     </div>
                 </div>
@@ -453,36 +453,36 @@
                 <!-- Right: Theoretical Foundation Card (5 cols) -->
                 <div class="lg:col-span-5 bg-white/10 p-5 sm:p-7 rounded-3xl border border-white/20 backdrop-blur-md space-y-4">
                     <h3 class="font-serif font-bold text-base sm:text-lg text-[#C9A24D] flex items-center gap-2">
-                        <span>📚</span> <span>4 Bukti Akademis & Karya Utama</span>
+                        <span>📚</span> <span>{{ \App\Models\Setting::get('theory_card_title', '4 Bukti Akademis & Karya Utama') }}</span>
                     </h3>
 
                     <ul class="space-y-3 text-xs text-slate-200">
                         <li class="flex items-start gap-2.5">
                             <span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold shrink-0 mt-0.5 text-[10px]">✓</span>
                             <div>
-                                <strong class="text-white block font-bold">Buku Monograf Ruhiologi (2025)</strong>
-                                <span class="text-slate-300 text-[11px]">Karya monumental Prof. Dr. Iskandar Nazari penerbit Ruhiology Press.</span>
+                                <strong class="text-white block font-bold">{{ \App\Models\Setting::get('theory_item1_title', 'Buku Monograf Ruhiologi (2025)') }}</strong>
+                                <span class="text-slate-300 text-[11px]">{{ \App\Models\Setting::get('theory_item1_desc', 'Karya monumental Prof. Dr. Iskandar Nazari penerbit Ruhiology Press.') }}</span>
                             </div>
                         </li>
                         <li class="flex items-start gap-2.5">
                             <span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold shrink-0 mt-0.5 text-[10px]">✓</span>
                             <div>
-                                <strong class="text-white block font-bold">Uji Validitas pada {{ number_format($stats['total_participants'] ?? 14000) }}+ Responden</strong>
-                                <span class="text-slate-300 text-[11px]">Meliputi mahasiswa, pelajar, ASN, pendidik, dan praktisi di 38 provinsi.</span>
+                                <strong class="text-white block font-bold">{{ \App\Models\Setting::get('theory_item2_title', 'Uji Validitas pada ' . number_format($stats['total_participants'] ?? 14000) . '+ Responden') }}</strong>
+                                <span class="text-slate-300 text-[11px]">{{ \App\Models\Setting::get('theory_item2_desc', 'Meliputi mahasiswa, pelajar, ASN, pendidik, dan praktisi di 38 provinsi.') }}</span>
                             </div>
                         </li>
                         <li class="flex items-start gap-2.5">
                             <span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold shrink-0 mt-0.5 text-[10px]">✓</span>
                             <div>
-                                <strong class="text-white block font-bold">Mitra Konsorsium PT & Sekolah</strong>
-                                <span class="text-slate-300 text-[11px]">Kerja sama riset pengukuran dengan {{ number_format($stats['total_institutions'] ?? 80) }}+ perguruan tinggi & sekolah.</span>
+                                <strong class="text-white block font-bold">{{ \App\Models\Setting::get('theory_item3_title', 'Mitra Konsorsium PT & Sekolah') }}</strong>
+                                <span class="text-slate-300 text-[11px]">{{ \App\Models\Setting::get('theory_item3_desc', 'Kerja sama riset pengukuran dengan ' . number_format($stats['total_institutions'] ?? 80) . '+ perguruan tinggi & sekolah.') }}</span>
                             </div>
                         </li>
                         <li class="flex items-start gap-2.5">
                             <span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold shrink-0 mt-0.5 text-[10px]">✓</span>
                             <div>
-                                <strong class="text-white block font-bold">Rekomendasi Refleksi & Intervensi</strong>
-                                <span class="text-slate-300 text-[11px]">Setiap skor dilengkapi panduan penataan niat dan purifikasi batin.</span>
+                                <strong class="text-white block font-bold">{{ \App\Models\Setting::get('theory_item4_title', 'Rekomendasi Refleksi & Intervensi') }}</strong>
+                                <span class="text-slate-300 text-[11px]">{{ \App\Models\Setting::get('theory_item4_desc', 'Setiap skor dilengkapi panduan penataan niat dan purifikasi batin.') }}</span>
                             </div>
                         </li>
                     </ul>
@@ -730,17 +730,17 @@
                             <!-- Center Content -->
                             <div class="lg:col-span-7 space-y-3 sm:space-y-4 text-center lg:text-left">
                                 <h2 class="text-2xl sm:text-4xl font-bold font-serif text-[#0B2A43] tracking-tight">
-                                    {{ $isEn ? 'Discover Your Ruhiology Profile' : 'Kenali Profil Ruhiologi Anda' }}
+                                    {{ \App\Models\Setting::get('profile_title', $isEn ? 'Discover Your Ruhiology Profile' : 'Kenali Profil Ruhiologi Anda') }}
                                 </h2>
                                 <p class="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
-                                    {{ $isEn ? 'The RQ Assessment is scientifically designed to evaluate the 5 Ruhiology Intelligence Dimensions (RQI-15) alongside the WHO-5 Mental Well-Being Index.' : 'RQ Assessment dirancang sebagai instrumen ilmiah terstruktur untuk memetakan 5 Pilar Dimensi Ruhiologi (RQI-15) dan Indeks Kesejahteraan Mental (WHO-5).' }}
+                                    {{ \App\Models\Setting::get('profile_description', $isEn ? 'The RQ Assessment is scientifically designed to evaluate the 6 Ruhiology Intelligence Dimensions (RQI-15) alongside the WHO-5 Mental Well-Being Index.' : 'RQ Assessment dirancang sebagai instrumen ilmiah terstruktur untuk memetakan 6 Pilar Dimensi Ruhiologi (RQI-15) dan Indeks Kesejahteraan Mental (WHO-5).') }}
                                 </p>
                                 <div class="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-3">
                                     <a href="{{ route('assessment.index') }}" class="px-7 py-3.5 bg-[#0B2A43] hover:bg-[#123B59] text-white rounded-full text-xs font-bold uppercase tracking-wider shadow-md transition-transform hover:scale-105 inline-flex items-center gap-2 min-h-[44px]">
-                                        <span>{{ $isEn ? 'Start Assessment' : 'Mulai Assessment' }}</span> <span>→</span>
+                                        <span>{{ \App\Models\Setting::get('profile_btn1_text', $isEn ? 'Start Assessment' : 'Mulai Assessment') }}</span> <span>→</span>
                                     </a>
                                     <a href="{{ route('assessment.index') }}#cek-hasil" class="px-5 py-3.5 bg-white hover:bg-slate-50 text-[#0B2A43] border border-slate-300 rounded-full text-xs font-bold tracking-wider shadow-2xs transition inline-flex items-center gap-2 min-h-[44px]">
-                                        <span>🔍 {{ $isEn ? 'Check My Results / Certificate' : 'Cek Hasil / Sertifikat Saya' }}</span>
+                                        <span>🔍 {{ \App\Models\Setting::get('profile_btn2_text', $isEn ? 'Check My Results / Certificate' : 'Cek Hasil / Sertifikat Saya') }}</span>
                                     </a>
                                 </div>
                             </div>
@@ -752,7 +752,7 @@
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                     </div>
                                     <div>
-                                        <strong class="text-[#0B2A43] block font-bold">{{ $isEn ? 'Structured Scale (20 Questions)' : 'Instrumen Terstruktur (20 Soal)' }}</strong>
+                                        <strong class="text-[#0B2A43] block font-bold">{{ \App\Models\Setting::get('profile_bullet1', $isEn ? 'Structured Scale (20 Questions)' : 'Instrumen Terstruktur (20 Soal)') }}</strong>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-3 text-xs sm:text-sm">
@@ -760,7 +760,7 @@
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                                     </div>
                                     <div>
-                                        <strong class="text-[#0B2A43] block font-bold">{{ $isEn ? 'Dual-Pillar & Radar Chart Report' : 'Laporan Dual-Pilar & Radar' }}</strong>
+                                        <strong class="text-[#0B2A43] block font-bold">{{ \App\Models\Setting::get('profile_bullet2', $isEn ? 'Dual-Pillar & Radar Chart Report' : 'Laporan Dual-Pilar & Radar') }}</strong>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-3 text-xs sm:text-sm">
@@ -768,27 +768,27 @@
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                                     </div>
                                     <div>
-                                        <strong class="text-[#0B2A43] block font-bold">{{ $isEn ? 'Official Certificate & Story Card' : 'Sertifikat Resmi & Kartu Story' }}</strong>
+                                        <strong class="text-[#0B2A43] block font-bold">{{ \App\Models\Setting::get('profile_bullet3', $isEn ? 'Official Certificate & Story Card' : 'Sertifikat Resmi & Kartu Story') }}</strong>
                                     </div>
                                 </div>
                             </div>
 
                         </div>
 
-                        <!-- 5 Dimensi Pengukuran RQ Grid -->
+                        <!-- 6 Dimensi Pengukuran RQ Grid -->
                         <div class="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-slate-300/80">
                             <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                                 <span class="text-xs font-bold text-[#0B2A43] uppercase tracking-wider font-mono flex items-center gap-1.5">
-                                    <span>✨</span> <span>{{ $isEn ? '5 RQI-15 Pillars + WHO-5 Well-Being' : '5 Pilar Pengukuran RQI-15 + WHO-5' }}</span>
+                                    <span>✨</span> <span>{{ \App\Models\Setting::get('profile_pills_title', $isEn ? '6 Dimensions: RQI-15 Pillars + WHO-5 Well-Being' : '6 Dimensi Pengukuran: Pilar RQI-15 + Indeks WHO-5') }}</span>
                                 </span>
                                 <span class="text-[10px] sm:text-[11px] font-mono font-bold text-emerald-800 bg-emerald-100/80 px-2.5 py-0.5 rounded-full border border-emerald-300">
                                     📊 {{ number_format($stats['total_participants'] ?? 14000) }}+ {{ $isEn ? 'Participants Assessed' : 'Peserta Terukur' }}
                                 </span>
                             </div>
-                            <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
                                 <a href="#dimensi-rqi" class="bg-white hover:bg-amber-50/70 p-2.5 rounded-xl border border-slate-200 hover:border-[#C9A24D] text-center space-y-0.5 shadow-2xs transition group">
                                     <span class="text-sm inline-block group-hover:scale-110 transition-transform">🌌</span>
-                                    <div class="text-[10px] font-bold text-[#0B2A43]">{{ $isEn ? 'Divine Awareness (God Spot)' : 'Kesadaran Ilahi (God Spot)' }}</div>
+                                    <div class="text-[10px] font-bold text-[#0B2A43]">{{ $isEn ? 'Divine Awareness' : 'Kesadaran Ilahi' }}</div>
                                 </a>
                                 <a href="#dimensi-rqi" class="bg-white hover:bg-amber-50/70 p-2.5 rounded-xl border border-slate-200 hover:border-[#C9A24D] text-center space-y-0.5 shadow-2xs transition group">
                                     <span class="text-sm inline-block group-hover:scale-110 transition-transform">🕌</span>
@@ -796,15 +796,19 @@
                                 </a>
                                 <a href="#dimensi-rqi" class="bg-white hover:bg-amber-50/70 p-2.5 rounded-xl border border-slate-200 hover:border-[#C9A24D] text-center space-y-0.5 shadow-2xs transition group">
                                     <span class="text-sm inline-block group-hover:scale-110 transition-transform">🌿</span>
-                                    <div class="text-[10px] font-bold text-[#0B2A43]">{{ $isEn ? 'Inner Purification (Tazkiyah)' : 'Purifikasi Batin (Tazkiyah)' }}</div>
+                                    <div class="text-[10px] font-bold text-[#0B2A43]">{{ $isEn ? 'Inner Purification' : 'Purifikasi Batin' }}</div>
                                 </a>
                                 <a href="#dimensi-rqi" class="bg-white hover:bg-amber-50/70 p-2.5 rounded-xl border border-slate-200 hover:border-[#C9A24D] text-center space-y-0.5 shadow-2xs transition group">
                                     <span class="text-sm inline-block group-hover:scale-110 transition-transform">🤝</span>
-                                    <div class="text-[10px] font-bold text-[#0B2A43]">{{ $isEn ? 'Noble Character & Social Care' : 'Akhlak & Kepedulian Sosial' }}</div>
+                                    <div class="text-[10px] font-bold text-[#0B2A43]">{{ $isEn ? 'Social Ethics' : 'Akhlak Sosial' }}</div>
                                 </a>
-                                <a href="#dimensi-rqi" class="bg-white hover:bg-amber-50/70 p-2.5 rounded-xl border border-slate-200 hover:border-[#C9A24D] text-center space-y-0.5 shadow-2xs col-span-2 sm:col-span-1 transition group">
+                                <a href="#dimensi-rqi" class="bg-white hover:bg-amber-50/70 p-2.5 rounded-xl border border-slate-200 hover:border-[#C9A24D] text-center space-y-0.5 shadow-2xs transition group">
                                     <span class="text-sm inline-block group-hover:scale-110 transition-transform">🛡️</span>
-                                    <div class="text-[10px] font-bold text-[#0B2A43]">{{ $isEn ? 'Resilience & Soul Strength' : 'Ketangguhan & Resiliensi' }}</div>
+                                    <div class="text-[10px] font-bold text-[#0B2A43]">{{ $isEn ? 'Soul Resilience' : 'Resiliensi Jiwa' }}</div>
+                                </a>
+                                <a href="#dimensi-rqi" class="bg-emerald-50 hover:bg-emerald-100/70 p-2.5 rounded-xl border border-emerald-200 hover:border-emerald-400 text-center space-y-0.5 shadow-2xs transition group">
+                                    <span class="text-sm inline-block group-hover:scale-110 transition-transform">💚</span>
+                                    <div class="text-[10px] font-bold text-emerald-900">{{ $isEn ? 'WHO-5 Well-Being' : 'Kesejahteraan Mental (WHO-5)' }}</div>
                                 </a>
                             </div>
                         </div>
@@ -817,14 +821,16 @@
     </section>
 
     <!-- SECTION 3.5: ALUR 4 LANGKAH MUDAH ASSESSMENT RQ -->
-    <section class="py-14 sm:py-20 bg-[#F8F6F0] border-y border-slate-200/80">
+    <section id="alur-asesmen" class="py-14 sm:py-20 bg-[#F8F6F0] border-y border-slate-200/80 scroll-mt-20">
         <div class="max-w-[1280px] mx-auto px-4 sm:px-10">
             <div class="text-center max-w-2xl mx-auto mb-10 sm:mb-14 space-y-2">
-                <span class="text-xs font-mono font-bold text-[#C9A24D] uppercase tracking-widest block">✦ {{ $isEn ? 'ASSESSMENT PROCESS & STEPS' : 'ALUR & PROSES EVALUASI' }}</span>
+                <span class="text-xs font-mono font-bold text-[#C9A24D] uppercase tracking-widest block">{{ \App\Models\Setting::get('flow_badge', $isEn ? '✦ ASSESSMENT PROCESS & STEPS' : '✦ ALUR & PROSES EVALUASI') }}</span>
                 <h2 class="font-serif text-2xl sm:text-4xl font-bold text-[#0B2A43] tracking-tight">
-                    {{ $isEn ? '4 Simple Steps to Complete Your RQ Assessment' : '4 Langkah Mudah Mengikuti Assessment RQ' }}
+                    {{ \App\Models\Setting::get('flow_title', $isEn ? '4 Simple Steps to Complete Your RQ Assessment' : '4 Langkah Mudah Mengikuti Assessment RQ') }}
                 </h2>
-                <p class="text-xs sm:text-sm text-slate-600 font-normal">{{ $isEn ? 'A structured and streamlined evaluation process from intake to executive recommendations.' : 'Proses praktis dan terstruktur dari registrasi hingga lembar rekomendasi potensi.' }}</p>
+                <p class="text-xs sm:text-sm text-slate-600 font-normal">
+                    {{ \App\Models\Setting::get('flow_description', $isEn ? 'A structured and streamlined evaluation process from intake to executive recommendations.' : 'Proses praktis dan terstruktur dari registrasi hingga lembar rekomendasi potensi.') }}
+                </p>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 relative">
@@ -834,15 +840,17 @@
                     <div class="space-y-3 sm:space-y-4">
                         <div class="flex items-center justify-between">
                             <span class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-[#0B2A43] group-hover:bg-[#C9A24D] group-hover:text-[#0B2A43] text-white font-mono font-bold text-base sm:text-lg flex items-center justify-center shadow-sm transition-colors">01</span>
-                            <span class="text-xl sm:text-2xl group-hover:scale-110 transition-transform">📝</span>
+                            <span class="text-xl sm:text-2xl group-hover:scale-110 transition-transform">{{ \App\Models\Setting::get('flow_step1_icon', '📝') }}</span>
                         </div>
-                        <h3 class="font-serif font-bold text-base text-[#0B2A43] group-hover:text-[#B48A16] transition-colors">{{ $isEn ? 'Data Intake & Code' : 'Intake Data & Kode' }}</h3>
+                        <h3 class="font-serif font-bold text-base text-[#0B2A43] group-hover:text-[#B48A16] transition-colors">
+                            {{ \App\Models\Setting::get('flow_step1_title', $isEn ? 'Data Intake & Code' : 'Intake Data & Kode') }}
+                        </h3>
                         <p class="text-xs text-slate-600 leading-relaxed">
-                            {{ $isEn ? 'Select Individual Assessment or enter the Event Access Code provided by your institution/campus/school.' : 'Pilih jalur Asesmen Mandiri atau masukkan Kode Akses Event dari kampus/sekolah/instansi Anda.' }}
+                            {{ \App\Models\Setting::get('flow_step1_desc', $isEn ? 'Select Individual Assessment or enter the Event Access Code provided by your institution/campus/school.' : 'Pilih jalur Asesmen Mandiri atau masukkan Kode Akses Event dari kampus/sekolah/instansi Anda.') }}
                         </p>
                     </div>
                     <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-[#C9A24D] group-hover:text-[#0B2A43] transition-colors">
-                        <span>{{ $isEn ? 'Instant Access' : 'Akses Instan' }}</span>
+                        <span>{{ \App\Models\Setting::get('flow_step1_tag', $isEn ? 'Instant Access' : 'Akses Instan') }}</span>
                         <span class="transform group-hover:translate-x-1 transition-transform">➔</span>
                     </div>
                 </a>
@@ -852,15 +860,17 @@
                     <div class="space-y-3 sm:space-y-4">
                         <div class="flex items-center justify-between">
                             <span class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-[#0B2A43] group-hover:bg-[#C9A24D] group-hover:text-[#0B2A43] text-white font-mono font-bold text-base sm:text-lg flex items-center justify-center shadow-sm transition-colors">02</span>
-                            <span class="text-xl sm:text-2xl group-hover:scale-110 transition-transform">⏱️</span>
+                            <span class="text-xl sm:text-2xl group-hover:scale-110 transition-transform">{{ \App\Models\Setting::get('flow_step2_icon', '⏱️') }}</span>
                         </div>
-                        <h3 class="font-serif font-bold text-base text-[#0B2A43] group-hover:text-[#B48A16] transition-colors">{{ $isEn ? '10-15 Min Test' : 'Pengerjaan 10-15 Menit' }}</h3>
+                        <h3 class="font-serif font-bold text-base text-[#0B2A43] group-hover:text-[#B48A16] transition-colors">
+                            {{ \App\Models\Setting::get('flow_step2_title', $isEn ? '10-15 Min Test' : 'Pengerjaan 10-15 Menit') }}
+                        </h3>
                         <p class="text-xs text-slate-600 leading-relaxed">
-                            {{ $isEn ? 'Answer 20 structured items (15 RQI & 5 WHO-5) with real-time automatic saving on your device.' : 'Isikan 20 pernyataan terstruktur (15 butir RQI & 5 butir WHO-5) dengan fitur auto-save otomatis.' }}
+                            {{ \App\Models\Setting::get('flow_step2_desc', $isEn ? 'Answer 20 structured items (15 RQI & 5 WHO-5) with real-time automatic saving on your device.' : 'Isikan 20 pernyataan terstruktur (15 butir RQI & 5 butir WHO-5) dengan fitur auto-save otomatis.') }}
                         </p>
                     </div>
                     <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-[#C9A24D] group-hover:text-[#0B2A43] transition-colors">
-                        <span>20 {{ $isEn ? 'Questions' : 'Pertanyaan' }}</span>
+                        <span>{{ \App\Models\Setting::get('flow_step2_tag', '20 Pertanyaan') }}</span>
                         <span class="transform group-hover:translate-x-1 transition-transform">➔</span>
                     </div>
                 </a>
@@ -870,15 +880,17 @@
                     <div class="space-y-3 sm:space-y-4">
                         <div class="flex items-center justify-between">
                             <span class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-[#0B2A43] group-hover:bg-[#C9A24D] group-hover:text-[#0B2A43] text-white font-mono font-bold text-base sm:text-lg flex items-center justify-center shadow-sm transition-colors">03</span>
-                            <span class="text-xl sm:text-2xl group-hover:scale-110 transition-transform">📊</span>
+                            <span class="text-xl sm:text-2xl group-hover:scale-110 transition-transform">{{ \App\Models\Setting::get('flow_step3_icon', '📊') }}</span>
                         </div>
-                        <h3 class="font-serif font-bold text-base text-[#0B2A43] group-hover:text-[#B48A16] transition-colors">{{ $isEn ? 'Dual-Pillar Scoring' : 'Kalkulasi Dual-Pilar' }}</h3>
+                        <h3 class="font-serif font-bold text-base text-[#0B2A43] group-hover:text-[#B48A16] transition-colors">
+                            {{ \App\Models\Setting::get('flow_step3_title', $isEn ? 'Dual-Pillar Scoring' : 'Kalkulasi Dual-Pilar') }}
+                        </h3>
                         <p class="text-xs text-slate-600 leading-relaxed">
-                            {{ $isEn ? 'Instant psychometric calculation for RQI-15 (15-75 Pts), WHO-5 Index (0-100%), and 5-Dimension Radar Balance.' : 'Sistem secara instan menghitung skor RQI-15 (15–75 Poin), Indeks WHO-5 (0–100%), dan Grafik Radar 5 Dimensi.' }}
+                            {{ \App\Models\Setting::get('flow_step3_desc', $isEn ? 'Instant psychometric calculation for RQI-15 (15-75 Pts), WHO-5 Index (0-100%), and 6-Dimension Radar Balance.' : 'Sistem secara instan menghitung skor RQI-15 (15–75 Poin), Indeks WHO-5 (0–100%), dan Grafik Radar 6 Dimensi.') }}
                         </p>
                     </div>
                     <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-[#C9A24D] group-hover:text-[#0B2A43] transition-colors">
-                        <span>{{ $isEn ? 'Instant Calculation' : 'Kalkulasi Instan' }}</span>
+                        <span>{{ \App\Models\Setting::get('flow_step3_tag', $isEn ? 'Instant Calculation' : 'Kalkulasi Instan') }}</span>
                         <span class="transform group-hover:translate-x-1 transition-transform">➔</span>
                     </div>
                 </a>
@@ -888,15 +900,17 @@
                     <div class="space-y-3 sm:space-y-4">
                         <div class="flex items-center justify-between">
                             <span class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-emerald-600 group-hover:bg-emerald-500 text-white font-mono font-bold text-base sm:text-lg flex items-center justify-center shadow-sm transition-colors">04</span>
-                            <span class="text-xl sm:text-2xl group-hover:scale-110 transition-transform">📄</span>
+                            <span class="text-xl sm:text-2xl group-hover:scale-110 transition-transform">{{ \App\Models\Setting::get('flow_step4_icon', '📄') }}</span>
                         </div>
-                        <h3 class="font-serif font-bold text-base text-[#0B2A43] group-hover:text-emerald-700 transition-colors">{{ $isEn ? 'Report & Certificate' : 'Laporan & Sertifikat' }}</h3>
+                        <h3 class="font-serif font-bold text-base text-[#0B2A43] group-hover:text-emerald-700 transition-colors">
+                            {{ \App\Models\Setting::get('flow_step4_title', $isEn ? 'Report & Certificate' : 'Laporan & Sertifikat') }}
+                        </h3>
                         <p class="text-xs text-slate-600 leading-relaxed">
-                            {{ $isEn ? 'Download your Official A4 Certificate, Executive PDF Report, and 4:5 Social Media Story Card.' : 'Unduh Sertifikat Resmi A4, Laporan PDF Eksekutif, serta Kartu Shareable 4:5 untuk Instagram/WhatsApp.' }}
+                            {{ \App\Models\Setting::get('flow_step4_desc', $isEn ? 'Download your Official A4 Certificate, Executive PDF Report, and 4:5 Social Media Story Card.' : 'Unduh Sertifikat Resmi A4, Laporan PDF Eksekutif, serta Kartu Shareable 4:5 untuk Instagram/WhatsApp.') }}
                         </p>
                     </div>
                     <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-emerald-600 group-hover:text-emerald-800 transition-colors">
-                        <span>{{ $isEn ? 'Download Certificate & Card' : 'Unduh Sertifikat & Kartu' }}</span>
+                        <span>{{ \App\Models\Setting::get('flow_step4_tag', $isEn ? 'Download Certificate & Card' : 'Unduh Sertifikat & Kartu') }}</span>
                         <span class="transform group-hover:translate-x-1 transition-transform">➔</span>
                     </div>
                 </a>
@@ -905,30 +919,33 @@
         </div>
     </section>
 
-    <!-- SECTION 4: 5 PILAR DIMENSI RUHIOLOGI -->
+    <!-- SECTION 4: 6 PILAR DIMENSI RUHIOLOGI & WHO-5 -->
     <section id="dimensi-rqi" class="py-14 sm:py-20 bg-[#0B2A43] text-white scroll-mt-20">
         <div class="max-w-[1280px] mx-auto px-4 sm:px-10">
-            <div class="text-center max-w-2xl mx-auto mb-10 sm:mb-12">
-                <span class="text-xs font-bold text-[#C9A24D] uppercase tracking-widest block mb-2 font-mono">✦ {{ $isEn ? 'THEORETICAL FRAMEWORK & PILLARS' : 'Dimensi & Kerangka Teori' }}</span>
+            <div class="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
+                <span class="text-xs font-bold text-[#C9A24D] uppercase tracking-widest block mb-2 font-mono">{{ \App\Models\Setting::get('dimensi_badge', $isEn ? '✦ THEORETICAL FRAMEWORK & PILLARS' : '✦ Dimensi & Kerangka Teori') }}</span>
                 <h2 class="font-serif text-2xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight">
-                    {{ $isEn ? 'Five Core Pillars of Ruhiology Quotient (RQI-15)' : 'Lima Pilar Dimensi Kecerdasan Ruhiologi (RQI-15)' }}
+                    {{ \App\Models\Setting::get('dimensi_title', $isEn ? 'Six Core Pillars of Ruhiology Quotient & Well-Being (RQI-15 + WHO-5)' : 'Enam Pilar Dimensi Kecerdasan Ruhiologi & Kesejahteraan Jiwa (RQI-15 + WHO-5)') }}
                 </h2>
                 <p class="text-slate-200 text-xs sm:text-sm mt-3 font-normal leading-relaxed">
-                    {{ $isEn ? 'The five foundational pillars formulated by Prof. Dr. Iskandar Nazari as the central intelligence and equilibrium of human potential.' : 'Lima pilar utama yang dirumuskan oleh Prof. Dr. Iskandar Nazari sebagai pusat inteligensi dan keseimbangan potensi kemanusiaan.' }}
+                    {{ \App\Models\Setting::get('dimensi_subtitle', $isEn ? 'The six foundational pillars formulated by Prof. Dr. Iskandar Nazari alongside the WHO standard index as the central intelligence and equilibrium of human potential.' : 'Enam pilar utama yang dirumuskan oleh Prof. Dr. Iskandar Nazari bersama indeks standar WHO sebagai pusat inteligensi dan keseimbangan potensi kemanusiaan paripurna.') }}
                 </p>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-5">
+            <!-- 6 Pillars Cards Grid (3x2 Balanced Layout) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
                 
                 <!-- Pilar 1 -->
                 <div class="bg-white/10 p-5 sm:p-6 rounded-3xl border border-white/15 backdrop-blur-md flex flex-col justify-between hover:bg-white/15 transition duration-300">
                     <div>
                         <div class="w-10 h-10 rounded-2xl bg-[#C9A24D]/20 text-[#C9A24D] flex items-center justify-center font-bold text-lg mb-4 border border-[#C9A24D]/30">
-                            ✦
+                            {{ \App\Models\Setting::get('pillar1_icon', '✦') }}
                         </div>
-                        <h3 class="font-serif font-bold text-base text-white mb-2 tracking-tight">{{ $isEn ? '1. Divine Awareness (God Spot)' : '1. Kesadaran Ketuhanan (God Spot)' }}</h3>
+                        <h3 class="font-serif font-bold text-base text-white mb-2 tracking-tight">
+                            {{ \App\Models\Setting::get('pillar1_title', $isEn ? '1. Divine Awareness (God Spot)' : '1. Kesadaran Ketuhanan (God Spot)') }}
+                        </h3>
                         <p class="text-xs text-slate-200 leading-relaxed font-normal">
-                            {{ $isEn ? 'Deep consciousness of divine presence, sincerity of purpose, and transcendental orientation in life.' : 'Kesadaran mendalam akan kehadiran Sang Pencipta, keikhlasan niat, dan orientasi hidup transendental.' }}
+                            {{ \App\Models\Setting::get('pillar1_desc', $isEn ? 'Deep consciousness of divine presence, sincerity of purpose, and transcendental orientation in life.' : 'Kesadaran mendalam akan kehadiran Sang Pencipta, keikhlasan niat, dan orientasi hidup transendental.') }}
                         </p>
                     </div>
                 </div>
@@ -937,11 +954,13 @@
                 <div class="bg-white/10 p-5 sm:p-6 rounded-3xl border border-white/15 backdrop-blur-md flex flex-col justify-between hover:bg-white/15 transition duration-300">
                     <div>
                         <div class="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-300 flex items-center justify-center font-bold text-lg mb-4 border border-amber-400/30">
-                            🕌
+                            {{ \App\Models\Setting::get('pillar2_icon', '🕌') }}
                         </div>
-                        <h3 class="font-serif font-bold text-base text-white mb-2 tracking-tight">{{ $isEn ? '2. Spiritual Devotion & Practice' : '2. Ketaatan Spiritual & Ibadah' }}</h3>
+                        <h3 class="font-serif font-bold text-base text-white mb-2 tracking-tight">
+                            {{ \App\Models\Setting::get('pillar2_title', $isEn ? '2. Spiritual Devotion & Practice' : '2. Ketaatan Spiritual & Ibadah') }}
+                        </h3>
                         <p class="text-xs text-slate-200 leading-relaxed font-normal">
-                            {{ $isEn ? 'Consistent discipline in worship rituals, prayer, contemplation, and strengthening the vertical bond with God.' : 'Kedisiplinan ibadah ritual, penghayatan doa/zikir, dan konsistensi menjaga hubungan vertikal.' }}
+                            {{ \App\Models\Setting::get('pillar2_desc', $isEn ? 'Consistent discipline in worship rituals, prayer, contemplation, and strengthening the vertical bond with God.' : 'Kedisiplinan ibadah ritual, penghayatan doa/zikir, dan konsistensi menjaga hubungan vertikal.') }}
                         </p>
                     </div>
                 </div>
@@ -950,11 +969,13 @@
                 <div class="bg-white/10 p-5 sm:p-6 rounded-3xl border border-white/15 backdrop-blur-md flex flex-col justify-between hover:bg-white/15 transition duration-300">
                     <div>
                         <div class="w-10 h-10 rounded-2xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold text-lg mb-4 border border-emerald-400/30">
-                            ✨
+                            {{ \App\Models\Setting::get('pillar3_icon', '✨') }}
                         </div>
-                        <h3 class="font-serif font-bold text-base text-white mb-2 tracking-tight">{{ $isEn ? '3. Inner Purification (Tazkiyah)' : '3. Purifikasi Batin (Tazkiyah)' }}</h3>
+                        <h3 class="font-serif font-bold text-base text-white mb-2 tracking-tight">
+                            {{ \App\Models\Setting::get('pillar3_title', $isEn ? '3. Inner Purification (Tazkiyah)' : '3. Purifikasi Batin (Tazkiyah)') }}
+                        </h3>
                         <p class="text-xs text-slate-200 leading-relaxed font-normal">
-                            {{ $isEn ? 'Purity of heart from envy, arrogance, intellectual pride, and cultivating sincere conscience and integrity.' : 'Kebersihan hati dari penyakit iri, dengki, keangkuhan intelektual, serta kejujuran nurani.' }}
+                            {{ \App\Models\Setting::get('pillar3_desc', $isEn ? 'Purity of heart from envy, arrogance, intellectual pride, and cultivating sincere conscience and integrity.' : 'Kebersihan hati dari penyakit iri, dengki, keangkuhan intelektual, serta kejujuran nurani.') }}
                         </p>
                     </div>
                 </div>
@@ -963,37 +984,56 @@
                 <div class="bg-white/10 p-5 sm:p-6 rounded-3xl border border-white/15 backdrop-blur-md flex flex-col justify-between hover:bg-white/15 transition duration-300">
                     <div>
                         <div class="w-10 h-10 rounded-2xl bg-sky-500/20 text-sky-300 flex items-center justify-center font-bold text-lg mb-4 border border-sky-400/30">
-                            🤝
+                            {{ \App\Models\Setting::get('pillar4_icon', '🤝') }}
                         </div>
-                        <h3 class="font-serif font-bold text-base text-white mb-2 tracking-tight">{{ $isEn ? '4. Noble Character & Social Care' : '4. Akhlak & Kepedulian Sosial' }}</h3>
+                        <h3 class="font-serif font-bold text-base text-white mb-2 tracking-tight">
+                            {{ \App\Models\Setting::get('pillar4_title', $isEn ? '4. Noble Character & Social Care' : '4. Akhlak & Kepedulian Sosial') }}
+                        </h3>
                         <p class="text-xs text-slate-200 leading-relaxed font-normal">
-                            {{ $isEn ? 'Graceful social conduct, genuine empathy, and altruistic actions that bring tangible benefit to society.' : 'Adab pergaulan, empati tulus, dan keberfungsian sosial yang membawa manfaat nyata bagi sesama.' }}
+                            {{ \App\Models\Setting::get('pillar4_desc', $isEn ? 'Graceful social conduct, genuine empathy, and altruistic actions that bring tangible benefit to society.' : 'Adab pergaulan, empati tulus, dan keberfungsian sosial yang membawa manfaat nyata bagi sesama.') }}
                         </p>
                     </div>
                 </div>
 
                 <!-- Pilar 5 -->
-                <div class="bg-white/10 p-5 sm:p-6 rounded-3xl border border-white/15 backdrop-blur-md flex flex-col justify-between hover:bg-white/15 transition duration-300 sm:col-span-2 lg:col-span-1">
+                <div class="bg-white/10 p-5 sm:p-6 rounded-3xl border border-white/15 backdrop-blur-md flex flex-col justify-between hover:bg-white/15 transition duration-300">
                     <div>
                         <div class="w-10 h-10 rounded-2xl bg-purple-500/20 text-purple-300 flex items-center justify-center font-bold text-lg mb-4 border border-purple-400/30">
-                            🛡️
+                            {{ \App\Models\Setting::get('pillar5_icon', '🛡️') }}
                         </div>
-                        <h3 class="font-serif font-bold text-base text-white mb-2 tracking-tight">{{ $isEn ? '5. Soul Resilience & Fortitude' : '5. Ketangguhan & Resiliensi Jiwa' }}</h3>
+                        <h3 class="font-serif font-bold text-base text-white mb-2 tracking-tight">
+                            {{ \App\Models\Setting::get('pillar5_title', $isEn ? '5. Soul Resilience & Fortitude' : '5. Ketangguhan & Resiliensi Jiwa') }}
+                        </h3>
                         <p class="text-xs text-slate-200 leading-relaxed font-normal">
-                            {{ $isEn ? 'Inner serenity, patience when facing trials and crises, and faith-driven optimism to rebound.' : 'Ketenangan batin, kesabaran menghadapi tekanan/ujian hidup, dan optimisme bangkit dari kesulitan.' }}
+                            {{ \App\Models\Setting::get('pillar5_desc', $isEn ? 'Inner serenity, patience when facing trials and crises, and faith-driven optimism to rebound.' : 'Ketenangan batin, kesabaran menghadapi tekanan/ujian hidup, dan optimisme bangkit dari kesulitan.') }}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Pilar 6 (WHO-5 Mental Well-Being) -->
+                <div class="bg-emerald-950/40 p-5 sm:p-6 rounded-3xl border-2 border-emerald-400/40 backdrop-blur-md flex flex-col justify-between hover:bg-emerald-900/40 transition duration-300 shadow-lg shadow-emerald-950/50">
+                    <div>
+                        <div class="w-10 h-10 rounded-2xl bg-emerald-500/30 text-emerald-300 flex items-center justify-center font-bold text-lg mb-4 border border-emerald-400/50">
+                            {{ \App\Models\Setting::get('pillar6_icon', '💚') }}
+                        </div>
+                        <h3 class="font-serif font-bold text-base text-emerald-200 mb-2 tracking-tight">
+                            {{ \App\Models\Setting::get('pillar6_title', $isEn ? '6. Mental Well-Being (WHO-5)' : '6. Kesejahteraan Mental (WHO-5)') }}
+                        </h3>
+                        <p class="text-xs text-emerald-100/90 leading-relaxed font-normal">
+                            {{ \App\Models\Setting::get('pillar6_desc', $isEn ? 'Psychological vitality, calmness, positive daily mood, and emotional equilibrium evaluated through the WHO-5 standard.' : 'Vitalitas psikologis, ketenangan suasana hati, energi positif, dan kesejahteraan emosional berstandar WHO.') }}
                         </p>
                     </div>
                 </div>
 
             </div>
 
-            <!-- Interactive Radar Chart Visualizer (5 Dimensi Balance) -->
+            <!-- Interactive Radar Chart Visualizer (6 Dimensi Balance) -->
             <div class="mt-12 pt-10 border-t border-white/10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                 <div class="lg:col-span-5 bg-white/10 p-6 rounded-3xl border border-white/20 backdrop-blur-md">
                     <h4 class="font-serif font-bold text-base text-[#C9A24D] mb-1 flex items-center gap-2">
-                        <span>🕸️</span> <span>{{ $isEn ? '5-Dimension RQ Balance Visualization' : 'Visualisasi Balance 5 Dimensi RQ' }}</span>
+                        <span>🕸️</span> <span>{{ $isEn ? '6-Dimension RQ Balance Visualization' : 'Visualisasi Keseimbangan 6 Dimensi RQ & WHO-5' }}</span>
                     </h4>
-                    <p class="text-xs text-slate-200 mb-4">{{ $isEn ? 'Proportional equilibrium chart of spiritual dimensions from structured assessment results.' : 'Grafik keseimbangan potensi ruhiologi dari hasil asesmen terstruktur.' }}</p>
+                    <p class="text-xs text-slate-200 mb-4">{{ $isEn ? 'Proportional equilibrium chart of spiritual dimensions from structured assessment results.' : 'Grafik keseimbangan 6 potensi ruhiologi & kesehatan mental dari hasil asesmen terstruktur.' }}</p>
                     <div class="relative w-full aspect-square max-w-xs mx-auto">
                         <canvas id="landingRadarChart"></canvas>
                     </div>
@@ -1006,7 +1046,7 @@
                         {{ $isEn ? 'Harmonious Balance of Inner Soul, Mind, & Ethical Action' : 'Keseimbangan Integratif Antara Batin, Pikiran, & Aksi Real' }}
                     </h3>
                     <p class="text-xs sm:text-sm text-slate-200 leading-relaxed font-normal">
-                        {{ $isEn ? 'Ruhiology Quotient (RQ) measures the harmonious integration between transcendental awareness, devotional practice, emotional purity, social ethics, and psychological well-being (WHO-5).' : 'Kecerdasan Ruhiologi (RQ) mengukur integrasi harmonis antara kesadaran ketuhanan, ketaatan spiritual, kebersihan batin, akhlak sosial, dan ketangguhan mental (WHO-5).' }}
+                        {{ $isEn ? 'Ruhiology Quotient (RQ) measures the harmonious integration between transcendental awareness, devotional practice, emotional purity, social ethics, soul resilience, and psychological well-being (WHO-5).' : 'Kecerdasan Ruhiologi (RQ) mengukur integrasi harmonis antara kesadaran ketuhanan, ketaatan spiritual, kebersihan batin, akhlak sosial, resiliensi jiwa, dan ketangguhan mental (WHO-5).' }}
                     </p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                         <div class="p-3.5 bg-white/10 rounded-2xl border border-white/10">
@@ -1022,7 +1062,7 @@
                             <span class="text-[11px] text-slate-300">{{ $isEn ? 'Empathy, ethics, and meaningful contribution to others.' : 'Adab, empati, & kontribusi bagi sesama.' }}</span>
                         </div>
                         <div class="p-3.5 bg-white/10 rounded-2xl border border-white/10">
-                            <strong class="text-xs text-emerald-300 block font-bold">{{ $isEn ? '4. Resilience & WHO-5 Screening' : '4. Resiliensi & Skrining WHO-5' }}</strong>
+                            <strong class="text-xs text-emerald-300 block font-bold">{{ $isEn ? '4. Resilience & WHO-5 Well-Being' : '4. Resiliensi Jiwa & Skrining WHO-5' }}</strong>
                             <span class="text-[11px] text-slate-300">{{ $isEn ? 'Stress coping, emotional vitality, and flourishing.' : 'Ketangguhan menghadapi stres & kesejahteraan mental.' }}</span>
                         </div>
                     </div>
@@ -1447,21 +1487,23 @@ document.addEventListener('DOMContentLoaded', function() {
             type: 'radar',
             data: {
                 labels: isEn ? [
-                    'Transcendence',
-                    'Inner Purity',
-                    'Sincere Intention',
-                    'Altruism',
-                    'Social Action'
+                    'Divine Awareness',
+                    'Spiritual Devotion',
+                    'Inner Purification',
+                    'Social Ethics',
+                    'Soul Resilience',
+                    'WHO-5 Well-Being'
                 ] : [
-                    'Transendental',
-                    'Tazkiyah Mental',
-                    'Niat Intensional',
-                    'Altruisme',
-                    'Fungsi Sosial'
+                    'Kesadaran Ilahi',
+                    'Ketaatan Spiritual',
+                    'Purifikasi Batin',
+                    'Akhlak Sosial',
+                    'Resiliensi Jiwa',
+                    'Kesejahteraan Mental (WHO-5)'
                 ],
                 datasets: [{
-                    label: isEn ? 'Benchmark RQI (%)' : 'Benchmark RQI (%)',
-                    data: [88, 82, 90, 85, 84],
+                    label: isEn ? 'Benchmark RQI + WHO-5 (%)' : 'Benchmark RQI + WHO-5 (%)',
+                    data: [88, 85, 84, 88, 82, 86],
                     backgroundColor: 'rgba(201, 162, 77, 0.25)',
                     borderColor: '#C9A24D',
                     borderWidth: 2,
