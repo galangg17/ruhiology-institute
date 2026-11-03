@@ -25,6 +25,8 @@ window.rqAssessmentIndex = function rqAssessmentIndex() {
         eventCode: new URLSearchParams(window.location.search).get('event') || '',
         eventName: '',
         eventInstitution: '',
+        eventCountryCode: 'ID',
+        eventCountryName: 'Indonesia',
         isCategoryLocked: false,
         eventGroupLabel: '',
         eventSubcategories: [],
@@ -222,7 +224,13 @@ window.rqAssessmentIndex = function rqAssessmentIndex() {
                     this.eventCode = evt.event_code;
                     this.eventName = evt.title;
                     this.eventInstitution = evt.institution_name || '';
+                    this.eventCountryCode = evt.country_code || 'ID';
+                    this.eventCountryName = evt.country_name || 'Indonesia';
                     this.form.event_code = evt.event_code;
+                    if (evt.country_code && evt.country_code !== 'ID') {
+                        this.form.country_code = evt.country_code;
+                        this.form.country_name = evt.country_name;
+                    }
                     if (evt.institution_name) {
                         this.form.detail_institution = evt.institution_name;
                     }
@@ -605,7 +613,15 @@ document.addEventListener('alpine:init', () => {
                             <div class="border-b border-slate-700/80 pb-3">
                                 <span class="text-[9px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest block mb-1">🎯 {{ $isEn ? 'VERIFIED EVENT' : 'TERVERIFIKASI EVENT' }}</span>
                                 <h4 class="font-serif font-bold text-base text-white leading-tight" x-text="eventName || eventCode"></h4>
-                                <p class="text-xs text-slate-300 mt-1 font-medium" x-text="eventInstitution || '{{ $isEn ? 'Registered Institution' : 'Instansi Terdaftar' }}'"></p>
+                                <div class="flex items-center gap-2 flex-wrap mt-1">
+                                    <p class="text-xs text-slate-300 font-medium" x-text="eventInstitution || '{{ $isEn ? 'Registered Institution' : 'Instansi Terdaftar' }}'"></p>
+                                    <template x-if="eventCountryName && eventCountryCode !== 'ID'">
+                                        <span class="inline-flex items-center gap-1 text-[10px] font-bold bg-[#D4AF37]/20 text-[#E5C068] px-2 py-0.5 rounded-full border border-[#D4AF37]/40 font-mono">
+                                            <span>🌍</span>
+                                            <span x-text="eventCountryName"></span>
+                                        </span>
+                                    </template>
+                                </div>
                             </div>
 
                             <div class="space-y-2 text-xs">

@@ -65,6 +65,7 @@
 <body class="min-h-screen py-6 px-2 sm:px-4 flex flex-col items-center justify-start"
       x-data="{
           isExporting: false,
+          isExportingStory: false,
           exportStatus: '',
           async downloadPdf() {
               this.isExporting = true;
@@ -108,6 +109,29 @@
               } finally {
                   setTimeout(() => { this.isExporting = false; }, 1500);
               }
+          },
+          async downloadStory() {
+              this.isExportingStory = true;
+              try {
+                  const card = document.getElementById('storyCard');
+                  card.style.display = 'flex';
+                  const canvas = await html2canvas(card, {
+                      scale: 2.5,
+                      useCORS: true,
+                      logging: false,
+                      backgroundColor: '#071626'
+                  });
+                  card.style.display = 'none';
+                  const link = document.createElement('a');
+                  link.download = 'Story_Sertifikat_' + '{{ Str::slug($response->participant_name) }}' + '.png';
+                  link.href = canvas.toDataURL('image/png');
+                  link.click();
+              } catch(e) {
+                  console.error(e);
+                  alert('Gagal membuat kartu Story. Silakan coba kembali.');
+              } finally {
+                  this.isExportingStory = false;
+              }
           }
       }">
 
@@ -124,11 +148,29 @@
         </div>
 
         <div class="flex items-center gap-2">
+            <!-- Unduh Kartu Story (9:16) -->
+            <button type="button" @click="downloadStory()" :disabled="isExportingStory" 
+                    class="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-[#D4AF37] hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs shadow-lg transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50">
+                <template x-if="!isExportingStory">
+                    <span class="flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-slate-950" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                        </svg>
+                        <span>Unduh Story (9:16)</span>
+                    </span>
+                </template>
+                <template x-if="isExportingStory">
+                    <span>Menyiapkan Story...</span>
+                </template>
+            </button>
+
+            <!-- Cetak Print -->
             <button type="button" onclick="window.print()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs shadow-sm transition flex items-center gap-1.5 cursor-pointer border border-slate-700">
                 <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
                 <span>Cetak / Print</span>
             </button>
 
+            <!-- Unduh PDF Resmi (2 Halaman) -->
             <button type="button" @click="downloadPdf()" :disabled="isExporting" 
                     class="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs shadow-lg transition flex items-center gap-2 cursor-pointer disabled:opacity-50">
                 <template x-if="!isExporting">
@@ -158,6 +200,18 @@
         <div class="absolute top-4 right-4 w-10 h-10 border-t-2 border-r-2 border-[#D4AF37] pointer-events-none"></div>
         <div class="absolute bottom-4 left-4 w-10 h-10 border-b-2 border-l-2 border-[#D4AF37] pointer-events-none"></div>
         <div class="absolute bottom-4 right-4 w-10 h-10 border-b-2 border-r-2 border-[#D4AF37] pointer-events-none"></div>
+
+        <!-- Security Watermark & Guilloche Motif -->
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.035] select-none z-0">
+            <svg class="w-[520px] h-[520px]" viewBox="0 0 200 200" fill="none" stroke="#0B2A43" stroke-width="0.75">
+                <circle cx="100" cy="100" r="92" stroke-dasharray="2,2"/>
+                <circle cx="100" cy="100" r="78"/>
+                <circle cx="100" cy="100" r="62" stroke-dasharray="3,3"/>
+                <polygon points="100,15 125,60 175,60 135,95 150,145 100,115 50,145 65,95 25,60 75,60"/>
+                <text x="100" y="102" text-anchor="middle" font-family="Cinzel" font-size="8.5" font-weight="bold" fill="#0B2A43">RUHIOLOGY INSTITUTE</text>
+                <text x="100" y="112" text-anchor="middle" font-family="Plus Jakarta Sans" font-size="4.5" font-weight="bold" fill="#0B2A43">OFFICIAL VERIFIED CREDENTIAL</text>
+            </svg>
+        </div>
 
         <!-- 1. Header Kop (Logos & Institute Name) -->
         <div class="relative z-10 flex items-center justify-between border-b border-slate-200/90 pb-4 px-4">
@@ -342,6 +396,18 @@
         <div class="absolute inset-2 border-[2px] border-[#D4AF37] pointer-events-none"></div>
         <div class="absolute inset-3 border-[1px] border-[#D4AF37]/40 pointer-events-none"></div>
 
+        <!-- Security Watermark & Guilloche Motif -->
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.035] select-none z-0">
+            <svg class="w-[520px] h-[520px]" viewBox="0 0 200 200" fill="none" stroke="#0B2A43" stroke-width="0.75">
+                <circle cx="100" cy="100" r="92" stroke-dasharray="2,2"/>
+                <circle cx="100" cy="100" r="78"/>
+                <circle cx="100" cy="100" r="62" stroke-dasharray="3,3"/>
+                <polygon points="100,15 125,60 175,60 135,95 150,145 100,115 50,145 65,95 25,60 75,60"/>
+                <text x="100" y="102" text-anchor="middle" font-family="Cinzel" font-size="8.5" font-weight="bold" fill="#0B2A43">RUHIOLOGY INSTITUTE</text>
+                <text x="100" y="112" text-anchor="middle" font-family="Plus Jakarta Sans" font-size="4.5" font-weight="bold" fill="#0B2A43">OFFICIAL VERIFIED CREDENTIAL</text>
+            </svg>
+        </div>
+
         <!-- 1. Header Halaman Belakang -->
         <div class="relative z-10 border-b border-slate-200 pb-3 text-center">
             <h2 class="font-cinzel text-xl font-bold tracking-widest text-[#0B2A43]">
@@ -437,6 +503,112 @@
                 </div>
                 <strong class="block font-bold text-slate-900 border-b border-slate-300 pb-0.5 text-xs tracking-wide">
                     {{ $form->certificate_signer1_name ?: 'Prof. Dr. Iskandar Nazari, S.Ag., M.Pd., M.S.I., M.H., Ph.D.' }}
+                </strong>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- KARTU HASIL / STORY SOSIAL MEDIA (9:16)    -->
+    <!-- (Hidden by default, captured by html2canvas)-->
+    <!-- ========================================== -->
+    <div id="storyCard" class="hidden flex-col justify-between p-10 text-center text-white relative overflow-hidden font-sans select-none" 
+         style="width: 480px; height: 854px; background: radial-gradient(circle at 50% 15%, #0F3252 0%, #061524 100%); border: 8px solid #0B2A43;">
+        
+        <!-- Luxury Gold Borders for Story -->
+        <div class="absolute inset-2 border-[2px] border-[#D4AF37] pointer-events-none"></div>
+        <div class="absolute inset-3 border-[1px] border-[#D4AF37]/40 pointer-events-none"></div>
+
+        <!-- Corner Accents -->
+        <div class="absolute top-4 left-4 w-8 h-8 border-t-2 border-l-2 border-[#D4AF37] pointer-events-none"></div>
+        <div class="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-[#D4AF37] pointer-events-none"></div>
+        <div class="absolute bottom-4 left-4 w-8 h-8 border-b-2 border-l-2 border-[#D4AF37] pointer-events-none"></div>
+        <div class="absolute bottom-4 right-4 w-8 h-8 border-b-2 border-r-2 border-[#D4AF37] pointer-events-none"></div>
+
+        <!-- Faint Background Star & Seal -->
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.06] z-0">
+            <svg class="w-80 h-80" viewBox="0 0 200 200" fill="none" stroke="#D4AF37" stroke-width="1.2">
+                <circle cx="100" cy="100" r="90" stroke-dasharray="3,3"/>
+                <polygon points="100,15 125,60 175,60 135,95 150,145 100,115 50,145 65,95 25,60 75,60"/>
+            </svg>
+        </div>
+
+        <!-- 1. Header Story -->
+        <div class="relative z-10 pt-3 space-y-2">
+            <div class="flex items-center justify-center gap-2.5">
+                <img src="{{ asset('images/ruhiology-logo.png') }}" alt="Ruhiology" class="h-10 w-auto object-contain">
+                <span class="font-cinzel text-sm font-bold tracking-widest text-[#E5C068]">RUHIOLOGY INSTITUTE</span>
+            </div>
+            <div>
+                <span class="inline-block px-3 py-0.5 rounded-full bg-[#D4AF37]/20 border border-[#D4AF37]/50 text-[9px] font-bold uppercase tracking-widest text-[#E5C068] font-mono">
+                    Official Certified Credential
+                </span>
+            </div>
+        </div>
+
+        <!-- 2. Main Content Story -->
+        <div class="relative z-10 my-auto py-4 space-y-3">
+            <p class="text-[10px] uppercase font-mono tracking-widest text-slate-400">Diberikan dengan Hormat Kepada:</p>
+            
+            <h2 class="font-cinzel font-bold text-2xl text-white tracking-wide leading-tight px-4 text-[#F7E7B4]">
+                {{ $response->participant_name }}
+            </h2>
+
+            @if($response->participant_institution)
+                <p class="text-xs text-slate-300 font-medium">
+                    {{ $response->participant_institution }}
+                </p>
+            @endif
+
+            <div class="w-16 h-0.5 bg-[#D4AF37] mx-auto my-2 opacity-70"></div>
+
+            <div class="space-y-1">
+                <p class="text-[10px] text-slate-300">Telah berhasil menyelesaikan & lulus agenda:</p>
+                <h3 class="font-serif-title font-bold text-base text-[#E5C068] leading-snug px-3">
+                    "{{ $form->certificate_event_name ?: $form->title }}"
+                </h3>
+            </div>
+
+            <!-- Bobot JP Pill -->
+            <div class="pt-1">
+                <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-gradient-to-r from-[#D4AF37] to-amber-500 text-slate-950 font-black text-xs shadow-md">
+                    <span>⚡ Akumulasi Bobot:</span>
+                    <span>{{ $form->calculated_total_jp }}</span>
+                </span>
+            </div>
+
+            <p class="text-[10px] text-slate-400 pt-1">
+                {{ $form->certificate_event_location ? explode(',', $form->certificate_event_location)[0] : 'Jambi' }} • {{ $form->certificate_event_date ?: now()->translatedFormat('d F Y') }}
+            </p>
+        </div>
+
+        <!-- 3. Footer Story (TTD & QR) -->
+        <div class="relative z-10 pb-2 border-t border-slate-700/80 pt-4 flex items-end justify-between px-3">
+            <!-- QR Verification -->
+            <div class="text-left flex items-center gap-2.5">
+                <div class="p-1 bg-white rounded-lg shadow-sm">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data={{ urlencode(route('public.certificate.verify', $response->response_code)) }}" 
+                         alt="QR" class="w-12 h-12">
+                </div>
+                <div>
+                    <span class="text-[8px] font-mono text-emerald-400 uppercase tracking-wider block font-bold">✓ Terverifikasi</span>
+                    <span class="text-[8px] font-mono text-slate-300 block">{{ $response->response_code }}</span>
+                </div>
+            </div>
+
+            <!-- Founder Signer -->
+            <div class="text-right">
+                <span class="text-[9px] font-bold text-[#E5C068] block">Founder & Direktur</span>
+                <div class="h-10 flex items-center justify-end my-0.5">
+                    @if($form->certificate_signer1_signature)
+                        <img src="{{ $form->certificate_signer1_signature }}" alt="TTD" class="h-9 object-contain">
+                    @else
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data={{ urlencode(route('public.certificate.verify', $response->response_code)) }}" alt="QR" class="w-9 h-9 p-0.5 bg-white rounded">
+                    @endif
+                </div>
+                <strong class="text-[10px] font-bold text-white block border-t border-slate-600 pt-0.5">
+                    Prof. Dr. Iskandar Nazari
                 </strong>
             </div>
         </div>

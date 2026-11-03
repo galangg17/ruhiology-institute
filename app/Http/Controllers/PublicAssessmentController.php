@@ -80,15 +80,25 @@ class PublicAssessmentController extends Controller
         if (!empty($request->input('event_code'))) {
             $eventModel = \App\Models\Event::where('event_code', strtoupper(trim($request->input('event_code'))))->first();
             if ($eventModel) {
-                $defaultProvId = $eventModel->province_id ?? \App\Models\Province::where('status', 'active')->first()?->id ?? 1;
-                $defaultRegId = $eventModel->regency_id ?? \App\Models\Regency::where('province_id', $defaultProvId)->first()?->id ?? 1;
+                if ($eventModel->isInternational()) {
+                    if (empty($request->input('country_code')) || $request->input('country_code') === 'ID') {
+                        $request->merge([
+                            'country_code' => $eventModel->country_code,
+                            'country_name' => $eventModel->country_name,
+                        ]);
+                    }
+                } else {
+                    $defaultProvId = $eventModel->province_id ?? \App\Models\Province::where('status', 'active')->first()?->id ?? 1;
+                    $defaultRegId = $eventModel->regency_id ?? \App\Models\Regency::where('province_id', $defaultProvId)->first()?->id ?? 1;
 
-                if (empty($request->input('province_id'))) {
-                    $request->merge(['province_id' => $defaultProvId]);
+                    if (empty($request->input('province_id'))) {
+                        $request->merge(['province_id' => $defaultProvId]);
+                    }
+                    if (empty($request->input('regency_id'))) {
+                        $request->merge(['regency_id' => $defaultRegId]);
+                    }
                 }
-                if (empty($request->input('regency_id'))) {
-                    $request->merge(['regency_id' => $defaultRegId]);
-                }
+
                 if (!empty($eventModel->target_category)) {
                     $request->merge(['category' => $eventModel->target_category]);
                 } elseif (empty($request->input('category'))) {
@@ -704,6 +714,8 @@ class PublicAssessmentController extends Controller
                 'target_category' => $event->target_category,
                 'group_label' => $event->group_label,
                 'custom_subcategories' => $event->custom_subcategories,
+                'country_code' => $event->country_code,
+                'country_name' => $event->country_name,
                 'province_id' => $event->province_id,
                 'regency_id' => $event->regency_id,
             ]
