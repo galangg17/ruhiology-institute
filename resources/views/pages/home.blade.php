@@ -1004,8 +1004,8 @@
                 <div class="bg-white/10 p-5 sm:p-6 rounded-3xl border border-white/15 backdrop-blur-md flex flex-col justify-between hover:bg-white/15 hover:border-[#C9A24D]/60 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-[#C9A24D]/15 transition duration-300 relative group">
                     <span class="absolute top-5 right-5 text-[9px] font-mono font-bold tracking-widest text-[#C9A24D] bg-[#C9A24D]/15 px-2.5 py-0.5 rounded-full border border-[#C9A24D]/30">PILAR I</span>
                     <div>
-                        <div class="w-10 h-10 rounded-2xl bg-[#C9A24D]/20 text-[#C9A24D] flex items-center justify-center font-bold text-lg mb-4 border border-[#C9A24D]/30 group-hover:scale-110 transition-transform">
-                            {{ \App\Models\Setting::get('pillar1_icon', '✦') }}
+                        <div class="w-11 h-11 rounded-2xl bg-[#C9A24D]/20 text-[#C9A24D] flex items-center justify-center font-bold text-lg mb-4 border border-[#C9A24D]/40 group-hover:scale-110 group-hover:bg-[#C9A24D]/30 transition-all shadow-md shadow-[#C9A24D]/10">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" stroke-width="2"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2v3m0 14v3M2 12h3m14 0h3m-3.05-6.95l-2.12 2.12m-9.66 9.66l-2.12 2.12m0-13.9l2.12 2.12m9.66 9.66l2.12 2.12"/></svg>
                         </div>
                         <h3 class="font-serif font-bold text-base text-white mb-2 tracking-tight">
                             {{ \App\Models\Setting::get('pillar1_title', $isEn ? '1. Divine Awareness (God Spot)' : '1. Kesadaran Ketuhanan (God Spot)') }}
@@ -1020,8 +1020,8 @@
                 <div class="bg-white/10 p-5 sm:p-6 rounded-3xl border border-white/15 backdrop-blur-md flex flex-col justify-between hover:bg-white/15 hover:border-amber-400/60 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-amber-500/15 transition duration-300 relative group">
                     <span class="absolute top-5 right-5 text-[9px] font-mono font-bold tracking-widest text-amber-300 bg-amber-500/15 px-2.5 py-0.5 rounded-full border border-amber-400/30">PILAR II</span>
                     <div>
-                        <div class="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-300 flex items-center justify-center font-bold text-lg mb-4 border border-amber-400/30 group-hover:scale-110 transition-transform">
-                            {{ \App\Models\Setting::get('pillar2_icon', '🕌') }}
+                        <div class="w-11 h-11 rounded-2xl bg-amber-500/20 text-amber-300 flex items-center justify-center font-bold text-lg mb-4 border border-amber-400/40 group-hover:scale-110 group-hover:bg-amber-500/30 transition-all shadow-md shadow-amber-500/10">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                         </div>
                         <h3 class="font-serif font-bold text-base text-white mb-2 tracking-tight">
                             {{ \App\Models\Setting::get('pillar2_title', $isEn ? '2. Spiritual Devotion & Practice' : '2. Ketaatan Spiritual & Ibadah') }}
@@ -1036,8 +1036,8 @@
                 <div class="bg-white/10 p-5 sm:p-6 rounded-3xl border border-white/15 backdrop-blur-md flex flex-col justify-between hover:bg-white/15 hover:border-emerald-400/60 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-emerald-500/15 transition duration-300 relative group">
                     <span class="absolute top-5 right-5 text-[9px] font-mono font-bold tracking-widest text-emerald-300 bg-emerald-500/15 px-2.5 py-0.5 rounded-full border border-emerald-400/30">PILAR III</span>
                     <div>
-                        <div class="w-10 h-10 rounded-2xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold text-lg mb-4 border border-emerald-400/30 group-hover:scale-110 transition-transform">
-                            {{ \App\Models\Setting::get('pillar3_icon', '✨') }}
+                        <div class="w-11 h-11 rounded-2xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold text-lg mb-4 border border-emerald-400/40 group-hover:scale-110 group-hover:bg-emerald-500/30 transition-all shadow-md shadow-emerald-500/10">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
                         </div>
                         <h3 class="font-serif font-bold text-base text-white mb-2 tracking-tight">
                             {{ \App\Models\Setting::get('pillar3_title', $isEn ? '3. Inner Purification (Tazkiyah)' : '3. Purifikasi Batin (Tazkiyah)') }}
@@ -1052,8 +1052,8 @@
                 <div class="bg-white/10 p-5 sm:p-6 rounded-3xl border border-white/15 backdrop-blur-md flex flex-col justify-between hover:bg-white/15 hover:border-sky-400/60 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-sky-500/15 transition duration-300 relative group">
                     <span class="absolute top-5 right-5 text-[9px] font-mono font-bold tracking-widest text-sky-300 bg-sky-500/15 px-2.5 py-0.5 rounded-full border border-sky-400/30">PILAR IV</span>
                     <div>
-                        <div class="w-10 h-10 rounded-2xl bg-sky-500/20 text-sky-300 flex items-center justify-center font-bold text-lg mb-4 border border-sky-400/30 group-hover:scale-110 transition-transform">
-                            {{ \App\Models\Setting::get('pillar4_icon', '🤝') }}
+                        <div class="w-11 h-11 rounded-2xl bg-sky-500/20 text-sky-300 flex items-center justify-center font-bold text-lg mb-4 border border-sky-400/40 group-hover:scale-110 group-hover:bg-sky-500/30 transition-all shadow-md shadow-sky-500/10">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                         </div>
                         <h3 class="font-serif font-bold text-base text-white mb-2 tracking-tight">
                             {{ \App\Models\Setting::get('pillar4_title', $isEn ? '4. Noble Character & Social Care' : '4. Akhlak & Kepedulian Sosial') }}
@@ -1068,8 +1068,8 @@
                 <div class="bg-white/10 p-5 sm:p-6 rounded-3xl border border-white/15 backdrop-blur-md flex flex-col justify-between hover:bg-white/15 hover:border-purple-400/60 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-purple-500/15 transition duration-300 relative group">
                     <span class="absolute top-5 right-5 text-[9px] font-mono font-bold tracking-widest text-purple-300 bg-purple-500/15 px-2.5 py-0.5 rounded-full border border-purple-400/30">PILAR V</span>
                     <div>
-                        <div class="w-10 h-10 rounded-2xl bg-purple-500/20 text-purple-300 flex items-center justify-center font-bold text-lg mb-4 border border-purple-400/30 group-hover:scale-110 transition-transform">
-                            {{ \App\Models\Setting::get('pillar5_icon', '🛡️') }}
+                        <div class="w-11 h-11 rounded-2xl bg-purple-500/20 text-purple-300 flex items-center justify-center font-bold text-lg mb-4 border border-purple-400/40 group-hover:scale-110 group-hover:bg-purple-500/30 transition-all shadow-md shadow-purple-500/10">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                         </div>
                         <h3 class="font-serif font-bold text-base text-white mb-2 tracking-tight">
                             {{ \App\Models\Setting::get('pillar5_title', $isEn ? '5. Soul Resilience & Fortitude' : '5. Ketangguhan & Resiliensi Jiwa') }}
@@ -1084,8 +1084,8 @@
                 <div class="bg-emerald-950/40 p-5 sm:p-6 rounded-3xl border-2 border-emerald-400/40 backdrop-blur-md flex flex-col justify-between hover:bg-emerald-900/40 hover:-translate-y-1.5 hover:border-emerald-400 hover:shadow-xl hover:shadow-emerald-500/20 transition duration-300 relative group shadow-lg shadow-emerald-950/50">
                     <span class="absolute top-5 right-5 text-[9px] font-mono font-bold tracking-widest text-emerald-300 bg-emerald-500/20 px-2.5 py-0.5 rounded-full border border-emerald-400/40">PILAR VI (WHO-5)</span>
                     <div>
-                        <div class="w-10 h-10 rounded-2xl bg-emerald-500/30 text-emerald-300 flex items-center justify-center font-bold text-lg mb-4 border border-emerald-400/50 group-hover:scale-110 transition-transform">
-                            {{ \App\Models\Setting::get('pillar6_icon', '💚') }}
+                        <div class="w-11 h-11 rounded-2xl bg-emerald-500/30 text-emerald-300 flex items-center justify-center font-bold text-lg mb-4 border border-emerald-400/50 group-hover:scale-110 group-hover:bg-emerald-500/40 transition-all shadow-md shadow-emerald-500/20">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
                         </div>
                         <h3 class="font-serif font-bold text-base text-emerald-200 mb-2 tracking-tight">
                             {{ \App\Models\Setting::get('pillar6_title', $isEn ? '6. Mental Well-Being (WHO-5)' : '6. Kesejahteraan Mental (WHO-5)') }}

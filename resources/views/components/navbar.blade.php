@@ -32,20 +32,25 @@
                 </a>
 
                 <a href="{{ url('/#founder') }}"
-                   class="px-2.5 xl:px-3 py-1.5 rounded-full transition-all flex items-center gap-1 whitespace-nowrap hover:text-[#0B2A43] hover:bg-white/80">
-                    <span class="text-xs">👨‍🏫</span>
+                   class="px-2.5 xl:px-3 py-1.5 rounded-full transition-all flex items-center gap-1.5 whitespace-nowrap hover:text-[#0B2A43] hover:bg-white/80">
+                    <svg class="w-3.5 h-3.5 text-[#C9A24D] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+                    </svg>
                     <span>{{ app()->getLocale() === 'en' ? 'Founder Profile' : 'Profil Founder' }}</span>
                 </a>
 
                 <a href="{{ route('assessment.index') }}"
-                   class="px-2.5 xl:px-3 py-1.5 rounded-full transition-all flex items-center gap-1 whitespace-nowrap {{ request()->routeIs('assessment.*') ? 'bg-[#0B2A43] text-white font-bold shadow-xs' : 'hover:text-[#0B2A43] hover:bg-white/80' }}">
+                   class="px-2.5 xl:px-3 py-1.5 rounded-full transition-all flex items-center gap-1.5 whitespace-nowrap {{ request()->routeIs('assessment.*') ? 'bg-[#0B2A43] text-white font-bold shadow-xs' : 'hover:text-[#0B2A43] hover:bg-white/80' }}">
                     <svg class="w-3.5 h-3.5 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     <span>{{ app()->getLocale() === 'en' ? 'RQ Assessment' : 'RQ Assessment' }}</span>
                 </a>
 
                 <a href="{{ route('consultation.index') }}"
-                   class="px-2.5 xl:px-3 py-1.5 rounded-full transition-all flex items-center gap-1 whitespace-nowrap {{ request()->routeIs('consultation.*') ? 'bg-[#0B2A43] text-white font-bold shadow-xs' : 'hover:text-[#0B2A43] hover:bg-white/80' }}">
-                    <span class="text-xs">💬</span>
+                   class="px-2.5 xl:px-3 py-1.5 rounded-full transition-all flex items-center gap-1.5 whitespace-nowrap {{ request()->routeIs('consultation.*') ? 'bg-[#0B2A43] text-white font-bold shadow-xs' : 'hover:text-[#0B2A43] hover:bg-white/80' }}">
+                    <svg class="w-3.5 h-3.5 text-blue-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                    </svg>
                     <span>{{ app()->getLocale() === 'en' ? 'Consultation' : 'Konsultasi' }}</span>
                 </a>
 
@@ -76,7 +81,8 @@
                 </div>
 
                 <button @click="$dispatch('open-quick-check', { code: '' })" type="button" class="py-2 px-3 sm:px-3.5 bg-amber-500/10 hover:bg-amber-500/20 text-[#0B2A43] font-bold text-[11px] xl:text-xs rounded-xl border border-[#C9A24D]/40 transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer">
-                    <span>🔍</span> <span>{{ app()->getLocale() === 'en' ? 'Check Score' : 'Cek Skor / Mulai' }}</span>
+                    <svg class="w-3.5 h-3.5 text-[#C9A24D] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    <span>{{ app()->getLocale() === 'en' ? 'Check Score' : 'Cek Skor / Mulai' }}</span>
                 </button>
 
                 @auth
@@ -118,29 +124,41 @@
                 <a href="{{ route('lang.switch', 'en') }}" class="px-3 py-1 rounded-lg {{ app()->getLocale() === 'en' ? 'bg-[#0B2A43] text-[#C9A24D]' : 'text-slate-600' }}">🇬🇧 EN</a>
             </div>
         </div>
-        <a href="{{ url('/') }}" @click="mobileOpen = false" class="flex items-center gap-2 text-slate-800 py-2 border-b border-slate-100 hover:text-[#0B2A43]">
-            <span>🏠</span>
-            <span>Beranda</span>
+        <a href="{{ url('/') }}" @click="mobileOpen = false" class="flex items-center gap-3 text-slate-800 py-2.5 px-2 rounded-xl hover:bg-slate-50 hover:text-[#0B2A43] transition border-b border-slate-100">
+            <span class="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center text-[#0B2A43] shrink-0">
+                <svg class="w-3.5 h-3.5 text-[#C9A24D]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            </span>
+            <span>{{ app()->getLocale() === 'en' ? 'Home' : 'Beranda' }}</span>
         </a>
-        <a href="{{ url('/#founder') }}" @click="mobileOpen = false" class="flex items-center gap-2 text-slate-800 py-2 border-b border-slate-100 hover:text-[#0B2A43]">
-            <span>👨‍🏫</span>
-            <span>Profil Founder</span>
+        <a href="{{ url('/#founder') }}" @click="mobileOpen = false" class="flex items-center gap-3 text-slate-800 py-2.5 px-2 rounded-xl hover:bg-slate-50 hover:text-[#0B2A43] transition border-b border-slate-100">
+            <span class="w-7 h-7 rounded-lg bg-amber-50 flex items-center justify-center text-[#C9A24D] shrink-0">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+            </span>
+            <span>{{ app()->getLocale() === 'en' ? 'Founder Profile' : 'Profil Founder' }}</span>
         </a>
-        <a href="{{ route('assessment.index') }}" @click="mobileOpen = false" class="flex items-center gap-2 text-slate-800 py-2 border-b border-slate-100 hover:text-[#0B2A43]">
-            <span>📄</span>
+        <a href="{{ route('assessment.index') }}" @click="mobileOpen = false" class="flex items-center gap-3 text-slate-800 py-2.5 px-2 rounded-xl hover:bg-slate-50 hover:text-[#0B2A43] transition border-b border-slate-100">
+            <span class="w-7 h-7 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </span>
             <span>RQ Assessment</span>
         </a>
-        <a href="{{ route('consultation.index') }}" @click="mobileOpen = false" class="flex items-center gap-2 text-slate-800 py-2 border-b border-slate-100 hover:text-[#0B2A43]">
-            <span>💬</span>
-            <span>Konsultasi</span>
+        <a href="{{ route('consultation.index') }}" @click="mobileOpen = false" class="flex items-center gap-3 text-slate-800 py-2.5 px-2 rounded-xl hover:bg-slate-50 hover:text-[#0B2A43] transition border-b border-slate-100">
+            <span class="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+            </span>
+            <span>{{ app()->getLocale() === 'en' ? 'Consultation' : 'Konsultasi' }}</span>
         </a>
-        <a href="{{ route('catalog.index') }}" @click="mobileOpen = false" class="flex items-center gap-2 text-slate-800 py-2 border-b border-slate-100 hover:text-[#0B2A43]">
-            <span>📚</span>
-            <span>Katalog Buku</span>
+        <a href="{{ route('catalog.index') }}" @click="mobileOpen = false" class="flex items-center gap-3 text-slate-800 py-2.5 px-2 rounded-xl hover:bg-slate-50 hover:text-[#0B2A43] transition border-b border-slate-100">
+            <span class="w-7 h-7 rounded-lg bg-amber-50 flex items-center justify-center text-[#C9A24D] shrink-0">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            </span>
+            <span>{{ app()->getLocale() === 'en' ? 'Books' : 'Katalog Buku' }}</span>
         </a>
-        <a href="{{ route('articles.index') }}" @click="mobileOpen = false" class="flex items-center gap-2 text-slate-800 py-2 border-b border-slate-100 hover:text-[#0B2A43]">
-            <span>📰</span>
-            <span>Artikel</span>
+        <a href="{{ route('articles.index') }}" @click="mobileOpen = false" class="flex items-center gap-3 text-slate-800 py-2.5 px-2 rounded-xl hover:bg-slate-50 hover:text-[#0B2A43] transition border-b border-slate-100">
+            <span class="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600 shrink-0">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+            </span>
+            <span>{{ app()->getLocale() === 'en' ? 'Articles' : 'Artikel' }}</span>
         </a>
         <div class="pt-3">
             @auth

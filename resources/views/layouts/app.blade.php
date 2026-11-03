@@ -83,13 +83,30 @@
         [x-cloak] { display: none !important; }
 
         body {
-            background-color: #FFFFFF;
+            background-color: #FAF9F6;
             color: #193247;
             font-family: 'Plus Jakarta Sans', sans-serif;
             margin: 0;
             padding: 0;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
+        }
+
+        /* Custom Elegant Slim Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F1EFE9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #C9A24D;
+            border-radius: 9999px;
+            border: 2px solid #F1EFE9;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0B2A43;
         }
 
         .nav-item {
@@ -137,7 +154,7 @@
         }
     </style>
 </head>
-<body class="bg-white text-[#193247] font-sans antialiased min-h-screen flex flex-col selection:bg-[#0B2A43] selection:text-white overflow-x-hidden">
+<body class="bg-[#FAF9F6] text-[#193247] font-sans antialiased min-h-screen flex flex-col selection:bg-[#0B2A43] selection:text-white overflow-x-hidden">
 
     <!-- HEADER / NAVBAR COMPONENT -->
     <x-navbar />
