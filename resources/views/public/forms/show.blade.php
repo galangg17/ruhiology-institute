@@ -62,7 +62,8 @@
                 @csrf
 
                 <!-- Form Header Card -->
-                <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden relative border-t-8 border-t-navy">
+                <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden relative">
+                    <div class="h-1.5 bg-gradient-to-r from-[#0B2A43] via-[#D4AF37] to-[#0B2A43]"></div>
                     @if($form->header_image)
                         <div class="h-44 md:h-56 w-full overflow-hidden bg-slate-100">
                             <img src="{{ $form->header_image }}" alt="{{ $form->title }}" class="w-full h-full object-cover">
@@ -71,8 +72,8 @@
 
                     <div class="p-6 md:p-8">
                         <div class="flex items-center gap-2 mb-2">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-primary-50 text-primary-800 border border-primary-200">
-                                Ruhiology Formulir
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#0B2A43]/10 text-[#0B2A43] border border-[#D4AF37]/40 font-mono">
+                                ✦ Ruhiology Formulir
                             </span>
                             @if($form->closes_at)
                                 <span class="text-xs text-slate-400">
@@ -217,23 +218,23 @@
                 <div class="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <button type="submit" 
                             :disabled="submitting"
-                            class="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-navy hover:bg-navy-dark text-white font-bold text-sm shadow-lg shadow-navy/20 transition flex items-center justify-center gap-2">
+                            class="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-gradient-to-r from-[#0B2A43] via-[#123B59] to-[#0B2A43] hover:from-[#123B59] hover:to-[#0B2A43] text-white font-bold text-sm shadow-xl hover:shadow-[#0B2A43]/30 transition transform hover:-translate-y-0.5 flex items-center justify-center gap-2 cursor-pointer border border-[#C9A24D]/30 disabled:opacity-50">
                         <template x-if="!submitting">
                             <span class="flex items-center gap-2">
-                                <svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                Kirim Jawaban
+                                <svg class="w-4 h-4 text-[#C9A24D]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Kirim Jawaban Formulir</span>
                             </span>
                         </template>
                         <template x-if="submitting">
                             <span class="flex items-center gap-2">
-                                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
-                                Menyimpan Respon...
+                                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-[#C9A24D]" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                                <span>Menyimpan respon Anda...</span>
                             </span>
                         </template>
                     </button>
 
-                    <div class="text-[11px] text-slate-400 text-center sm:text-right">
-                        <span>Ruhiology Secure Forms Engine</span>
+                    <div class="text-[11px] text-slate-400 text-center sm:text-right font-mono">
+                        <span>Ruhiology Secure Credential Engine</span>
                     </div>
                 </div>
 

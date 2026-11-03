@@ -102,7 +102,15 @@
     </div>
 
     <!-- Mobile Navigation Drawer -->
-    <div x-show="mobileOpen" x-cloak class="lg:hidden bg-white/95 backdrop-blur-md border-b border-slate-200 px-6 pt-4 pb-6 space-y-3 text-xs font-semibold shadow-2xl">
+    <div x-show="mobileOpen" 
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 -translate-y-2"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 translate-y-0"
+         x-transition:leave-end="opacity-0 -translate-y-2"
+         x-cloak 
+         class="lg:hidden bg-white/95 backdrop-blur-md border-b border-slate-200 px-6 pt-4 pb-6 space-y-3 text-xs font-semibold shadow-2xl">
         <div class="flex items-center justify-between py-2 border-b border-slate-100">
             <span class="text-xs font-bold text-slate-500">Pilihan Bahasa / Language:</span>
             <div class="flex items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200/90 text-xs font-bold">

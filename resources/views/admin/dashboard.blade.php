@@ -52,16 +52,16 @@
     <!-- OVERVIEW STATS KPI CARDS -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         <!-- Total Peserta -->
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between hover:shadow-sm transition">
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between hover:shadow-lg hover:border-[#D4AF37]/60 hover:-translate-y-1 transition-all duration-300 group">
             <div>
                 <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Total Peserta Terdaftar</span>
-                <span class="text-3xl font-extrabold text-[#0F2537] mt-1 block tracking-tight">{{ number_format($kpis['total_participants']) }}</span>
+                <span class="text-3xl font-extrabold text-[#0F2537] mt-1 block tracking-tight font-mono group-hover:text-[#8C703E] transition-colors">{{ number_format($kpis['total_participants']) }}</span>
                 <span class="text-[10px] text-emerald-700 font-semibold block mt-1.5 flex items-center gap-1.5">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                     <span>38 Provinsi & 514 Kab/Kota</span>
                 </span>
             </div>
-            <div class="w-12 h-12 rounded-xl bg-slate-50 text-[#0F2537] border border-slate-200 flex items-center justify-center shrink-0">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-50 to-amber-100/80 text-[#8C703E] border border-amber-200/80 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-xs">
                 <svg class="w-6 h-6 text-[#8C703E]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                 </svg>
@@ -69,11 +69,11 @@
         </div>
 
         <!-- Rata-rata Skor RQI-15 -->
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between hover:shadow-sm transition">
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between hover:shadow-lg hover:border-[#D4AF37]/60 hover:-translate-y-1 transition-all duration-300 group">
             <div>
                 <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Indeks RQI-15 Nasional</span>
                 <div class="flex items-baseline gap-2 mt-1">
-                    <span class="text-3xl font-extrabold text-[#0F2537] tracking-tight">{{ $kpis['avg_rq_score'] ?? 0 }}%</span>
+                    <span class="text-3xl font-extrabold text-[#0F2537] tracking-tight font-mono group-hover:text-[#8C703E] transition-colors">{{ $kpis['avg_rq_score'] ?? 0 }}%</span>
                     <span class="text-xs font-bold text-[#8C703E]">({{ $kpis['avg_rqi_raw'] ?? 0 }} / 75)</span>
                 </div>
                 <span class="text-[10px] text-[#8C703E] font-semibold block mt-1.5 flex items-center gap-1.5">
@@ -81,7 +81,7 @@
                     <span>Rata-rata 5 Pilar Ruhiologi</span>
                 </span>
             </div>
-            <div class="w-12 h-12 rounded-xl bg-slate-50 text-[#0F2537] border border-slate-200 flex items-center justify-center shrink-0">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-50 to-amber-100/80 text-[#8C703E] border border-amber-200/80 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-xs">
                 <svg class="w-6 h-6 text-[#8C703E]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                 </svg>
@@ -89,16 +89,16 @@
         </div>
 
         <!-- Rata-rata Indeks WHO-5 -->
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between hover:shadow-sm transition">
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between hover:shadow-lg hover:border-emerald-400 hover:-translate-y-1 transition-all duration-300 group">
             <div>
                 <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Indeks WHO-5 Nasional</span>
-                <span class="text-3xl font-extrabold text-emerald-800 mt-1 block tracking-tight">{{ $kpis['avg_who5_score'] ?? 0 }}%</span>
+                <span class="text-3xl font-extrabold text-emerald-800 mt-1 block tracking-tight font-mono group-hover:text-emerald-600 transition-colors">{{ $kpis['avg_who5_score'] ?? 0 }}%</span>
                 <span class="text-[10px] text-emerald-700 font-semibold block mt-1.5 flex items-center gap-1.5">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                     <span>Kesejahteraan Mental Peserta</span>
                 </span>
             </div>
-            <div class="w-12 h-12 rounded-xl bg-slate-50 text-emerald-800 border border-slate-200 flex items-center justify-center shrink-0">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100/80 text-emerald-800 border border-emerald-200/80 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-xs">
                 <svg class="w-6 h-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                 </svg>
@@ -106,13 +106,13 @@
         </div>
 
         <!-- Total Assessment Submissions -->
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between hover:shadow-sm transition">
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between hover:shadow-lg hover:border-blue-400 hover:-translate-y-1 transition-all duration-300 group">
             <div>
                 <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Total Sesi Asesmen</span>
-                <span class="text-3xl font-extrabold text-[#0F2537] mt-1 block tracking-tight">{{ number_format($kpis['total_submissions']) }}</span>
+                <span class="text-3xl font-extrabold text-[#0F2537] mt-1 block tracking-tight font-mono group-hover:text-[#1E3E5B] transition-colors">{{ number_format($kpis['total_submissions']) }}</span>
                 <a href="{{ route('admin.results.index') }}" class="text-[10px] text-slate-600 hover:text-[#0F2537] font-bold underline block mt-1.5">Lembar Evaluasi →</a>
             </div>
-            <div class="w-12 h-12 rounded-xl bg-slate-50 text-[#0F2537] border border-slate-200 flex items-center justify-center shrink-0">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100/80 text-[#0F2537] border border-blue-200/80 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-xs">
                 <svg class="w-6 h-6 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
