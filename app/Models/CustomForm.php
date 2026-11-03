@@ -100,19 +100,36 @@ class CustomForm extends Model
         return $this->certificate_status === 'released';
     }
 
+    public function getCleanCertificateEventNameAttribute(): string
+    {
+        $name = $this->certificate_event_name ?: $this->title;
+        $name = str_ireplace('workahop', 'WORKSHOP', (string)$name);
+        $name = str_ireplace('worshop', 'WORKSHOP', (string)$name);
+        return trim($name);
+    }
+
     public function getParsedCurriculumAttribute(): array
     {
         if (empty($this->certificate_curriculum)) {
             return [];
         }
-        if (is_array($this->certificate_curriculum)) {
-            return $this->certificate_curriculum;
+        $decoded = is_array($this->certificate_curriculum)
+            ? $this->certificate_curriculum
+            : json_decode($this->certificate_curriculum, true);
+
+        if (!is_array($decoded)) {
+            return [];
         }
-        $decoded = json_decode($this->certificate_curriculum, true);
-        if (is_array($decoded)) {
-            return $decoded;
+
+        foreach ($decoded as &$item) {
+            if (isset($item['title'])) {
+                $item['title'] = str_ireplace('ruhioloy', 'Ruhiologi', $item['title']);
+                $item['title'] = str_ireplace('aktifasi', 'Aktivasi', $item['title']);
+                $item['title'] = str_ireplace('workahop', 'Workshop', $item['title']);
+                $item['title'] = str_ireplace('worshop', 'Workshop', $item['title']);
+            }
         }
-        return [];
+        return $decoded;
     }
 
     public function getCalculatedTotalJpAttribute(): string
@@ -146,11 +163,21 @@ class CustomForm extends Model
         $year = date('Y');
 
         if (!empty($this->certificate_number_pattern)) {
-            return str_replace(
+            $pat = $this->certificate_number_pattern;
+            $pat = str_replace(
+                ['{{no}}', '{{bulan}}', '{{m}}', '{{tahun}}', '{{Y}}'],
                 ['{no}', '{bulan}', '{m}', '{tahun}', '{Y}'],
-                [$seqPadded, $monthRoman, $monthRoman, $year, $year],
-                $this->certificate_number_pattern
+                $pat
             );
+            $res = str_replace(
+                ['{no}', '{bulan}', '{m}', '{tahun}', '{Y}', '{seq}', '{month}', '{year}'],
+                [$seqPadded, $monthRoman, $monthRoman, $year, $year, $seqPadded, $monthRoman, $year],
+                $pat
+            );
+            $res = preg_replace('/\{([0-9a-zA-Z\-_]+)\}/', '$1', $res);
+            $res = str_ireplace('worshop', 'Workshop', $res);
+            $res = str_ireplace('workahop', 'Workshop', $res);
+            return trim($res);
         }
 
         $slugSlug = strtoupper(substr(preg_replace('/[^a-zA-Z0-9]/', '', $this->slug), 0, 8));

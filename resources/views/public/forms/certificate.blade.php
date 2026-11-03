@@ -247,7 +247,7 @@
             
             <div class="inline-block">
                 <p class="font-mono text-xs font-semibold text-[#8C703E] tracking-wider px-4 py-0.5 border-b border-[#D4AF37]">
-                    NOMOR: {{ $response->certificate_number }}
+                    NOMOR: {{ $response->clean_certificate_number }}
                 </p>
             </div>
 
@@ -271,7 +271,7 @@
             <div class="max-w-3xl mx-auto text-xs text-slate-700 leading-relaxed font-sans pt-2">
                 Atas partisipasi aktif dan kelulusannya sebagai <strong class="text-[#0B2A43] uppercase">PESERTA</strong> dalam agenda:
                 <h3 class="font-serif-title font-bold text-base md:text-lg text-[#0B2A43] my-1 leading-snug">
-                    "{{ $form->certificate_event_name ?: $form->title }}"
+                    "{{ $form->clean_certificate_event_name }}"
                 </h3>
                 <span>
                     yang diselenggarakan pada tanggal <strong>{{ $form->certificate_event_date ?: now()->translatedFormat('d F Y') }}</strong>
@@ -285,36 +285,49 @@
 
         <!-- 3. Signatures & QR Code Section -->
         @php
-            $hasSecondSigner = !empty($form->certificate_signer2_name) 
-                && trim((string)$form->certificate_signer2_name) !== '' 
-                && trim(strtolower((string)$form->certificate_signer2_name)) !== trim(strtolower((string)$form->certificate_signer1_name));
+            $signer1Raw = (string)$form->certificate_signer1_name;
+            $signer2Raw = (string)$form->certificate_signer2_name;
+            $s1Norm = strtolower(preg_replace('/[^a-z]/i', '', $signer1Raw));
+            $s2Norm = strtolower(preg_replace('/[^a-z]/i', '', $signer2Raw));
+
+            $isIskandar1 = str_contains($s1Norm, 'iskandar') || str_contains($s1Norm, 'nazari');
+            $isIskandar2 = str_contains($s2Norm, 'iskandar') || str_contains($s2Norm, 'nazari');
+
+            // Jika tanda tangan ke-2 kosong, sama, atau keduanya Prof. Iskandar, gunakan 1 TTD tunggal resmi
+            $hasSecondSigner = !empty($signer2Raw) 
+                && trim($signer2Raw) !== '' 
+                && !($isIskandar1 && $isIskandar2)
+                && $s1Norm !== $s2Norm;
+
+            $officialSignerRole = 'Founder & Direktur Ruhiology Institute';
+            $officialSignerName = 'Prof. Dr. Iskandar Nazari, S.Ag., M.Pd., M.S.I., M.H., Ph.D.';
         @endphp
 
         @if($hasSecondSigner)
             <!-- DUA TANDA TANGAN (KEMITRAAN DENGAN INSTANSI LAIN) -->
-            <div class="relative z-10 pt-4 border-t border-slate-200/90 px-8 flex items-end justify-between text-xs">
+            <div class="relative z-10 pt-3 border-t border-slate-200/90 px-8 flex items-end justify-between text-xs">
                 <!-- Signer 1: Founder & Direktur -->
                 <div class="text-center w-56">
                     <p class="text-[11px] font-bold text-[#0B2A43] leading-tight min-h-[28px] flex items-center justify-center">
-                        {{ $form->certificate_signer1_role ?: 'Founder & Direktur Ruhiology Institute' }}
+                        {{ $form->certificate_signer1_role ?: $officialSignerRole }}
                     </p>
-                    <div class="h-16 flex items-center justify-center my-1">
+                    <div class="h-14 flex items-center justify-center my-1">
                         @if($form->certificate_signer1_signature)
-                            <img src="{{ $form->certificate_signer1_signature }}" alt="QR Tanda Tangan" class="h-14 object-contain">
+                            <img src="{{ $form->certificate_signer1_signature }}" alt="QR Tanda Tangan" class="h-12 object-contain">
                         @else
-                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode(route('public.certificate.verify', $response->response_code)) }}" alt="QR Tanda Tangan" class="w-14 h-14 p-0.5 border border-slate-200 rounded-lg">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode(route('public.certificate.verify', $response->response_code)) }}" alt="QR Tanda Tangan" class="w-12 h-12 p-0.5 border border-slate-200 rounded-lg">
                         @endif
                     </div>
                     <strong class="block font-bold text-slate-900 border-b border-slate-300 pb-0.5 text-xs">
-                        {{ $form->certificate_signer1_name ?: 'Prof. Dr. Iskandar Nazari, S.Ag., M.Pd., M.S.I., M.H., Ph.D.' }}
+                        {{ $isIskandar1 ? $officialSignerName : ($form->certificate_signer1_name ?: $officialSignerName) }}
                     </strong>
                 </div>
 
                 <!-- Center: QR Code Verification -->
                 <div class="text-center px-4 flex flex-col items-center">
-                    <div class="p-1.5 bg-white border border-slate-200 rounded-xl shadow-xs">
+                    <div class="p-1 bg-white border border-slate-200 rounded-xl shadow-xs">
                         <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode(route('public.certificate.verify', $response->response_code)) }}" 
-                             alt="QR Verifikasi" class="w-16 h-16">
+                             alt="QR Verifikasi" class="w-14 h-14">
                     </div>
                     <span class="text-[8px] font-mono text-slate-400 mt-1 uppercase tracking-wider">Scan untuk Keaslian Digital</span>
                     <span class="text-[8px] font-mono font-bold text-slate-600">{{ $response->response_code }}</span>
@@ -325,11 +338,11 @@
                     <p class="text-[11px] font-bold text-[#0B2A43] leading-tight min-h-[28px] flex items-center justify-center">
                         {{ $form->certificate_signer2_role ?: 'Pimpinan Mitra / Instansi' }}
                     </p>
-                    <div class="h-16 flex items-center justify-center my-1">
+                    <div class="h-14 flex items-center justify-center my-1">
                         @if($form->certificate_signer2_signature)
-                            <img src="{{ $form->certificate_signer2_signature }}" alt="TTD Mitra" class="h-14 object-contain">
+                            <img src="{{ $form->certificate_signer2_signature }}" alt="TTD Mitra" class="h-12 object-contain">
                         @else
-                            <div class="w-14 h-14 rounded-full border border-slate-200 flex items-center justify-center text-[8px] text-slate-400 uppercase font-mono">
+                            <div class="w-12 h-12 rounded-full border border-slate-200 flex items-center justify-center text-[8px] text-slate-400 uppercase font-mono">
                                 STEMPEL
                             </div>
                         @endif
@@ -341,45 +354,45 @@
             </div>
         @else
             <!-- SATU TANDA TANGAN TUNGGAL RESMI (FOUNDER & DIREKTUR RUHIOLOGY INSTITUTE) -->
-            <div class="relative z-10 pt-4 border-t border-slate-200/90 px-10 flex items-end justify-between text-xs">
+            <div class="relative z-10 pt-3 border-t border-slate-200/90 px-8 flex items-end justify-between text-xs">
                 <!-- Sisi Kiri: Verifikasi Keaslian Digital -->
-                <div class="flex items-center gap-3.5 bg-slate-50/80 p-2.5 rounded-xl border border-slate-200/80">
+                <div class="flex items-center gap-3 bg-slate-50/90 p-2.5 rounded-xl border border-slate-200/90 shadow-2xs">
                     <div class="p-1 bg-white border border-slate-200 rounded-lg shadow-2xs shrink-0">
                         <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode(route('public.certificate.verify', $response->response_code)) }}" 
                              alt="QR Verifikasi" class="w-14 h-14">
                     </div>
                     <div class="space-y-0.5 text-left">
                         <span class="text-[8px] uppercase tracking-wider font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 inline-block font-mono">
-                            ✓ Terverifikasi Sah
+                            ✓ Dokumen Sah & Terverifikasi
                         </span>
                         <p class="text-[9px] font-mono font-bold text-slate-700 pt-0.5">KODE: {{ $response->response_code }}</p>
-                        <p class="text-[8px] text-slate-400 font-sans max-w-[200px] leading-tight">
-                            Pindai QR untuk memeriksa validitas & keaslian piagam ini pada sistem digital Ruhiology Institute.
+                        <p class="text-[8px] text-slate-400 font-sans max-w-[210px] leading-tight">
+                            Pindai QR untuk memeriksa autentikasi & validitas piagam ini pada server digital Ruhiology Institute.
                         </p>
                     </div>
                 </div>
 
-                <!-- Sisi Kanan: Format Sesuai Permintaan: Jabatan -> QR -> Nama -->
+                <!-- Sisi Kanan: Format Permintaan: Jabatan -> QR -> Nama -->
                 <div class="text-center w-72">
-                    <p class="text-[10px] text-slate-500 mb-0.5">
+                    <p class="text-[10px] text-slate-500 mb-0.5 font-sans">
                         {{ $form->certificate_event_location ? explode(',', $form->certificate_event_location)[0] : 'Jambi' }}, {{ $form->certificate_event_date ?: now()->translatedFormat('d F Y') }}
                     </p>
                     <p class="text-xs font-bold text-[#0B2A43] leading-snug">
-                        {{ $form->certificate_signer1_role ?: 'Founder & Direktur Ruhiology Institute' }}
+                        {{ $officialSignerRole }}
                     </p>
                     
-                    <!-- QR Code / Tanda Tangan Digital -->
-                    <div class="h-16 flex items-center justify-center my-1.5">
+                    <!-- QR Code / Tanda Tangan Digital Resmi -->
+                    <div class="h-14 flex items-center justify-center my-1">
                         @if($form->certificate_signer1_signature)
-                            <img src="{{ $form->certificate_signer1_signature }}" alt="QR Tanda Tangan" class="h-14 object-contain">
+                            <img src="{{ $form->certificate_signer1_signature }}" alt="QR Tanda Tangan" class="h-12 object-contain">
                         @else
-                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode(route('public.certificate.verify', $response->response_code)) }}" alt="QR Tanda Tangan" class="w-14 h-14 p-0.5 border border-slate-200 rounded-lg">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode(route('public.certificate.verify', $response->response_code)) }}" alt="QR Tanda Tangan" class="w-12 h-12 p-0.5 border border-slate-200 rounded-lg">
                         @endif
                     </div>
 
-                    <!-- Nama Lengkap & Gelar -->
+                    <!-- Nama Lengkap & Gelar Resmi -->
                     <strong class="block font-bold text-slate-900 border-b border-slate-300 pb-0.5 text-xs tracking-wide">
-                        {{ $form->certificate_signer1_name ?: 'Prof. Dr. Iskandar Nazari, S.Ag., M.Pd., M.S.I., M.H., Ph.D.' }}
+                        {{ $officialSignerName }}
                     </strong>
                 </div>
             </div>
@@ -390,7 +403,7 @@
     <!-- ========================================== -->
     <!-- HALAMAN 2: LEMBAR STRUKTUR MATERI & JP     -->
     <!-- ========================================== -->
-    <div id="certPage2" class="a4-landscape shadow-2xl p-10 flex flex-col justify-between border-[8px] border-[#0B2A43] relative">
+    <div id="certPage2" class="a4-landscape shadow-2xl p-6 sm:p-7 flex flex-col justify-between border-[8px] border-[#0B2A43] relative">
         
         <!-- Double Border Accent (Gold) -->
         <div class="absolute inset-2 border-[2px] border-[#D4AF37] pointer-events-none"></div>
@@ -409,22 +422,22 @@
         </div>
 
         <!-- 1. Header Halaman Belakang -->
-        <div class="relative z-10 border-b border-slate-200 pb-3 text-center">
-            <h2 class="font-cinzel text-xl font-bold tracking-widest text-[#0B2A43]">
+        <div class="relative z-10 border-b border-slate-200 pb-2 text-center">
+            <h2 class="font-cinzel text-lg sm:text-xl font-bold tracking-widest text-[#0B2A43]">
                 STRUKTUR PROGRAM & MATRIKS JAM PELAJARAN (JP)
             </h2>
-            <p class="font-serif-title font-semibold text-sm text-[#8C703E] mt-1">
-                "{{ $form->certificate_event_name ?: $form->title }}"
+            <p class="font-serif-title font-semibold text-xs sm:text-sm text-[#8C703E] mt-0.5">
+                "{{ $form->clean_certificate_event_name }}"
             </p>
-            <div class="flex items-center justify-center gap-4 text-[10px] text-slate-500 mt-2 font-mono">
+            <div class="flex items-center justify-center gap-4 text-[9px] text-slate-500 mt-1 font-mono">
                 <span>Nama Peserta: <strong class="text-slate-800">{{ $response->participant_name }}</strong></span>
                 <span>•</span>
-                <span>No. Sertifikat: <strong class="text-slate-800">{{ $response->certificate_number }}</strong></span>
+                <span>No. Sertifikat: <strong class="text-slate-800">{{ $response->clean_certificate_number }}</strong></span>
             </div>
         </div>
 
         <!-- 2. Curriculum Table -->
-        <div class="relative z-10 my-auto py-4 px-6">
+        <div class="relative z-10 my-auto py-1 px-4 sm:px-6">
             @php
                 $curriculum = $form->parsed_curriculum;
                 if (empty($curriculum)) {
@@ -441,21 +454,21 @@
                 <table class="w-full text-left border-collapse text-xs">
                     <thead>
                         <tr class="bg-[#0B2A43] text-white text-[11px] uppercase tracking-wider font-semibold">
-                            <th class="py-2.5 px-4 w-12 text-center border-r border-slate-700">No</th>
-                            <th class="py-2.5 px-6 border-r border-slate-700">Pokok Bahasan / Materi Pelatihan</th>
-                            <th class="py-2.5 px-6 w-36 text-center">Alokasi Waktu</th>
+                            <th class="py-2 px-4 w-12 text-center border-r border-slate-700">No</th>
+                            <th class="py-2 px-6 border-r border-slate-700">Pokok Bahasan / Materi Pelatihan</th>
+                            <th class="py-2 px-6 w-36 text-center">Alokasi Waktu</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-200 font-medium text-slate-800">
                         @foreach($curriculum as $index => $item)
                             <tr class="{{ $index % 2 === 0 ? 'bg-white' : 'bg-slate-50/70' }}">
-                                <td class="py-2.5 px-4 text-center font-bold text-slate-500 border-r border-slate-200">
+                                <td class="py-2 px-4 text-center font-bold text-slate-500 border-r border-slate-200">
                                     {{ $index + 1 }}
                                 </td>
-                                <td class="py-2.5 px-6 border-r border-slate-200 font-semibold text-slate-800">
+                                <td class="py-2 px-6 border-r border-slate-200 font-semibold text-slate-800">
                                     {{ $item['title'] }}
                                 </td>
-                                <td class="py-2.5 px-6 text-center font-bold text-[#8C703E]">
+                                <td class="py-2 px-6 text-center font-bold text-[#8C703E]">
                                     {{ $item['jp'] }}
                                 </td>
                             </tr>
@@ -463,10 +476,10 @@
                     </tbody>
                     <tfoot>
                         <tr class="bg-amber-50/80 border-t-2 border-slate-300 text-xs font-bold text-[#0B2A43]">
-                            <td colspan="2" class="py-3 px-6 text-right uppercase tracking-wider border-r border-slate-300">
+                            <td colspan="2" class="py-2 px-6 text-right uppercase tracking-wider border-r border-slate-300">
                                 Total Alokasi Jam Pelajaran (JP)
                             </td>
-                            <td class="py-3 px-6 text-center text-sm font-black text-[#8C703E]">
+                            <td class="py-2 px-6 text-center text-sm font-black text-[#8C703E]">
                                 {{ $form->calculated_total_jp }}
                             </td>
                         </tr>
@@ -474,35 +487,34 @@
                 </table>
             </div>
             
-            <p class="text-[10px] text-slate-400 mt-2 italic text-center">
+            <p class="text-[9px] text-slate-400 mt-1 italic text-center">
                 * 1 (satu) Jam Pelajaran (JP) setara dengan 45 menit pembelajaran aktif/praktik terbimbing.
             </p>
         </div>
 
         <!-- 3. Signature & Validation Footer Halaman 2 -->
-        <div class="relative z-10 pt-4 border-t border-slate-200/90 px-8 flex items-end justify-between text-xs">
-            <div class="text-[10px] text-slate-500 max-w-sm leading-relaxed">
+        <div class="relative z-10 pt-2 border-t border-slate-200/90 px-6 sm:px-8 flex items-end justify-between text-xs">
+            <div class="text-[9px] text-slate-500 max-w-sm leading-relaxed">
                 <p><strong>Catatan Legalitas:</strong></p>
-                <p>Dokumen ini merupakan lampiran kurikulum materi resmi dan tak terpisahkan dari lembar sertifikat utama ber-QR digital dengan nomor seri registrasi <strong>{{ $response->certificate_number }}</strong>.</p>
+                <p>Dokumen ini merupakan lampiran kurikulum materi resmi dan tak terpisahkan dari lembar sertifikat utama ber-QR digital dengan nomor seri registrasi <strong>{{ $response->clean_certificate_number }}</strong>.</p>
             </div>
 
             <div class="text-center w-72">
                 <p class="text-[10px] text-slate-500 mb-0.5">
-                    Ditetapkan di: {{ $form->certificate_event_location ? explode(',', $form->certificate_event_location)[0] : 'Jambi' }}<br>
-                    Pada tanggal: {{ $form->certificate_event_date ?: now()->translatedFormat('d F Y') }}
+                    Ditetapkan di: {{ $form->certificate_event_location ? explode(',', $form->certificate_event_location)[0] : 'Jambi' }}, {{ $form->certificate_event_date ?: now()->translatedFormat('d F Y') }}
                 </p>
                 <p class="text-xs font-bold text-[#0B2A43] leading-snug">
-                    {{ $form->certificate_signer1_role ?: 'Founder & Direktur Ruhiology Institute' }}
+                    {{ $officialSignerRole }}
                 </p>
-                <div class="h-16 flex items-center justify-center my-1.5">
+                <div class="h-14 flex items-center justify-center my-1">
                     @if($form->certificate_signer1_signature)
-                        <img src="{{ $form->certificate_signer1_signature }}" alt="QR Pengesahan" class="h-14 object-contain">
+                        <img src="{{ $form->certificate_signer1_signature }}" alt="QR Pengesahan" class="h-12 object-contain">
                     @else
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode(route('public.certificate.verify', $response->response_code)) }}" alt="QR Pengesahan" class="w-14 h-14 p-0.5 border border-slate-200 rounded-lg">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode(route('public.certificate.verify', $response->response_code)) }}" alt="QR Pengesahan" class="w-12 h-12 p-0.5 border border-slate-200 rounded-lg">
                     @endif
                 </div>
                 <strong class="block font-bold text-slate-900 border-b border-slate-300 pb-0.5 text-xs tracking-wide">
-                    {{ $form->certificate_signer1_name ?: 'Prof. Dr. Iskandar Nazari, S.Ag., M.Pd., M.S.I., M.H., Ph.D.' }}
+                    {{ $officialSignerName }}
                 </strong>
             </div>
         </div>

@@ -146,6 +146,20 @@ class CustomFormResponse extends Model
         return $certNo;
     }
 
+    public function getCleanCertificateNumberAttribute(): string
+    {
+        $num = $this->certificate_number;
+        if (empty($num)) {
+            $num = $this->ensureCertificateNumber();
+        }
+        // Clean up curly braces left over from patterns like {017} or {10} or {2026}
+        $num = preg_replace('/\{([0-9a-zA-Z\-_]+)\}/', '$1', (string)$num);
+        // Fix common typos in number pattern
+        $num = str_ireplace('worshop', 'Workshop', $num);
+        $num = str_ireplace('workahop', 'Workshop', $num);
+        return trim($num);
+    }
+
     public function getCertificateUrlAttribute(): string
     {
         return route('public.form.view_certificate', [
