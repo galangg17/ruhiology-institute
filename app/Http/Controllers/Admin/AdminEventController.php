@@ -68,6 +68,8 @@ class AdminEventController extends Controller
             'group_label' => ['nullable', 'string', 'max:100'],
             'custom_subcategories' => ['nullable'],
             'institution_name' => ['nullable', 'string', 'max:255'],
+            'country_code' => ['nullable', 'string', 'max:10'],
+            'country_name' => ['nullable', 'string', 'max:100'],
             'province_id' => ['nullable', 'exists:provinces,id'],
             'regency_id' => ['nullable', 'exists:regencies,id'],
             'program_id' => ['nullable', 'exists:programs,id'],
@@ -88,6 +90,19 @@ class AdminEventController extends Controller
             $validated['event_code'] = 'RQ-' . $prefix . '-' . strtoupper(Str::random(6));
         } else {
             $validated['event_code'] = strtoupper(Str::slug($validated['event_code'], '-'));
+        }
+
+        // Handle Regional Scope (Dalam Negeri vs Luar Negeri)
+        $countryCode = strtoupper(trim((string) $request->input('country_code', 'ID')));
+        $countryName = trim((string) $request->input('country_name', 'Indonesia'));
+        if ($countryCode !== 'ID' && !empty($countryName) && $countryName !== 'Indonesia') {
+            $validated['country_code'] = $countryCode;
+            $validated['country_name'] = $countryName;
+            $validated['province_id'] = null;
+            $validated['regency_id'] = null;
+        } else {
+            $validated['country_code'] = 'ID';
+            $validated['country_name'] = 'Indonesia';
         }
 
         // Process custom_subcategories input if string
@@ -183,6 +198,8 @@ class AdminEventController extends Controller
             'target_category' => ['nullable', 'string', 'max:100'],
             'group_label' => ['nullable', 'string', 'max:100'],
             'custom_subcategories' => ['nullable'],
+            'country_code' => ['nullable', 'string', 'max:10'],
+            'country_name' => ['nullable', 'string', 'max:100'],
             'province_id' => ['nullable', 'exists:provinces,id'],
             'regency_id' => ['nullable', 'exists:regencies,id'],
             'access_type' => ['nullable', 'in:EVENT_PROGRAM,PUBLIC_SELF'],
@@ -209,6 +226,19 @@ class AdminEventController extends Controller
             } elseif (is_array($validated['custom_subcategories'])) {
                 $validated['custom_subcategories'] = array_values(array_filter(array_map('trim', $validated['custom_subcategories'])));
             }
+        }
+
+        // Handle Regional Scope (Dalam Negeri vs Luar Negeri)
+        $countryCode = strtoupper(trim((string) $request->input('country_code', 'ID')));
+        $countryName = trim((string) $request->input('country_name', 'Indonesia'));
+        if ($countryCode !== 'ID' && !empty($countryName) && $countryName !== 'Indonesia') {
+            $validated['country_code'] = $countryCode;
+            $validated['country_name'] = $countryName;
+            $validated['province_id'] = null;
+            $validated['regency_id'] = null;
+        } else {
+            $validated['country_code'] = 'ID';
+            $validated['country_name'] = 'Indonesia';
         }
 
         $event->update($validated);

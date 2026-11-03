@@ -19,6 +19,16 @@
                 <h1 class="text-2xl font-bold font-serif text-[#0B2A43]">{{ $event->title }}</h1>
                 <p class="text-xs text-slate-500 mt-1 flex items-center gap-2">
                     <span>🏛️ {{ $event->institution_name ?? 'Umum' }}</span>
+                    @if($event->isInternational())
+                        <span>•</span>
+                        <span class="inline-flex items-center gap-1 font-semibold text-amber-800 bg-amber-50 px-2 py-0.5 rounded text-[10px] border border-amber-200">
+                            <span>🌍</span>
+                            <span>{{ $event->country_name }}</span>
+                        </span>
+                    @elseif($event->regency || $event->province)
+                        <span>•</span>
+                        <span>📍 {{ $event->regency ? $event->regency->formatted_name : '' }}{{ $event->province ? ', ' . $event->province->name : '' }}</span>
+                    @endif
                     <span>•</span>
                     <span>📅 {{ $event->start_date ? $event->start_date->format('d M Y') : 'Kapan Saja' }}</span>
                 </p>
@@ -286,6 +296,88 @@
                             <input type="text" name="institution_name" x-model="editData.institution_name" required placeholder="Contoh: SMAN Titian Teras Jambi / Aula Pemda" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-[#0B2A43] outline-none font-medium text-xs">
                         </div>
 
+                        <!-- Cakupan Wilayah Event -->
+                        <div class="space-y-1.5">
+                            <label class="block font-bold text-slate-700 text-xs">Cakupan Wilayah Event *</label>
+                            <div class="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-xl border border-slate-200">
+                                <button type="button" 
+                                    @click="editScope = 'domestic'; editCountryCode = 'ID'; editCountryName = 'Indonesia'"
+                                    :class="editScope === 'domestic' ? 'bg-white shadow-xs font-bold text-[#0B2A43]' : 'text-slate-600 font-medium hover:text-slate-900'"
+                                    class="py-1.5 px-3 rounded-lg text-xs flex items-center justify-center gap-1.5 transition cursor-pointer">
+                                    <span>🇮🇩</span>
+                                    <span>Dalam Negeri</span>
+                                </button>
+                                <button type="button" 
+                                    @click="editScope = 'international'; if(editCountryCode === 'ID') { editCountryCode = 'MY'; editCountryName = 'Malaysia'; } editProvinceId = ''; editRegencyId = ''"
+                                    :class="editScope === 'international' ? 'bg-[#0F2537] text-white shadow-xs font-bold' : 'text-slate-600 font-medium hover:text-slate-900'"
+                                    class="py-1.5 px-3 rounded-lg text-xs flex items-center justify-center gap-1.5 transition cursor-pointer">
+                                    <span>🌍</span>
+                                    <span>Luar Negeri</span>
+                                </button>
+                            </div>
+                            <input type="hidden" name="country_code" :value="editCountryCode">
+                            <input type="hidden" name="country_name" :value="editCountryName">
+                        </div>
+
+                        <!-- Jika Dalam Negeri (Indonesia) -->
+                        <div x-show="editScope === 'domestic'" class="grid grid-cols-2 gap-3" x-transition>
+                            <div>
+                                <label class="block font-bold text-slate-700 text-xs mb-1">Provinsi</label>
+                                <select name="province_id" x-model="editProvinceId" @change="onEditProvinceChange(true)" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-white font-medium text-slate-800 outline-none text-xs">
+                                    <option value="">-- Pilih Provinsi --</option>
+                                    <template x-for="prov in provincesList" :key="prov.id">
+                                        <option :value="prov.id" x-text="prov.name"></option>
+                                    </template>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-700 text-xs mb-1">Kabupaten / Kota</label>
+                                <select name="regency_id" x-model="editRegencyId" :disabled="!editProvinceId" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-white font-medium text-slate-800 outline-none text-xs disabled:opacity-50">
+                                    <option value="">-- Pilih Kab/Kota --</option>
+                                    <template x-for="reg in filteredEditRegencies" :key="reg.id">
+                                        <option :value="reg.id" x-text="reg.formatted_name || reg.name"></option>
+                                    </template>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Jika Luar Negeri (Internasional) -->
+                        <div x-show="editScope === 'international'" class="p-3 bg-amber-50/70 rounded-xl border border-amber-200/80 space-y-2.5" x-transition style="display: none;">
+                            <div class="flex items-center gap-1.5 text-xs font-bold text-amber-950">
+                                <span>🌍</span>
+                                <span>Pilihan Negara Internasional</span>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block font-bold text-slate-700 text-xs mb-1">Negara Tujuan</label>
+                                    <select x-model="editCountryName" @change="
+                                        const c = commonCountries.find(x => x.name === editCountryName);
+                                        if (c) { editCountryCode = c.code; }
+                                        else if (editCountryName === 'Lainnya') { editCountryCode = 'OTHER'; }
+                                    " class="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-white font-semibold text-slate-800 outline-none focus:border-[#0F2537] text-xs transition">
+                                        <template x-for="c in commonCountries" :key="c.code">
+                                            <option :value="c.name" x-text="c.flag + ' ' + c.name"></option>
+                                        </template>
+                                        <option value="Lainnya">🌍 Negara Lainnya...</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block font-bold text-slate-700 text-xs mb-1">
+                                        <span x-show="editCountryName === 'Lainnya'">Ketik Nama Negara</span>
+                                        <span x-show="editCountryName !== 'Lainnya'">Kota / Wilayah Luar Negeri</span>
+                                    </label>
+                                    <template x-if="editCountryName === 'Lainnya'">
+                                        <input type="text" x-model="customCountryNameEdit" @input="editCountryName = customCountryNameEdit; editCountryCode = 'OTHER'" placeholder="Contoh: Jerman, Prancis, Maroko..." class="w-full px-3 py-2.5 rounded-xl border border-amber-300 bg-white text-xs outline-none font-medium">
+                                    </template>
+                                    <template x-if="editCountryName !== 'Lainnya'">
+                                        <div class="text-[11px] text-slate-500 pt-1 leading-snug">
+                                            Kota luar negeri ditulis pada kolom <strong>Tempat / Instansi Kegiatan</strong> di atas.
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <label class="block font-bold text-slate-800 text-xs mb-1 flex items-center justify-between">
@@ -550,7 +642,41 @@ function adminEventsManager() {
         provincesList: @json($provinces ?? []),
         regenciesMap: @json($regenciesMap ?? []),
         filteredBulkRegencies: [],
-        editUrl: '',
+        editProvinceId: '',
+        editRegencyId: '',
+        filteredEditRegencies: [],
+        editScope: 'domestic',
+        editCountryCode: 'ID',
+        editCountryName: 'Indonesia',
+        customCountryNameEdit: '',
+
+        commonCountries: [
+            { code: 'MY', name: 'Malaysia', flag: '🇲🇾' },
+            { code: 'SG', name: 'Singapura', flag: '🇸🇬' },
+            { code: 'BN', name: 'Brunei Darussalam', flag: '🇧🇳' },
+            { code: 'SA', name: 'Arab Saudi', flag: '🇸🇦' },
+            { code: 'EG', name: 'Mesir', flag: '🇪🇬' },
+            { code: 'TR', name: 'Turki', flag: '🇹🇷' },
+            { code: 'AE', name: 'Uni Emirat Arab', flag: '🇦🇪' },
+            { code: 'JO', name: 'Yordania', flag: '🇯🇴' },
+            { code: 'QA', name: 'Qatar', flag: '🇶🇦' },
+            { code: 'JP', name: 'Jepang', flag: '🇯🇵' },
+            { code: 'AU', name: 'Australia', flag: '🇦🇺' },
+            { code: 'GB', name: 'Inggris (UK)', flag: '🇬🇧' },
+            { code: 'US', name: 'Amerika Serikat', flag: '🇺🇸' },
+        ],
+
+        onEditProvinceChange(resetRegency = true) {
+            if (resetRegency) {
+                this.editRegencyId = '';
+            }
+            if (!this.editProvinceId) {
+                this.filteredEditRegencies = [];
+                return;
+            }
+            const pid = String(this.editProvinceId);
+            this.filteredEditRegencies = this.regenciesMap[pid] || this.regenciesMap[Number(pid)] || [];
+        },
         newOptionText: '',
         editSubcategoriesList: [],
 
@@ -621,9 +747,21 @@ function adminEventsManager() {
 
             this.newOptionText = '';
 
+            const isIntl = eventData.country_code && eventData.country_code !== 'ID';
+            this.editScope = isIntl ? 'international' : 'domestic';
+            this.editCountryCode = eventData.country_code || 'ID';
+            this.editCountryName = eventData.country_name || 'Indonesia';
+            this.customCountryNameEdit = '';
+
+            this.editProvinceId = eventData.province_id || '';
+            this.onEditProvinceChange(false);
+            this.editRegencyId = eventData.regency_id || '';
+
             this.editData = {
                 title: eventData.title || '',
                 institution_name: eventData.institution_name || '',
+                country_code: eventData.country_code || 'ID',
+                country_name: eventData.country_name || 'Indonesia',
                 event_code: eventData.event_code || '',
                 status: eventData.status || 'active',
                 instrument_id: eventData.instrument_id || '',

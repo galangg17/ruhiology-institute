@@ -75,6 +75,25 @@ class Event extends Model
         return $this->hasMany(AssessmentSubmission::class, 'event_id');
     }
 
+    public function isInternational(): bool
+    {
+        return !empty($this->country_code) && $this->country_code !== 'ID';
+    }
+
+    public function getLocationLabelAttribute(): string
+    {
+        if ($this->isInternational()) {
+            return '🌍 ' . ($this->country_name ?: 'Luar Negeri');
+        }
+        if ($this->regency) {
+            return $this->regency->formatted_name;
+        }
+        if ($this->province) {
+            return $this->province->name;
+        }
+        return 'Indonesia';
+    }
+
     public function getDirectAccessUrlAttribute(): string
     {
         return url('/assessment?event=' . $this->event_code);

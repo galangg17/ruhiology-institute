@@ -185,27 +185,27 @@
                         
                         <!-- Signer 1: Ruhiology -->
                         <div class="p-4 bg-slate-50/70 rounded-2xl border border-slate-200/80 space-y-3">
-                            <span class="text-xs font-bold text-slate-800 block">Tanda Tangan 1: Direktur Ruhiology Institute</span>
+                            <span class="text-xs font-bold text-slate-800 block">Tanda Tangan Utama: Founder & Direktur Ruhiology Institute</span>
                             <div>
                                 <label class="block text-[11px] text-slate-600 mb-1">Nama Lengkap & Gelar</label>
-                                <input type="text" name="certificate_signer1_name" value="Prof. Dr. Iskandar Nazari, M.Pd" class="w-full p-2 rounded-lg border border-slate-300 text-xs bg-white">
+                                <input type="text" name="certificate_signer1_name" value="Prof. Dr. Iskandar Nazari, S.Ag., M.Pd., M.S.I., M.H., Ph.D." class="w-full p-2 rounded-lg border border-slate-300 text-xs bg-white">
                             </div>
                             <div>
-                                <label class="block text-[11px] text-slate-600 mb-1">Jabatan Resmi</label>
-                                <input type="text" name="certificate_signer1_role" value="Direktur Ruhiology Institute" class="w-full p-2 rounded-lg border border-slate-300 text-xs bg-white">
+                                <label class="block text-[11px] text-slate-600 mb-1">Jabatan Resmi (Label Atas Tanda Tangan)</label>
+                                <input type="text" name="certificate_signer1_role" value="Founder & Direktur Ruhiology Institute" class="w-full p-2 rounded-lg border border-slate-300 text-xs bg-white">
                             </div>
                             <div>
-                                <label class="block text-[11px] text-slate-600 mb-1">File Tanda Tangan Digital (.png transparan)</label>
+                                <label class="block text-[11px] text-slate-600 mb-1">File Tanda Tangan / QR Code (.png transparan atau gambar)</label>
                                 <input type="file" name="signer1_sig_file" accept="image/*" class="w-full text-xs p-1 rounded-lg border border-slate-300 bg-white">
                             </div>
                         </div>
 
                         <!-- Signer 2: Partner / School -->
                         <div class="p-4 bg-slate-50/70 rounded-2xl border border-slate-200/80 space-y-3">
-                            <span class="text-xs font-bold text-slate-800 block">Tanda Tangan 2: Pimpinan Mitra / Sekolah</span>
+                            <span class="text-xs font-bold text-slate-800 block">Tanda Tangan 2: Pimpinan Mitra / Sekolah <span class="text-[10px] text-slate-400 font-normal">(Opsional)</span></span>
                             <div>
-                                <label class="block text-[11px] text-slate-600 mb-1">Nama Lengkap & Gelar</label>
-                                <input type="text" name="certificate_signer2_name" placeholder="Contoh: Drs. H. Ahmad Sobri, M.Si" class="w-full p-2 rounded-lg border border-slate-300 text-xs bg-white">
+                                <label class="block text-[11px] text-slate-600 mb-1">Nama Lengkap & Gelar (Kosongkan jika hanya 1 TTD)</label>
+                                <input type="text" name="certificate_signer2_name" placeholder="Kosongkan jika hanya Prof. Iskandar" class="w-full p-2 rounded-lg border border-slate-300 text-xs bg-white">
                             </div>
                             <div>
                                 <label class="block text-[11px] text-slate-600 mb-1">Jabatan Resmi</label>

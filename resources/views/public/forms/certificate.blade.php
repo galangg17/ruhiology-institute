@@ -230,58 +230,106 @@
         </div>
 
         <!-- 3. Signatures & QR Code Section -->
-        <div class="relative z-10 pt-4 border-t border-slate-200/90 px-8 flex items-end justify-between text-xs">
-            
-            <!-- Signer 1 (Direktur Ruhiology) -->
-            <div class="text-center w-56">
-                <p class="text-[10px] text-slate-400 font-semibold uppercase">Penyelenggara,</p>
-                <div class="h-16 flex items-center justify-center my-1">
-                    @if($form->certificate_signer1_signature)
-                        <img src="{{ $form->certificate_signer1_signature }}" alt="TTD 1" class="h-14 object-contain">
-                    @else
-                        <!-- Official Digital Seal Stamp Placeholder -->
-                        <div class="w-16 h-16 rounded-full border-2 border-dashed border-[#D4AF37] flex items-center justify-center text-[9px] font-bold text-[#D4AF37] uppercase text-center p-1">
-                            RUHIOLOGY SEAL
-                        </div>
-                    @endif
-                </div>
-                <strong class="block font-bold text-slate-900 border-b border-slate-300 pb-0.5 text-xs">{{ $form->certificate_signer1_name ?: 'Prof. Dr. Iskandar Nazari, M.Pd' }}</strong>
-                <span class="text-[10px] text-slate-500 block mt-0.5">{{ $form->certificate_signer1_role ?: 'Direktur Ruhiology Institute' }}</span>
-            </div>
+        @php
+            $hasSecondSigner = !empty($form->certificate_signer2_name) 
+                && trim((string)$form->certificate_signer2_name) !== '' 
+                && trim(strtolower((string)$form->certificate_signer2_name)) !== trim(strtolower((string)$form->certificate_signer1_name));
+        @endphp
 
-            <!-- Center: QR Code Verification -->
-            <div class="text-center px-4 flex flex-col items-center">
-                <div class="p-1.5 bg-white border border-slate-200 rounded-xl shadow-xs">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode(route('public.certificate.verify', $response->response_code)) }}" 
-                         alt="QR Verifikasi" class="w-16 h-16">
+        @if($hasSecondSigner)
+            <!-- DUA TANDA TANGAN (KEMITRAAN DENGAN INSTANSI LAIN) -->
+            <div class="relative z-10 pt-4 border-t border-slate-200/90 px-8 flex items-end justify-between text-xs">
+                <!-- Signer 1: Founder & Direktur -->
+                <div class="text-center w-56">
+                    <p class="text-[11px] font-bold text-[#0B2A43] leading-tight min-h-[28px] flex items-center justify-center">
+                        {{ $form->certificate_signer1_role ?: 'Founder & Direktur Ruhiology Institute' }}
+                    </p>
+                    <div class="h-16 flex items-center justify-center my-1">
+                        @if($form->certificate_signer1_signature)
+                            <img src="{{ $form->certificate_signer1_signature }}" alt="QR Tanda Tangan" class="h-14 object-contain">
+                        @else
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode(route('public.certificate.verify', $response->response_code)) }}" alt="QR Tanda Tangan" class="w-14 h-14 p-0.5 border border-slate-200 rounded-lg">
+                        @endif
+                    </div>
+                    <strong class="block font-bold text-slate-900 border-b border-slate-300 pb-0.5 text-xs">
+                        {{ $form->certificate_signer1_name ?: 'Prof. Dr. Iskandar Nazari, S.Ag., M.Pd., M.S.I., M.H., Ph.D.' }}
+                    </strong>
                 </div>
-                <span class="text-[8px] font-mono text-slate-400 mt-1 uppercase tracking-wider">Scan untuk Keaslian Digital</span>
-                <span class="text-[8px] font-mono font-bold text-slate-600">{{ $response->response_code }}</span>
-            </div>
 
-            <!-- Signer 2 (Mitra / Kepala Sekolah) -->
-            <div class="text-center w-56">
-                <p class="text-[10px] text-slate-400 font-semibold uppercase">
-                    {{ $form->certificate_signer2_name ? 'Mengetahui / Pimpinan Mitra,' : 'Penanggung Jawab Akademik,' }}
-                </p>
-                <div class="h-16 flex items-center justify-center my-1">
-                    @if($form->certificate_signer2_signature)
-                        <img src="{{ $form->certificate_signer2_signature }}" alt="TTD 2" class="h-14 object-contain">
-                    @else
-                        <div class="w-16 h-16 rounded-full border border-slate-200 flex items-center justify-center text-[9px] text-slate-400 uppercase">
-                            STEMPEL
-                        </div>
-                    @endif
+                <!-- Center: QR Code Verification -->
+                <div class="text-center px-4 flex flex-col items-center">
+                    <div class="p-1.5 bg-white border border-slate-200 rounded-xl shadow-xs">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode(route('public.certificate.verify', $response->response_code)) }}" 
+                             alt="QR Verifikasi" class="w-16 h-16">
+                    </div>
+                    <span class="text-[8px] font-mono text-slate-400 mt-1 uppercase tracking-wider">Scan untuk Keaslian Digital</span>
+                    <span class="text-[8px] font-mono font-bold text-slate-600">{{ $response->response_code }}</span>
                 </div>
-                <strong class="block font-bold text-slate-900 border-b border-slate-300 pb-0.5 text-xs">
-                    {{ $form->certificate_signer2_name ?: 'Drs. H. Ahmad Fauzi, M.Si' }}
-                </strong>
-                <span class="text-[10px] text-slate-500 block mt-0.5">
-                    {{ $form->certificate_signer2_role ?: 'Ketua Tim Penjamin Mutu Pelatihan' }}
-                </span>
-            </div>
 
-        </div>
+                <!-- Signer 2 (Pimpinan Mitra / Sekolah) -->
+                <div class="text-center w-56">
+                    <p class="text-[11px] font-bold text-[#0B2A43] leading-tight min-h-[28px] flex items-center justify-center">
+                        {{ $form->certificate_signer2_role ?: 'Pimpinan Mitra / Instansi' }}
+                    </p>
+                    <div class="h-16 flex items-center justify-center my-1">
+                        @if($form->certificate_signer2_signature)
+                            <img src="{{ $form->certificate_signer2_signature }}" alt="TTD Mitra" class="h-14 object-contain">
+                        @else
+                            <div class="w-14 h-14 rounded-full border border-slate-200 flex items-center justify-center text-[8px] text-slate-400 uppercase font-mono">
+                                STEMPEL
+                            </div>
+                        @endif
+                    </div>
+                    <strong class="block font-bold text-slate-900 border-b border-slate-300 pb-0.5 text-xs">
+                        {{ $form->certificate_signer2_name }}
+                    </strong>
+                </div>
+            </div>
+        @else
+            <!-- SATU TANDA TANGAN TUNGGAL RESMI (FOUNDER & DIREKTUR RUHIOLOGY INSTITUTE) -->
+            <div class="relative z-10 pt-4 border-t border-slate-200/90 px-10 flex items-end justify-between text-xs">
+                <!-- Sisi Kiri: Verifikasi Keaslian Digital -->
+                <div class="flex items-center gap-3.5 bg-slate-50/80 p-2.5 rounded-xl border border-slate-200/80">
+                    <div class="p-1 bg-white border border-slate-200 rounded-lg shadow-2xs shrink-0">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode(route('public.certificate.verify', $response->response_code)) }}" 
+                             alt="QR Verifikasi" class="w-14 h-14">
+                    </div>
+                    <div class="space-y-0.5 text-left">
+                        <span class="text-[8px] uppercase tracking-wider font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 inline-block font-mono">
+                            ✓ Terverifikasi Sah
+                        </span>
+                        <p class="text-[9px] font-mono font-bold text-slate-700 pt-0.5">KODE: {{ $response->response_code }}</p>
+                        <p class="text-[8px] text-slate-400 font-sans max-w-[200px] leading-tight">
+                            Pindai QR untuk memeriksa validitas & keaslian piagam ini pada sistem digital Ruhiology Institute.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Sisi Kanan: Format Sesuai Permintaan: Jabatan -> QR -> Nama -->
+                <div class="text-center w-72">
+                    <p class="text-[10px] text-slate-500 mb-0.5">
+                        {{ $form->certificate_event_location ? explode(',', $form->certificate_event_location)[0] : 'Jambi' }}, {{ $form->certificate_event_date ?: now()->translatedFormat('d F Y') }}
+                    </p>
+                    <p class="text-xs font-bold text-[#0B2A43] leading-snug">
+                        {{ $form->certificate_signer1_role ?: 'Founder & Direktur Ruhiology Institute' }}
+                    </p>
+                    
+                    <!-- QR Code / Tanda Tangan Digital -->
+                    <div class="h-16 flex items-center justify-center my-1.5">
+                        @if($form->certificate_signer1_signature)
+                            <img src="{{ $form->certificate_signer1_signature }}" alt="QR Tanda Tangan" class="h-14 object-contain">
+                        @else
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode(route('public.certificate.verify', $response->response_code)) }}" alt="QR Tanda Tangan" class="w-14 h-14 p-0.5 border border-slate-200 rounded-lg">
+                        @endif
+                    </div>
+
+                    <!-- Nama Lengkap & Gelar -->
+                    <strong class="block font-bold text-slate-900 border-b border-slate-300 pb-0.5 text-xs tracking-wide">
+                        {{ $form->certificate_signer1_name ?: 'Prof. Dr. Iskandar Nazari, S.Ag., M.Pd., M.S.I., M.H., Ph.D.' }}
+                    </strong>
+                </div>
+            </div>
+        @endif
 
     </div>
 
@@ -369,27 +417,27 @@
         <div class="relative z-10 pt-4 border-t border-slate-200/90 px-8 flex items-end justify-between text-xs">
             <div class="text-[10px] text-slate-500 max-w-sm leading-relaxed">
                 <p><strong>Catatan Legalitas:</strong></p>
-                <p>Dokumen ini merupakan lampiran resmi dan tak terpisahkan dari lembar sertifikat utama dengan nomor registrasi yang sama.</p>
+                <p>Dokumen ini merupakan lampiran kurikulum materi resmi dan tak terpisahkan dari lembar sertifikat utama ber-QR digital dengan nomor seri registrasi <strong>{{ $response->certificate_number }}</strong>.</p>
             </div>
 
-            <div class="text-center w-64">
-                <p class="text-[10px] text-slate-500">
-                    Ditetapkan di: {{ $form->certificate_event_location ?: 'Indonesia' }}<br>
+            <div class="text-center w-72">
+                <p class="text-[10px] text-slate-500 mb-0.5">
+                    Ditetapkan di: {{ $form->certificate_event_location ? explode(',', $form->certificate_event_location)[0] : 'Jambi' }}<br>
                     Pada tanggal: {{ $form->certificate_event_date ?: now()->translatedFormat('d F Y') }}
                 </p>
-                <div class="h-14 flex items-center justify-center my-1">
+                <p class="text-xs font-bold text-[#0B2A43] leading-snug">
+                    {{ $form->certificate_signer1_role ?: 'Founder & Direktur Ruhiology Institute' }}
+                </p>
+                <div class="h-16 flex items-center justify-center my-1.5">
                     @if($form->certificate_signer1_signature)
-                        <img src="{{ $form->certificate_signer1_signature }}" alt="TTD Pengesahan" class="h-12 object-contain">
+                        <img src="{{ $form->certificate_signer1_signature }}" alt="QR Pengesahan" class="h-14 object-contain">
                     @else
-                        <div class="w-14 h-14 rounded-full border-2 border-dashed border-[#D4AF37] flex items-center justify-center text-[8px] font-bold text-[#D4AF37] uppercase text-center p-1">
-                            SEAL
-                        </div>
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode(route('public.certificate.verify', $response->response_code)) }}" alt="QR Pengesahan" class="w-14 h-14 p-0.5 border border-slate-200 rounded-lg">
                     @endif
                 </div>
-                <strong class="block font-bold text-slate-900 border-b border-slate-300 pb-0.5 text-xs">
-                    {{ $form->certificate_signer1_name ?: 'Prof. Dr. Iskandar Nazari, M.Pd' }}
+                <strong class="block font-bold text-slate-900 border-b border-slate-300 pb-0.5 text-xs tracking-wide">
+                    {{ $form->certificate_signer1_name ?: 'Prof. Dr. Iskandar Nazari, S.Ag., M.Pd., M.S.I., M.H., Ph.D.' }}
                 </strong>
-                <span class="text-[10px] text-slate-500 block mt-0.5">Penanggung Jawab Akademik</span>
             </div>
         </div>
 
