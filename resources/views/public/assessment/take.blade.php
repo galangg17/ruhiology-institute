@@ -48,7 +48,7 @@
                     <span x-text="progressPercentage + '%'" class="text-white font-mono"></span>
                 </div>
                 <div class="w-24 sm:w-48 bg-slate-700 rounded-full h-1.5 sm:h-2 overflow-hidden">
-                    <div class="bg-[#C9A24D] h-full rounded-full transition-all duration-300" :style="'width: ' + progressPercentage + '%'"></div>
+                    <div class="bg-gradient-to-r from-[#C9A24D] via-amber-400 to-emerald-400 h-full rounded-full transition-all duration-300 shadow-sm shadow-[#C9A24D]/50" :style="'width: ' + progressPercentage + '%'"></div>
                 </div>
             </div>
         </div>
@@ -105,9 +105,9 @@
                             <!-- Options Radio Cards (Text Only Minimalist Pill Grid) -->
                             <div class="pt-1 grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-2.5 text-xs">
                                 @foreach($q->options as $opt)
-                                    <label class="border-2 border-slate-200/90 rounded-2xl p-3 sm:p-4 text-center cursor-pointer hover:bg-slate-50 hover:border-[#0B2A43]/40 has-[:checked]:bg-[#0B2A43] has-[:checked]:border-[#0B2A43] has-[:checked]:text-white transition-all duration-200 flex flex-col justify-center items-center group shadow-2xs min-h-[50px] sm:min-h-[58px]">
+                                    <label class="border-2 border-slate-200/90 rounded-2xl p-3 sm:p-4 text-center cursor-pointer hover:bg-slate-50 hover:border-[#0B2A43]/40 has-[:checked]:bg-gradient-to-br has-[:checked]:from-[#0B2A43] has-[:checked]:to-[#123B59] has-[:checked]:border-[#C9A24D] has-[:checked]:text-white has-[:checked]:shadow-lg has-[:checked]:shadow-[#0B2A43]/20 has-[:checked]:scale-[1.02] transition-all duration-200 flex flex-col justify-center items-center group shadow-2xs min-h-[50px] sm:min-h-[58px]">
                                         <input type="radio" name="answers[{{ $q->id }}]" value="opt_{{ $opt->id }}" required @change="onAnswerChange()" class="peer sr-only">
-                                        
+                                        <span class="w-1.5 h-1.5 rounded-full bg-[#C9A24D] mb-1 opacity-0 group-has-[:checked]:opacity-100 transition-opacity"></span>
                                         <span class="text-xs font-semibold text-slate-700 group-has-[:checked]:text-[#C9A24D] group-has-[:checked]:font-extrabold transition-colors leading-tight text-center">
                                             {{ $opt->localized_text }}
                                         </span>
@@ -148,9 +148,9 @@
 
                                 <div class="pt-1 grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-2.5 text-xs">
                                     @foreach($wq->options as $wOpt)
-                                        <label class="border-2 border-slate-200/90 rounded-2xl p-3 sm:p-4 text-center cursor-pointer hover:bg-emerald-50 hover:border-emerald-500 has-[:checked]:bg-emerald-800 has-[:checked]:border-emerald-800 has-[:checked]:text-white transition-all duration-200 flex flex-col justify-center items-center group shadow-2xs min-h-[50px] sm:min-h-[58px]">
+                                        <label class="border-2 border-slate-200/90 rounded-2xl p-3 sm:p-4 text-center cursor-pointer hover:bg-emerald-50 hover:border-emerald-500 has-[:checked]:bg-gradient-to-br has-[:checked]:from-emerald-900 has-[:checked]:to-emerald-800 has-[:checked]:border-emerald-400 has-[:checked]:text-white has-[:checked]:shadow-lg has-[:checked]:shadow-emerald-900/30 has-[:checked]:scale-[1.02] transition-all duration-200 flex flex-col justify-center items-center group shadow-2xs min-h-[50px] sm:min-h-[58px]">
                                             <input type="radio" name="answers[{{ $wq->id }}]" value="opt_{{ $wOpt->id }}" required @change="onAnswerChange()" class="peer sr-only">
-                                            
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mb-1 opacity-0 group-has-[:checked]:opacity-100 transition-opacity"></span>
                                             <span class="text-xs font-semibold text-slate-700 group-has-[:checked]:text-white group-has-[:checked]:font-extrabold transition-colors leading-tight text-center">
                                                 {{ $wOpt->localized_text }}
                                             </span>

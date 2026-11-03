@@ -110,6 +110,31 @@
             border-bottom: 2px solid #0B2A43;
             padding-bottom: 0.2rem;
         }
+
+        /* Luxury Gold & Glassmorphism Utilities */
+        @keyframes pulseGlowGold {
+            0%, 100% { box-shadow: 0 0 15px rgba(201, 162, 77, 0.2), 0 0 30px rgba(201, 162, 77, 0.1); }
+            50% { box-shadow: 0 0 25px rgba(201, 162, 77, 0.4), 0 0 45px rgba(201, 162, 77, 0.2); }
+        }
+        @keyframes floatSubtle {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+        .glow-gold { animation: pulseGlowGold 4s infinite ease-in-out; }
+        .animate-float { animation: floatSubtle 6s infinite ease-in-out; }
+
+        .glass-dark {
+            background: rgba(11, 42, 67, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(201, 162, 77, 0.25);
+        }
+        .glass-gold {
+            background: linear-gradient(135deg, rgba(201, 162, 77, 0.12) 0%, rgba(11, 42, 67, 0.3) 100%);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(201, 162, 77, 0.35);
+        }
     </style>
 </head>
 <body class="bg-white text-[#193247] font-sans antialiased min-h-screen flex flex-col selection:bg-[#0B2A43] selection:text-white overflow-x-hidden">

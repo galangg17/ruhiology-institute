@@ -17,7 +17,7 @@
             <div class="lg:col-span-7 space-y-6 sm:space-y-8 text-center lg:text-left">
                 
                 <!-- Eyebrow Location Pill Badge -->
-                <div class="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-md border border-white/20 text-[#C9A24D] text-[11px] sm:text-xs font-mono font-bold px-3.5 sm:px-4.5 py-1.5 sm:py-2 rounded-full shadow-sm">
+                <div class="inline-flex items-center space-x-2 bg-slate-900/80 backdrop-blur-md border border-[#C9A24D]/40 text-[#C9A24D] text-[11px] sm:text-xs font-mono font-bold px-3.5 sm:px-4.5 py-1.5 sm:py-2 rounded-full shadow-lg shadow-[#C9A24D]/10">
                     <span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
                     <span>{{ $isEn ? '✨ Ruhiology Institute · International Center' : \App\Models\Setting::get('hero_eyebrow', '✨ Ruhiology Institute · Jambi, Indonesia') }}</span>
                 </div>
@@ -118,7 +118,7 @@
 
             <!-- Right Visual Hero Card (5 cols) - Fully Editable Image & Text -->
             <div class="lg:col-span-5 relative">
-                <div class="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white/20 bg-slate-900 aspect-[4/3] sm:aspect-[4/3] lg:aspect-[3/4] group max-w-md mx-auto lg:max-w-none">
+                <div class="relative rounded-3xl overflow-hidden shadow-2xl border-2 border-[#C9A24D]/40 bg-slate-900 aspect-[4/3] sm:aspect-[4/3] lg:aspect-[3/4] group max-w-md mx-auto lg:max-w-none glow-gold">
                     <img src="{{ \App\Models\Setting::get('hero_card_image', asset('images/settings/hero_card_1790081685.jpg')) }}" alt="Riset & Ekosistem Ruhiologi" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
 
                     <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent"></div>

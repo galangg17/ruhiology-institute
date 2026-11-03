@@ -936,9 +936,10 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
                 
                 <!-- Pilar 1 -->
-                <div class="bg-white/10 p-5 sm:p-6 rounded-3xl border border-white/15 backdrop-blur-md flex flex-col justify-between hover:bg-white/15 transition duration-300">
+                <div class="bg-white/10 p-5 sm:p-6 rounded-3xl border border-white/15 backdrop-blur-md flex flex-col justify-between hover:bg-white/15 hover:border-[#C9A24D]/60 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-[#C9A24D]/15 transition duration-300 relative group">
+                    <span class="absolute top-5 right-5 text-[9px] font-mono font-bold tracking-widest text-[#C9A24D] bg-[#C9A24D]/15 px-2.5 py-0.5 rounded-full border border-[#C9A24D]/30">PILAR I</span>
                     <div>
-                        <div class="w-10 h-10 rounded-2xl bg-[#C9A24D]/20 text-[#C9A24D] flex items-center justify-center font-bold text-lg mb-4 border border-[#C9A24D]/30">
+                        <div class="w-10 h-10 rounded-2xl bg-[#C9A24D]/20 text-[#C9A24D] flex items-center justify-center font-bold text-lg mb-4 border border-[#C9A24D]/30 group-hover:scale-110 transition-transform">
                             {{ \App\Models\Setting::get('pillar1_icon', '✦') }}
                         </div>
                         <h3 class="font-serif font-bold text-base text-white mb-2 tracking-tight">
@@ -951,9 +952,10 @@
                 </div>
 
                 <!-- Pilar 2 -->
-                <div class="bg-white/10 p-5 sm:p-6 rounded-3xl border border-white/15 backdrop-blur-md flex flex-col justify-between hover:bg-white/15 transition duration-300">
+                <div class="bg-white/10 p-5 sm:p-6 rounded-3xl border border-white/15 backdrop-blur-md flex flex-col justify-between hover:bg-white/15 hover:border-amber-400/60 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-amber-500/15 transition duration-300 relative group">
+                    <span class="absolute top-5 right-5 text-[9px] font-mono font-bold tracking-widest text-amber-300 bg-amber-500/15 px-2.5 py-0.5 rounded-full border border-amber-400/30">PILAR II</span>
                     <div>
-                        <div class="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-300 flex items-center justify-center font-bold text-lg mb-4 border border-amber-400/30">
+                        <div class="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-300 flex items-center justify-center font-bold text-lg mb-4 border border-amber-400/30 group-hover:scale-110 transition-transform">
                             {{ \App\Models\Setting::get('pillar2_icon', '🕌') }}
                         </div>
                         <h3 class="font-serif font-bold text-base text-white mb-2 tracking-tight">
@@ -966,9 +968,10 @@
                 </div>
 
                 <!-- Pilar 3 -->
-                <div class="bg-white/10 p-5 sm:p-6 rounded-3xl border border-white/15 backdrop-blur-md flex flex-col justify-between hover:bg-white/15 transition duration-300">
+                <div class="bg-white/10 p-5 sm:p-6 rounded-3xl border border-white/15 backdrop-blur-md flex flex-col justify-between hover:bg-white/15 hover:border-emerald-400/60 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-emerald-500/15 transition duration-300 relative group">
+                    <span class="absolute top-5 right-5 text-[9px] font-mono font-bold tracking-widest text-emerald-300 bg-emerald-500/15 px-2.5 py-0.5 rounded-full border border-emerald-400/30">PILAR III</span>
                     <div>
-                        <div class="w-10 h-10 rounded-2xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold text-lg mb-4 border border-emerald-400/30">
+                        <div class="w-10 h-10 rounded-2xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold text-lg mb-4 border border-emerald-400/30 group-hover:scale-110 transition-transform">
                             {{ \App\Models\Setting::get('pillar3_icon', '✨') }}
                         </div>
                         <h3 class="font-serif font-bold text-base text-white mb-2 tracking-tight">
@@ -981,9 +984,10 @@
                 </div>
 
                 <!-- Pilar 4 -->
-                <div class="bg-white/10 p-5 sm:p-6 rounded-3xl border border-white/15 backdrop-blur-md flex flex-col justify-between hover:bg-white/15 transition duration-300">
+                <div class="bg-white/10 p-5 sm:p-6 rounded-3xl border border-white/15 backdrop-blur-md flex flex-col justify-between hover:bg-white/15 hover:border-sky-400/60 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-sky-500/15 transition duration-300 relative group">
+                    <span class="absolute top-5 right-5 text-[9px] font-mono font-bold tracking-widest text-sky-300 bg-sky-500/15 px-2.5 py-0.5 rounded-full border border-sky-400/30">PILAR IV</span>
                     <div>
-                        <div class="w-10 h-10 rounded-2xl bg-sky-500/20 text-sky-300 flex items-center justify-center font-bold text-lg mb-4 border border-sky-400/30">
+                        <div class="w-10 h-10 rounded-2xl bg-sky-500/20 text-sky-300 flex items-center justify-center font-bold text-lg mb-4 border border-sky-400/30 group-hover:scale-110 transition-transform">
                             {{ \App\Models\Setting::get('pillar4_icon', '🤝') }}
                         </div>
                         <h3 class="font-serif font-bold text-base text-white mb-2 tracking-tight">
@@ -996,9 +1000,10 @@
                 </div>
 
                 <!-- Pilar 5 -->
-                <div class="bg-white/10 p-5 sm:p-6 rounded-3xl border border-white/15 backdrop-blur-md flex flex-col justify-between hover:bg-white/15 transition duration-300">
+                <div class="bg-white/10 p-5 sm:p-6 rounded-3xl border border-white/15 backdrop-blur-md flex flex-col justify-between hover:bg-white/15 hover:border-purple-400/60 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-purple-500/15 transition duration-300 relative group">
+                    <span class="absolute top-5 right-5 text-[9px] font-mono font-bold tracking-widest text-purple-300 bg-purple-500/15 px-2.5 py-0.5 rounded-full border border-purple-400/30">PILAR V</span>
                     <div>
-                        <div class="w-10 h-10 rounded-2xl bg-purple-500/20 text-purple-300 flex items-center justify-center font-bold text-lg mb-4 border border-purple-400/30">
+                        <div class="w-10 h-10 rounded-2xl bg-purple-500/20 text-purple-300 flex items-center justify-center font-bold text-lg mb-4 border border-purple-400/30 group-hover:scale-110 transition-transform">
                             {{ \App\Models\Setting::get('pillar5_icon', '🛡️') }}
                         </div>
                         <h3 class="font-serif font-bold text-base text-white mb-2 tracking-tight">
@@ -1011,9 +1016,10 @@
                 </div>
 
                 <!-- Pilar 6 (WHO-5 Mental Well-Being) -->
-                <div class="bg-emerald-950/40 p-5 sm:p-6 rounded-3xl border-2 border-emerald-400/40 backdrop-blur-md flex flex-col justify-between hover:bg-emerald-900/40 transition duration-300 shadow-lg shadow-emerald-950/50">
+                <div class="bg-emerald-950/40 p-5 sm:p-6 rounded-3xl border-2 border-emerald-400/40 backdrop-blur-md flex flex-col justify-between hover:bg-emerald-900/40 hover:-translate-y-1.5 hover:border-emerald-400 hover:shadow-xl hover:shadow-emerald-500/20 transition duration-300 relative group shadow-lg shadow-emerald-950/50">
+                    <span class="absolute top-5 right-5 text-[9px] font-mono font-bold tracking-widest text-emerald-300 bg-emerald-500/20 px-2.5 py-0.5 rounded-full border border-emerald-400/40">PILAR VI (WHO-5)</span>
                     <div>
-                        <div class="w-10 h-10 rounded-2xl bg-emerald-500/30 text-emerald-300 flex items-center justify-center font-bold text-lg mb-4 border border-emerald-400/50">
+                        <div class="w-10 h-10 rounded-2xl bg-emerald-500/30 text-emerald-300 flex items-center justify-center font-bold text-lg mb-4 border border-emerald-400/50 group-hover:scale-110 transition-transform">
                             {{ \App\Models\Setting::get('pillar6_icon', '💚') }}
                         </div>
                         <h3 class="font-serif font-bold text-base text-emerald-200 mb-2 tracking-tight">
@@ -1028,12 +1034,32 @@
             </div>
 
             <!-- Interactive Radar Chart Visualizer (6 Dimensi Balance) -->
-            <div class="mt-12 pt-10 border-t border-white/10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <div class="mt-12 pt-10 border-t border-white/10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center" x-data="{ activeProfile: 'benchmark' }">
                 <div class="lg:col-span-5 bg-white/10 p-6 rounded-3xl border border-white/20 backdrop-blur-md">
-                    <h4 class="font-serif font-bold text-base text-[#C9A24D] mb-1 flex items-center gap-2">
-                        <span>🕸️</span> <span>{{ $isEn ? '6-Dimension RQ Balance Visualization' : 'Visualisasi Keseimbangan 6 Dimensi RQ & WHO-5' }}</span>
-                    </h4>
-                    <p class="text-xs text-slate-200 mb-4">{{ $isEn ? 'Proportional equilibrium chart of spiritual dimensions from structured assessment results.' : 'Grafik keseimbangan 6 potensi ruhiologi & kesehatan mental dari hasil asesmen terstruktur.' }}</p>
+                    <div class="flex items-center justify-between mb-2">
+                        <h4 class="font-serif font-bold text-base text-[#C9A24D] flex items-center gap-2">
+                            <span>🕸️</span> <span>{{ $isEn ? '6-Dimension RQ Balance' : 'Keseimbangan 6 Dimensi' }}</span>
+                        </h4>
+                        <span class="text-[9px] font-mono font-bold uppercase text-slate-300 bg-white/10 px-2 py-0.5 rounded-full border border-white/10" x-text="activeProfile.toUpperCase()"></span>
+                    </div>
+                    <p class="text-xs text-slate-200 mb-3">{{ $isEn ? 'Explore benchmark profiles and spiritual equilibrium:' : 'Pilih profil untuk melihat dinamika pemetaan 6 dimensi:' }}</p>
+                    
+                    <!-- Preset Profile Switcher Buttons -->
+                    <div class="flex flex-wrap items-center gap-1.5 mb-4">
+                        <button type="button" @click="activeProfile = 'benchmark'; window.changeRadarProfile('benchmark')" :class="activeProfile === 'benchmark' ? 'bg-[#C9A24D] text-[#0B2A43] font-bold shadow' : 'bg-white/10 text-slate-300 hover:text-white'" class="px-2.5 py-1 rounded-lg text-[10px] transition font-medium cursor-pointer">
+                            ✦ Benchmark
+                        </button>
+                        <button type="button" @click="activeProfile = 'eksekutif'; window.changeRadarProfile('eksekutif')" :class="activeProfile === 'eksekutif' ? 'bg-[#C9A24D] text-[#0B2A43] font-bold shadow' : 'bg-white/10 text-slate-300 hover:text-white'" class="px-2.5 py-1 rounded-lg text-[10px] transition font-medium cursor-pointer">
+                            👑 Eksekutif
+                        </button>
+                        <button type="button" @click="activeProfile = 'pendidik'; window.changeRadarProfile('pendidik')" :class="activeProfile === 'pendidik' ? 'bg-[#C9A24D] text-[#0B2A43] font-bold shadow' : 'bg-white/10 text-slate-300 hover:text-white'" class="px-2.5 py-1 rounded-lg text-[10px] transition font-medium cursor-pointer">
+                            🎓 Pendidik
+                        </button>
+                        <button type="button" @click="activeProfile = 'pemuda'; window.changeRadarProfile('pemuda')" :class="activeProfile === 'pemuda' ? 'bg-[#C9A24D] text-[#0B2A43] font-bold shadow' : 'bg-white/10 text-slate-300 hover:text-white'" class="px-2.5 py-1 rounded-lg text-[10px] transition font-medium cursor-pointer">
+                            🌱 Pemuda
+                        </button>
+                    </div>
+
                     <div class="relative w-full aspect-square max-w-xs mx-auto">
                         <canvas id="landingRadarChart"></canvas>
                     </div>
@@ -1483,7 +1509,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const ctx = document.getElementById('landingRadarChart');
     if (ctx && typeof Chart !== 'undefined') {
         const isEn = {{ $isEn ? 'true' : 'false' }};
-        new Chart(ctx, {
+        window.landingRadarChartInstance = new Chart(ctx, {
             type: 'radar',
             data: {
                 labels: isEn ? [
@@ -1504,9 +1530,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 datasets: [{
                     label: isEn ? 'Benchmark RQI + WHO-5 (%)' : 'Benchmark RQI + WHO-5 (%)',
                     data: [88, 85, 84, 88, 82, 86],
-                    backgroundColor: 'rgba(201, 162, 77, 0.25)',
+                    backgroundColor: 'rgba(201, 162, 77, 0.28)',
                     borderColor: '#C9A24D',
-                    borderWidth: 2,
+                    borderWidth: 2.5,
                     pointBackgroundColor: '#C9A24D',
                     pointBorderColor: '#fff',
                     pointHoverBackgroundColor: '#fff',
@@ -1516,6 +1542,10 @@ document.addEventListener('DOMContentLoaded', function() {
             options: {
                 responsive: true,
                 maintainAspectRatio: true,
+                animation: {
+                    duration: 750,
+                    easing: 'easeOutQuart'
+                },
                 scales: {
                     r: {
                         angleLines: { color: 'rgba(255, 255, 255, 0.15)' },
@@ -1532,6 +1562,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
+
+        window.changeRadarProfile = function(profile) {
+            if (!window.landingRadarChartInstance) return;
+            const profiles = {
+                'eksekutif': [94, 86, 88, 92, 90, 88],
+                'pendidik': [86, 94, 85, 95, 84, 88],
+                'pemuda': [82, 85, 88, 86, 80, 82],
+                'benchmark': [88, 85, 84, 88, 82, 86]
+            };
+            const targetData = profiles[profile] || profiles['benchmark'];
+            window.landingRadarChartInstance.data.datasets[0].data = targetData;
+            window.landingRadarChartInstance.update();
+        };
     }
 });
 </script>
