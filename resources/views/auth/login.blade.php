@@ -36,13 +36,14 @@
 
                 <div class="space-y-3 pt-2">
                     <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-[#C9A24D]/30 text-[#C9A24D] text-[10px] sm:text-xs font-mono font-bold uppercase tracking-wider">
-                        <span>🏛️</span> <span>Portal LITBANG & Management UI</span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#C9A24D]"></span>
+                        <span>Portal Manajemen & Layanan Asesmen</span>
                     </span>
                     <h1 class="text-2xl sm:text-3xl font-serif font-bold text-white tracking-tight leading-snug">
-                        Sistem Informasi Terpadu Asesmen & Riset Ruhiologi
+                        Sistem Informasi Terpadu Ruhiology Institute
                     </h1>
                     <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal">
-                        Akses terpusat otentikasi aman untuk peserta, peneliti, praktisi, serta manajerial instansi mitra dalam mengelola data asesmen kecerdasan ruhiologi & pengembangan potensi.
+                        Akses terpusat otentikasi aman untuk peserta, pengelola, serta instansi mitra dalam mengakses layanan asesmen kecerdasan ruhiologi, sertifikasi, dan pengembangan potensi diri.
                     </p>
                 </div>
             </div>
@@ -51,17 +52,17 @@
             <div class="py-8 space-y-4 relative z-10">
                 <div class="flex items-start gap-3 p-3 sm:p-3.5 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 hover:border-[#C9A24D]/40 transition">
                     <div class="w-8 h-8 rounded-xl bg-[#C9A24D]/20 border border-[#C9A24D]/40 flex items-center justify-center shrink-0 text-[#C9A24D] font-bold text-sm">
-                        🔒
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                     </div>
                     <div>
                         <h4 class="text-xs sm:text-sm font-bold text-white">Keamanan Terenkripsi & Proteksi Akses</h4>
-                        <p class="text-[11px] text-slate-300">Akses akun menggunakan otentikasi aman terenkripsi untuk perlindungan privasi instansi.</p>
+                        <p class="text-[11px] text-slate-300">Akses akun menggunakan otentikasi aman terenkripsi untuk perlindungan data dan privasi pengguna.</p>
                     </div>
                 </div>
 
                 <div class="flex items-start gap-3 p-3 sm:p-3.5 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 hover:border-[#C9A24D]/40 transition">
                     <div class="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center shrink-0 text-emerald-300 font-bold text-sm">
-                        📊
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                     </div>
                     <div>
                         <h4 class="text-xs sm:text-sm font-bold text-white">Analytics Laporan & Skrining WHO-5</h4>
@@ -92,7 +93,8 @@
                 @if ($errors->any())
                     <div class="p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 space-y-1">
                         <div class="font-bold flex items-center gap-1.5">
-                            <span>⚠️</span> <span>Gagal Otentikasi</span>
+                            <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                            <span>Gagal Otentikasi</span>
                         </div>
                         <ul class="list-disc list-inside text-[11px] space-y-0.5">
                             @foreach ($errors->all() as $error)
@@ -174,8 +176,9 @@
 
             <!-- Footer Security Notice -->
             <div class="pt-4 text-center border-t border-slate-100">
-                <div class="inline-flex items-center gap-1.5 text-[10px] text-slate-400 bg-slate-50 px-3 py-1 rounded-full border border-slate-200/60">
-                    <span>🛡️</span> <span>Sistem Terproteksi — Jagalah kerahasiaan password Anda.</span>
+                <div class="inline-flex items-center gap-1.5 text-[10px] text-slate-500 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200/60 font-medium">
+                    <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                    <span>Sistem Terproteksi — Akses aman terenkripsi 256-bit SSL.</span>
                 </div>
             </div>
 
