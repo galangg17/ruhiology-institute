@@ -61,21 +61,50 @@
         @endif
 
         <!-- Search Box Card -->
-        <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200/90 space-y-4">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200/90 space-y-4" x-data="{ queryText: '{{ addslashes($searchQuery ?? '') }}', isSubmitting: false }">
             <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
-                <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                Cari Data Sertifikat Anda
+                <svg class="w-4 h-4 text-[#8C703E]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <span>Cari Data Sertifikat Anda</span>
             </h2>
 
-            <form method="GET" action="{{ route('public.form.claim_certificate', $form->slug) }}" class="space-y-3">
+            <form method="GET" action="{{ route('public.form.claim_certificate', $form->slug) }}" @submit="isSubmitting = true" class="space-y-3">
                 <div class="relative">
-                    <input type="text" name="q" value="{{ $searchQuery }}" required autofocus
-                           placeholder="Ketik Nomor WhatsApp atau Nama Lengkap saat mendaftar..."
-                           class="w-full text-xs sm:text-sm px-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-navy focus:outline-none transition">
+                    <input type="text" 
+                           name="q" 
+                           x-model="queryText"
+                           required 
+                           autofocus
+                           placeholder="Ketik nama lengkap atau nomor WhatsApp saat registrasi..."
+                           class="w-full text-xs sm:text-sm pl-4 pr-10 py-3.5 rounded-2xl border-2 border-slate-200 focus:border-[#0B2A43] focus:ring-2 focus:ring-[#0B2A43]/10 focus:outline-none transition shadow-2xs">
+                    
+                    <!-- Quick Clear Button -->
+                    <button type="button" 
+                            x-show="queryText.length > 0" 
+                            @click="queryText = ''; $refs.searchInput?.focus()" 
+                            class="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-600 transition p-1 cursor-pointer" 
+                            style="display: none;">
+                        ✕
+                    </button>
                 </div>
-                <button type="submit" class="w-full py-3 px-6 rounded-xl bg-navy hover:bg-navy-dark text-white font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
-                    <svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    <span>Cari Sertifikat Saya</span>
+
+                <div class="flex items-center justify-between text-[11px] text-slate-400 px-1">
+                    <span>💡 Tips: Cukup ketik sebagian nama lengkap Anda atau nomor WA</span>
+                    <span x-show="queryText.length > 0" class="font-mono text-emerald-600 font-bold" x-text="queryText.length + ' karakter'"></span>
+                </div>
+
+                <button type="submit" :disabled="isSubmitting" class="w-full py-3.5 px-6 rounded-2xl bg-[#0B2A43] hover:bg-[#123B59] text-white font-bold text-xs sm:text-sm shadow-md hover:shadow-lg transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50">
+                    <template x-if="!isSubmitting">
+                        <span class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            <span>Cari Sertifikat Saya</span>
+                        </span>
+                    </template>
+                    <template x-if="isSubmitting">
+                        <span class="flex items-center gap-2">
+                            <svg class="w-4 h-4 animate-spin text-[#D4AF37]" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>
+                            <span>Mencari data sertifikat...</span>
+                        </span>
+                    </template>
                 </button>
             </form>
         </div>

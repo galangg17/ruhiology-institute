@@ -202,12 +202,17 @@
                 </div>
             </div>
 
-            <!-- Global Quick Search Bar -->
-            <div class="flex-1 max-w-md mx-4">
-                <form action="{{ route('admin.results.index') }}" method="GET" class="relative">
-                    <input type="text" name="q" placeholder="Cari nama peserta, kode submission, pesanan..." class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:ring-1 focus:ring-[#0F2537] focus:border-[#0F2537] focus:bg-white transition outline-none">
-                    <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                </form>
+            <!-- Global Quick Search Bar & Command Palette Trigger -->
+            <div class="flex-1 max-w-md mx-4" x-data>
+                <button type="button" @click="$dispatch('open-cmd-palette')" class="w-full pl-9 pr-3 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 hover:border-slate-300 rounded-xl text-xs font-medium text-slate-400 flex items-center justify-between transition cursor-pointer text-left shadow-2xs group">
+                    <span class="flex items-center gap-2 text-slate-500 group-hover:text-slate-800 transition-colors">
+                        <svg class="w-4 h-4 text-slate-400 group-hover:text-[#D4AF37] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        <span>Cari menu, event, formulir, atau modul...</span>
+                    </span>
+                    <span class="hidden sm:inline-flex items-center gap-1 font-mono text-[10px] font-bold bg-white text-slate-500 px-2 py-0.5 rounded border border-slate-200 shadow-2xs">
+                        <kbd>Ctrl</kbd> + <kbd>K</kbd>
+                    </span>
+                </button>
             </div>
 
             <!-- User Menu & Quick Role Badge -->
@@ -266,6 +271,112 @@
         <main class="flex-1 p-4 sm:p-8 overflow-y-auto print:p-0 print:overflow-visible">
             @yield('content')
         </main>
+    </div>
+
+    <!-- GLOBAL ADMIN COMMAND PALETTE (CTRL+K / CMD+K) -->
+    <div x-data="{
+            open: false,
+            search: '',
+            selectedIndex: 0,
+            routes: [
+                { title: 'Dashboard Utama', group: 'Navigasi', url: '{{ route('admin.dashboard') }}', icon: '📊', desc: 'Ringkasan metrik statistik sistem' },
+                { title: 'Manajemen Event & Pelatihan', group: 'Modul Asesmen', url: '{{ route('admin.events.index') }}', icon: '🎪', desc: 'Kelola jadwal event dalam & luar negeri' },
+                { title: 'Data Peserta & Nilai Evaluasi', group: 'Modul Asesmen', url: '{{ route('admin.participants.index') }}', icon: '👥', desc: 'Daftar peserta, skor RQI-15 & WHO-5' },
+                { title: 'Formulir & Sertifikat Custom', group: 'Formulir & Kuisioner', url: '{{ route('admin.forms.index') }}', icon: '📋', desc: 'Kelola form pendaftaran & template sertifikat' },
+                { title: 'Buat Formulir Baru', group: 'Formulir & Kuisioner', url: '{{ route('admin.forms.create') }}', icon: '➕', desc: 'Tambah formulir kuisioner & sertifikasi baru' },
+                { title: 'Master Data & Importer Wilayah', group: 'Data Pokok', url: '{{ route('admin.master_data.index') }}', icon: '🌐', desc: 'Provinsi, kabupaten, & data kampus mitra' },
+                { title: 'Paket & Bank Soal', group: 'Instrumen', url: '{{ route('admin.instruments.index') }}', icon: '📝', desc: 'Manajemen butir soal RQI-15 & rubrik skor' },
+                { title: 'Institusi Mitra', group: 'Institusi', url: '{{ route('admin.institutions.index') }}', icon: '🏛️', desc: 'Daftar sekolah & perguruan tinggi konsorsium' },
+                { title: 'Training Programs', group: 'Layanan', url: '{{ route('admin.training.index') }}', icon: '🎓', desc: 'Katalog program sertifikasi & workshop' },
+                { title: 'Konsultasi Ruhiologi', group: 'Layanan', url: '{{ route('admin.consultations.index') }}', icon: '💬', desc: 'Jadwal sesi bimbingan & konseling' },
+                { title: 'Katalog Buku & Pesanan', group: 'Komersial', url: '{{ route('admin.products.index') }}', icon: '📚', desc: 'Inventori buku Ruhiologi Press & order' },
+                { title: 'Artikel & Publikasi Ilmiah', group: 'Media', url: '{{ route('admin.articles.index') }}', icon: '📰', desc: 'Karya tulis, jurnal, & opini pakar' },
+                { title: 'Pengaturan Landing Page & CMS', group: 'Pengaturan', url: '{{ route('admin.settings.index') }}', icon: '⚙️', desc: 'Edit teks beranda, hero, filosofi & logo' },
+                { title: 'Manajemen Akun Admin & Staf', group: 'Sistem', url: '{{ route('admin.users.index') }}', icon: '🔐', desc: 'Kelola hak akses & profil pengguna admin' },
+            ],
+            get filtered() {
+                if (!this.search.trim()) return this.routes;
+                const q = this.search.toLowerCase();
+                return this.routes.filter(r => r.title.toLowerCase().includes(q) || r.group.toLowerCase().includes(q) || r.desc.toLowerCase().includes(q));
+            },
+            navigate() {
+                const list = this.filtered;
+                if (list[this.selectedIndex]) {
+                    window.location.href = list[this.selectedIndex].url;
+                }
+            }
+        }"
+        @open-cmd-palette.window="open = true; search = ''; selectedIndex = 0; $nextTick(() => $refs.cmdInput.focus())"
+        @keydown.window.ctrl.k.prevent="open = true; search = ''; selectedIndex = 0; $nextTick(() => $refs.cmdInput.focus())"
+        @keydown.window.cmd.k.prevent="open = true; search = ''; selectedIndex = 0; $nextTick(() => $refs.cmdInput.focus())"
+        @keydown.window.escape="open = false"
+        x-cloak
+    >
+        <!-- Backdrop -->
+        <div x-show="open" 
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 bg-slate-950/70 backdrop-blur-md z-50 flex items-start justify-center pt-16 sm:pt-24 px-4"
+             @click.self="open = false">
+
+            <!-- Modal Panel -->
+            <div class="w-full max-w-xl bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl overflow-hidden text-slate-200"
+                 @keydown.down.prevent="selectedIndex = (selectedIndex + 1) % filtered.length"
+                 @keydown.up.prevent="selectedIndex = (selectedIndex - 1 + filtered.length) % filtered.length"
+                 @keydown.enter.prevent="navigate()">
+                
+                <!-- Search Input Header -->
+                <div class="p-3.5 border-b border-slate-800 flex items-center gap-3 bg-slate-950/50">
+                    <svg class="w-5 h-5 text-[#D4AF37] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    <input type="text" 
+                           x-ref="cmdInput" 
+                           x-model="search" 
+                           @input="selectedIndex = 0"
+                           placeholder="Ketik tujuan navigasi atau modul (misal: event, peserta, form, setting)..." 
+                           class="w-full bg-transparent text-white text-xs sm:text-sm outline-none placeholder-slate-500 border-none focus:ring-0 p-0 font-medium">
+                    <button type="button" @click="open = false" class="text-[10px] font-mono bg-slate-800 text-slate-400 px-2 py-0.5 rounded border border-slate-700 hover:text-white cursor-pointer">
+                        ESC
+                    </button>
+                </div>
+
+                <!-- Results List -->
+                <div class="max-h-80 overflow-y-auto p-2 divide-y divide-slate-800/40">
+                    <template x-for="(item, idx) in filtered" :key="item.url">
+                        <a :href="item.url" 
+                           @mouseenter="selectedIndex = idx"
+                           :class="selectedIndex === idx ? 'bg-[#123B59] text-white border-l-4 border-[#D4AF37]' : 'text-slate-300 hover:bg-slate-800/50'"
+                           class="flex items-center justify-between p-2.5 rounded-xl transition text-xs cursor-pointer group">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <span class="text-base shrink-0" x-text="item.icon"></span>
+                                <div class="min-w-0">
+                                    <div class="font-bold truncate" x-text="item.title"></div>
+                                    <div class="text-[10px] text-slate-400 truncate" x-text="item.desc"></div>
+                                </div>
+                            </div>
+                            <span class="text-[9px] font-mono px-2 py-0.5 rounded bg-slate-800/80 text-[#D4AF37] shrink-0 uppercase tracking-wider font-bold border border-slate-700/60" x-text="item.group"></span>
+                        </a>
+                    </template>
+
+                    <div x-show="filtered.length === 0" class="p-6 text-center text-slate-400 text-xs">
+                        Tidak ada menu atau modul yang cocok dengan kata kunci "<span class="text-white font-mono" x-text="search"></span>".
+                    </div>
+                </div>
+
+                <!-- Footer Hint -->
+                <div class="p-2.5 bg-slate-950 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between px-4 font-mono">
+                    <div class="flex items-center gap-2">
+                        <span>↑↓ Navigasi</span>
+                        <span>•</span>
+                        <span>↵ Pilih</span>
+                    </div>
+                    <span class="text-[#D4AF37] font-semibold">Ruhiology Admin Command Engine</span>
+                </div>
+            </div>
+        </div>
     </div>
 
     @stack('scripts')

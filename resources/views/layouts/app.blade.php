@@ -175,6 +175,46 @@
     <!-- GLOBAL QUICK CHECK SCORE & POSTTEST MODAL -->
     <x-quick-check-modal />
 
+    <!-- FLOATING BACK TO TOP WITH CIRCULAR PROGRESS RING -->
+    <div x-data="{
+            show: false,
+            progress: 0,
+            updateProgress() {
+                const scrollTotal = document.documentElement.scrollHeight - window.innerHeight;
+                this.progress = scrollTotal > 0 ? Math.min(100, Math.round((window.scrollY / scrollTotal) * 100)) : 0;
+                this.show = window.scrollY > 300;
+            },
+            scrollToTop() {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }"
+        @scroll.window.passive="updateProgress()"
+        x-cloak
+        x-show="show"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 translate-y-4 scale-90"
+        x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+        x-transition:leave-end="opacity-0 translate-y-4 scale-90"
+        class="fixed bottom-6 right-6 z-40 print:hidden"
+    >
+        <button @click="scrollToTop()" type="button" aria-label="Kembali ke atas" class="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-[#0B2A43] text-[#C9A24D] shadow-2xl flex items-center justify-center hover:scale-110 hover:shadow-[#C9A24D]/30 transition-all border border-[#C9A24D]/40 cursor-pointer relative group">
+            <!-- Circular Progress Ring SVG -->
+            <svg class="w-11 h-11 sm:w-12 sm:h-12 -rotate-90 absolute inset-0 pointer-events-none" viewBox="0 0 48 48">
+                <circle cx="24" cy="24" r="20" stroke="rgba(255,255,255,0.15)" stroke-width="2.5" fill="none"/>
+                <circle cx="24" cy="24" r="20" stroke="#C9A24D" stroke-width="2.5" fill="none"
+                        stroke-dasharray="125.6"
+                        :stroke-dashoffset="125.6 - (125.6 * progress / 100)"
+                        stroke-linecap="round"
+                        class="transition-all duration-150"/>
+            </svg>
+            <svg class="w-4 h-4 text-[#C9A24D] group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+            </svg>
+        </button>
+    </div>
+
     @stack('scripts')
 
 </body>

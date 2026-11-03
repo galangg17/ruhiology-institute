@@ -1238,7 +1238,20 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // Golden Celebration Confetti for Assessment Completion
+    setTimeout(function() {
+        if (typeof confetti === 'function') {
+            confetti({
+                particleCount: 60,
+                spread: 70,
+                origin: { y: 0.25 },
+                colors: ['#D4AF37', '#C9A24D', '#E5C068', '#0B2A43', '#10B981']
+            });
+        }
+    }, 700);
 });
 </script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 @endpush
 @endsection
