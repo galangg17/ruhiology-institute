@@ -450,38 +450,44 @@ document.addEventListener('alpine:init', () => {
 
             <!-- Action Buttons -->
             <div class="pt-4 flex flex-wrap items-center justify-center gap-4">
-                <button type="button" @click="openRegistrationModal('PUBLIC_SELF')" class="bg-gradient-to-r from-[#C9A24D] to-[#B48A16] hover:from-[#B48A16] hover:to-[#96710E] text-[#0B2A43] font-extrabold text-xs sm:text-sm px-8 py-4 rounded-2xl shadow-xl hover:shadow-[#C9A24D]/30 transition transform hover:-translate-y-0.5 flex items-center space-x-2 cursor-pointer">
-                    <span>✨ {{ $isEn ? 'START SELF ASSESSMENT' : 'MULAI ASESMEN MANDIRI' }}</span>
+                <button type="button" @click="openRegistrationModal('PUBLIC_SELF')" class="bg-gradient-to-r from-[#C9A24D] to-[#B48A16] hover:from-[#B48A16] hover:to-[#96710E] text-[#0B2A43] font-extrabold text-xs sm:text-sm px-8 py-4 rounded-2xl shadow-xl hover:shadow-[#C9A24D]/30 transition transform hover:-translate-y-0.5 flex items-center space-x-2.5 cursor-pointer">
+                    <svg class="w-4 h-4 shrink-0 text-[#0B2A43]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    <span>{{ $isEn ? 'START SELF ASSESSMENT' : 'MULAI ASESMEN MANDIRI' }}</span>
                 </button>
 
-                <button type="button" @click="openEventSelectorModal()" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 text-xs sm:text-sm font-bold px-8 py-4 rounded-2xl transition backdrop-blur-md flex items-center space-x-2 cursor-pointer">
-                    <span>🎯 {{ $isEn ? 'SELECT EVENT / EVENT CODE' : 'PILIH EVENT / KODE ACARA' }}</span>
+                <button type="button" @click="openEventSelectorModal()" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 text-xs sm:text-sm font-bold px-8 py-4 rounded-2xl transition backdrop-blur-md flex items-center space-x-2.5 cursor-pointer">
+                    <svg class="w-4 h-4 shrink-0 text-[#C9A24D]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/></svg>
+                    <span>{{ $isEn ? 'SELECT EVENT / EVENT CODE' : 'PILIH EVENT / KODE ACARA' }}</span>
                 </button>
             </div>
 
             <!-- Informative Notice Badges Grid -->
             <div class="pt-10 max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-left">
                 <div class="p-4 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-sm space-y-1">
-                    <div class="text-xs font-bold text-[#C9A24D] flex items-center gap-1.5">
-                        <span>🔒</span> <span>{{ $isEn ? 'Confidential & Private' : 'Personal & Rahasia' }}</span>
+                    <div class="text-xs font-bold text-[#C9A24D] flex items-center gap-2">
+                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                        <span>{{ $isEn ? 'Confidential & Private' : 'Personal & Rahasia' }}</span>
                     </div>
                     <p class="text-[11px] text-slate-300 font-normal">{{ $isEn ? 'Assessment results are strictly processed for your personal development.' : 'Hasil asesmen diproses khusus untuk pengembangan diri Anda.' }}</p>
                 </div>
                 <div class="p-4 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-sm space-y-1">
-                    <div class="text-xs font-bold text-[#C9A24D] flex items-center gap-1.5">
-                        <span>🛡️</span> <span>{{ $isEn ? 'Securely Stored' : 'Tersimpan Aman' }}</span>
+                    <div class="text-xs font-bold text-[#C9A24D] flex items-center gap-2">
+                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                        <span>{{ $isEn ? 'Securely Stored' : 'Tersimpan Aman' }}</span>
                     </div>
                     <p class="text-[11px] text-slate-300 font-normal">{{ $isEn ? 'Responses and identities are protected under strict privacy standards.' : 'Jawaban dan identitas dilindungi dengan standar privasi ketat.' }}</p>
                 </div>
                 <div class="p-4 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-sm space-y-1">
-                    <div class="text-xs font-bold text-[#C9A24D] flex items-center gap-1.5">
-                        <span>🩺</span> <span>{{ $isEn ? 'Non-Medical' : 'Bukan Medis' }}</span>
+                    <div class="text-xs font-bold text-[#C9A24D] flex items-center gap-2">
+                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        <span>{{ $isEn ? 'Non-Medical' : 'Bukan Medis' }}</span>
                     </div>
                     <p class="text-[11px] text-slate-300 font-normal">{{ $isEn ? 'This result is a reflective spiritual assessment, not a medical diagnosis.' : 'Hasil ini merupakan refleksi batin, bukan klaim/diagnosis medis.' }}</p>
                 </div>
                 <div class="p-4 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-sm space-y-1">
-                    <div class="text-xs font-bold text-[#C9A24D] flex items-center gap-1.5">
-                        <span>📊</span> <span>{{ $isEn ? 'WHO-5 Well-Being Index' : 'Skrining WHO-5' }}</span>
+                    <div class="text-xs font-bold text-[#C9A24D] flex items-center gap-2">
+                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                        <span>{{ $isEn ? 'WHO-5 Well-Being Index' : 'Skrining WHO-5' }}</span>
                     </div>
                     <p class="text-[11px] text-slate-300 font-normal">{{ $isEn ? 'Standardized international instrument to map psychological well-being.' : 'Instrumen terstandar untuk memetakan kesejahteraan batiniah.' }}</p>
                 </div>
@@ -533,7 +539,7 @@ document.addEventListener('alpine:init', () => {
 
             <div class="flex items-center gap-3 border-b border-slate-100 pb-4">
                 <div class="w-12 h-12 bg-[#0B2A43] text-[#C9A24D] rounded-2xl flex items-center justify-center text-xl font-bold shadow">
-                    🎯
+                    <svg class="w-6 h-6 text-[#C9A24D]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/></svg>
                 </div>
                 <div>
                     <span class="text-[10px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest block">{{ $isEn ? 'ASSESSMENT EVENTS & WORKSHOPS' : 'EVENT & ACARA ASESMEN' }}</span>
@@ -566,7 +572,8 @@ document.addEventListener('alpine:init', () => {
 
                 <template x-if="eventCheckError">
                     <div class="p-3 bg-rose-50 border border-rose-200 text-rose-700 font-semibold rounded-xl text-xs flex items-center gap-2">
-                        <span>⚠️</span> <span x-text="eventCheckError"></span>
+                        <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        <span x-text="eventCheckError"></span>
                     </div>
                 </template>
 
@@ -597,8 +604,9 @@ document.addEventListener('alpine:init', () => {
                     <h3 class="text-lg sm:text-xl font-bold font-serif text-[#0B2A43]">{{ $isEn ? 'Ruhiology Assessment Intake Form' : 'Form Intake Asesmen Ruhiologi' }}</h3>
                 </div>
                 <template x-if="eventCode">
-                    <span class="text-xs font-mono font-bold bg-[#0B2A43] text-[#C9A24D] px-3 py-1 rounded-full border border-[#C9A24D]/30">
-                        📌 {{ $isEn ? 'Event Mode: ' : 'Mode Event: ' }}<span x-text="eventCode"></span>
+                    <span class="text-xs font-mono font-bold bg-[#0B2A43] text-[#C9A24D] px-3 py-1 rounded-full border border-[#C9A24D]/30 inline-flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5 text-[#C9A24D]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        <span>{{ $isEn ? 'Event Mode: ' : 'Mode Event: ' }}<span x-text="eventCode"></span></span>
                     </span>
                 </template>
             </div>
@@ -611,13 +619,16 @@ document.addEventListener('alpine:init', () => {
                         <!-- LEFT COLUMN (5 cols): Locked Event Metadata Card -->
                         <div class="md:col-span-5 bg-[#0B2A43] text-white p-5 rounded-2xl shadow-md border border-slate-800 space-y-4">
                             <div class="border-b border-slate-700/80 pb-3">
-                                <span class="text-[9px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest block mb-1">🎯 {{ $isEn ? 'VERIFIED EVENT' : 'TERVERIFIKASI EVENT' }}</span>
+                                <span class="text-[9px] font-mono font-bold text-[#C9A24D] uppercase tracking-widest flex items-center gap-1.5 mb-1">
+                                    <svg class="w-3 h-3 text-[#C9A24D]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    <span>{{ $isEn ? 'VERIFIED EVENT' : 'TERVERIFIKASI EVENT' }}</span>
+                                </span>
                                 <h4 class="font-serif font-bold text-base text-white leading-tight" x-text="eventName || eventCode"></h4>
                                 <div class="flex items-center gap-2 flex-wrap mt-1">
                                     <p class="text-xs text-slate-300 font-medium" x-text="eventInstitution || '{{ $isEn ? 'Registered Institution' : 'Instansi Terdaftar' }}'"></p>
                                     <template x-if="eventCountryName && eventCountryCode !== 'ID'">
                                         <span class="inline-flex items-center gap-1 text-[10px] font-bold bg-[#D4AF37]/20 text-[#E5C068] px-2 py-0.5 rounded-full border border-[#D4AF37]/40 font-mono">
-                                            <span>🌍</span>
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                             <span x-text="eventCountryName"></span>
                                         </span>
                                     </template>
@@ -636,8 +647,9 @@ document.addEventListener('alpine:init', () => {
                             </div>
 
                             <div class="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-[11px] text-amber-200/90 leading-relaxed space-y-1">
-                                <div class="font-bold text-amber-400 flex items-center gap-1">
-                                    <span>🔒 {{ $isEn ? 'Organization Profile Locked' : 'Data Instansi Dikunci' }}</span>
+                                <div class="font-bold text-amber-400 flex items-center gap-1.5">
+                                    <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                    <span>{{ $isEn ? 'Organization Profile Locked' : 'Data Instansi Dikunci' }}</span>
                                 </div>
                                 <p class="text-[10px] text-slate-300">
                                     {{ $isEn ? 'Institution and regional details are pre-configured by your host organizer. You only need to fill in your personal identity.' : 'Profil sekolah, instansi, & wilayah sudah diset otomatis oleh panitia event. Anda cukup mengisi identitas diri di samping.' }}
@@ -668,11 +680,13 @@ document.addEventListener('alpine:init', () => {
                             <div>
                                 <label class="block font-bold text-slate-700 mb-1">{{ $isEn ? 'Gender *' : 'Jenis Kelamin *' }}</label>
                                 <div class="grid grid-cols-2 gap-2">
-                                    <button type="button" @click="form.gender = 'Laki-laki'" :class="form.gender === 'Laki-laki' ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'" class="py-2 px-3 rounded-xl border text-xs transition-colors text-center cursor-pointer">
-                                        👨 {{ $isEn ? 'Male' : 'Laki-laki' }}
+                                    <button type="button" @click="form.gender = 'Laki-laki'" :class="form.gender === 'Laki-laki' ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'" class="py-2 px-3 rounded-xl border text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                        <span>{{ $isEn ? 'Male' : 'Laki-laki' }}</span>
                                     </button>
-                                    <button type="button" @click="form.gender = 'Perempuan'" :class="form.gender === 'Perempuan' ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'" class="py-2 px-3 rounded-xl border text-xs transition-colors text-center cursor-pointer">
-                                        👩 {{ $isEn ? 'Female' : 'Perempuan' }}
+                                    <button type="button" @click="form.gender = 'Perempuan'" :class="form.gender === 'Perempuan' ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'" class="py-2 px-3 rounded-xl border text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                        <span>{{ $isEn ? 'Female' : 'Perempuan' }}</span>
                                     </button>
                                 </div>
                             </div>
@@ -706,9 +720,13 @@ document.addEventListener('alpine:init', () => {
                 <template x-if="!eventCode">
                     <div class="space-y-4">
                         <div class="flex items-center justify-between p-3 bg-[#0B2A43]/5 border border-[#0B2A43]/15 rounded-2xl">
-                            <span class="font-bold text-[#0B2A43] text-xs">🟢 {{ $isEn ? 'Self / Personal Assessment Track' : 'Track Asesmen Mandiri / Personal' }}</span>
-                            <button type="button" @click="showRegModal = false; openEventSelectorModal()" class="text-[11px] font-bold text-[#C9A24D] hover:underline cursor-pointer flex items-center gap-1">
-                                <span>🎯 {{ $isEn ? 'Have an Organizer Event Code?' : 'Punya Kode Event Panitia?' }}</span>
+                            <span class="font-bold text-[#0B2A43] text-xs flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span>{{ $isEn ? 'Self / Personal Assessment Track' : 'Track Asesmen Mandiri / Personal' }}</span>
+                            </span>
+                            <button type="button" @click="showRegModal = false; openEventSelectorModal()" class="text-[11px] font-bold text-[#C9A24D] hover:underline cursor-pointer flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5 text-[#C9A24D]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/></svg>
+                                <span>{{ $isEn ? 'Have an Organizer Event Code?' : 'Punya Kode Event Panitia?' }}</span>
                             </button>
                         </div>
 
@@ -717,7 +735,8 @@ document.addEventListener('alpine:init', () => {
                             <div class="p-3.5 bg-amber-500/10 border border-amber-400/40 rounded-2xl space-y-2">
                                 <div class="flex items-center justify-between">
                                     <label class="block font-serif font-bold text-xs text-[#0B2A43] flex items-center gap-1.5">
-                                        <span>📋</span> <span>{{ $isEn ? 'Select Assessment Instrument / Package *' : 'Pilih Paket Soal / Instrumen Asesmen *' }}</span>
+                                        <svg class="w-3.5 h-3.5 text-[#0B2A43]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                                        <span>{{ $isEn ? 'Select Assessment Instrument / Package *' : 'Pilih Paket Soal / Instrumen Asesmen *' }}</span>
                                     </label>
                                     <span class="text-[10px] font-mono font-bold text-amber-800 bg-amber-100 border border-amber-300 px-2.5 py-0.5 rounded-full" x-text="publicInstruments.length + ' {{ $isEn ? 'Public Instruments' : 'Paket Soal Publik' }}'"></span>
                                 </div>
@@ -732,8 +751,10 @@ document.addEventListener('alpine:init', () => {
                         <!-- Single Active Instrument Info Badge -->
                         <template x-if="publicInstruments && publicInstruments.length === 1">
                             <div class="p-3 bg-slate-100/90 border border-slate-200 rounded-2xl flex items-center justify-between text-xs">
-                                <div class="flex items-center gap-2">
-                                    <span class="text-base">📝</span>
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-8 h-8 rounded-xl bg-[#0B2A43]/10 text-[#0B2A43] flex items-center justify-center">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                    </div>
                                     <div>
                                         <span class="text-[9px] font-bold text-slate-400 uppercase font-mono tracking-wider block">{{ $isEn ? 'ASSESSMENT PACKAGE' : 'PAKET SOAL ASESMEN' }}</span>
                                         <strong class="font-bold text-[#0B2A43]" x-text="publicInstruments[0].name"></strong>
@@ -770,11 +791,13 @@ document.addEventListener('alpine:init', () => {
                                 <div>
                                     <label class="block font-bold text-slate-700 mb-1">{{ app()->getLocale() === 'en' ? 'Gender *' : 'Jenis Kelamin *' }}</label>
                                     <div class="grid grid-cols-2 gap-2">
-                                        <button type="button" @click="form.gender = 'Laki-laki'" :class="form.gender === 'Laki-laki' ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'" class="py-2 px-3 rounded-xl border text-xs transition-colors text-center cursor-pointer">
-                                            👨 {{ app()->getLocale() === 'en' ? 'Male' : 'Laki-laki' }}
+                                        <button type="button" @click="form.gender = 'Laki-laki'" :class="form.gender === 'Laki-laki' ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'" class="py-2 px-3 rounded-xl border text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                            <span>{{ app()->getLocale() === 'en' ? 'Male' : 'Laki-laki' }}</span>
                                         </button>
-                                        <button type="button" @click="form.gender = 'Perempuan'" :class="form.gender === 'Perempuan' ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'" class="py-2 px-3 rounded-xl border text-xs transition-colors text-center cursor-pointer">
-                                            👩 {{ app()->getLocale() === 'en' ? 'Female' : 'Perempuan' }}
+                                        <button type="button" @click="form.gender = 'Perempuan'" :class="form.gender === 'Perempuan' ? 'bg-[#0B2A43] text-white font-bold border-[#0B2A43]' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'" class="py-2 px-3 rounded-xl border text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                            <span>{{ app()->getLocale() === 'en' ? 'Female' : 'Perempuan' }}</span>
                                         </button>
                                     </div>
                                 </div>
@@ -788,7 +811,10 @@ document.addEventListener('alpine:init', () => {
                                 <div>
                                     <div class="flex items-center justify-between mb-1">
                                         <label class="font-bold text-slate-700 text-xs">{{ app()->getLocale() === 'en' ? 'Country of Residence *' : 'Negara Domisili *' }}</label>
-                                        <span x-show="form.country_code !== 'ID'" class="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">🌍 International</span>
+                                        <span x-show="form.country_code !== 'ID'" class="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200 inline-flex items-center gap-1">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                            <span>International</span>
+                                        </span>
                                     </div>
                                     <select x-model="form.country_code" @change="onCountryChange()" class="w-full p-2.5 text-xs font-bold rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
                                         <option value="ID">🇮🇩 Indonesia</option>
@@ -946,7 +972,8 @@ document.addEventListener('alpine:init', () => {
 
             <div class="flex gap-3 pt-2">
                 <button type="button" @click="copyCode()" class="flex-1 py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
-                    <span>📋</span> <span x-text="copied ? (appLocale === 'en' ? 'Copied!' : 'Tersalin!') : (appLocale === 'en' ? 'COPY CODE' : 'SALIN KODE')"></span>
+                    <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                    <span x-text="copied ? (appLocale === 'en' ? 'Copied!' : 'Tersalin!') : (appLocale === 'en' ? 'COPY CODE' : 'SALIN KODE')"></span>
                 </button>
                 <a :href="takeUrl" class="flex-1 py-3 px-4 bg-[#0B2A43] hover:bg-[#123B59] text-white font-bold rounded-xl text-xs shadow-md transition-colors flex items-center justify-center gap-1.5">
                     <span>{{ app()->getLocale() === 'en' ? 'START ASSESSMENT →' : 'MULAI ASSESSMENT →' }}</span>
