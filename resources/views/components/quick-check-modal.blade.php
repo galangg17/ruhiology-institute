@@ -71,8 +71,9 @@
                 ✕
             </button>
 
-            <div class="flex items-center gap-2.5 mb-1 text-[#C9A24D] text-xs font-mono font-bold uppercase tracking-wider">
-                <span>🔍 {{ $isEn ? 'ASSESSMENT EVALUATION & VERIFICATION' : 'EVALUASI & VERIFIKASI ASESMEN' }}</span>
+            <div class="flex items-center gap-2 mb-1 text-[#C9A24D] text-xs font-mono font-bold uppercase tracking-wider">
+                <svg class="w-4 h-4 text-[#C9A24D] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                <span>{{ $isEn ? 'ASSESSMENT EVALUATION & VERIFICATION' : 'EVALUASI & VERIFIKASI ASESMEN' }}</span>
             </div>
             <h3 class="font-serif text-2xl font-bold text-white tracking-tight">
                 {{ $isEn ? 'Check Score & Posttest Status' : 'Cek Skor & Status Posttest' }}
@@ -100,7 +101,7 @@
                     class="bg-[#0B2A43] hover:bg-[#123B59] text-white font-bold text-xs px-6 py-3 rounded-2xl transition shrink-0 shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                     <span x-show="!loading">{{ $isEn ? 'Check Result →' : 'Cek Hasil →' }}</span>
-                    <span x-show="loading" class="animate-spin">⏳</span>
+                    <span x-show="loading" class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
                 </button>
             </form>
 
@@ -113,7 +114,7 @@
             <!-- Error / Not Found State -->
             <div x-show="errorMessage && !loading" x-cloak class="bg-amber-50 border border-amber-200 rounded-2xl p-5 text-center space-y-3">
                 <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-lg mx-auto">
-                    ⚠️
+                    <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                 </div>
                 <div>
                     <h4 class="font-bold text-xs text-amber-900" x-text="errorMessage"></h4>
@@ -190,7 +191,8 @@
                                 :href="resultData.latest_result.result_url" 
                                 class="w-full py-3 px-4 bg-white border-2 border-[#0B2A43] text-[#0B2A43] hover:bg-slate-50 font-bold text-xs rounded-2xl transition shadow-sm flex items-center justify-center gap-2 text-center"
                             >
-                                <span>📊</span> <span>{{ $isEn ? 'View Result & Reflection' : 'Lihat Hasil & Refleksi' }}</span>
+                                <svg class="w-4 h-4 text-[#0B2A43]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                                <span>{{ $isEn ? 'View Result & Reflection' : 'Lihat Hasil & Refleksi' }}</span>
                             </a>
                         </template>
 
@@ -206,7 +208,8 @@
                                     type="submit" 
                                     class="w-full py-3 px-4 bg-gradient-to-r from-[#C9A24D] to-[#B48A16] hover:from-[#B48A16] hover:to-[#96710E] text-[#0B2A43] font-bold text-xs rounded-2xl transition shadow-md flex items-center justify-center gap-2 text-center cursor-pointer"
                                 >
-                                    <span>🚀</span> <span>{{ $isEn ? 'Proceed to Posttest' : 'Lanjut Kerjakan Posttest' }}</span>
+                                    <svg class="w-4 h-4 text-[#0B2A43]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                    <span>{{ $isEn ? 'Proceed to Posttest' : 'Lanjut Kerjakan Posttest' }}</span>
                                 </button>
                             </form>
                         </template>

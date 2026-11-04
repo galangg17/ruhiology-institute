@@ -7,8 +7,9 @@
 <!-- Banner Header (Centered Aesthetic with Ruhiology Colors) -->
 <div class="bg-[#0B2A43] text-white py-16 sm:py-20 text-center relative overflow-hidden">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-3 relative z-10">
-        <span class="text-xs font-bold text-[#C9A24D] uppercase tracking-widest block font-mono">
-            📚 {{ $isEn ? 'RQ Books & Literature Catalog' : 'Katalog Buku & Literatur RQ' }}
+        <span class="inline-flex items-center gap-2 text-xs font-bold text-[#C9A24D] uppercase tracking-widest font-mono bg-white/10 px-3.5 py-1.5 rounded-full border border-white/15">
+            <svg class="w-3.5 h-3.5 text-[#C9A24D]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            <span>{{ $isEn ? 'RQ Books & Literature Catalog' : 'Katalog Buku & Literatur RQ' }}</span>
         </span>
         <h1 class="font-serif text-3xl sm:text-5xl font-bold leading-tight tracking-tight">
             {{ $isEn ? 'Ruhiology Institute Books & Monographs' : 'Buku & Monograf Ruhiology Institute' }}

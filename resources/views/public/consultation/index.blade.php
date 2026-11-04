@@ -9,7 +9,8 @@
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 space-y-4">
         <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#C9A24D]/15 border border-[#C9A24D]/40 text-[#C9A24D] text-xs font-black uppercase tracking-widest shadow-xs">
-            <span>📍</span> <span>Pendampingan Ahli & Audiensi Institusi</span>
+            <span class="w-1.5 h-1.5 rounded-full bg-[#C9A24D]"></span>
+            <span>Pendampingan Ahli & Audiensi Institusi</span>
         </div>
         
         <h1 class="text-3xl sm:text-5xl font-black font-serif tracking-tight text-white leading-tight">
@@ -22,14 +23,17 @@
 
         <!-- Quick Stats Badge -->
         <div class="pt-4 flex flex-wrap justify-center items-center gap-4 text-xs font-semibold text-slate-300">
-            <div class="flex items-center gap-1.5 bg-white/5 border border-white/10 px-3.5 py-1.5 rounded-xl">
-                <span class="text-[#C9A24D]">✨</span> <span>Pendampingan Personal & Korporasi</span>
+            <div class="flex items-center gap-2 bg-white/5 border border-white/10 px-3.5 py-1.5 rounded-xl">
+                <svg class="w-3.5 h-3.5 text-[#C9A24D]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                <span>Pendampingan Personal & Korporasi</span>
             </div>
-            <div class="flex items-center gap-1.5 bg-white/5 border border-white/10 px-3.5 py-1.5 rounded-xl">
-                <span class="text-emerald-400">🌐</span> <span>Sesi Online (Zoom) & Offline</span>
+            <div class="flex items-center gap-2 bg-white/5 border border-white/10 px-3.5 py-1.5 rounded-xl">
+                <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
+                <span>Sesi Online (Zoom) & Offline</span>
             </div>
-            <div class="flex items-center gap-1.5 bg-white/5 border border-white/10 px-3.5 py-1.5 rounded-xl">
-                <span class="text-amber-400">🛡️</span> <span>Kerahasiaan Data Terjamin</span>
+            <div class="flex items-center gap-2 bg-white/5 border border-white/10 px-3.5 py-1.5 rounded-xl">
+                <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                <span>Kerahasiaan Data Terjamin</span>
             </div>
         </div>
     </div>
@@ -47,13 +51,16 @@
                 <!-- Card 1: Pillar Layanan -->
                 <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-5">
                     <h2 class="text-base font-black text-[#0B2A43] font-serif border-b border-slate-100 pb-3 flex items-center gap-2">
-                        <span class="text-amber-500">🌟</span> <span>Pilihan Layanan Konsultasi</span>
+                        <svg class="w-4 h-4 text-[#C9A24D]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+                        <span>Pilihan Layanan Konsultasi</span>
                     </h2>
 
                     <div class="space-y-4">
                         <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1 hover:border-[#C9A24D]/50 transition-colors">
                             <div class="flex items-center gap-2 font-bold text-xs text-[#0B2A43]">
-                                <span class="p-1 rounded-lg bg-emerald-500/10 text-emerald-600 text-xs">👤</span>
+                                <span class="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-600">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                </span>
                                 <span>Konsultasi Personal RQ</span>
                             </div>
                             <p class="text-[11px] text-slate-500 leading-relaxed pl-7">
@@ -63,7 +70,9 @@
 
                         <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1 hover:border-[#C9A24D]/50 transition-colors">
                             <div class="flex items-center gap-2 font-bold text-xs text-[#0B2A43]">
-                                <span class="p-1 rounded-lg bg-amber-500/10 text-amber-600 text-xs">🏛️</span>
+                                <span class="p-1.5 rounded-lg bg-amber-500/10 text-amber-600">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                                </span>
                                 <span>Training & Asesmen Institusi</span>
                             </div>
                             <p class="text-[11px] text-slate-500 leading-relaxed pl-7">
@@ -73,7 +82,9 @@
 
                         <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1 hover:border-[#C9A24D]/50 transition-colors">
                             <div class="flex items-center gap-2 font-bold text-xs text-[#0B2A43]">
-                                <span class="p-1 rounded-lg bg-indigo-500/10 text-indigo-600 text-xs">👑</span>
+                                <span class="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-600">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+                                </span>
                                 <span>Executive Leadership Guidance</span>
                             </div>
                             <p class="text-[11px] text-slate-500 leading-relaxed pl-7">
@@ -86,7 +97,8 @@
                 <!-- Card 2: Alur Prosedur -->
                 <div class="bg-gradient-to-br from-[#0B2A43] to-[#0F3554] p-6 rounded-3xl text-white space-y-4 shadow-md border border-[#C9A24D]/30">
                     <h3 class="text-sm font-black text-[#C9A24D] font-serif uppercase tracking-wider flex items-center gap-2">
-                        <span>🗺️</span> <span>Alur & Prosedur Layanan</span>
+                        <svg class="w-4 h-4 text-[#C9A24D]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                        <span>Alur & Prosedur Layanan</span>
                     </h3>
 
                     <div class="space-y-3 text-xs">
@@ -118,7 +130,9 @@
 
                 <!-- Card 3: Helpdesk Fast Response -->
                 <div class="p-5 rounded-2xl bg-amber-500/10 border border-[#C9A24D]/40 text-slate-800 flex items-center gap-3">
-                    <span class="text-2xl">💬</span>
+                    <span class="w-10 h-10 rounded-xl bg-[#C9A24D]/20 text-[#0B2A43] flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5 text-[#0B2A43]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                    </span>
                     <div class="text-xs">
                         <h4 class="font-black text-[#0B2A43]">Butuh Respon Cepat?</h4>
                         <p class="text-[11px] text-slate-600 mt-0.5">Hubungi Admin Secretariat Ruhiology via WhatsApp di <a href="https://wa.me/6281274110001" target="_blank" class="font-bold text-[#0B2A43] underline hover:text-[#C9A24D]">0812-7411-0001</a></p>
@@ -133,14 +147,16 @@
                     
                     <div class="border-b border-slate-100 pb-4 mb-6">
                         <h2 class="text-xl font-black text-[#0B2A43] font-serif flex items-center gap-2">
-                            <span class="text-[#C9A24D]">📝</span> <span>Form Permintaan Jadwal Konsultasi</span>
+                            <svg class="w-5 h-5 text-[#C9A24D]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            <span>Form Permintaan Jadwal Konsultasi</span>
                         </h2>
                         <p class="text-xs text-slate-500 mt-1">Silakan isi formulir di bawah ini dengan lengkap untuk mengajukan sesi konsultasi.</p>
                     </div>
 
                     @if(session('success'))
                         <div class="mb-6 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-800 text-xs font-semibold flex items-center gap-2">
-                            <span>✅</span> <span>{{ session('success') }}</span>
+                            <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span>{{ session('success') }}</span>
                         </div>
                     @endif
 
@@ -199,7 +215,8 @@
                         </div>
 
                         <button type="submit" class="w-full py-4 font-black rounded-xl text-xs uppercase tracking-wider text-white bg-[#0B2A43] hover:bg-[#123B59] border border-[#C9A24D]/40 shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer group">
-                            <span>📍</span> <span>Kirim Permintaan Konsultasi</span> <span class="group-hover:translate-x-1 transition-transform">→</span>
+                            <svg class="w-4 h-4 text-[#C9A24D]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                            <span>Kirim Permintaan Konsultasi</span> <span class="group-hover:translate-x-1 transition-transform">→</span>
                         </button>
                     </form>
                 </div>

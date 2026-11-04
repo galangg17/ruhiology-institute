@@ -44,7 +44,10 @@
                 {{ $title }}
             </h3>
             <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed font-normal">
-                ✍️ {{ $author }} &mdash; {{ $shortDesc }}
+                <span class="inline-flex items-center gap-1 font-semibold text-slate-700">
+                    <svg class="w-3 h-3 text-[#C9A24D] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                    <span>{{ $author }}</span>
+                </span> &mdash; {{ $shortDesc }}
             </p>
             <div class="pt-2 font-bold text-[#0B2A43] text-sm sm:text-base">
                 {{ $formattedPrice }}

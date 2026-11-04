@@ -82,8 +82,10 @@
 
         <!-- Header -->
         <div class="mb-6 pb-3 border-b border-slate-100">
-            <h3 class="text-xl sm:text-2xl font-bold font-serif text-slate-900 flex items-center gap-2">
-                <span>🛒</span>
+            <h3 class="text-xl sm:text-2xl font-bold font-serif text-slate-900 flex items-center gap-2.5">
+                <span class="w-9 h-9 rounded-xl bg-amber-500/10 text-[#C9A24D] flex items-center justify-center shrink-0 border border-[#C9A24D]/30">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                </span>
                 <span>Form Pemesanan Langsung Buku</span>
             </h3>
             <template x-if="productTitle">
