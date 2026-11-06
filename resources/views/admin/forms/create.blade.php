@@ -178,58 +178,70 @@
                     </div>
                 </div>
 
-                <!-- Signers & Logo Grid -->
+                <!-- Penandatangan Resmi & Identitas Mitra -->
                 <div class="space-y-4 pt-3 border-t border-slate-100">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">2. Penandatangan & Identitas Mitra</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        
-                        <!-- Signer 1: Ruhiology -->
-                        <div class="p-4 bg-slate-50/70 rounded-2xl border border-slate-200/80 space-y-3">
-                            <span class="text-xs font-bold text-slate-800 block">Tanda Tangan Utama: Founder & Direktur Ruhiology Institute</span>
-                            <div>
-                                <label class="block text-[11px] text-slate-600 mb-1">Nama Lengkap & Gelar</label>
-                                <input type="text" name="certificate_signer1_name" value="Prof. Dr. Iskandar Nazari, S.Ag., M.Pd., M.S.I., M.H., Ph.D." class="w-full p-2 rounded-lg border border-slate-300 text-xs bg-white">
-                            </div>
-                            <div>
-                                <label class="block text-[11px] text-slate-600 mb-1">Jabatan Resmi (Label Atas Tanda Tangan)</label>
-                                <input type="text" name="certificate_signer1_role" value="Founder & Direktur Ruhiology Institute" class="w-full p-2 rounded-lg border border-slate-300 text-xs bg-white">
-                            </div>
-                            <div>
-                                <label class="block text-[11px] text-slate-600 mb-1">File Tanda Tangan / QR Code (.png transparan atau gambar)</label>
-                                <input type="file" name="signer1_sig_file" accept="image/*" class="w-full text-xs p-1 rounded-lg border border-slate-300 bg-white">
-                            </div>
-                        </div>
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">2. Penandatangan & Identitas Mitra</h3>
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                            </svg>
+                            Penandatangan Tunggal Resmi
+                        </span>
+                    </div>
 
-                        <!-- Signer 2: Partner / School -->
-                        <div class="p-4 bg-slate-50/70 rounded-2xl border border-slate-200/80 space-y-3">
-                            <span class="text-xs font-bold text-slate-800 block">Tanda Tangan 2: Pimpinan Mitra / Sekolah <span class="text-[10px] text-slate-400 font-normal">(Opsional)</span></span>
-                            <div>
-                                <label class="block text-[11px] text-slate-600 mb-1">Nama Lengkap & Gelar (Kosongkan jika hanya 1 TTD)</label>
-                                <input type="text" name="certificate_signer2_name" placeholder="Kosongkan jika hanya Prof. Iskandar" class="w-full p-2 rounded-lg border border-slate-300 text-xs bg-white">
+                    <!-- Hidden fields to ensure single signer in database -->
+                    <input type="hidden" name="certificate_signer2_name" value="">
+                    <input type="hidden" name="certificate_signer2_role" value="">
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Signer: Prof. Dr. Iskandar Nazari (Founder & Direktur) -->
+                        <div class="md:col-span-2 p-4 bg-slate-50/70 rounded-2xl border border-slate-200/80 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                                    <svg class="w-4 h-4 text-[#0B2A43]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                    Pengesah Sertifikat: Founder & Direktur Ruhiology Institute
+                                </span>
+                                <span class="text-[10px] text-slate-400 font-medium">Prof. Dr. Iskandar Nazari</span>
                             </div>
-                            <div>
-                                <label class="block text-[11px] text-slate-600 mb-1">Jabatan Resmi</label>
-                                <input type="text" name="certificate_signer2_role" placeholder="Contoh: Kepala Sekolah SMAN TT" class="w-full p-2 rounded-lg border border-slate-300 text-xs bg-white">
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Nama Lengkap & Gelar</label>
+                                    <input type="text" name="certificate_signer1_name" value="Prof. Dr. Iskandar Nazari, S.Ag., M.Pd., M.S.I., M.H., Ph.D." class="w-full p-2.5 rounded-xl border border-slate-300 text-xs bg-white focus:border-[#0B2A43] focus:ring-1 focus:ring-[#0B2A43]">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Jabatan Resmi (Kop Tanda Tangan)</label>
+                                    <input type="text" name="certificate_signer1_role" value="Founder & Direktur Ruhiology Institute" class="w-full p-2.5 rounded-xl border border-slate-300 text-xs bg-white focus:border-[#0B2A43] focus:ring-1 focus:ring-[#0B2A43]">
+                                </div>
                             </div>
+
                             <div>
-                                <label class="block text-[11px] text-slate-600 mb-1">File Tanda Tangan Digital (.png transparan)</label>
-                                <input type="file" name="signer2_sig_file" accept="image/*" class="w-full text-xs p-1 rounded-lg border border-slate-300 bg-white">
+                                <label class="block text-[11px] font-semibold text-slate-600 mb-1">File Tanda Tangan / QR Code (.png transparan atau gambar digital)</label>
+                                <input type="file" name="signer1_sig_file" accept="image/*" class="w-full text-xs p-1.5 rounded-xl border border-slate-300 bg-white">
+                                <span class="text-[10px] text-slate-400 mt-1 block">Opsional. Jika dikosongkan, sistem secara otomatis menerbitkan QR code validasi digital resmi dengan identitas Prof. Dr. Iskandar Nazari.</span>
                             </div>
                         </div>
 
                         <!-- Partner Logo -->
-                        <div class="md:col-span-2 p-4 bg-slate-50/70 rounded-2xl border border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="p-4 bg-slate-50/70 rounded-2xl border border-slate-200/80 flex flex-col justify-between gap-3">
                             <div class="space-y-1">
-                                <span class="text-xs font-bold text-slate-800 block">Logo Mitra / Sekolah (Opsional)</span>
-                                <p class="text-[11px] text-slate-500">
-                                    Akan ditampilkan berdampingan dengan lambang resmi Ruhiology Institute di kop sertifikat.
+                                <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                                    <svg class="w-4 h-4 text-[#D4AF37]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                    </svg>
+                                    Logo Mitra (Opsional)
+                                </span>
+                                <p class="text-[11px] text-slate-500 leading-relaxed">
+                                    Logo instansi/sekolah mitra akan disandingkan dengan lambang resmi Ruhiology Institute di bagian kop sertifikat.
                                 </p>
                             </div>
                             <div>
-                                <input type="file" name="partner_logo_file" accept="image/*" class="text-xs p-1.5 rounded-xl border border-slate-300 bg-white">
+                                <input type="file" name="partner_logo_file" accept="image/*" class="w-full text-xs p-1.5 rounded-xl border border-slate-300 bg-white">
                             </div>
                         </div>
-
                     </div>
                 </div>
 
