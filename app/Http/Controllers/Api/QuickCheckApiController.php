@@ -33,11 +33,8 @@ class QuickCheckApiController extends Controller
         if ($submission) {
             $participant = $submission->participant;
         } else {
-            // 2. Search by assessment_code or participant_code
-            $participant = Participant::where('assessment_code', $codeUpper)
-                ->orWhere('participant_code', $codeUpper)
-                ->with(['university', 'school'])
-                ->first();
+            // 2. Search by phone, email, assessment_code or participant_code
+            $participant = Participant::findByIdentifier($code);
 
             if ($participant) {
                 $submission = AssessmentSubmission::where('participant_id', $participant->id)
@@ -51,7 +48,7 @@ class QuickCheckApiController extends Controller
         if (!$participant && !$submission) {
             return response()->json([
                 'found' => false,
-                'message' => 'Kode "' . e($code) . '" tidak ditemukan dalam sistem database. Silakan periksa kembali kode Anda.'
+                'message' => 'Data untuk "' . e($code) . '" tidak ditemukan dalam sistem database. Pastikan Nomor WhatsApp, Email, atau Kode Anda sudah benar.'
             ]);
         }
 

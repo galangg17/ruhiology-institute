@@ -197,4 +197,48 @@ class Participant extends Model
 
         return $inst;
     }
+
+    /**
+     * Find a participant by Phone Number, Email, Assessment Code, or Participant Code.
+     * Normalizes phone numbers (handles 08..., 628..., +628..., dashes, spaces).
+     */
+    public static function findByIdentifier(string $identifier, ?int $eventId = null, ?int $periodId = null): ?self
+    {
+        $raw = trim($identifier);
+        if (empty($raw)) {
+            return null;
+        }
+
+        $query = self::query();
+
+        // 1. If it looks like an email
+        if (filter_var($raw, FILTER_VALIDATE_EMAIL) || str_contains($raw, '@')) {
+            $query->where('email', strtolower($raw));
+        } else {
+            // 2. Extract digits for phone comparison
+            $digits = preg_replace('/\D/', '', $raw);
+            $corePhone = null;
+            if (strlen($digits) >= 8) {
+                // Strip leading 62 or 0
+                $corePhone = preg_replace('/^(62|0)/', '', $digits);
+            }
+
+            $query->where(function ($q) use ($raw, $corePhone) {
+                $q->where('assessment_code', strtoupper($raw))
+                  ->orWhere('participant_code', strtoupper($raw))
+                  ->orWhere('phone', $raw);
+
+                if (!empty($corePhone)) {
+                    $q->orWhere('phone', 'LIKE', '%' . $corePhone);
+                }
+            });
+        }
+
+        // If eventId specified, prioritize matching that event
+        if ($eventId) {
+            $query->orderByRaw('CASE WHEN event_id = ? THEN 0 ELSE 1 END', [$eventId]);
+        }
+
+        return $query->latest('id')->first();
+    }
 }

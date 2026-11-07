@@ -197,10 +197,16 @@
                 </p>
             </div>
             <div class="flex flex-wrap gap-2.5 w-full md:w-auto">
-                <a href="{{ route('assessment.certificate', $submission->submission_code) }}" target="_blank" class="flex-1 md:flex-none justify-center px-4 py-2.5 bg-[#B5945B] hover:bg-[#A3834B] text-white text-xs font-semibold rounded-xl shadow-xs transition cursor-pointer flex items-center gap-2 min-h-[42px]">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
-                    <span>{{ $isEn ? 'Official Certificate' : 'Sertifikat Resmi' }}</span>
-                </a>
+                @if(strtolower($submission->submission_type) === 'posttest' || empty($submission->event_id))
+                    <a href="{{ route('assessment.certificate', $submission->submission_code) }}" target="_blank" class="flex-1 md:flex-none justify-center px-4 py-2.5 bg-[#B5945B] hover:bg-[#A3834B] text-white text-xs font-semibold rounded-xl shadow-xs transition cursor-pointer flex items-center gap-2 min-h-[42px]">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+                        <span>{{ $isEn ? 'Official Certificate' : 'Sertifikat Resmi' }}</span>
+                    </a>
+                @else
+                    <div class="flex-1 md:flex-none justify-center px-3.5 py-2.5 bg-white/10 text-slate-300 text-[11px] font-semibold rounded-xl border border-white/20 flex items-center gap-1.5 min-h-[42px]">
+                        <span>🎓 Sertifikat Terbit Pasca Post-Test</span>
+                    </div>
+                @endif
                 <button @click="openStoryModal()" class="flex-1 md:flex-none justify-center px-4 py-2.5 bg-white/10 hover:bg-white/15 text-white border border-white/20 text-xs font-semibold rounded-xl transition cursor-pointer flex items-center gap-2 min-h-[42px]">
                     <svg class="w-4 h-4 text-[#C5A059]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
                     <span>{{ $isEn ? 'Social Card (IG/WA)' : 'Kartu Sosmed (IG/WA)' }}</span>
@@ -220,6 +226,22 @@
         @if(session('success'))
             <div class="p-4 bg-emerald-50 text-emerald-900 text-xs font-semibold rounded-2xl border border-emerald-200 shadow-2xs flex items-center justify-between no-print">
                 <span>{{ session('success') }}</span>
+            </div>
+        @endif
+
+        @if(strtolower($submission->submission_type) === 'pretest' && ($submission->event_id || $submission->access_type === 'EVENT_PROGRAM'))
+            <div class="p-5 bg-gradient-to-r from-sky-50 to-blue-50 border border-sky-200 rounded-2xl shadow-2xs space-y-2 no-print">
+                <div class="flex items-center gap-2 text-sky-950 font-bold text-sm">
+                    <span class="text-xl">✅</span>
+                    <span>Sesi Pretest Anda Telah Berhasil Disimpan</span>
+                </div>
+                <p class="text-xs text-sky-900 leading-relaxed font-normal">
+                    Terima kasih, <strong>{{ $submission->participant->name }}</strong>. Hasil pengukuran baseline awal Anda telah tuntas tersimpan di database Ruhiology Institute. Silakan ikuti seluruh rangkaian kegiatan. Sesi <strong>Post-Test</strong> beserta penerbitan <strong>Sertifikat Pelatihan Resmi</strong> akan dibuka saat evaluasi akhir program.
+                </p>
+                <div class="pt-1 flex items-center gap-2 text-[11px] text-sky-700 font-medium">
+                    <span class="font-bold">💡 Pengingat:</span>
+                    <span>Cukup gunakan nomor WhatsApp Anda <strong>({{ $submission->participant->phone ?: $submission->participant->email }})</strong> untuk membuka sesi Post-Test nanti.</span>
+                </div>
             </div>
         @endif
         

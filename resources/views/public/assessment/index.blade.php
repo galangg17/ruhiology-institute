@@ -35,6 +35,12 @@ window.rqAssessmentIndex = function rqAssessmentIndex() {
         appLocale: '{{ app()->getLocale() }}',
         participantCategoriesList: @json($participantCategories ?? []),
 
+        eventSessionTab: new URLSearchParams(window.location.search).get('type') === 'posttest' ? 'posttest' : 'pretest',
+        posttestIdentifier: '',
+        posttestChecking: false,
+        posttestStatus: null,
+        posttestError: '',
+
         form: {
             event_code: new URLSearchParams(window.location.search).get('event') || '',
             instrument_id: '',
@@ -412,6 +418,44 @@ window.rqAssessmentIndex = function rqAssessmentIndex() {
             });
         },
 
+        checkPosttestStatus() {
+            const id = (this.posttestIdentifier || '').trim();
+            if (!id) {
+                this.posttestError = 'Mohon masukkan nomor WhatsApp atau Email Anda.';
+                this.posttestStatus = null;
+                return;
+            }
+            this.posttestChecking = true;
+            this.posttestError = '';
+            this.posttestStatus = null;
+
+            fetch('{{ route("api.assessment.check_status") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    identifier: id,
+                    event_code: this.eventCode || ''
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                this.posttestChecking = false;
+                if (data.found) {
+                    this.posttestStatus = data;
+                } else {
+                    this.posttestError = data.message || 'Data tidak ditemukan. Pastikan nomor/email sama saat mendaftar Pretest.';
+                }
+            })
+            .catch(err => {
+                this.posttestChecking = false;
+                this.posttestError = 'Terjadi kesalahan jaringan. Silakan coba kembali.';
+            });
+        },
+
         copyCode() {
             navigator.clipboard.writeText(this.generatedCode);
             this.copied = true;
@@ -496,39 +540,270 @@ document.addEventListener('alpine:init', () => {
         </div>
     </section>
 
-    <!-- EXISTING PARTICIPANT CODE ACCESS SECTION -->
-    <section class="py-12">
-        <div class="max-w-[1280px] mx-auto px-6 sm:px-10">
-            <div class="bg-white rounded-3xl p-8 border border-slate-200/80 shadow-sm max-w-3xl mx-auto space-y-6">
-                <div class="flex items-center justify-between border-b border-slate-100 pb-4">
-                    <div>
-                        <h3 class="font-serif font-bold text-lg text-[#0B2A43]">{{ $isEn ? 'Already Have an Assessment or Participant Code?' : 'Punya Kode Peserta / Kode Assessment Lama?' }}</h3>
-                        <p class="text-xs text-slate-500 font-normal mt-0.5">{{ $isEn ? 'Enter your code below to directly access your Pretest/Posttest session.' : 'Masukkan kode Anda di bawah ini untuk verifikasi langsung ke sesi Pretest/Posttest.' }}</p>
+    <!-- MAIN ACCESS PATHWAYS (EVENT VS MANDIRI) -->
+    <section class="py-10 sm:py-14">
+        <div class="max-w-[1280px] mx-auto px-4 sm:px-10">
+
+            <!-- A. EVENT MODE ACTIVE BANNER & PRETEST/POSTTEST TABS -->
+            <template x-if="eventCode">
+                <div class="bg-white rounded-3xl p-6 sm:p-10 border-2 border-[#0B2A43]/15 shadow-xl max-w-4xl mx-auto space-y-6">
+                    <!-- Event Header Bar -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
+                        <div class="space-y-1">
+                            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-[#0B2A43] text-[#C9A24D] border border-[#C9A24D]/30">
+                                <span>✦ SESI PELATIHAN RESMI TERDAFTAR</span>
+                            </div>
+                            <h2 class="text-xl sm:text-2xl font-serif font-bold text-[#0B2A43]" x-text="eventName || eventCode"></h2>
+                            <p class="text-xs text-slate-500 font-medium flex items-center gap-2">
+                                <span x-text="eventInstitution || 'Instansi Mitra Ruhiology Institute'"></span>
+                                <span class="text-slate-300">•</span>
+                                <span class="font-mono font-bold text-[#0B2A43]" x-text="'Kode: ' + eventCode"></span>
+                            </p>
+                        </div>
+                        <button type="button" @click="eventCode = ''; inputEventCode = '';" class="self-start sm:self-auto text-xs text-slate-400 hover:text-slate-700 underline font-medium cursor-pointer">
+                            Ganti Event / Keluar Mode Event
+                        </button>
                     </div>
-                    <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">{{ $isEn ? 'Active Session' : 'Sesi Aktif' }}</span>
+
+                    <!-- 2 Big Tabs: Pretest vs Posttest -->
+                    <div class="grid grid-cols-2 p-1.5 bg-slate-100/80 rounded-2xl gap-1">
+                        <button type="button" @click="eventSessionTab = 'pretest'" 
+                                :class="eventSessionTab === 'pretest' ? 'bg-[#0B2A43] text-[#C9A24D] shadow-md font-bold' : 'text-slate-600 hover:text-slate-900 font-semibold'"
+                                class="py-3 px-4 rounded-xl text-xs sm:text-sm transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer">
+                            <span>📝</span>
+                            <span>1. SESI PRETEST (Awal)</span>
+                        </button>
+                        <button type="button" @click="eventSessionTab = 'posttest'" 
+                                :class="eventSessionTab === 'posttest' ? 'bg-[#0B2A43] text-[#C9A24D] shadow-md font-bold' : 'text-slate-600 hover:text-slate-900 font-semibold'"
+                                class="py-3 px-4 rounded-xl text-xs sm:text-sm transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer">
+                            <span>🎯</span>
+                            <span>2. SESI POSTTEST (Akhir)</span>
+                        </button>
+                    </div>
+
+                    <!-- TAB 1: PRETEST PANEL -->
+                    <div x-show="eventSessionTab === 'pretest'" x-cloak class="space-y-6 pt-2">
+                        <div class="p-5 bg-sky-50/70 border border-sky-100 rounded-2xl flex items-start gap-3.5">
+                            <span class="text-2xl">💡</span>
+                            <div class="space-y-1 text-xs text-slate-700 leading-relaxed">
+                                <strong class="text-sky-900 block font-semibold text-sm">Petunjuk Pengisian Pretest</strong>
+                                <p>Sesi Pretest dilakukan sebelum materi kegiatan/pelatihan dimulai untuk memetakan capaian awal kesadaran ruhiologi Anda. Peserta baru diwajibkan melengkapi profil identitas diri.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 bg-[#FAF9F6] border border-[#EAE6DF] rounded-2xl">
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-sm">Belum Mengisi Data Pretest?</h4>
+                                <p class="text-xs text-slate-500 mt-0.5">Daftarkan profil diri Anda sekali saja untuk mendapatkan nomor peserta resmi.</p>
+                            </div>
+                            <button type="button" @click="openRegistrationModal('EVENT_PROGRAM')" class="w-full sm:w-auto px-6 py-3 bg-[#0B2A43] hover:bg-[#123B59] text-[#C9A24D] font-bold rounded-xl text-xs shadow-md transition cursor-pointer flex items-center justify-center gap-2">
+                                <span>📝 Mulai Isi Pretest Sekarang</span>
+                                <span>→</span>
+                            </button>
+                        </div>
+
+                        <!-- Resume Pretest form -->
+                        <div class="pt-4 border-t border-slate-100 space-y-3">
+                            <span class="text-xs font-bold text-slate-700 block">Sudah pernah isi profil tapi sesi tertutup? Lanjutkan di sini:</span>
+                            <form action="{{ route('assessment.verify') }}" method="POST" class="flex flex-col sm:flex-row gap-3">
+                                @csrf
+                                <input type="hidden" name="type" value="pretest">
+                                <input type="hidden" name="event_code" :value="eventCode">
+                                <input type="hidden" name="period_code" value="{{ $defaultPeriod->period_code ?? 'RQI-PERIOD-2026' }}">
+                                <input type="text" name="identifier" required placeholder="Masukkan Nomor WhatsApp atau Email Anda" class="flex-1 p-3 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-[#0B2A43] outline-none bg-white">
+                                <button type="submit" class="px-5 py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl transition cursor-pointer">
+                                    Lanjut Pretest →
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: POSTTEST PANEL -->
+                    <div x-show="eventSessionTab === 'posttest'" x-cloak class="space-y-6 pt-2">
+                        <div class="p-5 bg-emerald-50/70 border border-emerald-100 rounded-2xl flex items-start gap-3.5">
+                            <span class="text-2xl">🎓</span>
+                            <div class="space-y-1 text-xs text-slate-700 leading-relaxed">
+                                <strong class="text-emerald-900 block font-semibold text-sm">Petunjuk Pengisian Posttest & Sertifikat</strong>
+                                <p>Sesi Post-Test dilakukan setelah rangkaian pelatihan selesai untuk mengukur perkembangan Anda. <strong>Cukup masukkan Nomor WhatsApp atau Email</strong> yang Anda gunakan saat Pretest.</p>
+                            </div>
+                        </div>
+
+                        <form action="{{ route('assessment.verify') }}" method="POST" class="space-y-4">
+                            @csrf
+                            <input type="hidden" name="type" value="posttest">
+                            <input type="hidden" name="event_code" :value="eventCode">
+                            <input type="hidden" name="period_code" value="{{ $defaultPeriod->period_code ?? 'RQI-PERIOD-2026' }}">
+
+                            <div>
+                                <label class="block font-bold text-slate-800 text-xs mb-1.5">
+                                    Nomor WhatsApp atau Email Anda <span class="text-rose-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <input type="text" name="identifier" x-model="posttestIdentifier" @input.debounce.500ms="checkPosttestStatus()" required 
+                                           placeholder="Contoh: 08123456789 atau email@domain.com" 
+                                           class="w-full p-3.5 rounded-xl border-2 border-slate-300 focus:border-[#0B2A43] focus:ring-2 focus:ring-[#0B2A43]/20 text-sm outline-none font-medium bg-white">
+                                    <template x-if="posttestChecking">
+                                        <div class="absolute right-3.5 top-3.5 text-xs text-slate-400 flex items-center gap-1.5">
+                                            <span class="animate-spin">⏳</span> Memeriksa...
+                                        </div>
+                                    </template>
+                                </div>
+                                <span class="text-[11px] text-slate-400 mt-1 block">Pastikan nomor/email persis sama seperti saat Anda mengisi formulir Pretest.</span>
+                            </div>
+
+                            <!-- Live Feedback Status Box -->
+                            <template x-if="posttestStatus">
+                                <div class="p-4 rounded-xl text-xs space-y-2 border transition-all"
+                                     :class="posttestStatus.status === 'all_completed' ? 'bg-amber-50 border-amber-200 text-amber-900' : 'bg-emerald-50 border-emerald-200 text-emerald-900'">
+                                    <div class="flex items-center justify-between font-bold">
+                                        <span x-text="'✓ Data Ditemukan: ' + posttestStatus.participant_name"></span>
+                                        <span class="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-white/70" x-text="posttestStatus.institution || 'Mitra Event'"></span>
+                                    </div>
+                                    <template x-if="posttestStatus.status === 'pretest_completed'">
+                                        <p class="text-[11px] text-emerald-700">Pretest selesai pada tanggal <strong x-text="posttestStatus.pretest_date"></strong>. Anda berhak mengikuti sesi Posttest sekarang!</p>
+                                    </template>
+                                    <template x-if="posttestStatus.status === 'all_completed'">
+                                        <div class="space-y-1">
+                                            <p class="text-[11px] text-amber-800">Anda telah menyelesaikan Pretest & Posttest. Sertifikat resmi Anda siap diunduh.</p>
+                                            <a :href="posttestStatus.result_url" class="inline-flex items-center gap-1.5 font-bold text-[#0B2A43] underline hover:text-[#B48A16]">
+                                                <span>Lihat Hasil & Unduh Sertifikat</span> <span>→</span>
+                                            </a>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+
+                            <template x-if="posttestError">
+                                <div class="p-3.5 bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-xl flex items-center gap-2">
+                                    <span>⚠️</span>
+                                    <span x-text="posttestError"></span>
+                                </div>
+                            </template>
+
+                            <button type="submit" class="w-full py-3.5 px-6 bg-[#0B2A43] hover:bg-[#123B59] text-[#C9A24D] font-bold rounded-xl text-sm shadow-md transition cursor-pointer flex items-center justify-center gap-2">
+                                <span>🚀 Mulai Pengerjaan Post-Test & Klaim Sertifikat</span>
+                                <span>→</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </template>
+
+            <!-- B. PUBLIC MODE: 2 PATHWAYS (EVENT VS MANDIRI) -->
+            <template x-if="!eventCode">
+                <div class="space-y-10">
+                    <div class="text-center max-w-2xl mx-auto space-y-2">
+                        <span class="text-xs font-mono font-bold text-[#C9A24D] uppercase tracking-wider block">PILIH JALUR ASESMEN</span>
+                        <h2 class="text-2xl sm:text-3xl font-serif font-bold text-[#0B2A43]">Silakan Pilih Jalur Kepesertaan Anda</h2>
+                        <p class="text-xs sm:text-sm text-slate-500 font-normal">Apakah Anda mengikuti pelatihan bersama mitra/sekolah, atau ingin melakukan asesmen kesadaran jiwa secara mandiri?</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                        
+                        <!-- CARD 1: PESERTA EVENT / PELATIHAN -->
+                        <div class="bg-white rounded-3xl p-6 sm:p-8 border-2 border-slate-200/90 hover:border-[#0B2A43] transition-all shadow-sm hover:shadow-xl flex flex-col justify-between space-y-6 group">
+                            <div class="space-y-4">
+                                <div class="w-14 h-14 rounded-2xl bg-[#0B2A43] text-[#C9A24D] flex items-center justify-center text-2xl shadow-md group-hover:scale-105 transition-transform">
+                                    🏛️
+                                </div>
+                                <div class="space-y-1">
+                                    <span class="text-[10px] font-mono font-bold text-sky-600 bg-sky-50 px-2.5 py-0.5 rounded-full border border-sky-200 uppercase tracking-wide">Pelatihan & Mitra Institusi</span>
+                                    <h3 class="text-lg font-serif font-bold text-[#0B2A43]">Peserta Event / Mitra</h3>
+                                    <p class="text-xs text-slate-500 leading-relaxed">
+                                        Untuk peserta seminar, workshop, sekolah, kampus, atau instansi mitra. Dilengkapi sistem <strong>Pretest & Posttest</strong> serta <strong>Sertifikat Pelatihan Resmi</strong> bertanda tangan Prof. Dr. Iskandar Nazari.
+                                    </p>
+                                </div>
+                                <ul class="text-xs text-slate-600 space-y-1.5 pt-2 border-t border-slate-100">
+                                    <li class="flex items-center gap-2">
+                                        <span class="text-emerald-500 font-bold">✓</span> Evaluasi Longitudinal (Pre vs Post)
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <span class="text-emerald-500 font-bold">✓</span> Sertifikat Pelatihan Resmi Ber-QR
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <span class="text-emerald-500 font-bold">✓</span> Akses Mudah Cukup Nomor WhatsApp
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <button type="button" @click="openEventSelectorModal()" class="w-full py-3.5 px-4 bg-[#0B2A43] hover:bg-[#123B59] text-[#C9A24D] font-bold rounded-2xl text-xs transition cursor-pointer flex items-center justify-center gap-2 shadow-sm">
+                                <span>Pilih Event / Masukkan Kode Event</span>
+                                <span>→</span>
+                            </button>
+                        </div>
+
+                        <!-- CARD 2: PESERTA MANDIRI (PUBLIK) -->
+                        <div class="bg-white rounded-3xl p-6 sm:p-8 border-2 border-[#C9A24D]/40 hover:border-[#C9A24D] transition-all shadow-sm hover:shadow-xl flex flex-col justify-between space-y-6 group relative overflow-hidden">
+                            <div class="absolute -top-10 -right-10 w-28 h-28 bg-[#C9A24D]/10 rounded-full blur-xl pointer-events-none"></div>
+
+                            <div class="space-y-4">
+                                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#C9A24D] to-[#B48A16] text-[#0B2A43] flex items-center justify-center text-2xl shadow-md group-hover:scale-105 transition-transform">
+                                    🌱
+                                </div>
+                                <div class="space-y-1">
+                                    <span class="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 uppercase tracking-wide">Personal Self-Checkup</span>
+                                    <h3 class="text-lg font-serif font-bold text-[#0B2A43]">Peserta Mandiri (Umum)</h3>
+                                    <p class="text-xs text-slate-500 leading-relaxed">
+                                        Untuk masyarakat umum, akademisi, dan profesional yang ingin melakukan <strong>skrining kesadaran spiritual & kesehatan emosional pribadi</strong> secara mandiri dalam 1 sesi lengkap.
+                                    </p>
+                                </div>
+                                <ul class="text-xs text-slate-600 space-y-1.5 pt-2 border-t border-slate-100">
+                                    <li class="flex items-center gap-2">
+                                        <span class="text-emerald-500 font-bold">✓</span> 1x Sesi Asesmen Lengkap Langsung Tuntas
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <span class="text-emerald-500 font-bold">✓</span> Grafik Radar 6 Dimensi (RQI-15 & WHO-5)
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <span class="text-emerald-500 font-bold">✓</span> Rapor Refleksi Diri & Kartu Sosial Media
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <button type="button" @click="openRegistrationModal('PUBLIC_SELF')" class="w-full py-3.5 px-4 bg-gradient-to-r from-[#C9A24D] to-[#B48A16] hover:from-[#B48A16] hover:to-[#96710E] text-[#0B2A43] font-extrabold rounded-2xl text-xs transition cursor-pointer flex items-center justify-center gap-2 shadow-md">
+                                <span>Mulai Asesmen Mandiri Sekarang</span>
+                                <span>→</span>
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </template>
+
+            <!-- C. UNIVERSAL QUICK LOOKUP (CEK HASIL & UNDUH SERTIFIKAT TANPA KODE ACAK) -->
+            <div class="mt-12 bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm max-w-4xl mx-auto space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-2">
+                    <div>
+                        <h3 class="font-serif font-bold text-base sm:text-lg text-[#0B2A43]">Sudah Pernah Mengerjakan? Cek Hasil & Unduh Sertifikat</h3>
+                        <p class="text-xs text-slate-500 font-normal">Cukup masukkan Nomor WhatsApp atau Email yang Anda daftarkan sebelumnya.</p>
+                    </div>
+                    <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200 self-start sm:self-auto">
+                        ✓ Verifikasi Cepat
+                    </span>
                 </div>
 
-                <form action="{{ route('assessment.verify') }}" method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-sans">
+                <form action="{{ route('assessment.verify') }}" method="POST" class="grid grid-cols-1 sm:grid-cols-12 gap-3 text-xs">
                     @csrf
-                    <div>
-                        <label class="block font-bold text-slate-700 mb-1">{{ $isEn ? 'Assessment / Participant Code' : 'Kode Assessment / Peserta' }}</label>
-                        <input type="text" name="participant_code" required placeholder="{{ $isEn ? 'Example: RQI-7F82K9' : 'Contoh: RQI-7F82K9' }}" class="w-full p-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none font-medium">
+                    <div class="sm:col-span-6">
+                        <label class="block font-bold text-slate-700 mb-1">Nomor WhatsApp atau Email</label>
+                        <input type="text" name="identifier" required placeholder="Contoh: 08123456789 atau email@domain.com" class="w-full p-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none font-medium bg-white">
                     </div>
-                    <div>
-                        <label class="block font-bold text-slate-700 mb-1">{{ $isEn ? 'Session Type' : 'Tipe Sesi' }}</label>
+                    <div class="sm:col-span-3">
+                        <label class="block font-bold text-slate-700 mb-1">Pilihan Sesi</label>
                         <select name="type" class="w-full p-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#0B2A43] outline-none font-medium bg-slate-50">
-                            <option value="pretest">{{ $isEn ? 'PRETEST (Initial Baseline)' : 'PRETEST (Pengukuran Awal)' }}</option>
-                            <option value="posttest">{{ $isEn ? 'POSTTEST (Final Evaluation)' : 'POSTTEST (Evaluasi Akhir)' }}</option>
+                            <option value="posttest">POSTTEST / Hasil Akhir</option>
+                            <option value="pretest">PRETEST (Awal)</option>
                         </select>
                     </div>
                     <input type="hidden" name="period_code" value="{{ $defaultPeriod->period_code ?? 'RQI-PERIOD-2026' }}">
-                    <div class="flex items-end">
-                        <button type="submit" class="w-full py-3 px-4 bg-[#0B2A43] hover:bg-[#123B59] text-white font-bold rounded-xl shadow transition-colors cursor-pointer">
-                            {{ $isEn ? 'Enter Session →' : 'Masuk Sesi →' }}
+                    <div class="sm:col-span-3 flex items-end">
+                        <button type="submit" class="w-full py-3 px-4 bg-[#0B2A43] hover:bg-[#123B59] text-[#C9A24D] font-bold rounded-xl shadow transition-colors cursor-pointer text-center">
+                            Buka Sesi / Hasil →
                         </button>
                     </div>
                 </form>
             </div>
+
         </div>
     </section>
 

@@ -46,6 +46,7 @@ Route::prefix('api/master')->group(function () {
 });
 
 Route::post('/api/assessment/quick-check', [QuickCheckApiController::class, 'check'])->name('api.assessment.quick_check');
+Route::post('/api/assessment/check-status', [PublicAssessmentController::class, 'checkParticipantStatus'])->name('api.assessment.check_status');
 Route::post('/api/events/verify', [PublicAssessmentController::class, 'verifyEventCode'])->name('api.events.verify');
 
 

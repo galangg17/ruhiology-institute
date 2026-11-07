@@ -282,41 +282,82 @@ class PublicAssessmentController extends Controller
         $safeEntryYear = !empty($validated['entry_year']) ? mb_substr(trim((string) $validated['entry_year']), 0, 10) : null;
         $safeSubCategory = !empty($subCategory) ? mb_substr(trim((string) $subCategory), 0, 250) : null;
 
-        $participant = Participant::create([
-            'event_id' => $eventId,
-            'access_type' => $accessType,
-            'participant_code' => $participantCode,
-            'assessment_code' => $assessmentCode,
-            'user_id' => Auth::id(),
-            'name' => trim($validated['name']),
-            'birth_date' => $validated['birth_date'],
-            'gender' => $validated['gender'] ?? 'Laki-laki',
-            'phone' => $validated['phone'] ?? null,
-            'phone_country_code' => $validated['phone_country_code'] ?? '+62',
-            'category' => $validated['category'],
-            'sub_category' => $safeSubCategory,
-            'email' => $email,
-            'country_id' => $countryId,
-            'country_code' => $validated['country_code'] ?? ($isInternational ? 'INT' : 'ID'),
-            'country_name' => $validated['country_name'] ?? ($isInternational ? 'International' : 'Indonesia'),
-            'state_custom' => $validated['state_custom'] ?? null,
-            'city_custom' => $validated['city_custom'] ?? null,
-            'province_id' => $validated['province_id'] ?? null,
-            'regency_id' => $validated['regency_id'] ?? null,
-            'school_id' => null,
-            'school_custom' => $schoolCustom ? mb_substr(trim((string) $schoolCustom), 0, 250) : null,
-            'university_id' => null,
-            'university_custom' => $universityCustom ? mb_substr(trim((string) $universityCustom), 0, 250) : null,
-            'faculty_id' => $validated['faculty_id'] ?? null,
-            'study_program_id' => $validated['study_program_id'] ?? null,
-            'school_level' => $safeSchoolLevel,
-            'school_class' => $safeSchoolClass,
-            'semester' => $validated['semester'] ?? null,
-            'entry_year' => $safeEntryYear,
-            'occupation_id' => $validated['occupation_id'] ?? null,
-            'occupation_custom' => !empty($detailInst) ? mb_substr(trim((string) $detailInst), 0, 250) : ($validated['occupation_custom'] ?? null),
-            'status' => 'active',
-        ]);
+        // Check if participant already registered with this phone/email in this event to avoid duplicate records
+        $participant = null;
+        if (!empty($validated['phone']) || !empty($email)) {
+            $existingQuery = Participant::query();
+            if ($eventId) {
+                $existingQuery->where('event_id', $eventId);
+            } else {
+                $existingQuery->whereNull('event_id');
+            }
+
+            $existingQuery->where(function ($q) use ($validated, $email) {
+                if (!empty($validated['phone'])) {
+                    $digits = preg_replace('/\D/', '', $validated['phone']);
+                    $core = preg_replace('/^(62|0)/', '', $digits);
+                    $q->where('phone', $validated['phone']);
+                    if (!empty($core) && strlen($core) >= 8) {
+                        $q->orWhere('phone', 'LIKE', '%' . $core);
+                    }
+                }
+                if (!empty($email) && !str_contains($email, '@ruhiologyinstitute.com')) {
+                    $q->orWhere('email', strtolower($email));
+                }
+            });
+
+            $participant = $existingQuery->latest('id')->first();
+        }
+
+        if ($participant) {
+            // Update profile with newest details
+            $participant->update([
+                'name' => trim($validated['name']),
+                'birth_date' => $validated['birth_date'] ?? $participant->birth_date,
+                'gender' => $validated['gender'] ?? $participant->gender,
+                'category' => $validated['category'] ?? $participant->category,
+                'sub_category' => $safeSubCategory ?: $participant->sub_category,
+                'school_custom' => $schoolCustom ?: $participant->school_custom,
+                'university_custom' => $universityCustom ?: $participant->university_custom,
+                'status' => 'active',
+            ]);
+        } else {
+            $participant = Participant::create([
+                'event_id' => $eventId,
+                'access_type' => $accessType,
+                'participant_code' => $participantCode,
+                'assessment_code' => $assessmentCode,
+                'user_id' => Auth::id(),
+                'name' => trim($validated['name']),
+                'birth_date' => $validated['birth_date'],
+                'gender' => $validated['gender'] ?? 'Laki-laki',
+                'phone' => $validated['phone'] ?? null,
+                'phone_country_code' => $validated['phone_country_code'] ?? '+62',
+                'category' => $validated['category'],
+                'sub_category' => $safeSubCategory,
+                'email' => $email,
+                'country_id' => $countryId,
+                'country_code' => $validated['country_code'] ?? ($isInternational ? 'INT' : 'ID'),
+                'country_name' => $validated['country_name'] ?? ($isInternational ? 'International' : 'Indonesia'),
+                'state_custom' => $validated['state_custom'] ?? null,
+                'city_custom' => $validated['city_custom'] ?? null,
+                'province_id' => $validated['province_id'] ?? null,
+                'regency_id' => $validated['regency_id'] ?? null,
+                'school_id' => null,
+                'school_custom' => $schoolCustom ? mb_substr(trim((string) $schoolCustom), 0, 250) : null,
+                'university_id' => null,
+                'university_custom' => $universityCustom ? mb_substr(trim((string) $universityCustom), 0, 250) : null,
+                'faculty_id' => $validated['faculty_id'] ?? null,
+                'study_program_id' => $validated['study_program_id'] ?? null,
+                'school_level' => $safeSchoolLevel,
+                'school_class' => $safeSchoolClass,
+                'semester' => $validated['semester'] ?? null,
+                'entry_year' => $safeEntryYear,
+                'occupation_id' => $validated['occupation_id'] ?? null,
+                'occupation_custom' => !empty($detailInst) ? mb_substr(trim((string) $detailInst), 0, 250) : ($validated['occupation_custom'] ?? null),
+                'status' => 'active',
+            ]);
+        }
 
         // Auto intake session for Pre-test
         session([
@@ -348,36 +389,117 @@ class PublicAssessmentController extends Controller
 
     public function verify(Request $request)
     {
-        $validated = $request->validate([
-            'participant_code' => ['required', 'string'],
-            'period_code' => ['required', 'string'],
-            'type' => ['required', 'in:pretest,posttest'],
-        ]);
-
-        $code = trim($validated['participant_code']);
-        
-        // Lookup by assessment_code OR participant_code
-        $participant = Participant::where('assessment_code', $code)
-            ->orWhere('participant_code', $code)
-            ->first();
-
-        if (!$participant) {
-            return back()->with('error', 'Kode Assessment / Peserta tidak ditemukan dalam database.')->withInput();
+        $inputIdentifier = $request->input('identifier') ?? $request->input('participant_code');
+        if (empty($inputIdentifier)) {
+            return back()->with('error', 'Silakan masukkan Nomor WhatsApp, Email, atau Kode Peserta Anda.')->withInput();
         }
 
+        $type = $request->input('type', 'posttest');
+        if (!in_array($type, ['pretest', 'posttest'])) {
+            $type = 'posttest';
+        }
+
+        $eventCode = trim((string) $request->input('event_code'));
+        $eventId = null;
+        if (!empty($eventCode)) {
+            $event = \App\Models\Event::where('event_code', strtoupper($eventCode))->first();
+            if ($event) {
+                $eventId = $event->id;
+            }
+        }
+
+        // 1. Lookup participant by Phone, Email, or Code
+        $participant = Participant::findByIdentifier($inputIdentifier, $eventId);
+
+        if (!$participant) {
+            $msg = ($type === 'posttest')
+                ? 'Nomor WhatsApp atau Email belum terdaftar pada sesi Pretest. Pastikan nomor/email yang Anda masukkan persis sama saat mendaftar Pretest.'
+                : 'Data kepesertaan tidak ditemukan. Silakan lakukan pendaftaran terlebih dahulu.';
+            return back()->with('error', $msg)->withInput();
+        }
+
+        // 2. Resolve Period
+        $periodCode = $request->input('period_code');
+        $period = null;
+
+        if (!empty($periodCode)) {
+            $period = AssessmentPeriod::where('period_code', $periodCode)->first();
+        }
+
+        if (!$period && $participant->event_id) {
+            $ev = $participant->event;
+            if ($ev && $ev->instrument_id) {
+                $period = AssessmentPeriod::where('instrument_id', $ev->instrument_id)->where('status', 'active')->first();
+            }
+        }
+
+        if (!$period) {
+            $prevSub = AssessmentSubmission::where('participant_id', $participant->id)->latest('id')->first();
+            if ($prevSub && $prevSub->period) {
+                $period = $prevSub->period;
+            }
+        }
+
+        if (!$period) {
+            $period = AssessmentPeriod::where('status', 'active')->first();
+        }
+
+        if (!$period) {
+            return back()->with('error', 'Periode asesmen aktif tidak ditemukan.')->withInput();
+        }
+
+        // 3. Smart Handling: If participant already finished this session type
+        $existing = AssessmentSubmission::where('period_id', $period->id)
+            ->where('participant_id', $participant->id)
+            ->where('submission_type', $type)
+            ->where('status', 'submitted')
+            ->first();
+
+        if ($existing) {
+            if ($type === 'posttest') {
+                return redirect()->route('assessment.result', $existing->submission_code)
+                    ->with('success', 'Selamat datang kembali, ' . $participant->name . '! Anda telah menyelesaikan seluruh sesi Post-Test. Berikut laporan evaluasi dan sertifikat resmi Anda.');
+            } else {
+                $existingPost = AssessmentSubmission::where('period_id', $period->id)
+                    ->where('participant_id', $participant->id)
+                    ->where('submission_type', 'posttest')
+                    ->where('status', 'submitted')
+                    ->first();
+
+                if ($existingPost) {
+                    return redirect()->route('assessment.result', $existingPost->submission_code)
+                        ->with('success', 'Halo ' . $participant->name . ', Anda telah menyelesaikan Pretest & Posttest. Berikut adalah sertifikat dan hasil lengkap Anda.');
+                }
+
+                return back()->with('info', 'Halo ' . $participant->name . ', Anda telah menyelesaikan sesi PRETEST pada ' . ($existing->submitted_at ? $existing->submitted_at->format('d/m/Y') : '') . '. Silakan pilih sesi POSTTEST untuk melanjutkan evaluasi akhir.')->withInput();
+            }
+        }
+
+        // 4. Validate Pretest requirement for Posttest
+        if ($type === 'posttest') {
+            $hasPretest = AssessmentSubmission::where('period_id', $period->id)
+                ->where('participant_id', $participant->id)
+                ->where('submission_type', 'pretest')
+                ->where('status', 'submitted')
+                ->exists();
+
+            if (!$hasPretest) {
+                return back()->with('error', 'Halo ' . $participant->name . ', Anda wajib menyelesaikan sesi PRETEST terlebih dahulu sebelum dapat mengakses POSTTEST.')->withInput();
+            }
+        }
+
+        // 5. Eligibility Check
         $check = $this->assessmentService->validateEligibility(
             $participant->participant_code,
-            $validated['period_code'],
-            $validated['type']
+            $period->period_code,
+            $type
         );
 
         if (!$check['eligible']) {
             return back()->with('error', $check['message'])->withInput();
         }
 
-        $period = $check['period'];
-        $type = $validated['type'];
-
+        // 6. Set intake session and redirect to take
         session([
             'assessment_intake' => [
                 'participant_id' => $participant->id,
@@ -389,6 +511,60 @@ class PublicAssessmentController extends Controller
         return redirect()->route('assessment.take', [
             'period_code' => $period->period_code,
             'type' => $type,
+        ]);
+    }
+
+    public function checkParticipantStatus(Request $request)
+    {
+        $identifier = trim((string) $request->input('identifier'));
+        if (empty($identifier)) {
+            return response()->json(['found' => false, 'message' => 'Masukkan nomor WhatsApp atau Email.']);
+        }
+
+        $eventCode = trim((string) $request->input('event_code'));
+        $eventId = null;
+        if (!empty($eventCode)) {
+            $evt = \App\Models\Event::where('event_code', strtoupper($eventCode))->first();
+            $eventId = $evt?->id;
+        }
+
+        $participant = Participant::findByIdentifier($identifier, $eventId);
+        if (!$participant) {
+            return response()->json([
+                'found' => false,
+                'message' => 'Data tidak ditemukan. Pastikan Nomor WhatsApp atau Email persis sama saat mendaftar.'
+            ]);
+        }
+
+        $pretest = AssessmentSubmission::where('participant_id', $participant->id)
+            ->where('submission_type', 'pretest')
+            ->where('status', 'submitted')
+            ->latest()
+            ->first();
+
+        $posttest = AssessmentSubmission::where('participant_id', $participant->id)
+            ->where('submission_type', 'posttest')
+            ->where('status', 'submitted')
+            ->latest()
+            ->first();
+
+        $status = 'not_started';
+        if ($pretest && $posttest) {
+            $status = 'all_completed';
+        } elseif ($pretest) {
+            $status = 'pretest_completed';
+        }
+
+        return response()->json([
+            'found' => true,
+            'participant_name' => $participant->name,
+            'institution' => $participant->resolved_institution,
+            'status' => $status,
+            'has_pretest' => (bool) $pretest,
+            'pretest_date' => $pretest ? $pretest->submitted_at?->format('d/m/Y') : null,
+            'has_posttest' => (bool) $posttest,
+            'posttest_date' => $posttest ? $posttest->submitted_at?->format('d/m/Y') : null,
+            'result_url' => $posttest ? route('assessment.result', $posttest->submission_code) : null,
         ]);
     }
 
