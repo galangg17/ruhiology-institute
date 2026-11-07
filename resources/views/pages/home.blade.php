@@ -557,6 +557,73 @@
         </div>
     </section>
 
+    <!-- SECTION: LEGALITAS & BADAN HUKUM RESMI (PT SAMUDRA INSPIRASI RUHIOLOGI) -->
+    <section id="legalitas" class="py-14 sm:py-20 bg-[#FAF9F6] border-b border-slate-200/80 scroll-mt-20 relative overflow-hidden">
+        <!-- Subtle Ambient Gold Glow -->
+        <div class="absolute -top-24 -right-24 w-96 h-96 bg-[#C9A24D]/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-[#0B2A43]/5 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-[1280px] mx-auto px-4 sm:px-10">
+            <div class="bg-gradient-to-br from-[#0B2A43] via-[#0F3759] to-[#071E30] rounded-3xl p-6 sm:p-12 text-white border-2 border-[#C9A24D]/40 shadow-2xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-80 h-80 bg-[#C9A24D]/10 rounded-full blur-2xl pointer-events-none"></div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+                    <div class="lg:col-span-8 space-y-4">
+                        <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-[11px] font-mono font-bold bg-[#C9A24D]/20 text-[#C9A24D] border border-[#C9A24D]/40 uppercase tracking-widest">
+                            <span>⚖️ LEGALITAS & BADAN HUKUM RESMI</span>
+                        </div>
+
+                        <h2 class="font-serif text-2xl sm:text-4xl font-bold text-white tracking-tight leading-tight">
+                            PT SAMUDRA INSPIRASI RUHIOLOGI
+                        </h2>
+
+                        <p class="text-xs sm:text-sm text-slate-200 leading-relaxed font-normal">
+                            <strong>PT SAMUDRA INSPIRASI RUHIOLOGI</strong> adalah badan hukum perseroan resmi yang bergerak di bidang pengembangan sumber daya manusia, literasi spiritual, dan layanan konseling psikologi berbasis Kecerdasan Ruhiologi <em>(Ruhiology Quotient / RQ)</em>. Didirikan dengan legalitas resmi <strong>Kementerian Hukum RI Nomor AHU-042084.AH.01.30.Tahun 2025</strong>, kami hadir sebagai unit strategis di bawah ekosistem <strong>Ruhiology Institute</strong> untuk mentransformasi intelektualitas manusia modern agar selaras dengan kejernihan jiwa.
+                        </p>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-xs">
+                            <div class="flex items-center gap-2.5 p-3 rounded-xl bg-white/10 border border-white/10">
+                                <span class="text-emerald-400 font-bold text-sm">✓</span>
+                                <span class="text-slate-200">Legalitas Resmi Kemenkum RI Terdaftar</span>
+                            </div>
+                            <div class="flex items-center gap-2.5 p-3 rounded-xl bg-white/10 border border-white/10">
+                                <span class="text-[#C9A24D] font-bold text-sm">✓</span>
+                                <span class="text-slate-200">Pengembangan SDM & Pelatihan Karakter</span>
+                            </div>
+                            <div class="flex items-center gap-2.5 p-3 rounded-xl bg-white/10 border border-white/10">
+                                <span class="text-sky-400 font-bold text-sm">✓</span>
+                                <span class="text-slate-200">Literasi Spiritual & Publikasi Ilmiah</span>
+                            </div>
+                            <div class="flex items-center gap-2.5 p-3 rounded-xl bg-white/10 border border-white/10">
+                                <span class="text-amber-400 font-bold text-sm">✓</span>
+                                <span class="text-slate-200">Layanan Konseling Psikologi Berbasis RQ</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-4 bg-white/10 p-6 rounded-2xl border border-white/15 backdrop-blur-md space-y-4 text-center">
+                        <div class="w-16 h-16 mx-auto rounded-2xl bg-[#C9A24D]/20 text-[#C9A24D] flex items-center justify-center text-3xl border border-[#C9A24D]/40 shadow-inner">
+                            🏛️
+                        </div>
+                        <div class="space-y-1">
+                            <span class="text-[10px] font-mono text-[#C9A24D] font-bold uppercase tracking-widest block">NOMOR SK PENGESAHAN</span>
+                            <div class="font-mono font-bold text-xs sm:text-sm text-white tracking-wider bg-[#071E30]/80 py-2.5 px-3 rounded-xl border border-[#C9A24D]/30 select-all shadow-xs">
+                                AHU-042084.AH.01.30.Tahun 2025
+                            </div>
+                        </div>
+                        <p class="text-[11px] text-slate-300">
+                            Kementerian Hukum Republik Indonesia
+                        </p>
+                        <div class="pt-2 border-t border-white/10 flex items-center justify-center gap-2 text-[10px] text-emerald-400 font-medium">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <span>Badan Hukum Perseroan Aktif & Sah</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- SECTION: INSTITUTIONAL PARTNERS SHOWCASE (DYNAMIC ANIMATED MARQUEE TICKER) -->
     <section class="py-12 bg-white border-b border-slate-200/80 overflow-hidden">
         <style>

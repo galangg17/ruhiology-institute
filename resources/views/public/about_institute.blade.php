@@ -59,6 +59,29 @@
             </p>
         </section>
 
+        <!-- Badan Hukum & Legalitas Resmi -->
+        <section class="space-y-4 bg-white p-8 rounded-3xl border-2 border-slate-200/80 shadow-md">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                <h3 class="text-xl font-black font-sans text-[#1B4332]">{{ $isEn ? 'Official Legal Entity' : 'Badan Hukum & Legalitas Resmi' }}</h3>
+                <span class="text-[11px] font-mono font-bold px-3 py-1 bg-emerald-50 text-emerald-800 rounded-full border border-emerald-200">Kemenkum RI</span>
+            </div>
+            <div class="space-y-3 text-xs text-slate-700 leading-relaxed font-medium">
+                <p>
+                    <strong>PT SAMUDRA INSPIRASI RUHIOLOGI</strong> adalah badan hukum perseroan resmi yang bergerak di bidang pengembangan sumber daya manusia, literasi spiritual, dan layanan konseling psikologi berbasis Kecerdasan Ruhiologi <em>(Ruhiology Quotient / RQ)</em>.
+                </p>
+                <div class="p-4 bg-[#FAF9F6] border border-[#EAE6DF] rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <span class="text-[10px] text-slate-400 font-mono uppercase block">Legalitas Resmi SK Kementerian Hukum RI</span>
+                        <strong class="text-sm font-mono text-[#0B2A43]">Nomor AHU-042084.AH.01.30.Tahun 2025</strong>
+                    </div>
+                    <span class="text-xs font-bold text-[#B48A16]">Unit Strategis Ekosistem Ruhiology Institute</span>
+                </div>
+                <p>
+                    Hadir sebagai unit strategis di bawah ekosistem Ruhiology Institute untuk mentransformasi intelektualitas manusia modern agar selaras dengan kejernihan jiwa.
+                </p>
+            </div>
+        </section>
+
     </div>
 </div>
 @endsection

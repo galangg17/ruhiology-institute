@@ -237,7 +237,7 @@
                 <div>
                     <h2 class="font-cinzel font-bold text-lg tracking-wider text-[#0B2A43] leading-none">RUHIOLOGY INSTITUTE</h2>
                     <p class="text-[9px] uppercase tracking-widest text-[#B48A16] font-semibold mt-1">Center for Spiritual & Human Potential Development</p>
-                    <p class="text-[8px] text-slate-400">SK Kemenkumham RI No. AHU-0012948.AH.01.04 • www.ruhiology-institute.site</p>
+                    <p class="text-[8px] text-slate-400">SK Kementerian Hukum RI No. AHU-042084.AH.01.30.Tahun 2025 • www.ruhiology-institute.site</p>
                 </div>
             </div>
 
@@ -512,7 +512,7 @@
         <div class="relative z-10 pt-2 border-t border-slate-200/90 px-6 sm:px-8 flex items-end justify-between text-xs">
             <div class="text-[9px] text-slate-500 max-w-sm leading-relaxed">
                 <p><strong>Catatan Legalitas:</strong></p>
-                <p>Dokumen ini merupakan lampiran kurikulum materi resmi dan tak terpisahkan dari lembar sertifikat utama ber-QR digital dengan nomor seri registrasi <strong>{{ $response->clean_certificate_number }}</strong>.</p>
+                <p>Diterbitkan oleh PT SAMUDRA INSPIRASI RUHIOLOGI (Ruhiology Institute) berdasarkan SK Kementerian Hukum RI No. AHU-042084.AH.01.30.Tahun 2025. Dokumen ini merupakan lampiran kurikulum materi resmi dan tak terpisahkan dari lembar sertifikat utama ber-QR digital dengan nomor seri registrasi <strong>{{ $response->clean_certificate_number }}</strong>.</p>
             </div>
 
             <div class="text-center w-72">

@@ -492,6 +492,10 @@
                                   :class="theme === 'dark' ? 'text-slate-400' : 'text-slate-500'">
                                 Tanggal Terbit: {{ $submission->submitted_at ? $submission->submitted_at->translatedFormat('d F Y') : date('d F Y') }}
                             </span>
+                            <span class="block text-[7.5px] font-mono tracking-tight"
+                                  :class="theme === 'dark' ? 'text-slate-500' : 'text-slate-400'">
+                                SK Kemenkum RI: AHU-042084.AH.01.30.Tahun 2025
+                            </span>
                         </div>
 
                         <!-- BOTTOM CENTER: MINIMALIST ARCHITECTURAL DRY-EMBOSS SEAL -->

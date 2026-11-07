@@ -116,6 +116,24 @@
 
         </div>
 
+        <!-- Legal Entity Notice (PT SAMUDRA INSPIRASI RUHIOLOGI) -->
+        <div class="mb-8 p-4 bg-slate-900/80 rounded-2xl border border-slate-800 text-xs text-slate-400 leading-relaxed flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#C9A24D]/15 text-[#C9A24D] border border-[#C9A24D]/30">
+                        ⚖️ LEGALITAS RESMI
+                    </span>
+                    <strong class="text-white text-xs">PT SAMUDRA INSPIRASI RUHIOLOGI</strong>
+                </div>
+                <p class="text-[11px] text-slate-400 leading-relaxed">
+                    Badan hukum perseroan resmi pengembang SDM, literasi spiritual, dan layanan konseling psikologi berbasis Ruhiology Quotient (RQ) di bawah ekosistem Ruhiology Institute.
+                </p>
+            </div>
+            <div class="shrink-0 bg-[#071E30] px-3.5 py-2 rounded-xl border border-slate-700 font-mono text-[11px] text-[#C9A24D] font-bold">
+                SK Kemenkum RI: AHU-042084.AH.01.30.Tahun 2025
+            </div>
+        </div>
+
         <!-- Bottom Line -->
         <div class="pt-8 border-t border-slate-800/80 flex flex-col md:flex-row justify-between items-center text-[11px] text-slate-500 font-medium gap-4">
             <p>&copy; 2026 Ruhiology Institute. {{ $isEn ? 'All rights reserved.' : 'Hak cipta dilindungi undang-undang.' }}</p>
